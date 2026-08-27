@@ -1,0 +1,87 @@
+identifier: gitlab
+name: GitLab
+description: View GitLab pipelines, merge requests, languages and contributors.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: ImmobiliareLabs
+category: Source Control Mgmt
+source: https://github.com/immobiliare/backstage-plugin-gitlab
+iconUrl: https://about.gitlab.com/images/press/logo/png/gitlab-icon-rgb.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/gitlab/
+config: |-
+  gitlab:
+    defaultCodeOwnersPath: .gitlab/CODEOWNERS
+    defaultReadmePath: .gitlab/README.md
+    allowedKinds: ['Component', 'Resource']
+    proxySecure: false
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityGitlabPeopleCard
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabPeopleCard
+        specs:
+          gridProps:
+            md: 3
+    - type: CARD
+      name: EntityGitlabLanguageCard
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabLanguageCard
+        specs:
+          gridProps:
+            md: 3
+    - type: CARD
+      name: EntityGitlabMergeRequestStatsCard
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabMergeRequestStatsCard
+        specs:
+          gridProps:
+            md: 3
+    - type: CARD
+      name: EntityGitlabReleasesCard
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabReleasesCard
+        specs:
+          gridProps:
+            md: 3
+    - type: CARD
+      name: EntityGitlabReadmeCard
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabReadmeCard
+        specs:
+          gridProps:
+            md: 3
+    - type: CARD
+      name: EntityGitlabPipelinesTable
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabPipelinesTable
+        specs:
+          gridProps:
+            md: 12
+    - type: CARD
+      name: EntityGitlabMergeRequestsTable
+      addByDefault: false
+      layoutSchemaSpecs:
+        component: EntityGitlabMergeRequestsTable
+        specs:
+          gridProps:
+            md: 12
+    - type: TAB_CONTENT
+      name: EntityGitlabContent
+      addByDefault: true
+      defaultRoute: /gitlab
+      layoutSchemaSpecs:
+        name: EntityGitlabContent
+        title: Gitlab
+        contents:
+          - component: EntityGitlabContent

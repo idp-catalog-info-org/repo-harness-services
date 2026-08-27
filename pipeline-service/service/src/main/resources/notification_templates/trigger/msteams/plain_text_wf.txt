@@ -1,0 +1,61 @@
+{
+   "type": "message",
+   "attachments": [
+      {
+         "contentType": "application/vnd.microsoft.card.adaptive",
+         "content": {
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
+               {
+                  "type": "Image",
+                  "url": "https://s3.amazonaws.com/wings-assets/slackicons/${IMAGE_STATUS}.png",
+                  "size": "Small"
+               },
+               {
+                  "type": "TextBlock",
+                  "size": "Medium",
+                  "weight": "Bolder",
+                  "text": "Pipeline [${PIPELINE}](${PIPELINE_URL}) failed to start",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "In Org ${ORG}",
+                  "isSubtle": true,
+                  "wrap": true
+               },
+               {
+                  "type": "FactSet",
+                  "facts": [
+                     {
+                           "name": "Pipeline",
+                           "value": "${PIPELINE}"
+                     },
+                     {
+                           "name": "Project",
+                           "value": "${PROJECT}"
+                     },
+                     {
+                           "name": "Events",
+                           "value": "Triggered on ${START_DATE}"
+                     },
+                     {
+                           "name": "ActivityHistory",
+                           "value": "[${TRIGGER}](${TRIGGER_ACTIVITY_URL})"
+                     },
+                  ]
+               }
+            ],
+            "actions": [
+               {
+                  "type": "Action.OpenUrl",
+                  "title": "View Activity History Details",
+                  "url": "${TRIGGER_ACTIVITY_URL}"
+               }
+            ]
+         }
+      }
+   ]
+}

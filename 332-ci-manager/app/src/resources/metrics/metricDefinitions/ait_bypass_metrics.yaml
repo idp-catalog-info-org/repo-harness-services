@@ -1,0 +1,8 @@
+name: CI AIT Bypass Metrics
+identifier: CIAitBypassMetrics
+metricGroup: CIAitBypassMetricsGroup
+metrics:
+  - metricName: ait_ci_bypass_decision
+    metricDefinition: AIT CI license bypass decision count
+    type: Count
+    unit: "1"

@@ -1,0 +1,64 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.idp.scorecard.datasourcelocations.locations.scm.github;
+
+import static io.harness.idp.common.Constants.DEFAULT_BRANCH_KEY;
+import static io.harness.idp.scorecard.datapoints.constants.Inputs.BRANCH_NAME;
+import static io.harness.idp.scorecard.datasourcelocations.constants.DataSourceLocations.REPO_SCM;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.idp.scorecard.common.GithubCommonUtils;
+import io.harness.idp.scorecard.datapoints.entity.DataPointEntity;
+import io.harness.idp.scorecard.datasourcelocations.locations.scm.ScmBaseDslNoLoop;
+import io.harness.spec.server.idp.v1.model.InputValue;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@OwnedBy(HarnessTeam.IDP)
+public class GithubMeanTimeToMergePRDsl extends ScmBaseDslNoLoop {
+  private static final String REPOSITORY_BRANCH_NAME_REPLACER = "{REPOSITORY_BRANCH_NAME_REPLACER}";
+
+  @Override
+  protected String replaceUrlPlaceholdersIfAny(String url, Map<String, String> replaceableUrls) {
+    url = GithubCommonUtils.constructGraphQLUrl(replaceableUrls.get(REPO_SCM));
+    return super.replaceUrlPlaceholdersIfAny(url, replaceableUrls);
+  }
+
+  @Override
+  protected String replaceInputValuePlaceholdersIfAnyInRequestUrl(
+      String url, DataPointEntity dataPoint, List<InputValue> inputValues) {
+    return url;
+  }
+
+  @Override
+  public String replaceInputValuePlaceholdersIfAnyInRequestBody(
+      String requestBody, DataPointEntity dataPoint, List<InputValue> inputValues, Object entity) {
+    Optional<InputValue> inputValueOpt =
+        inputValues.stream().filter(inputValue -> inputValue.getKey().equals(BRANCH_NAME)).findFirst();
+    if (inputValueOpt.isPresent()) {
+      String inputValue = inputValueOpt.get().getValue();
+      inputValue = inputValue.replace("\"", "");
+      if (!inputValue.isEmpty()) {
+        if (!inputValue.equals(DEFAULT_BRANCH_KEY)) {
+          requestBody = requestBody.replace(REPOSITORY_BRANCH_NAME_REPLACER,
+              ",baseRefName:"
+                  + "\\"
+                  + "\"" + inputValue + "\\"
+                  + "\"");
+        } else {
+          requestBody = requestBody.replace(REPOSITORY_BRANCH_NAME_REPLACER, "");
+        }
+      }
+    }
+
+    return requestBody;
+  }
+}

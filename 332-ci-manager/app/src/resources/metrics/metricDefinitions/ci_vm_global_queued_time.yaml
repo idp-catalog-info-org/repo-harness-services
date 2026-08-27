@@ -1,0 +1,9 @@
+name: CI Manager VM Global Queued Time
+identifier: CIManagerVMGlobalQueuedTime
+metricGroup: CIManagerVMGlobalQueuedTimeGroup
+metrics:
+  - metricName: ci_vm_global_queued_time
+    metricDefinition: Time a VM Stage spends being queued due to waiting on resources
+    type: Duration
+    distribution: [ 0m, 1m, 5m, 10m, 15m, 30m, 60m, 120m, 240m ]
+    unit: "ms"

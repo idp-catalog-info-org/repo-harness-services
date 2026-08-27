@@ -1,0 +1,112 @@
+stages:
+  - stage:
+      identifier: cdxd
+      type: Custom
+      name: cdxd
+      description: ""
+      spec:
+        execution:
+          steps:
+            - step:
+                identifier: Wait_1
+                type: Wait
+                name: Wait_1
+                spec:
+                  duration: 10s
+            - insert:
+                identifier: inject12
+                name: inject12
+                steps:
+                  - step:
+                      identifier: shell1
+                      type: ShellScript
+                      name: shell1
+                      spec:
+                        shell: Bash
+                        executionTarget: {}
+                        source:
+                          type: Inline
+                          spec:
+                            script: ter
+                        environmentVariables: []
+                        outputVariables: []
+                      timeout: 10m
+                      failureStrategies:
+                        - onFailure:
+                            errors:
+                              - AllErrors
+                            action:
+                              type: Ignore
+                  - step:
+                      identifier: shell12
+                      type: ShellScript
+                      name: shell12
+                      spec:
+                        shell: Bash
+                        executionTarget: {}
+                        source:
+                          type: Inline
+                          spec:
+                            script: ter
+                        environmentVariables: []
+                        outputVariables: []
+                      timeout: 10m
+                      failureStrategies:
+                        - onFailure:
+                            errors:
+                              - AllErrors
+                            action:
+                              type: Ignore
+            - step:
+                identifier: ShellScript_1
+                type: ShellScript
+                name: ShellScript_1
+                spec:
+                  shell: Bash
+                  executionTarget: {}
+                  source:
+                    type: Inline
+                    spec:
+                      script: exit 1
+                  environmentVariables: []
+                  outputVariables: []
+                timeout: 10m
+                failureStrategies:
+                  - onFailure:
+                      errors:
+                        - AllErrors
+                      action:
+                        type: Ignore
+      tags: {}
+  - insert:
+      identifier: inject
+      name: inject
+      stages:
+        - stage:
+            identifier: fdsf1
+            type: Custom
+            name: fdsf1
+            description: ""
+            spec:
+              execution:
+                steps:
+                  - step:
+                      identifier: baharWait
+                      type: Wait
+                      name: baharWait
+                      spec:
+                        duration: 10s
+        - stage:
+            identifier: fdsf2
+            type: Custom
+            name: fdsf2
+            description: ""
+            spec:
+              execution:
+                steps:
+                  - step:
+                      identifier: baharWait2
+                      type: Wait
+                      name: baharWait2
+                      spec:
+                        duration: 10s

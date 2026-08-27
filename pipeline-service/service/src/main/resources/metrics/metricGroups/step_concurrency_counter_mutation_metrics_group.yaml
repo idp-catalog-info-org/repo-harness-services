@@ -1,0 +1,7 @@
+name: Step Concurrency Counter Mutation Metrics Group
+identifier: StepConcurrencyCounterMutationMetricsGroup
+labels:
+  - scope
+  - operation
+  - accountId
+  - outcome

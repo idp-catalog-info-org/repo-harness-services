@@ -1,0 +1,68 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.service;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/ambiance/ambiance.proto";
+import "io/harness/pms/contracts/plan/plan_node_proto.proto";
+import "google/protobuf/any.proto";
+
+service EngineExpressionProtoService {
+  rpc renderExpression(ExpressionRenderBlobRequest) returns (ExpressionRenderBlobResponse);
+  rpc evaluateExpression(ExpressionEvaluateBlobRequest) returns (ExpressionEvaluateBlobResponse);
+
+  // This grpc method can be used to resolve expression by passing your context map, it takes ambiance as optional
+  // parameter.
+  rpc resolveExpressionWithContext(ExpressionResolveWithContextRequest) returns (ExpressionResolveWithContextResponse);
+
+  // Resolves an expression using the ambiance retrieved from a node execution. The server fetches the NodeExecution
+  // by ID, extracts the Ambiance, and delegates to the standard expression resolution logic.
+  rpc renderExpressionByNodeExecutionId(ExpressionRenderByNodeExecutionIdRequest)
+      returns (ExpressionRenderBlobResponse);
+}
+
+message ExpressionRenderBlobRequest {
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 1;
+  string expression = 2;
+  bool skipUnresolvedExpressionsCheck = 3;
+  io.harness.pms.contracts.plan.ExpressionMode expressionMode = 4;
+}
+
+message ExpressionRenderBlobResponse {
+  string value = 1;
+}
+
+message ExpressionEvaluateBlobRequest {
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 1;
+  string expression = 2;
+  io.harness.pms.contracts.plan.ExpressionMode expressionMode = 3;
+  // Added boolean to see if new recast flow for primitives needs to be handled or not
+  bool newRecastFlow = 4;
+}
+
+message ExpressionEvaluateBlobResponse {
+  string value = 1;
+}
+
+message ExpressionResolveWithContextRequest {
+  string expression = 1;
+  io.harness.pms.contracts.plan.ExpressionMode expressionMode = 2;
+  map<string, string> context = 3;
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 4;
+}
+
+message ExpressionResolveWithContextResponse {
+  string value = 1;
+}
+
+message ExpressionRenderByNodeExecutionIdRequest {
+  string node_execution_id = 1;
+  string expression = 2;
+  io.harness.pms.contracts.plan.ExpressionMode expressionMode = 3;
+}

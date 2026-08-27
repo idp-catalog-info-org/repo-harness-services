@@ -1,0 +1,50 @@
+# Copyright 2023 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["**/*.java"]),
+    resources = [],
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//958-migration-sdk:module",
+        "//959-psql-database-models:module",
+        "//960-persistence/src/main/java/io/harness/ng:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//999-annotations:module",
+        "//clients/access-control/admin-client/src/main/java/io/harness/accesscontrol:module",
+        "//clients/access-control/admin-client/src/main/java/io/harness/accesscontrol/migration:module",
+        "//clients/resource-group:module",
+        "//idp-service/modules/clients:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/entities:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/helpers:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/repositories:module",
+        "//idp-service/src/main/java/io/harness/idp/ccp/service:module",
+        "//idp-service/src/main/java/io/harness/idp/configmanager/entities:module",
+        "//idp-service/src/main/java/io/harness/idp/configmanager/service:module",
+        "//idp-service/src/main/java/io/harness/idp/groups/service:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/entities:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/repositories:module",
+        "//idp-service/src/main/java/io/harness/idp/integrations/helpers:module",
+        "//idp-service/src/main/java/io/harness/idp/integrations/service:module",
+        "//idp-service/src/main/java/io/harness/idp/layout/repositories:module",
+        "//idp-service/src/main/java/io/harness/idp/license:module",
+        "//idp-service/src/main/java/io/harness/idp/onboarding:module",
+        "//idp-service/src/main/java/io/harness/idp/personaview:module",
+        "//idp-service/src/main/java/io/harness/idp/personaview/service:module",
+        "//idp-service/src/main/java/io/harness/idp/proxy/layout:module",
+        "//idp-service/src/main/java/io/harness/idp/scorecard:module",
+        "//idp-service/src/main/java/io/harness/idp/settings:module",
+        "//idp-service/src/main/java/io/harness/idp/user:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:io_dropwizard_dropwizard_lifecycle",
+    ],
+)

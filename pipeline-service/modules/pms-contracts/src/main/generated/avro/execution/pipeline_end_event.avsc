@@ -1,0 +1,76 @@
+/*
+ * Copyright 2025 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2025/03/PolyForm-Free-Trial-1.0.0.txt.
+ */
+{
+  "type": "record",
+  "name": "PipelineEventAvro",
+  "namespace": "io.harness.pms.contracts.execution",
+  "fields": [
+    { "name": "level", "type": "string" },
+    { "name": "accountIdentifier", "type": "string" },
+    { "name": "orgIdentifier", "type": "string" },
+    { "name": "projectIdentifier", "type": "string" },
+    { "name": "parentUniqueId", "type": ["null", "string"], "default": null },
+    { "name": "pipelineIdentifier", "type": "string" },
+    { "name": "pipelineName", "type": "string" },
+    { "name": "planExecutionId", "type": "string" },
+    { "name": "executionUrl", "type": "string" },
+    { "name": "status", "type": "string" },
+    { "name": "eventType", "type": ["null", "string"], "default": null },
+    { "name": "createdAt", "type": "string" },
+    { "name": "startTs", "type": "string" },
+    { "name": "lastModifiedAt", "type": "string" },
+    { "name": "endTs", "type": "string" },
+    { "name": "duration", "type": "string" },
+    {
+      "name": "failureInfo",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "FailureInfoAvro",
+          "fields": [
+            {
+              "name": "failureData",
+              "type": [
+                "null",
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "record",
+                    "name": "FailureDataAvro",
+                    "fields": [
+                      { "name": "code", "type": ["null", "string"], "default": null },
+                      { "name": "level", "type": ["null", "string"], "default": null },
+                      { "name": "message", "type": ["null", "string"], "default": null },
+                      { "name": "failureType", "type": ["null", "string"], "default": null },
+                      { "name": "failureSubType", "type": ["null", "string"], "default": null }
+                    ]
+                  }
+                }
+              ],
+              "default": null
+            }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "tags",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": "string"
+        }
+      ],
+      "default": null
+    }
+    ,
+    { "name": "failureInfoJson", "type": ["null", "string"], "default": null }
+  ]
+}

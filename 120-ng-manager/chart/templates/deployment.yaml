@@ -1,0 +1,232 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ng-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: ng-manager
+    {{- include "ng-manager.labels" . | nindent 4 }}
+    {{- if .Values.global.commonLabels }}
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.progressDeadlineSeconds }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  {{- end }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- if .Values.updateStrategy }}
+  strategy: {{- toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ng-manager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.global.commonAnnotations }}
+        {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- include "harnesscommon.monitoring.annotations" . | nindent 8 }}
+      labels:
+        app: ng-manager
+        {{- include "ng-manager.selectorLabels" . | nindent 8 }}
+        {{- if .Values.global.commonLabels }}
+        {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.podLabels }}
+        {{- include "harnesscommon.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+       {{- include "ng-manager.pullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "ng-manager.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 180
+      initContainers:
+        {{- include "harnesscommon.secretsLoader.initContainer" (dict "ctx" $) | nindent 8 }}
+        {{- include "harnesscommon.jfr.v1.initContainer" (dict "ctx" $) | nindent 8 }}
+        {{ include "harnesscommon.initContainer.waitForContainer" (dict "root" . "appName" "harness-manager") | nindent 8}}
+        {{ include "harnesscommon.initContainer.waitForContainer" (dict "root" . "appName" "pipeline-service") | nindent 8}}
+        {{- if and .Values.securityContext .Values.securityContext.readOnlyRootFilesystem }}
+          {{ include "harnesscommon.initContainer.setupWritable" (dict "root" . "destinationPath" "/shared/volume" "sourcePath" "/opt/harness" "volumeName" "harness-opt") | nindent 8 }}
+        {{- end }}
+      containers:
+      - name: ng-manager
+        image: {{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if eq (include "harnesscommon.secretsLoader.enabled" (dict "ctx" $)) "true" }}
+        args: {{- include "harnesscommon.secretsLoader.args" (dict "ctx" $) | nindent 12 }}
+        {{- end }}          
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        ports:
+        - name: http-ng-manager
+          containerPort: {{ .Values.service.port }}
+          protocol: "TCP"
+        - name: grpc-ng-manager
+          containerPort: {{ .Values.service.grpcport }}
+          protocol: "TCP"
+        - name: grpc-git-sync
+          containerPort: {{ .Values.service.gitsyncgrpcport }}
+          protocol: "TCP"
+        {{- include "harnesscommon.monitoring.containerPort" . | nindent 8 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+            {{- include "harnesscommon.jfr.v1.renderEnvironmentVars" (dict "ctx" $)  | indent 12 }}
+            {{- if eq (include "harnesscommon.secretsLoader.enabled" (dict "ctx" $)) "false" }}
+            {{- include "harnesscommon.renderSecretsAsEnvironmentVariables" (dict "ctx" $) | indent 12 }}
+            {{- include "harnesscommon.secrets.manageSMTPEnv" (dict "ctx" $) | indent 12 }}
+            {{- $globalLicenseESOSecretIdentifier := include "harnesscommon.secrets.globalESOSecretCtxIdentifier" (dict "ctx" $  "ctxIdentifier" "license") }}
+            {{- $ngLicenseENV := include "harnesscommon.secrets.manageEnv" (dict "ctx" $ "variableName" "NG_LICENSE" "overrideEnvName" "SMP_LICENSE" "providedSecretValues" (list "global.license.ng") "extKubernetesSecretCtxs" (list .Values.global.license.secrets.kubernetesSecrets) "esoSecretCtxs" (list (dict "secretCtxIdentifier" $globalLicenseESOSecretIdentifier "secretCtx" .Values.global.license.secrets.secretManagement.externalSecretsOperator)))}}
+            {{- if $ngLicenseENV }}
+            - name: ENABLE_SMP_LICENSING
+              value: 'true'
+              {{- $ngLicenseENV | indent 12 }}
+            {{- end }}
+            {{- include "harnesscommon.dbv3.redisEnv" (dict "ctx" $ "database" "events" "userVariableName" "EVENTS_FRAMEWORK_REDIS_USERNAME" "passwordVariableName" "EVENTS_FRAMEWORK_REDIS_PASSWORD" ) | indent 12 }}
+            {{- include "harnesscommon.dbv3.redisEnv" (dict "ctx" $ "database" "lock" "userVariableName" "LOCK_CONFIG_REDIS_USERNAME" "passwordVariableName" "LOCK_CONFIG_REDIS_PASSWORD" ) | indent 12 }}
+            {{- include "harnesscommon.dbconnectionv2.timescaleEnv" (dict "ctx" $ "passwordVariableName" "TIMESCALE_PASSWORD" ) | indent 12 }}
+            {{- include "harnesscommon.dbconnectionv2.timescaleEnv" (dict "ctx" $ "userVariableName" "SECONDARY_TIMESCALEDB_USERNAME" "passwordVariableName" "SECONDARY_TIMESCALE_PASSWORD" "localTimescaleDBCtx" .Values.secondaryTimescaledb "additionalCtxIdentifier" "secondary-timescaledb") | indent 12 }}
+            {{- include "harnesscommon.dbv3.mongoEnv" (dict "ctx" $ "database" "ng-harness") | indent 12 }}
+            {{- include "harnesscommon.dbv3.mongoEnv" (dict "ctx" $ "database" "notifications") | indent 12 }}
+            {{- else }}
+            - name: ENABLE_SMP_LICENSING
+              value: 'true'
+            {{- end }}
+            {{- include "harnesscommon.dbv4.sslEnv" (dict "context" $ "dbType" "redis" "dbName" "events" "variableNames" ( dict "sslEnabled" "EVENTS_FRAMEWORK_REDIS_SSL_ENABLED" "sslCATrustStorePath" "EVENTS_FRAMEWORK_REDIS_SSL_CA_TRUST_STORE_PATH" "sslCATrustStorePassword" "EVENTS_FRAMEWORK_REDIS_SSL_CA_TRUST_STORE_PASSWORD")) | indent 12 }}
+            {{- include "harnesscommon.dbv4.sslEnv" (dict "context" $ "dbType" "redis" "dbName" "lock" "variableNames" ( dict "sslEnabled" "LOCK_CONFIG_REDIS_SSL_ENABLED" "sslCATrustStorePath" "LOCK_CONFIG_REDIS_SSL_CA_TRUST_STORE_PATH" "sslCATrustStorePassword" "LOCK_CONFIG_REDIS_SSL_CA_TRUST_STORE_PASSWORD")) | indent 12 }}
+            - name: TIMESCALE_URI
+              value: {{ include "harnesscommon.dbconnectionv2.timescaleConnection" (dict "protocol" "jdbc:postgresql" "database" "harness" "context" $) }}
+            - name: SECONDARY_TIMESCALE_URI
+              value: {{ include "harnesscommon.dbconnectionv3.timescaleConnection" (dict "protocol" "jdbc:postgresql" "database" "harness" "context" $ "localTimescaleDBCtx" .Values.secondaryTimescaledb ) }}
+            {{- if .Values.devopsEssentials.enabled }}
+            - name: ALLOYDB_URI
+              value: {{ include "harnesscommon.dbconnectionv2.postgresConnection" (dict "ctx" $ "database" "harness" "protocol" "jdbc:postgresql" "keywordValueConnectionString" false "setPasswordEmpty" true "setUsernameEmpty" true "globalDBCtx" .Values.global.database.alloydb "localDBCtx" .Values.database.alloydb.harness) }}
+            {{- if eq (include "harnesscommon.secretsLoader.enabled" (dict "ctx" $)) "false" }}
+            {{- include "harnesscommon.dbconnectionv3.postgresEnv" (dict "ctx" $ "userVariableName" "ALLOYDB_USERNAME" "passwordVariableName" "ALLOYDB_PASSWORD" "localDBCtx" .Values.database.alloydb.harness "additionalCtxIdentifier" "alloydb" "globalDBCtx" .Values.global.database.alloydb) | indent 12 }}
+            {{- end }}
+            {{- end }}
+            {{- include "harnesscommon.dbv3.mongoConnectionEnv" (dict "ctx" $ "database" "ng-harness" "connectionURIVariableName" "MONGO_URI") | indent 12 }}
+            {{- include "harnesscommon.dbv3.mongoConnectionEnv" (dict "ctx" $ "database" "notifications" "connectionURIVariableName" "NOTIFICATION_MONGO_URI") | indent 12 }}
+            {{- if .Values.extraEnvVars }}
+            {{- include "harnesscommon.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.global.ccm.enabled }}
+            - name: CE_AWS_DESTINATION_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: nextgen-ce
+                  key: AWS_DESTINATION_BUCKET
+            - name: CE_AWS_TEMPLATE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: nextgen-ce
+                  key: AWS_TEMPLATE_LINK
+            {{- end }}
+            - name: SMP_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: global-smp-config
+                  key: SMP_VERSION
+                  optional: true
+            - name: BILLING_METRICS_TOPIC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: billing-metrics-shared-config
+                  key: BILLING_METRICS_TOPIC_NAME
+                  optional: true
+        lifecycle: {{- include "harnesscommon.v1.renderLifecycleHooks" (dict "ctx" $) | nindent 12 }}
+        volumeMounts:
+        {{- include "harnesscommon.secretsLoader.volumeMounts" (dict "ctx" $) | nindent 8 }}
+        {{- if and .Values.securityContext .Values.securityContext.readOnlyRootFilesystem }}
+        {{ include "harnesscommon.volumeMounts" (dict "mounts" (list (dict "name" "harness-opt" "mountPath" "/opt/harness") (dict "name" "tmp" "mountPath" "/tmp")) ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.oidc.enabled }}
+        - name: oidc-config
+          mountPath: {{ .Values.config.OIDC_CONFIG_PATH }}
+        {{- end }}
+        {{- if .Values.licenseManager.enabled }}
+        - name: devops-essentials-config
+          mountPath: {{ .Values.config.DEVOPS_ESSENTIAL_CONFIG_PATH }}
+        {{- end }}
+        - name: cgi-config
+          mountPath: {{ .Values.config.CGI_TASK_CONFIG_PATH }}
+        - name: task-binary-config
+          mountPath: {{ .Values.config.TASK_BINARY_CONFIG_PATH }}
+        {{- include "harnesscommon.jfr.v1.volumeMounts" (dict "ctx" $) | indent 8 }}
+        {{- if eq (include "harnesscommon.secretsLoader.enabled" (dict "ctx" $)) "false" }}
+        {{- include "harnesscommon.mountRenderedSecretsAsVolumeMounts" (dict "ctx" $) | indent 8 }}
+        {{- end }}
+        {{- include "harnesscommon.dbv4.sslVolumeMount" (dict "context" $ "dbType" "redis" "dbName" "events") | nindent 8 }}
+        {{- include "harnesscommon.dbv4.sslVolumeMount" (dict "context" $ "dbType" "redis" "dbName" "lock") | nindent 8 }}
+        {{- if .Values.extraVolumeMounts }}
+        {{- include "harnesscommon.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: ng-manager
+        {{- toYaml .Values.probes | nindent 8}}
+        {{- if .Values.terminationMessage }}
+            {{- toYaml .Values.terminationMessage | nindent 8 }}
+          {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - ng-manager
+            topologyKey: "kubernetes.io/hostname"
+      {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- include "harnesscommon.secretsLoader.volumes" (dict "ctx" $) | nindent 8 }}
+      {{- if and .Values.securityContext .Values.securityContext.readOnlyRootFilesystem }}
+      {{ include "harnesscommon.volumes" (dict "volumes" (list (dict "name" "harness-opt" "type" "emptyDir") (dict "name" "tmp" "type" "emptyDir")) ) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.oidc.enabled }}
+        - name: oidc-config
+          configMap:
+            name: oidc-config-ng-manager
+      {{- end }}
+      {{- if .Values.licenseManager.enabled }}
+        - name: devops-essentials-config
+          configMap:
+            name: devops-essentials-config-ng-manager
+      {{- end }}
+        - name: cgi-config
+          configMap:
+            name: cgi-config-ng-manager
+        - name: task-binary-config
+          configMap:
+            name: task-binary-config-ng-manager
+      {{- if .Values.extraVolumes }}
+      {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.extraVolumes "context" $ ) | nindent 8 }}
+      {{- end }}
+      {{- include "harnesscommon.jfr.v1.volumes" (dict "ctx" $) | indent 8 }}
+      {{- if eq (include "harnesscommon.secretsLoader.enabled" (dict "ctx" $)) "false" }}
+      {{- include "harnesscommon.renderSecretsAsVolumes" (dict "ctx" $) | indent 8 }}
+      {{- end }}
+      {{- include "harnesscommon.dbv4.sslVolume" (dict "context" $ "dbType" "redis" "dbName" "events") | indent 8 }}
+      {{- include "harnesscommon.dbv4.sslVolume" (dict "context" $ "dbType" "redis" "dbName" "lock") | indent 8 }}

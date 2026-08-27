@@ -1,0 +1,14 @@
+name: OPA Evaluation Metrics
+identifier: OPAEvaluationMetrics
+metricGroup: OPAEvaluationMetricsGroup
+metrics:
+  - metricName: opa_infra_policies_evaluated_total
+    metricDefinition: Total number of infrastructure policy sets evaluated with their status (pass, warning, error)
+    type: Count
+    unit: "1"
+  - metricName: opa_customer_infra_evaluation_duration_seconds
+    metricDefinition: Duration of policy set evaluation on customer infrastructure (from when lite-engine starts executing the step to when plugin container completes)
+    type: Duration
+    distribution: [ 0ms, 100ms, 500ms, 1s, 5s, 10s, 30s, 60s, 120s, 300s ]
+    unit: "s"
+

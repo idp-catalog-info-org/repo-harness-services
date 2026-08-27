@@ -1,0 +1,39 @@
+pipeline:
+  stages:
+    - name: ${stageName}
+      id: ${stageId}
+      service:
+        type: kubernetes
+        items:
+          - ${serviceIdentifier}
+      environment:
+        id: ${environmentIdentifier}
+        deploy-to: ${infrastructureIdentifier}
+      steps:
+        - name: Kubernetes Blue Green Deploy
+          id: k8sBlueGreenDeployStep
+          template:
+            uses: k8sBlueGreenDeployStep
+        - name: Kubernetes Blue Green Swap Services Selectors
+          id: k8sBlueGreenSwapServicesSelectorsStep
+          template:
+            uses: k8sBlueGreenSwapServicesSelectorsStep
+            with:
+              stable_service: ${{stage.steps.k8sBlueGreenDeployStep.output.outputVariables.stableService}}
+              stage_service: ${{stage.steps.k8sBlueGreenDeployStep.output.outputVariables.stageService}}
+              is_openshift: ${{stage.steps.k8sBlueGreenDeployStep.output.outputVariables.isOpenshift}}
+      rollback:
+        - group:
+            steps:
+              - name: Kubernetes Blue Green Rollback Swap Services Selectors
+                id: k8sBlueGreenRollbackSwapServicesSelectorsStep
+                template:
+                  uses: k8sBlueGreenSwapServicesSelectorsStep
+                  with:
+                    stable_service: ${{rollback.data.PLUGIN_STABLE_SERVICE}}
+                    stage_service: ${{rollback.data.PLUGIN_STAGE_SERVICE}}
+                    is_openshift: ${{rollback.data.HARNESS_IS_OPENSHIFT}}
+      on-failure:
+        errors: all
+        action: stage-rollback
+      runtime: cloud

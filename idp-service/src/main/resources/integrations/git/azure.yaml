@@ -1,0 +1,7 @@
+integrations:
+  azure:
+    - host: ${HOST}
+      credentials:
+        - organizations:
+            - ${ORGANIZATION}
+          personalAccessToken: ${AZURE_PERSONAL_ACCESS_TOKEN}

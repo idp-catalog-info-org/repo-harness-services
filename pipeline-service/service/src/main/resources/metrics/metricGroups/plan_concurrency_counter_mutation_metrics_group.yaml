@@ -1,0 +1,7 @@
+name: Plan Concurrency Counter Mutation Metrics Group
+identifier: PlanConcurrencyCounterMutationMetricsGroup
+labels:
+  - scope
+  - operation
+  - accountId
+  - outcome

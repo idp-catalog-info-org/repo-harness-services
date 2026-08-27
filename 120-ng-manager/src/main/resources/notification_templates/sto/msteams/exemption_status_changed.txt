@@ -1,0 +1,24 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "title": "Harness Security Test Exemption Status Changed",
+  "summary": "Harness Security Test Exemption Status Changed",
+  "sections": [
+    {
+      "title": "Exemption Status Changed for Security Issue",
+      "text": "Issue Title: ${ISSUE_TITLE}<br>Severity: ${SEVERITY_CODE}<br>Scan Tool: ${SCAN_TOOL}<br>New Status: ${STATUS}<br><br>Org: ${ORG}<br>Project: ${PROJECT}<br>Scope: ${SCOPE}<br>Requester: ${REQUESTER}<br>${APPROVER_LABEL}: ${APPROVER}<br>Reason: ${REASON}<br>Expiration: ${EXPIRATION}",
+      "potentialAction": [
+        {
+            "@type": "OpenUri",
+            "name": "View Exemption in Harness",
+            "targets": [
+                {
+                "os": "default",
+                "uri": "${EXEMPTION_URL}"
+                }
+            ]
+        }
+      ]
+    }
+  ]
+}

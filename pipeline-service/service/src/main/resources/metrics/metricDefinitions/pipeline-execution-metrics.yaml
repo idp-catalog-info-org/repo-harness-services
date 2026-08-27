@@ -1,0 +1,35 @@
+name: Pipeline Executions Metrics
+identifier: PipelineExecutionMetrics
+metricGroup: PipelineExecutionMetricsGroup
+metrics:
+  - metricName: pipeline_execution_end_count
+    metricDefinition: Number of ended pipeline executions at a given instant
+    type: Count
+    unit: "1"
+  - metricName: stuck_node_executions_counter
+    metricDefinition: Counter of stuck node executions
+    type: Count
+    unit: "1"
+  - metricName: stuck_execution_detected
+    metricDefinition: Counter of stuck executions found by StuckExecutionDetector
+    type: Count
+    unit: "1"
+  - metricName: stuck_execution_detection_duration
+    metricDefinition: Duration for a stuck detector finish one cycle.
+    type: Duration
+    distribution: [ 0ms, 500ms, 5s, 15s, 30s, 1m, 2m, 5m, 20m ]
+    unit: "ms"
+  - metricName: pipeline_execution_metadata_deletion_time
+    metricDefinition: Time needed to delete pipeline execution metadata
+    type: Duration
+    distribution: [ 0ms, 500ms, 5s, 15s, 30s, 1m, 2m, 5m, 20m ]
+    unit: "ms"
+  - metricName: pipeline_delete_entities_processed_count
+    metricDefinition: Number of entities processed during pipeline execution details deletion
+    type: Count
+    unit: "1"
+  - metricName: pipeline_delete_entities_processing_duration
+    metricDefinition: Time taken to process entities during pipeline execution details deletion
+    type: Duration
+    distribution: [ 0ms, 500ms, 5s, 15s, 30s, 1m, 2m, 5m, 20m ]
+    unit: "ms"

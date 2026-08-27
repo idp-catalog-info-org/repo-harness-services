@@ -1,0 +1,28 @@
+name: GitX Webhook Queue Metrics
+identifier: GitXWebhookQueueMetrics
+metricGroup: gitx_webhook_queue_metrics_group
+metrics:
+  - metricName: gitx_webhook_push_event_enqueued
+    metricDefinition: Count of GitX webhook push events enqueued
+    type: Count
+    unit: "1"
+  - metricName: gitx_webhook_push_event_dequeued
+    metricDefinition: Count of GitX webhook push events dequeued
+    type: Count
+    unit: "1"
+  - metricName: gitx_webhook_branch_event_enqueued
+    metricDefinition: Count of GitX webhook branch events enqueued
+    type: Count
+    unit: "1"
+  - metricName: gitx_webhook_branch_event_dequeued
+    metricDefinition: Count of GitX webhook branch events dequeued
+    type: Count
+    unit: "1"
+  - metricName: gitx_webhook_pull_request_event_enqueued
+    metricDefinition: Count of GitX webhook pull request events enqueued
+    type: Count
+    unit: "1"
+  - metricName: gitx_webhook_pull_request_event_dequeued
+    metricDefinition: Count of GitX webhook pull request events dequeued
+    type: Count
+    unit: "1"

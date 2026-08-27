@@ -1,0 +1,33 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_binary")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    visibility = ["//visibility:public"],
+    exports = [
+        "//332-ci-manager/contracts/openapi/v1:ci-manager-server-spec-module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/beans/steps/stepinfo:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/cache/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/cd/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/cd/api/beans:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/dashboard/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/dependencies:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/execution/license:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/executionconfig/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/health:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/licensing/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/plugin/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/runner:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/savings/api:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/serializer:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/stages:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/stages/V1:module",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/yamlschema/api:module",
+    ],
+)

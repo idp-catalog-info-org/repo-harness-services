@@ -1,0 +1,39 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//125-cd-nextgen/modules/common/core/src/main/java/io/harness/cdng/helpers:module",
+        "//125-freeze/src/main/java/io/harness/freeze/beans:module",
+        "//125-freeze/src/main/java/io/harness/freeze/beans/yaml:module",
+        "//125-freeze/src/main/java/io/harness/freeze/entity:module",
+        "//125-freeze/src/main/java/io/harness/freeze/mappers:module",
+        "//125-freeze/src/main/java/io/harness/freeze/notifications:module",
+        "//125-freeze/src/main/java/io/harness/freeze/service:module",
+        "//125-freeze/src/main/java/io/harness/freeze/utils:module",
+        "//959-ng-persistence/src/main/java/io/harness/mongo/iterator/filter:module",
+        "//959-ng-persistence/src/main/java/io/harness/mongo/iterator/provider:module",
+        "//960-persistence/src/main/java/io/harness/iterator:module",
+        "//960-persistence/src/main/java/io/harness/iterator/interfaces:module",
+        "//960-persistence/src/main/java/io/harness/mongo/iterator:module",
+        "//960-persistence/src/main/java/io/harness/mongo/iterator/pojos:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+    ],
+)
+
+# run static analysis macro for pmd/checkstyle/sonarqube checks
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

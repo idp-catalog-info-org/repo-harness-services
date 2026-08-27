@@ -1,0 +1,4 @@
+summary: "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}. Execution Type: Dry Run. Start Time: ${EXECUTION_START_TIME}. End Time: ${EXECUTION_END_TIME}. Scheduled Execution Time: ${SCHEDULED_EXECUTION_TIME}. Artifacts Protected (Protection Rule): ${ARTIFACTS_SKIPPED}. Artifacts That Would Be Deleted: ${ARTIFACTS_DELETED}. Registries Affected: ${REGISTRIES_AFFECTED}. Estimated Storage Reclamation: ${STORAGE_RECLAIMED}"
+link:
+    href: ${EXECUTION_URL}
+    text: View Execution Details

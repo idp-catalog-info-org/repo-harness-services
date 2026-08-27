@@ -1,0 +1,5 @@
+name: Trigger Filter Times in Metrics Group
+identifier: trigger_filter_times_group
+labels:
+  - accountId
+  - triggerFilterType

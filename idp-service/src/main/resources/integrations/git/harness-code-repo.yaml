@@ -1,0 +1,4 @@
+integrations:
+  harness:
+    - host: ${HOST}
+      token: ${HARNESS_CODE_REPO_TOKEN}

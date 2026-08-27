@@ -1,0 +1,24 @@
+service:
+  name: k8s_service
+  identifier: k8s_service
+  orgIdentifier: default
+  projectIdentifier: CI_PROJECT
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: custom_manifest_id
+            type: K8sManifest
+            spec:
+              store:
+                type: CustomRemote
+                spec:
+                  filePath: <+input>.regex(^[1-9]+$)
+                  extractionScript: echo hello
+              skipResourceVersioning: <+input>.allowedValues(a,b,c)
+              enableDeclarativeRollback: <+input>.regex(^[1-9]+$)
+              valuesPaths:
+                - v1.yaml
+                - v2.yaml
+              optionalValuesYaml: false
+    type: Kubernetes

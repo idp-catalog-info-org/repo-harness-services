@@ -1,0 +1,7 @@
+name: Pipeline Service Mongo Metrics Group
+identifier: pipelineServiceMongoMetricsGroup
+labels:
+  - namespace
+  - containerName
+  - serverAddress
+  - clientDescription

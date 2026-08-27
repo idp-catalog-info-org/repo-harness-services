@@ -1,0 +1,27 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    resources = [],
+    visibility = ["//visibility:public"],
+    exports = [
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/beans/stepDetail:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/concurrency:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/engine/pms/steps/identity:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/interrupts:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/monitoring:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/plan:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/pms/data/stepdetails:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/pms/data/stepparameters:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/serializer/kryo:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/serializer/morphia:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/timeout:module",
+    ],
+)

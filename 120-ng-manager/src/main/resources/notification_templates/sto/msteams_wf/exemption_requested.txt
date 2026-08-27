@@ -1,0 +1,125 @@
+{
+    "type": "message",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "content": {
+                "type": "AdaptiveCard",
+                "body": [
+                    {
+                        "type": "Container",
+                        "style": "emphasis",
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Harness Security Test Exemption Requested",
+                                "wrap": true
+                            }
+                        ],
+                        "padding": "Default",
+                        "spacing": "None"
+                    },
+                    {
+                        "type": "Container",
+                        "separator": true,
+                        "style": "accent",
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "size": "Medium",
+                                "weight": "Bolder",
+                                "text": "Exemption requested for Security Issue",
+                                "wrap": true,
+                                "style": "heading"
+                            }
+                        ],
+                        "padding": "Default",
+                        "spacing": "None"
+                    },
+                    {
+                        "type": "Container",
+                        "items": [
+                            {
+                                "type": "FactSet",
+                                "facts": [
+                                    {
+                                        "title": "Issue Title:",
+                                        "value": "${ISSUE_TITLE}"
+                                    },
+                                    {
+                                        "title": "Severity:",
+                                        "value": "${SEVERITY_CODE}"
+                                    },
+                                    {
+                                        "title": "Scan Tool:",
+                                        "value": "${SCAN_TOOL}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "padding": "Default",
+                        "spacing": "Medium",
+                        "separator": false
+                    },
+                    {
+                        "type": "Container",
+                        "items": [
+                            {
+                                "type": "FactSet",
+                                "facts": [
+                                    {
+                                        "title": "Org:",
+                                        "value": "${ORG}"
+                                    },
+                                    {
+                                        "title": "Project:",
+                                        "value": "${PROJECT}"
+                                    },
+                                    {
+                                        "title": "Scope:",
+                                        "value": "${SCOPE}"
+                                    },
+                                    {
+                                        "title": "Requester:",
+                                        "value": "${REQUESTER}"
+                                    },
+                                    {
+                                        "title": "Reason:",
+                                        "value": "${REASON}"
+                                    },
+                                    {
+                                        "title": "Expiration:",
+                                        "value": "${EXPIRATION}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "padding": "Default",
+                        "spacing": "Medium",
+                        "separator": false
+                    },
+                    {
+                        "type": "Container",
+                        "padding": "Default",
+                        "items": [
+                            {
+                                "type": "ActionSet",
+                                "actions": [
+                                    {
+                                        "type": "Action.OpenUrl",
+                                        "title": "View Exemption in Harness",
+                                        "url": "${EXEMPTION_URL}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "spacing": "Medium"
+                    }
+                ],
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.0",
+                "padding": "None"
+            }
+        }
+    ]
+}

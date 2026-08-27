@@ -1,0 +1,51 @@
+pipeline:
+  name: pipelinewithtemp
+  identifier: pipelinewithtemp
+  tags: {}
+  projectIdentifier: templateref
+  orgIdentifier: default
+  stages:
+    - stage:
+        identifier: cd
+        name: acda
+        tags: {}
+        template:
+          templateRef: cdstage
+          versionLabel: v1
+          templateInputs:
+            type: Deployment
+            spec:
+              service:
+                serviceInputs:
+                  serviceDefinition:
+                    type: Kubernetes
+                    spec:
+                      variables:
+                        - name: testvar
+                          type: String
+                          value: < input>.executionInput()
+    - insert:
+        identifier: inserted
+        name: inserted
+        stages:
+          - stage:
+              name: approval
+              identifier: approval
+              tags: {}
+              template:
+                templateRef: approvalstage
+                versionLabel: v1
+                templateInputs:
+                  type: Approval
+                  variables:
+                    - name: test
+                      type: String
+                      value: < input>.executionInput()
+                  spec:
+                    execution:
+                      steps:
+                        - step:
+                            identifier: approval
+                            type: HarnessApproval
+                            spec:
+                              approvalMessage: < input>.executionInput()

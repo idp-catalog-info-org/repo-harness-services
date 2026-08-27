@@ -1,0 +1,45 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Token Updated",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "The token *${TOKEN_IDENTIFIER}* for API Key *${API_KEY_IDENTIFIER}* in Service Account *${SERVICE_ACCOUNT_NAME}* was updated.\n\n*New expiry:* ${EXPIRY_DATE}"
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Account:*\n${ACCOUNT_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Account ID:*\n${ACCOUNT_IDENTIFIER}"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Org:*\n${ORG_IDENTIFIER}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Project:*\n${PROJECT_IDENTIFIER}"
+				}
+			]
+		}
+	]
+}

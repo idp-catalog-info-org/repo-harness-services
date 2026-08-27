@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "A Component describes a software component. It is typically intimately linked to the source code that constitutes the component, and should be what a developer may regard a \"unit of software\", usually with a distinct deployable or linkable artifact.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "type",
+        "owner",
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "COMPONENT",
+            "Component",
+            "component"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of component.",
+          "examples": [
+            "service",
+            "website",
+            "library"
+          ],
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the component.",
+          "examples": [
+            "artist-relations-team",
+            "user:john.johnson"
+          ],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "required": [
+            "lifecycle"
+          ],
+          "properties": {
+            "lifecycle": {
+              "type": "string",
+              "description": "The lifecycle state of the component.",
+              "examples": [
+                "experimental",
+                "production",
+                "deprecated"
+              ],
+              "minLength": 1
+            },
+            "subcomponentOf": {
+              "type": "string",
+              "description": "An entity reference to another component of which the component is a part.",
+              "minLength": 1
+            },
+            "providesApis": {
+              "type": "array",
+              "description": "An array of entity references to the APIs that are provided by the component.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "consumesApis": {
+              "type": "array",
+              "description": "An array of entity references to the APIs that are consumed by the component.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dependsOn": {
+              "type": "array",
+              "description": "An array of references to other entities that the component depends on to function.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dependencyOf": {
+              "type": "array",
+              "description": "An array of references to other entities that depends on this component to function.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "harnessService": {
+              "type": "object",
+              "description": "A link to a Harness CD Service",
+              "required": [
+                "identifier"
+              ],
+              "properties":{
+                "identifier": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "projectIdentifier": {
+                  "type": ["string", "null"],
+                  "minLength": 1
+                },
+                "orgIdentifier": {
+                  "type": ["string", "null"],
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short (typically relatively few words, on one line) description of the entity."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Key/value pairs of identifying information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Key/value pairs of non-identifying auxiliary information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string"
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of single-valued strings, to for example classify catalog entities in various ways.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "A list of external hyperlinks related to the entity. Links can provide additional contextual information that may be located outside of Backstage itself. For example, an admin dashboard or external CMS page.",
+          "items": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A url in a standard uri format.",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "description": "A user friendly display name for the link.",
+                "minLength": 1
+              },
+              "icon": {
+                "type": "string",
+                "description": "A key representing a visual icon to be displayed in the UI.",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "description": "An optional value to categorize links into specific groups.",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

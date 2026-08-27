@@ -1,0 +1,32 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.core.migration;
+
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+
+import io.harness.migration.beans.NGMigration;
+import io.harness.ng.core.accountsetting.services.NGAccountSettingService;
+import io.harness.ng.core.services.OrganizationService;
+
+import com.google.inject.Inject;
+import java.util.List;
+
+public class NGAccountSettingsMigration implements NGMigration {
+  @Inject NGAccountSettingService accountSettingService;
+  @Inject OrganizationService organizationService;
+  @Override
+  public void migrate() {
+    final List<String> accountIdsToBeInserted = organizationService.getDistinctAccounts();
+
+    if (isNotEmpty(accountIdsToBeInserted)) {
+      for (String accountId : accountIdsToBeInserted) {
+        accountSettingService.setUpDefaultAccountSettings(accountId);
+      }
+    }
+  }
+}

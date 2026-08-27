@@ -1,0 +1,22 @@
+name: Queued Pipeline List Metrics
+identifier: QueuedPipelineListMetrics
+metricGroup: QueuedPipelineListMetricsGroup
+metrics:
+  - metricName: queued_pipelines_list_count
+    metricDefinition: Number of list queued pipelines API invocations (includes failures)
+    type: Count
+    unit: "1"
+  - metricName: queued_pipelines_list_duration
+    metricDefinition: End-to-end duration of listing queued pipeline executions (includes failures)
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s ]
+    unit: "ms"
+  - metricName: queued_pipelines_total_in_account
+    metricDefinition: Total executions found in account per successful list call, split by status label (queued/waiting/running)
+    type: LastValue
+    unit: "1"
+  - metricName: queued_pipelines_fetch_duration
+    metricDefinition: Duration of fetching queued/waiting/running executions from data source
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s ]
+    unit: "ms"

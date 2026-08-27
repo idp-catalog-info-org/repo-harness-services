@@ -1,0 +1,17 @@
+name: Step Concurrency Dequeue Metrics
+identifier: StepConcurrencyDequeueMetrics
+metricGroup: StepConcurrencyDequeueMetricsGroup
+metrics:
+  - metricName: pipeline_step_concurrency_dequeue_total
+    metricDefinition: Outcome of each step-concurrency two-tier dequeue attempt. tier in {same_plan, postgres_fifo}; outcome in {claimed, walk_exhausted, cap_reached}.
+    type: Count
+    unit: "1"
+  - metricName: pipeline_step_concurrency_dequeue_walk_length
+    metricDefinition: Number of Postgres candidates inspected during a tier-2 dequeue walk before a claim or exhaustion.
+    type: Distribution
+    distribution: ["1", "5", "10", "25", "50", "100"]
+    unit: "1"
+  - metricName: pipeline_step_concurrency_dequeue_skips_total
+    metricDefinition: Candidates skipped during a tier-2 dequeue walk. skip_reason in {account_cap, already_deleted, mongo_predicate_miss}.
+    type: Count
+    unit: "1"

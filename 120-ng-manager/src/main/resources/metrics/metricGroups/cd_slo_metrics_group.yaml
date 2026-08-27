@@ -1,0 +1,7 @@
+name: CD SLO Metrics Group
+identifier: cd_slo_metrics_group
+labels:
+  - accountId
+  - envType
+  - status
+

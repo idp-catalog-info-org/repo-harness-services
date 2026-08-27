@@ -1,0 +1,29 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_library(
+    name = "module",
+    resources = [],
+    visibility = ["//120-ng-manager:__subpackages__"],
+    exports = [
+        "//120-ng-manager/modules/ng-variables/contracts/src/main/java/io/harness/ng/core/variable:module",
+        "//120-ng-manager/modules/ng-variables/contracts/src/main/java/io/harness/ng/core/variable/dto:module",
+        "//120-ng-manager/modules/ng-variables/contracts/src/main/java/io/harness/ng/core/variable/resources:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/event:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/events:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/entity:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/expressions/functors:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/mappers:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/resources:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/services:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/services/impl:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/repositories/variable/custom:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/repositories/variable/spring:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/serializer/morphia:module",
+    ],
+)

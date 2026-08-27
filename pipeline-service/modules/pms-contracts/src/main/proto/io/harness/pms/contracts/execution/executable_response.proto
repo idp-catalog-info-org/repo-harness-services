@@ -1,0 +1,149 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.execution;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/execution/tasks/task_request.proto";
+import "io/harness/pms/contracts/execution/status.proto";
+import "io/harness/pms/contracts/ambiance/identity_execution_context.proto";
+
+message ExecutableResponse {
+  oneof response {
+    AsyncExecutableResponse async = 1;
+    ChildExecutableResponse child = 2;
+    ChildrenExecutableResponse children = 3;
+    ChildChainExecutableResponse childChain = 4;
+    TaskExecutableResponse task = 5;
+    TaskChainExecutableResponse taskChain = 6;
+    SyncExecutableResponse sync = 7;
+    SkipTaskExecutableResponse skipTask = 8;
+    AsyncChainExecutableResponse asyncChain = 9;
+    FacilitatorExecutableResponse facilitator = 10;
+    IdentityContextUpdateResponse identity_context_update = 11;
+  }
+}
+
+message IdentityContextUpdateResponse {
+  io.harness.pms.contracts.ambiance.IdentityExecutionContext updated_context = 1;
+}
+
+message SyncExecutableResponse {
+  repeated string logKeys = 1;
+  repeated string units = 2;
+}
+
+message FacilitatorExecutableResponse {
+  repeated string callbackIds = 1;
+  string type = 2;
+  int64 startTs = 3;
+  Status status = 4;
+  int64 timeoutInSeconds = 5;
+}
+
+message AsyncChainExecutableResponse {
+  bool chainEnd = 1;
+  string callbackId = 2;
+  repeated string logKeys = 3;
+  repeated string units = 4;
+  int32 timeout = 5;
+  Status status = 6;
+  bytes passThroughData = 7;
+  repeated string callbackIds = 8;
+}
+
+message AsyncExecutableResponse {
+  repeated string callbackIds = 1;
+  repeated string logKeys = 2;
+  repeated string units = 3;
+  int64 timeout = 5;
+  Status status = 9;  // Async step can send the status they want to set for their step. This status is only for
+                      // non-final status (StatusUtils.RESUMABLE_STATUSES())
+  bool shouldRemoveAlreadyProcessedNotifyIds = 10;  // Remove already processed notify ids from waitingOnCorrelationIds
+}
+
+message ChildExecutableResponse {
+  string childNodeId = 1;
+  repeated string logKeys = 2;
+  repeated string units = 3;
+  bool skip = 4;
+}
+
+message ChildrenExecutableResponse {
+  message Child {
+    string childNodeId = 1;
+    StrategyMetadata strategyMetadata = 2;
+  }
+  repeated Child children = 1;
+  int64 maxConcurrency = 2;
+  bool shouldProceedIfFailed = 4;
+  repeated string logKeys = 3;
+  repeated string units = 5;
+}
+
+message StrategyMetadata {
+  int32 currentIteration = 1;
+  int32 totalIterations = 2;
+  oneof metadata {
+    MatrixMetadata matrixMetadata = 3;
+    ForMetadata forMetadata = 4;
+  }
+  string identifierPostFix = 5;
+}
+
+message StrategyInfo {
+  int32 currentIteration = 1;
+  int32 totalIterations = 2;
+  oneof metadata {
+    ForMetadata forMetadata = 3;  // will be removed once instanceFunctor is moved to pipeline service
+  }
+  string identifierPostFix = 4;
+}
+
+message ForMetadata {
+  string value = 1;
+  repeated string partition = 2;
+}
+
+message MatrixMetadata {
+  map<string, string> matrixValues = 1;
+  repeated int32 matrixCombination = 2;
+  string subType = 3;
+  repeated string matrixKeysToSkipInName = 4;
+  string nodeName = 5;
+}
+
+message ChildChainExecutableResponse {
+  string nextChildId = 1;
+  string previousChildId = 2;
+  bytes passThroughData = 3;
+  bool lastLink = 4;
+  bool suspend = 6;
+}
+
+message TaskChainExecutableResponse {
+  string taskId = 1;
+  io.harness.pms.contracts.execution.tasks.TaskCategory taskCategory = 2;
+  bool chainEnd = 3;
+  bytes passThroughData = 4;
+  repeated string logKeys = 5;
+  repeated string units = 6;
+  string taskName = 7;
+}
+
+message TaskExecutableResponse {
+  string taskId = 1;
+  io.harness.pms.contracts.execution.tasks.TaskCategory taskCategory = 2;
+  repeated string logKeys = 3;
+  repeated string units = 4;
+  string taskName = 5;
+}
+
+message SkipTaskExecutableResponse {
+  string message = 1;
+}

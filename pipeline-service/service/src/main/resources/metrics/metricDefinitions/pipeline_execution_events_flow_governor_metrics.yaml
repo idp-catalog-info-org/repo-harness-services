@@ -1,0 +1,24 @@
+name: Pipeline Execution Events Flow Governor Metrics
+identifier: PipelineExecutionEventsFlowGovernorMetrics
+metricGroup: PipelineExecutionEventsFlowGovernorGroup
+metrics:
+  - metricName: pipeline_execution_events_flow_governor_invoked
+    metricDefinition: Count of records dequeued by an orchestration consumer while the flow governor is in a given mode (NORMAL / THROTTLED / HALTED)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_execution_events_throttled_mode_rps_actual
+    metricDefinition: Observed per-pod RPS while the flow governor is in THROTTLED mode
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_execution_events_throttled_mode_rps_expected
+    metricDefinition: Configured per-pod RPS ceiling while the flow governor is in THROTTLED mode
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_execution_events_flow_governor_queue_depth
+    metricDefinition: Current depth of the in-memory worker queue owned by a throttled orchestration consumer
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_execution_events_flow_governor_pause_resume
+    metricDefinition: Count of Kafka pause/resume calls issued by the flow governor per topic
+    type: Count
+    unit: "1"

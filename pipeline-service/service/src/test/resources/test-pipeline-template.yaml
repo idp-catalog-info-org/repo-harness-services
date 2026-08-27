@@ -1,0 +1,27 @@
+template:
+  name: test-pipeline-template
+  identifier: testpipelinetemplate
+  versionLabel: v1
+  type: Pipeline
+  projectIdentifier: RishiTest
+  orgIdentifier: default
+  tags: {}
+  spec:
+    stages:
+      - stage:
+          name: cs1
+          identifier: cs1
+          description: ""
+          type: Custom
+          spec:
+            execution:
+              steps:
+                - step:
+                    type: Wait
+                    name: Wait_1
+                    identifier: Wait_1
+                    spec:
+                      duration: 1m
+          tags: {}
+    allowStageExecutions: true
+    fixedInputsOnRerun: true

@@ -1,0 +1,36 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.service;
+
+option java_multiple_files = true;
+
+service PmsExecutionService {
+  rpc updateExecutionSummary(ExecutionSummaryUpdateRequest) returns (ExecutionSummaryResponse);
+  rpc getPlanExecutionMetadataYaml(PlanExecutionMetadataYamlRequest) returns (PlanExecutionMetadataYamlResponse);
+}
+
+message ExecutionSummaryUpdateRequest {
+  string planExecutionId = 1;
+  string moduleName = 2;
+  string nodeUuid = 3;
+  string nodeModuleInfoJson = 4;
+  string pipelineModuleInfoJson = 5;
+  string nodeExecutionId = 6;
+  string version = 7;
+}
+
+message ExecutionSummaryResponse {}
+
+message PlanExecutionMetadataYamlRequest {
+  string planExecutionId = 1;
+  string accountIdentifier = 2;
+}
+
+message PlanExecutionMetadataYamlResponse {
+  string yaml = 1;
+}

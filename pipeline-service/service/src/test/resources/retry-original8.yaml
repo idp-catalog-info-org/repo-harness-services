@@ -1,0 +1,199 @@
+pipeline:
+  identifier: pipelinewithtemp
+  name: pipelinewithtemp
+  tags: {}
+  template:
+    templateRef: pipelinewithtemplates
+    versionLabel: v1
+    templateInputs:
+      stages:
+        - stage:
+            identifier: cd
+            template:
+              templateInputs:
+                type: Deployment
+                spec:
+                  service:
+                    serviceInputs:
+                      serviceDefinition:
+                        type: Kubernetes
+                        spec:
+                          variables:
+                            - name: testvar
+                              type: String
+                              value: < input>.executionInput()
+        - insert:
+            identifier: inserted
+            stages:
+              - stage:
+                  identifier: approval
+                  name: approval
+                  tags: {}
+                  template:
+                    templateRef: approvalstage
+                    versionLabel: v1
+                    templateInputs:
+                      type: Approval
+                      variables:
+                        - name: test
+                          type: String
+                          value: < input>.executionInput()
+                      spec:
+                        execution:
+                          steps:
+                            - step:
+                                identifier: approval
+                                type: HarnessApproval
+                                spec:
+                                  approvalMessage: < input>.executionInput()
+    storeType: INLINE
+  stages:
+    - stage:
+        identifier: cd
+        name: acda
+        tags: {}
+        template:
+          templateRef: cdstage
+          versionLabel: v1
+          templateInputs:
+            type: Deployment
+            spec:
+              service:
+                serviceInputs:
+                  serviceDefinition:
+                    type: Kubernetes
+                    spec:
+                      variables:
+                        - name: testvar
+                          type: String
+                          value: < input>.executionInput()
+          storeType: INLINE
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          environment:
+            environmentRef: org.prodOrg
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: infra2
+          service:
+            serviceRef: org.service
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  variables:
+                    - name: testvar
+                      type: String
+                      value: < input>.executionInput()
+          execution:
+            steps:
+              - parallel:
+                  - stepGroup:
+                      identifier: sgtemp
+                      name: sgtempa
+                      template:
+                        templateRef: sg
+                        versionLabel: v1
+                        storeType: INLINE
+                      stageType: Deployment
+                      steps:
+                        - parallel:
+                            - step:
+                                name: staa
+                                identifier: st
+                                template:
+                                  templateRef: steptemp
+                                  versionLabel: v1
+                                  storeType: INLINE
+                                timeout: 10m
+                                type: ShellScript
+                                spec:
+                                  shell: Bash
+                                  executionTarget: {}
+                                  delegateSelectors: []
+                                  source:
+                                    type: Inline
+                                    spec:
+                                      script: echo 1
+                                  environmentVariables: []
+                                  outputVariables: []
+                  - step:
+                      identifier: stepa
+                      name: stepa
+                      template:
+                        templateRef: steptemp
+                        versionLabel: v1
+                        storeType: INLINE
+                      timeout: 10m
+                      type: ShellScript
+                      spec:
+                        shell: Bash
+                        executionTarget: {}
+                        delegateSelectors: []
+                        source:
+                          type: Inline
+                          spec:
+                            script: echo 1
+                        environmentVariables: []
+                        outputVariables: []
+            rollbackSteps: []
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+    - insert:
+        identifier: inserted
+        name: inserted
+        stages:
+          - stage:
+              identifier: approval
+              name: approval
+              tags: {}
+              template:
+                templateRef: approvalstage
+                versionLabel: v1
+                templateInputs:
+                  type: Approval
+                  variables:
+                    - name: test
+                      type: String
+                      value: < input>.executionInput()
+                  spec:
+                    execution:
+                      steps:
+                        - step:
+                            identifier: approval
+                            type: HarnessApproval
+                            spec:
+                              approvalMessage: < input>.executionInput()
+                storeType: INLINE
+              type: Approval
+              variables:
+                - name: test
+                  type: String
+                  description: ""
+                  required: false
+                  value: < input>.executionInput()
+              spec:
+                execution:
+                  steps:
+                    - step:
+                        identifier: approval
+                        type: HarnessApproval
+                        name: approval
+                        timeout: 1d
+                        spec:
+                          approvalMessage: < input>.executionInput()
+                          includePipelineExecutionHistory: true
+                          approvers:
+                            minimumCount: 1
+                            disallowPipelineExecutor: false
+                            userGroups:
+                              - account._account_all_users
+                          isAutoRejectEnabled: false
+                          approverInputs: []
+  projectIdentifier: templateref
+  orgIdentifier: default

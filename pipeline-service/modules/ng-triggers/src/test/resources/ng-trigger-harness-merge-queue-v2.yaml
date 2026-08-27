@@ -1,0 +1,30 @@
+trigger:
+  name: merge queue trigger
+  identifier: merge_queue_trigger
+  enabled: true
+  orgIdentifier: org
+  projectIdentifier: proj
+  pipelineIdentifier: pipeline
+  source:
+    type: Webhook
+    spec:
+      type: Harness
+      spec:
+        type: MergeQueue
+        spec:
+          repoName: myrepo
+          payloadConditions:
+            - key: <+trigger.targetBranch>
+              operator: Equals
+              value: main
+  inputYaml: |
+    pipeline:
+      identifier: secrethttp1
+      stages:
+        - stage:
+            identifier: qaStage
+            spec:
+              infrastructure:
+                infrastructureDefinition:
+                  spec:
+                    releaseName: releaseName1

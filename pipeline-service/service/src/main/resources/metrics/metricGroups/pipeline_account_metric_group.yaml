@@ -1,0 +1,7 @@
+name: Group by account for pipeline metrics
+identifier: PipelineAccountIdMetricsGroup
+labels:
+  - accountId
+  - status
+  - triggerType
+  - module

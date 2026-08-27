@@ -1,0 +1,116 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1707805033.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy",
+    "dynatrace"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/dynatrace"
+          ],
+          "properties": {
+            "/dynatrace": {
+              "$id": "#root/proxy/endpoints//dynatrace",
+              "title": "/dynatrace",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "pathRewrite",
+                "headers"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints//dynatrace/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints//dynatrace/pathRewrite",
+                  "title": "Pathrewrite",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "/api/proxy/dynatrace/?"
+                  ],
+                  "properties": {
+                    "/api/proxy/dynatrace/?": {
+                      "$id": "#root/proxy/endpoints//dynatrace/pathRewrite//api/proxy/dynatrace/?",
+                      "title": "/api/proxy/dynatrace/?",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              ,
+                "headers": {
+                  "$id": "#root/proxy/endpoints//dynatrace/headers",
+                  "title": "Headers",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "Authorization"
+                  ],
+                  "properties": {
+                    "Authorization": {
+                      "$id": "#root/proxy/endpoints//dynatrace/headers/Authorization",
+                      "title": "Authorization",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+
+              }
+            }
+
+          }
+        }
+
+      }
+    }
+  ,
+    "dynatrace": {
+      "$id": "#root/dynatrace",
+      "title": "Dynatrace",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseUrl"
+      ],
+      "properties": {
+        "baseUrl": {
+          "$id": "#root/dynatrace/baseUrl",
+          "title": "Baseurl",
+          "type": "string",
+          "default": "",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        }
+      }
+    }
+
+  }
+}

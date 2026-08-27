@@ -1,0 +1,51 @@
+trigger:
+  name: ccca
+  identifier: ccc
+  enabled: true
+  stagesToExecute: []
+  description: ""
+  tags: {}
+  orgIdentifier: default
+  projectIdentifier: testtt
+  pipelineIdentifier: test
+  source:
+    type: Webhook
+    spec:
+      type: HarnessArtifactRegistry
+      spec:
+        type: Artifact
+        spec:
+          registryName: org.orgregistry
+          autoAbortPreviousExecutions: true
+          payloadConditions:
+            - key: artifactVersion
+              operator: Equals
+              value: versionvalue
+            - key: artifactName
+              operator: Equals
+              value: artifactnamevalue
+          headerConditions: []
+          actions: []
+  inputYaml: |
+    pipeline:
+      identifier: test
+      stages:
+        - stage:
+            identifier: s2
+            type: Deployment
+            spec:
+              serviceConfig:
+                serviceDefinition:
+                  type: Kubernetes
+                  spec:
+                    artifacts:
+                      primary:
+                        type: DockerRegistry
+                        spec:
+                          tag: ss
+              infrastructure:
+                infrastructureDefinition:
+                  type: KubernetesDirect
+                  spec:
+                    connectorRef: ss
+                    namespace: ss

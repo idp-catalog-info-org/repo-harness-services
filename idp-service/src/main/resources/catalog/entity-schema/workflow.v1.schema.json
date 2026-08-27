@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "A Workflow describes a scaffolding task for use with the Scaffolder. It describes the required parameters as well as a series of steps that will be taken to execute the scaffolding task.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "type",
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "WORKFLOW",
+            "Workflow",
+            "workflow"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of workflow.",
+          "examples": [
+            "service",
+            "website",
+            "library"
+          ],
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the workflow.",
+          "examples": [
+            "artist-relations-team",
+            "user:john.johnson"
+          ],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "required": [
+            "parameters",
+            "steps"
+          ],
+          "properties": {
+            "lifecycle": {
+              "type": "string",
+              "description": "The lifecycle state of the template.",
+              "examples": ["experimental", "production", "deprecated"],
+              "minLength": 1
+            },
+            "parameters": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "description": "The JSONSchema describing the inputs for the template.",
+                  "properties": {
+                    "backstage:permissions": {
+                      "type": "object",
+                      "description": "Object used for authorizing the parameter",
+                      "properties": {
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "array",
+                  "description": "A list of separate forms to collect parameters.",
+                  "items": {
+                    "type": "object",
+                    "description": "The JSONSchema describing the inputs for the template.",
+                    "properties": {
+                      "backstage:permissions": {
+                        "type": "object",
+                        "description": "Object used for authorizing the parameter",
+                        "properties": {
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "steps": {
+              "type": "array",
+              "description": "A list of steps to execute.",
+              "items": {
+                "type": "object",
+                "description": "A description of the step to execute.",
+                "required": ["action"],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The ID of the step, which can be used to refer to its outputs."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the step, which will be displayed in the UI during the scaffolding process."
+                  },
+                  "action": {
+                    "type": "string",
+                    "description": "The name of the action to execute."
+                  },
+                  "input": {
+                    "type": "object",
+                    "description": "A templated object describing the inputs to the action."
+                  },
+                  "if": {
+                    "type": ["string", "boolean"],
+                    "description": "A templated condition that skips the step when evaluated to false. If the condition is true or not defined, the step is executed. The condition is true, if the input is not `false`, `undefined`, `null`, `\"\"`, `0`, or `[]`."
+                  },
+                  "backstage:permissions": {
+                    "type": "object",
+                    "description": "Object used for authorizing the step",
+                    "properties": {
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short (typically relatively few words, on one line) description of the entity."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Key/value pairs of identifying information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Key/value pairs of non-identifying auxiliary information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": ["array", "object", "string"]
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of single-valued strings, to for example classify catalog entities in various ways.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "A list of external hyperlinks related to the entity. Links can provide additional contextual information that may be located outside of Backstage itself. For example, an admin dashboard or external CMS page.",
+          "items": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A url in a standard uri format.",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "description": "A user friendly display name for the link.",
+                "minLength": 1
+              },
+              "icon": {
+                "type": "string",
+                "description": "A key representing a visual icon to be displayed in the UI.",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "description": "An optional value to categorize links into specific groups.",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

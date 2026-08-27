@@ -1,0 +1,66 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: AWS S3 connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  bucketName:
+    type: string
+    description: S3 bucket name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.bucketName}}
+  region:
+    type: string
+    description: AWS region (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.region}}
+  filePath:
+    type: string
+    description: Artifact file path (optional, mutually exclusive with filePathRegex)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.filePath}}
+  filePathRegex:
+    type: string
+    description: File path regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.filePathRegex}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/s3-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_REGION: ${{inputs.region}}
+    PLUGIN_ARTIFACT_BUCKET_NAME: ${{inputs.bucketName}}
+    PLUGIN_ARTIFACT_FILE_PATH: ${{inputs.filePath}}
+    PLUGIN_ARTIFACT_FILE_PATH_REGEX: ${{inputs.filePathRegex}}
+    PLUGIN_AWS_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{inputs.artifactConnector.accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{inputs.artifactConnector.secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{inputs.artifactConnector.sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.artifactConnector.crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{inputs.artifactConnector.externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.artifactConnector.assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{inputs.artifactConnector.iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.artifactConnector.oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{inputs.artifactConnector.sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.artifactConnector.baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.artifactConnector.maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.artifactConnector.retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.artifactConnector.fixedBackoff}}

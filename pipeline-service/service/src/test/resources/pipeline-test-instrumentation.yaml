@@ -1,0 +1,159 @@
+pipeline:
+  identifier: testIntrumentation
+  name: testIntrumentation
+  tags: {}
+  stages:
+    - parallel:
+        - stage:
+            identifier: ins1
+            name: ins1
+            tags: {}
+            type: Custom
+            spec:
+              execution:
+                steps:
+                  - parallel:
+                      - step:
+                          identifier: ShellScript_1
+                          type: ShellScript
+                          name: ShellScript_1
+                          spec:
+                            shell: Bash
+                            executionTarget: {}
+                            source:
+                              type: Inline
+                              spec:
+                                script: echo hi
+                            environmentVariables: []
+                            outputVariables: []
+                          timeout: 10m
+                          failureStrategies:
+                            - onFailure:
+                                errors:
+                                  - AllErrors
+                                action:
+                                  type: Ignore
+                          strategy:
+                            matrix:
+                              a:
+                                - a
+                                - b
+                                - c
+                      - insert:
+                          identifier: insert2
+                          name: insert2
+                          steps:
+                            - step:
+                                identifier: Wait_2
+                                type: Wait
+                                name: Wait_2
+                                spec:
+                                  duration: 10m
+                                failureStrategies:
+                                  - onFailure:
+                                      errors:
+                                        - AllErrors
+                                      action:
+                                        type: Abort
+                  - insert:
+                      identifier: insert1
+                      name: insert1
+                      steps:
+                        - step:
+                            identifier: Wait_1
+                            type: Wait
+                            name: Wait_1
+                            spec:
+                              duration: 10m
+                            failureStrategies:
+                              - onFailure:
+                                  errors:
+                                    - AllErrors
+                                  action:
+                                    type: MarkAsSuccess
+        - stage:
+            identifier: deploy
+            type: Deployment
+            name: deploy
+            description: ""
+            spec:
+              deploymentType: Kubernetes
+              environment:
+                environmentRef: env
+                deployToAll: false
+                infrastructureDefinitions:
+                  - identifier: infra
+              service:
+                serviceRef: account.test
+              execution:
+                steps:
+                  - step:
+                      identifier: ShellScript_1
+                      type: ShellScript
+                      name: ShellScript_1
+                      spec:
+                        shell: Bash
+                        executionTarget: {}
+                        source:
+                          type: Inline
+                          spec:
+                            script: echo hello
+                        environmentVariables: []
+                        outputVariables: []
+                      timeout: 10m
+                rollbackSteps: []
+            tags: {}
+            failureStrategies:
+              - onFailure:
+                  errors:
+                    - AllErrors
+                  action:
+                    type: StageRollback
+    - insert:
+        identifier: insertStages
+        name: insertStages
+        stages:
+          - stage:
+              identifier: approval
+              type: Approval
+              name: approval
+              description: ""
+              spec:
+                execution:
+                  steps:
+                    - step:
+                        identifier: ShellScript_1
+                        type: ShellScript
+                        name: ShellScript_1
+                        spec:
+                          shell: Bash
+                          executionTarget: {}
+                          source:
+                            type: Inline
+                            spec:
+                              script: echo hi
+                          environmentVariables: []
+                          outputVariables: []
+                        timeout: 10m
+                    - stepGroup:
+                        identifier: stp_grpp
+                        name: stp_grpp
+                        steps:
+                          - step:
+                              identifier: Wait_1
+                              type: Wait
+                              name: Wait_1
+                              spec:
+                                duration: 10m
+              tags: {}
+              failureStrategies:
+                - onFailure:
+                    errors:
+                      - AllErrors
+                    action:
+                      type: PipelineRollback
+              strategy:
+                repeat:
+                  times: 2
+  projectIdentifier: AmitTest
+  orgIdentifier: default

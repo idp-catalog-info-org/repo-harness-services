@@ -1,0 +1,13 @@
+{
+    "title": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+    "text": "A lifecycle rule dry run has completed with status: ${EXECUTION_STATUS}. No artifacts were modified. The results below show what would have happened if the lifecycle rule had been executed. Lifecycle Rule: ${POLICY_NAME}. Execution Type: Dry Run. Start Time: ${EXECUTION_START_TIME}. End Time: ${EXECUTION_END_TIME}. Scheduled Execution Time: ${SCHEDULED_EXECUTION_TIME}. Artifacts Protected (Protection Rule): ${ARTIFACTS_SKIPPED}. Artifacts That Would Be Deleted: ${ARTIFACTS_DELETED}. Registries Affected: ${REGISTRIES_AFFECTED}. Estimated Storage Reclamation: ${STORAGE_RECLAIMED}. View Details: ${EXECUTION_URL}",
+    "tags": [
+        "policy:${POLICY_NAME}",
+        "status:${EXECUTION_STATUS}",
+        "event_type:lifecycle_policy_dry_run_execution_completed"
+    ],
+    "aggregation_key": "${POLICY_NAME}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

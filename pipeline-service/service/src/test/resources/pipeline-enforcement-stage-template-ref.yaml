@@ -1,0 +1,12 @@
+pipeline:
+  name: TemplateRefPipeline
+  identifier: TemplateRefPipeline
+  projectIdentifier: testProject
+  orgIdentifier: testOrg
+  stages:
+    - stage:
+        name: BuildFromTemplate
+        identifier: BuildFromTemplate
+        template:
+          templateRef: ci_build_template
+          versionLabel: v1

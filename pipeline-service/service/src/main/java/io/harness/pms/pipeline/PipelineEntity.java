@@ -1,0 +1,297 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.pipeline;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.EntityType;
+import io.harness.annotation.HarnessEntity;
+import io.harness.annotations.ChangeDataCapture;
+import io.harness.annotations.StoreIn;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.data.validator.EntityIdentifier;
+import io.harness.data.validator.EntityName;
+import io.harness.data.validator.Trimmed;
+import io.harness.gitsync.beans.StoreType;
+import io.harness.gitsync.entityInfo.GitSyncableEntity;
+import io.harness.mongo.collation.CollationLocale;
+import io.harness.mongo.collation.CollationStrength;
+import io.harness.mongo.index.Collation;
+import io.harness.mongo.index.CompoundMongoIndex;
+import io.harness.mongo.index.FdIndex;
+import io.harness.mongo.index.MongoIndex;
+import io.harness.mongo.index.SortCompoundMongoIndex;
+import io.harness.ng.DbAliases;
+import io.harness.ng.core.common.beans.NGTag;
+import io.harness.persistence.AccountAccess;
+import io.harness.persistence.PersistentEntity;
+import io.harness.persistence.UniqueIdAware;
+import io.harness.persistence.UuidAware;
+import io.harness.persistence.gitaware.GitAware;
+import io.harness.pms.yaml.HarnessYamlVersion;
+import io.harness.template.yaml.ref.TemplateRefHelper;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.reinert.jjschema.SchemaIgnore;
+import com.google.common.collect.ImmutableList;
+import dev.morphia.annotations.Entity;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Singular;
+import lombok.Value;
+import lombok.experimental.FieldNameConstants;
+import lombok.experimental.NonFinal;
+import lombok.experimental.UtilityClass;
+import lombok.experimental.Wither;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
+@OwnedBy(PIPELINE)
+@Value
+@Builder(toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@FieldNameConstants(innerTypeName = "PipelineEntityKeys")
+@StoreIn(DbAliases.PMS)
+@Entity(value = "pipelinesPMS", noClassnameStored = true)
+@Document("pipelinesPMS")
+@TypeAlias("pipelinesPMS")
+@HarnessEntity(exportable = true)
+@ChangeDataCapture(table = "tags_info_ng", dataStore = "pms-harness", fields = {}, handler = "TagsInfoNGCD")
+@ChangeDataCapture(table = "pipelines", dataStore = "ng-harness", fields = {}, handler = "Pipelines")
+public class PipelineEntity
+    implements GitAware, GitSyncableEntity, PersistentEntity, AccountAccess, UuidAware, UniqueIdAware {
+  public static List<MongoIndex> mongoIndexes() {
+    return ImmutableList
+        .<MongoIndex>builder()
+        // pipeline get call
+        .add(CompoundMongoIndex.builder()
+                 .name("unique_accountId_parentUniqueId_pipelineId_repo_branch")
+                 .unique(true)
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.parentUniqueId)
+                 .field(PipelineEntityKeys.identifier)
+                 .field(PipelineEntityKeys.yamlGitConfigRef)
+                 .field(PipelineEntityKeys.branch)
+                 .build())
+        // used by countFileInstances
+        .add(CompoundMongoIndex.builder()
+                 .name("accountId_repoURL_filePath")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.repoURL)
+                 .field(PipelineEntityKeys.filePath)
+                 .build())
+        // Used by sort in pipeline list api
+        .add(SortCompoundMongoIndex.builder()
+                 .name("accountId_parentUniqueId_lastUpdatedAt_repo_identifier_idx")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.parentUniqueId)
+                 .descSortField(PipelineEntityKeys.lastUpdatedAt)
+                 // Range filters
+                 .ascRangeField(PipelineEntityKeys.repo)
+                 .ascRangeField(PipelineEntityKeys.identifier)
+                 .build())
+        .add(SortCompoundMongoIndex.builder()
+                 .name("accountId_parentUniqueId_name_repo_identifier_WithCollationIdx")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.parentUniqueId)
+                 .descSortField(PipelineEntityKeys.name)
+                 // Range filters
+                 .ascRangeField(PipelineEntityKeys.repo)
+                 .ascRangeField(PipelineEntityKeys.identifier)
+                 .collation(
+                     Collation.builder().locale(CollationLocale.ENGLISH).strength(CollationStrength.SECONDARY).build())
+                 .build())
+        .add(SortCompoundMongoIndex.builder()
+                 .name("accountId_parentUniqueId_lastExecutedAt_repo_identifier_idx")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.parentUniqueId)
+                 .descSortField(PipelineEntityKeys.lastExecutedAt)
+                 // Range filters
+                 .ascRangeField(PipelineEntityKeys.repo)
+                 .ascRangeField(PipelineEntityKeys.identifier)
+                 .build())
+        // used for fetching pipeline by repoName and file Path
+        .add(CompoundMongoIndex.builder()
+                 .name("accountId_repoName_filePath")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.repo)
+                 .field(PipelineEntityKeys.filePath)
+                 .build())
+        // used for fetching pipeline count by identifier and deleted
+        .add(CompoundMongoIndex.builder()
+                 .name("accountId_deleted_idx")
+                 .field(PipelineEntityKeys.accountId)
+                 .field(PipelineEntityKeys.deleted)
+                 .build())
+        .add(CompoundMongoIndex.builder()
+                 .name("harnessVersion_repoURL_storeType_idx")
+                 .field(PipelineEntityKeys.harnessVersion)
+                 .field(PipelineEntityKeys.repoURL)
+                 .field(PipelineEntityKeys.storeType)
+                 .build())
+        .build();
+  }
+  @Setter @NonFinal @Id @dev.morphia.annotations.Id String uuid;
+
+  @Setter @NonFinal Set<String> templateModules;
+
+  @NotEmpty String accountId;
+  @NotEmpty String orgIdentifier;
+  @Trimmed @NotEmpty String projectIdentifier;
+  @NotEmpty @EntityIdentifier String identifier;
+  @Wither @Setter @NonFinal Boolean isDraft;
+
+  @Wither @NotEmpty @NonFinal @Setter String yaml;
+
+  // Used by PipelineTelemetryPublisher
+  @Setter @NonFinal @SchemaIgnore @CreatedDate @Builder.Default Long createdAt = 0L;
+  @Wither @Setter @NonFinal @SchemaIgnore @NotNull @LastModifiedDate @Builder.Default Long lastUpdatedAt = 0L;
+  @Wither @Default Boolean deleted = Boolean.FALSE;
+
+  @Wither @EntityName String name;
+  @Wither @Size(max = 1024) String description;
+  @Wither @Size(max = 128) List<NGTag> tags;
+
+  @Wither @Version Long version;
+
+  @Wither @Default Map<String, org.bson.Document> filters = new HashMap<>();
+
+  /**
+   * @deprecated Use {@link RecentExecutionInfo} from {@link PipelineMetadataV2}
+   * lastExecutionTs move out from this dto to first class in pipelineEntity for sort filter
+   */
+  @Deprecated ExecutionSummaryInfo executionSummaryInfo;
+  @Builder.Default Integer runSequence = 0;
+
+  @Wither @Builder.Default Integer stageCount = 0;
+  @Wither @Singular List<String> stageNames;
+
+  @Wither Boolean allowStageExecutions;
+  @Setter @NonFinal Boolean allowDynamicExecutions;
+
+  @Wither @Setter @NonFinal @Builder.Default Boolean enableDAG = Boolean.FALSE;
+
+  // git experience parameters before simplification
+  @Wither @Setter @NonFinal String objectIdOfYaml;
+  @Setter @NonFinal Boolean isFromDefaultBranch;
+  @Setter @NonFinal String branch;
+  @Setter @NonFinal String yamlGitConfigRef;
+  @Wither @Setter @NonFinal String filePath; // -> also used in git simplification
+  @Setter @NonFinal String rootFolder;
+  @Getter(AccessLevel.NONE) @Wither @NonFinal Boolean isEntityInvalid;
+
+  // git experience parameters after simplification
+  @Wither @Setter @NonFinal StoreType storeType;
+  @Wither @Setter @NonFinal String repo;
+  @Wither @Setter @NonFinal String connectorRef;
+  @Wither @Setter @NonFinal String repoURL;
+  @Setter @NonFinal Integer yamlHash;
+
+  // to maintain pipeline version
+  @Setter @NonFinal String harnessVersion;
+
+  // V0 pipeline identifier this entity was converted from (null if natively V1)
+  @Setter @NonFinal String convertedFromPipelineId;
+
+  @FdIndex @Setter @NonFinal String uniqueId;
+  @FdIndex @Setter @NonFinal String parentUniqueId;
+
+  public String getData() {
+    return yaml;
+  }
+
+  @Override
+  public void setData(String data) {
+    yaml = data;
+  }
+
+  @Override
+  public EntityType getEntityType() {
+    return EntityType.PIPELINES;
+  }
+
+  @Override
+  public String getAccountIdentifier() {
+    return accountId;
+  }
+
+  @Override
+  public boolean isEntityInvalid() {
+    return Boolean.TRUE.equals(isEntityInvalid);
+  }
+
+  @Override
+  public void setEntityInvalid(boolean isEntityInvalid) {
+    this.isEntityInvalid = isEntityInvalid;
+  }
+
+  @Override
+  public String getInvalidYamlString() {
+    return yaml;
+  }
+
+  @JsonIgnore
+  public Boolean getTemplateReference() {
+    if (EmptyPredicate.isEmpty(getData())) {
+      return false;
+    }
+    return TemplateRefHelper.hasTemplateRefOrCustomDeploymentRef(getData(), getHarnessVersion());
+  }
+
+  public String getHarnessVersion() {
+    if (harnessVersion == null || harnessVersion.equals("V0")) {
+      return HarnessYamlVersion.V0;
+    }
+    return harnessVersion;
+  }
+
+  @UtilityClass
+  public static class PipelineEntityKeys {
+    public static final String lastExecutedAt = PipelineEntityKeys.executionSummaryInfo + "."
+        + "lastExecutionTs";
+  }
+
+  public String getGitAttributesYaml() {
+    StringBuilder builder = new StringBuilder();
+
+    if (storeType != null) {
+      builder.append(System.lineSeparator()).append("storeType: ").append(storeType.name());
+    }
+    if (repo != null) {
+      builder.append(System.lineSeparator()).append("repo: ").append(repo);
+    }
+    if (connectorRef != null) {
+      builder.append(System.lineSeparator()).append("connectorRef: ").append(connectorRef);
+    }
+    if (filePath != null) {
+      builder.append(System.lineSeparator()).append("filePath: ").append(filePath);
+    }
+
+    return builder.toString();
+  }
+}

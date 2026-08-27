@@ -1,0 +1,8 @@
+name: Kafka Producer Event Metrics
+identifier: KafkaProducerEventMetrics
+metricGroup: KafkaProducerMetricsGroup
+metrics:
+  - metricName: kafka_producer_event_sent_count
+    metricDefinition: Number of Kafka producer events sent (use status label to filter success/failure)
+    type: Count
+    unit: "1"

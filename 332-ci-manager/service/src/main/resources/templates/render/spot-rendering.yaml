@@ -1,0 +1,9 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/harness-rendering:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{serviceOutput.startupScript.paths}}

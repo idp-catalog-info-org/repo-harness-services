@@ -1,0 +1,98 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/fme-schema.json",
+    "title": "Root",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "proxy"
+    ],
+    "properties": {
+      "proxy": {
+        "$id": "#root/proxy",
+        "title": "Proxy",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoints"
+        ],
+        "properties": {
+          "endpoints": {
+            "$id": "#root/proxy/endpoints",
+            "title": "Endpoints",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "/harnessfme"
+            ],
+            "properties": {
+              "/harnessfme": {
+                "$id": "#root/proxy/endpoints//harnessfme",
+                "title": "/harnessfme",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "target",
+                  "headers"
+                ],
+                "properties": {
+                  "target": {
+                    "$id": "#root/proxy/endpoints//harnessfme/target",
+                    "title": "Target",
+                    "type": "string",
+                    "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                  },
+                  "pathRewrite": {
+                    "$id": "#root/proxy/endpoints//harnessfme/pathRewrite",
+                    "title": "Path Rewrite",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "/api/proxy/harnessfme/?"
+                    ],
+                    "properties": {
+                      "/api/proxy/harnessfme/?": {
+                          "$id": "#root/proxy/endpoints//harnessfme/pathRewrite//api/proxy/harnessfme/?",
+                          "title": "/api/proxy/harnessfme/?",
+                          "type": "string",
+                          "default": "",
+                          "pattern": "^.*$"
+                      }
+                    }
+                  },
+                  "headers": {
+                    "$id": "#root/proxy/endpoints//harnessfme/headers",
+                    "title": "Headers",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "Authorization": {
+                        "$id": "#root/proxy/endpoints//harnessfme/headers/Authorization",
+                        "title": "Authorization",
+                        "type": "string",
+                        "default": "Bearer ${SPLIT_API_TOKEN}",
+                        "pattern": "^.*$"
+                      },
+                      "x-api-key": {
+                        "$id": "#root/proxy/endpoints//harnessfme/headers/x-api-key",
+                        "title": "x-api-key",
+                        "type": "string",
+                        "default": "${SPLIT_API_TOKEN}",
+                        "pattern": "^.*$"
+                      }
+                    },
+                    "oneOf": [
+                      { "required": ["Authorization"] },
+                      { "required": ["x-api-key"] }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+     }
+    }
+  

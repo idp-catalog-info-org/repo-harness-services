@@ -1,0 +1,65 @@
+{
+   "type": "message",
+   "attachments": [
+      {
+         "contentType": "application/vnd.microsoft.card.adaptive",
+         "content": {
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
+               {
+                  "type": "TextBlock",
+                  "size": "Medium",
+                  "weight": "Bolder",
+                  "text": "Token deleted — ${TOKEN_IDENTIFIER}",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "The token ${TOKEN_IDENTIFIER} for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME} was deleted.",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "Any pipelines or integrations using this token will fail.",
+                  "wrap": true
+               },
+               {
+                  "type": "FactSet",
+                  "facts": [
+                     {
+                        "title": "Token Identifier:",
+                        "value": "${TOKEN_IDENTIFIER}"
+                     },
+                     {
+                        "title": "API Key Identifier:",
+                        "value": "${API_KEY_IDENTIFIER}"
+                     },
+                     {
+                        "title": "Service Account:",
+                        "value": "${SERVICE_ACCOUNT_NAME}"
+                     },
+                     {
+                        "title": "Account Name:",
+                        "value": "${ACCOUNT_NAME}"
+                     },
+                     {
+                        "title": "Account ID:",
+                        "value": "${ACCOUNT_IDENTIFIER}"
+                     },
+                     {
+                        "title": "Organization:",
+                        "value": "${ORG_IDENTIFIER}"
+                     },
+                     {
+                        "title": "Project:",
+                        "value": "${PROJECT_IDENTIFIER}"
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   ]
+}

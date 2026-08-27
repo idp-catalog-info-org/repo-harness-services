@@ -1,0 +1,282 @@
+!!!custom_delegateAsyncTaskResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateAsyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateSyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateTaskProgressResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateTaskProgressResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+approvalInstances {"name": "accountId_parentUniqueId_pipelineIdentifier_approvalKey_status_isAutoRejectEnabled_createdAt", "background": true} {"accountId": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "approvalKey": 1, "status": 1, "isAutoRejectEnabled": 1, "createdAt": 1}
+approvalInstances {"name": "accountId_status_type", "background": true} {"accountId": 1, "status": 1, "type": 1}
+approvalInstances {"name": "nodeExecutionId_1", "background": true} {"nodeExecutionId": 1}
+approvalInstances {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+approvalInstances {"name": "planExecutionId_status_type_nodeExecutionId", "background": true} {"planExecutionId": 1, "status": 1, "type": 1, "nodeExecutionId": 1}
+approvalInstances {"name": "status_deadline", "background": true} {"status": 1, "deadline": 1}
+approvalInstances {"name": "status_type_nextIteration", "background": true} {"status": 1, "type": 1, "nextIteration": -1}
+approvalInstances {"name": "status_type_nextIterations", "background": true} {"status": 1, "type": 1, "nextIterations": 1}
+approvalInstances {"name": "status_type_nextIterations_0", "background": true} {"status": 1, "type": 1, "nextIterations.0": 1}
+approvalInstances {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+approvalInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+barrierExecutionInstances {"name": "createdAt_1", "background": true} {"createdAt": 1}
+barrierExecutionInstances {"name": "next_iteration_idx", "background": true} {"barrierState": 1, "nextIteration": 1}
+barrierExecutionInstances {"name": "planExecutionId_barrierState_stagesIdentifier_idx", "background": true} {"planExecutionId": 1, "barrierState": 1, "setupInfo.stages.identifier": 1}
+barrierExecutionInstances {"name": "planExecutionId_strategySetupIds_idx", "background": true} {"planExecutionId": 1, "setupInfo.strategySetupIds": 1}
+barrierExecutionInstances {"name": "unique_identifier_planExecutionId_idx", "unique": true} {"identifier": 1, "planExecutionId": 1}
+barrierExecutionInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+blockExecutions {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+blockExecutions {"name": "parentUniqueId_pipelineId_idx", "unique": true} {"parentUniqueId": 1, "pipelineId": 1}
+blockExecutions {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+cache {"name": "accountId_1", "background": true} {"accountId": 1}
+cache {"name": "unique_commutative", "unique": true} {"_id": 1, "contextValue": 1}
+cache {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+cacheEntities {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+cacheEntities {"name": "createdAt_1", "background": true} {"createdAt": 1}
+cacheEntities {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+cdcEntitiesMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+conversionChecksums {"name": "entity_lookup_idx", "background": true} {"accountId": 1, "entityId": 1, "entityType": 1}
+conversionChecksums {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+conversionChecksums {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+conversionChecksums {"name": "unique_inline_entity_parent_idx", "unique": true, "partialFilterExpression": {"storeType": "INLINE"}} {"accountId": 1, "parentUniqueId": 1, "entityId": 1, "entityType": 1, "versionLabel": 1}
+conversionChecksums {"name": "unique_remote_entity_parent_idx", "unique": true, "partialFilterExpression": {"storeType": "REMOTE"}} {"accountId": 1, "parentUniqueId": 1, "entityId": 1, "versionLabel": 1, "repoURL": 1, "branch": 1}
+conversionJobs {"name": "accountId_createdAt_idx", "background": true} {"accountId": 1, "createdAt": -1}
+conversionJobs {"name": "accountId_status_createdAt_idx", "background": true} {"accountId": 1, "status": 1, "createdAt": -1}
+conversionJobs {"name": "entity_scope_lookup_idx", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "entityType": 1, "entityIdentifier": 1, "createdAt": -1}
+conversionJobs {"name": "nextIteration_status_idx", "background": true} {"status": 1, "nextIteration": 1}
+conversionJobs {"name": "parentJobId_status_idx", "background": true} {"parentJobId": 1, "status": 1}
+conversionJobs {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+conversionJobs {"name": "rootJobId_entity_dedup_idx", "background": true} {"rootJobId": 1, "entityIdentifier": 1, "entityType": 1, "status": 1}
+conversionJobs {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+conversionJobs {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+dataRetentionOverrides {"name": "accountIdentifier_1", "unique": true} {"accountIdentifier": 1}
+dataRetentionOverrides {"name": "dataRetentionSettings_idx", "background": true} {"dataRetentionSettings": 1}
+delayQueue {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+delayQueue {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+eventListenerStepInstances {"name": "accountId_parentUniqueId_pipelineIdentifier_webhookIdentifier_status_createdAt", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "webhookIdentifier": 1, "status": 1, "createdAt": 1}
+eventListenerStepInstances {"name": "nodeExecutionId_1", "background": true} {"nodeExecutionId": 1}
+eventListenerStepInstances {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+eventListenerStepInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+executionExpressionUsage {"name": "accountId_orgId_projectId_pipelineId_nodeFQN_expressionHash_createdAt", "background": true} {"metadata.accountIdentifier": 1, "metadata.orgIdentifier": 1, "metadata.projectIdentifier": 1, "metadata.pipelineIdentifier": 1, "metadata.nodeFQNHash": 1, "metadata.expressionHash": 1, "isError": 1, "createdAt": -1}
+executionExpressionUsage {"name": "planExecutionId_nodeExecutionId", "background": true} {"planExecutionId": 1, "nodeExecutionId": 1}
+executionExpressionUsage {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+executionInputInstance {"name": "expireAt_1", "background": true, "expireAfterSeconds": 0} {"expireAt": 1}
+executionInputInstance {"name": "nodeExecutionId_1", "unique": true} {"nodeExecutionId": 1}
+executionOutboxEvents {"name": "blocked_createdAt_nextUnblockAttemptAt_outbox_Idx", "background": true} {"blocked": 1, "createdAt": 1, "nextUnblockAttemptAt": 1}
+executionOutboxEvents {"name": "eventType_blocked_outbox_Idx", "background": true} {"eventType": 1, "blocked": 1}
+executionRetentionMetadata {"name": "accountId_endTs_idx", "background": true} {"accountId": 1, "endTs": 1}
+executionRetentionMetadata {"name": "parentUniqueId_idx", "background": true} {"parentUniqueId": 1}
+executionRetentionMetadata {"name": "planExecutionId_1", "unique": true} {"planExecutionId": 1}
+executionRetentionMetadata {"name": "retentionFile_collection_idx", "background": true} {"retentionFileData.collection": 1}
+executionRetentionMetadata {"name": "retentionFile_uuid_collectionName_idx", "background": true} {"retentionFileData.uuid": 1, "retentionFileData.collectionName": 1}
+executionRetentionMetadata {"name": "retentionFile_uuid_collection_collectionName_idx", "background": true} {"retentionFileData.uuid": 1, "retentionFileData.collection": 1, "retentionFileData.collectionName": 1}
+executionSweepingOutput {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+executionSweepingOutput {"name": "planExecutionId_fully_qualified_name_createdAt_Idx", "background": true} {"planExecutionId": 1, "fullyQualifiedName": 1, "createdAt": -1}
+executionSweepingOutput {"name": "producedByRuntime_Idx", "background": true} {"producedBy.runtimeId": 1}
+executionSweepingOutput {"name": "unique_levelRuntimeIdUniqueIdx2", "unique": true} {"planExecutionId": 1, "levelRuntimeIdIdx": 1, "name": 1}
+executionSweepingOutput {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+expressionUsage {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+expressionUsage {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+expressionUsage {"name": "unique_accountId_parentUniqueId_pipelineId", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "pipelineIdentifier": 1}
+filterUniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+filters {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+filters {"name": "unique_accountId_orgId_projectId_name_type_Index", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "name": 1, "filterType": 1}
+filters {"name": "unique_accountId_organizationId_projectId_type", "unique": true} {"fullyQualifiedIdentifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_identifier_type", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_name_type_Index", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "name": 1, "filterType": 1}
+gitProcessRequestSdk {"name": "accountId_repo_branch_commit_index", "background": true} {"accountId": 1, "repoUrl": 1, "branch": 1, "commitId": 1}
+globalTemplateSyncStatus {"name": "lastCommitId_1", "background": true} {"lastCommitId": 1}
+graphUpdateInfo {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+graphUpdateInfo {"name": "planExecutionId_lastUpdatedAt_createdAt_idx", "background": true} {"planExecutionId": 1, "lastUpdatedAt": 1, "createdAt": 1}
+graphUpdateInfo {"name": "unique_planExecutionId_stepCategory_nodeExecutionId", "unique": true} {"planExecutionId": 1, "executionSummaryUpdateInfo.stepCategory": 1, "nodeExecutionId": 1}
+graphUpdateInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+inputSetsPMS {"name": "accountId_parentUniqueId_repo_branch_WithCollationIdx", "background": true, "collation": {"locale": "en", "strength": 2}} {"accountId": 1, "parentUniqueId": 1, "yamlGitConfigRef": 1, "branch": 1, "lastUpdatedAt": -1}
+inputSetsPMS {"name": "accountId_repoURL_filePath", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1}
+inputSetsPMS {"name": "createdAt_1", "background": true} {"createdAt": 1}
+inputSetsPMS {"name": "gitx_accountId_parentUniqueId_pipelineId_inputSetId_repo", "background": true} {"accountId": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "identifier": 1, "repo": 1}
+inputSetsPMS {"name": "gitx_accountId_parentUniqueId_pipelineId_name_WithCollationIdx", "background": true, "collation": {"locale": "en", "strength": 2}} {"accountId": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "name": 1}
+inputSetsPMS {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+inputSetsPMS {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+inputSetsPMS {"name": "unique_accountId_parentUniqueId_pipelineId_inputSetId_repo_branch", "unique": true} {"accountId": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "identifier": 1, "yamlGitConfigRef": 1, "branch": 1}
+interrupts {"name": "planExecutionId_createdAt_idx", "background": true} {"planExecutionId": 1, "createdAt": -1}
+interrupts {"name": "planExecutionId_nodeExecutionId_createdAt_idx", "background": true} {"planExecutionId": 1, "nodeExecutionId": 1, "createdAt": -1}
+interrupts {"name": "planExecutionId_nodeExecutionId_type_createdAt_idx", "background": true} {"planExecutionId": 1, "nodeExecutionId": 1, "type": 1, "createdAt": -1}
+interrupts {"name": "planExecutionId_state_type_createdAt_idx", "background": true} {"planExecutionId": 1, "state": 1, "type": 1, "createdAt": -1}
+interrupts {"name": "state_type_monitoring_createdAt_idx", "background": true} {"state": 1, "type": 1, "createdAt": -1}
+interrupts {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+nodeExecutions {"name": "accountId_idx", "background": true} {"ambiance.setupAbstractions.accountId": 1}
+nodeExecutions {"name": "createdAt_1", "background": true} {"createdAt": 1}
+nodeExecutions {"name": "parentId_status_idx", "background": true} {"parentId": 1, "status": 1, "oldRetry": 1}
+nodeExecutions {"name": "planExecutionId_createdAt_idx", "background": true} {"ambiance.planExecutionId": 1, "createdAt": 1}
+nodeExecutions {"name": "planExecutionId_identifier_idx", "background": true} {"ambiance.planExecutionId": 1, "identifier": 1}
+nodeExecutions {"name": "planExecutionId_lastUpdatedAt_createdAt_idx", "background": true} {"ambiance.planExecutionId": 1, "lastUpdatedAt": 1, "createdAt": 1}
+nodeExecutions {"name": "planExecutionId_mode_status_oldRetry_idx", "background": true} {"ambiance.planExecutionId": 1, "mode": 1, "status": 1, "oldRetry": 1}
+nodeExecutions {"name": "planExecutionId_nodeId_idx", "background": true} {"ambiance.planExecutionId": 1, "nodeId": 1}
+nodeExecutions {"name": "planExecutionId_oldRetry_idx", "background": true} {"ambiance.planExecutionId": 1, "oldRetry": 1}
+nodeExecutions {"name": "planExecutionId_parentId_createdAt_idx", "background": true} {"ambiance.planExecutionId": 1, "parentId": 1, "createdAt": -1}
+nodeExecutions {"name": "planExecutionId_stageFqn_idx", "background": true} {"ambiance.planExecutionId": 1, "stageFqn": 1}
+nodeExecutions {"name": "planExecutionId_status_idx", "background": true} {"ambiance.planExecutionId": 1, "status": 1}
+nodeExecutions {"name": "planExecutionId_stepCategory_identifier_idx", "background": true} {"ambiance.planExecutionId": 1, "stepType.stepCategory": 1, "identifier": 1}
+nodeExecutions {"name": "previous_id_idx", "background": true} {"previousId": 1}
+nodeExecutions {"name": "processingEvent_nextIteration_status", "background": true} {"processingEvent": 1, "nextIteration": 1, "status": 1}
+nodeExecutions {"name": "status_idx", "background": true} {"status": 1}
+nodeExecutions {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+nodeExecutionsInfo {"name": "accountIdentifier_idx", "background": true} {"accountIdentifier": 1}
+nodeExecutionsInfo {"name": "nodeExecutionId_unique_idx", "unique": true} {"nodeExecutionId": 1}
+nodeExecutionsInfo {"name": "planExecutionId_idx", "background": true} {"planExecutionId": 1}
+nodeExecutionsInfo {"name": "planExecutionId_lastUpdatedAt_createdAt_idx", "background": true} {"planExecutionId": 1, "lastUpdatedAt": 1, "createdAt": 1}
+nodeExecutionsInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+nodes {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+nodes {"name": "nodeId_idx", "background": true} {"nodeId": 1}
+nodes {"name": "planNodeId_nodeId", "background": true} {"planId": 1, "nodeId": 1}
+nodes {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+notificationEventLog {"name": "planExecutionId_nodeExecutionId_pipelineEventType", "background": true} {"planExecutionId": 1, "nodeExecutionId": 1, "pipelineEventType": 1}
+notificationEventLog {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+notifyQueue {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+notifyQueue {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+notifyQueue {"name": "waitInstanceId_1", "unique": true} {"waitInstanceId": 1}
+notifyResponses {"name": "createdAt_1", "background": true} {"createdAt": 1}
+notifyResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+notifyResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+orchestrationEventLog {"name": "planExecutionId_createdAt", "background": true} {"planExecutionId": 1, "createdAt": 1}
+orchestrationEventLog {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+outboxEvents {"name": "blocked_createdAt_nextUnblockAttemptAt_outbox_Idx", "background": true} {"blocked": 1, "createdAt": 1, "nextUnblockAttemptAt": 1}
+outboxEvents {"name": "eventType_blocked_outbox_Idx", "background": true} {"eventType": 1, "blocked": 1}
+outcomeInstances {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+outcomeInstances {"name": "planExecutionIdProducedByRuntimeIdCreatedAtIdx", "background": true} {"planExecutionId": 1, "producedBy.runtimeId": 1, "createdAt": -1}
+outcomeInstances {"name": "planExecutionId_fully_qualified_name_createdAt", "background": true} {"planExecutionId": 1, "fullyQualifiedName": 1, "createdAt": -1}
+outcomeInstances {"name": "planExecutionId_name_idx", "background": true} {"planExecutionId": 1, "name": 1}
+outcomeInstances {"name": "producedByRuntimeIdIdx", "background": true} {"producedBy.runtimeId": 1}
+outcomeInstances {"name": "unique_levelRuntimeIdUniqueIdx", "unique": true} {"planExecutionId": 1, "levelRuntimeIdIdx": 1, "name": 1}
+outcomeInstances {"name": "unique_producedBySetupIdRuntimeIdIdx", "unique": true} {"planExecutionId": 1, "producedBy.setupId": 1, "producedBy.runtimeId": 1, "name": 1}
+outcomeInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pipelineAnnotations {"name": "accountId_planExecutionId_contextId_unique_idx", "unique": true} {"accountId": 1, "planExecutionId": 1, "contextId": 1}
+pipelineAnnotations {"name": "planExecutionId_contextId_idx", "background": true} {"planExecutionId": 1, "contextId": 1}
+pipelineAnnotations {"name": "planExecutionId_idx", "background": true} {"planExecutionId": 1}
+pipelineAnnotations {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pipelineBranchSequence {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+pipelineBranchSequence {"name": "pipeline_cleanup_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineIdentifier": 1}
+pipelineBranchSequence {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+pipelineBranchSequence {"name": "unique_branch_counter_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineIdentifier": 1, "normalizedRepoUrl": 1, "branch": 1}
+pipelineDeleteProcessorIterator {"name": "createdAt_1", "background": true} {"createdAt": 1}
+pipelineEntityOpaStatus {"name": "accountIdentifier_repoURL_branch_idx", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branch": 1}
+pipelineEntityOpaStatus {"name": "accountIdentifier_repoURL_filePath_branch_unique_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "filePath": 1, "branch": 1}
+pipelineEntityOpaStatus {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pipelineExecutionGitMetadata {"name": "accountId_parentUniqueId_pipelineId_repoName_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "pipelineIdentifier": 1, "repoName": 1}
+pipelineMetadata {"name": "account_org_project_pipeline_yaml_git_config_branch_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1, "entityGitDetails.branch": 1, "entityGitDetails.repoIdentifier": 1}
+pipelineMetadataV2 {"name": "account_parentUniqueId_pipeline", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+pipelineMetadataV2 {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+pipelineMetadataV2 {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+pipelineValidationEvent {"name": "fqn_action_startTs_idx", "background": true} {"fqn": 1, "action": 1, "startTs": -1}
+pipelineValidationEvent {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pipelineYamlConversions {"name": "accountId_orgId_projectId_pipelineId_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineIdentifier": 1}
+pipelineYamlConversions {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+pipelineYamlConversions {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+pipelineYamlConversions {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pipelinesPMS {"name": "accountId_deleted_idx", "background": true} {"accountId": 1, "deleted": 1}
+pipelinesPMS {"name": "accountId_parentUniqueId_lastExecutedAt_repo_identifier_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "executionSummaryInfo.lastExecutionTs": -1, "repo": 1, "identifier": 1}
+pipelinesPMS {"name": "accountId_parentUniqueId_lastUpdatedAt_repo_identifier_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "lastUpdatedAt": -1, "repo": 1, "identifier": 1}
+pipelinesPMS {"name": "accountId_parentUniqueId_name_repo_identifier_WithCollationIdx", "background": true, "collation": {"locale": "en", "strength": 2}} {"accountId": 1, "parentUniqueId": 1, "name": -1, "repo": 1, "identifier": 1}
+pipelinesPMS {"name": "accountId_repoName_filePath", "background": true} {"accountId": 1, "repo": 1, "filePath": 1}
+pipelinesPMS {"name": "accountId_repoURL_filePath", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1}
+pipelinesPMS {"name": "harnessVersion_repoURL_storeType_idx", "background": true} {"harnessVersion": 1, "repoURL": 1, "storeType": 1}
+pipelinesPMS {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+pipelinesPMS {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+pipelinesPMS {"name": "unique_accountId_parentUniqueId_pipelineId_repo_branch", "unique": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1, "yamlGitConfigRef": 1, "branch": 1}
+planCreationQueueRequests {"name": "planExecutionId_1", "unique": true} {"planExecutionId": 1}
+planCreationQueueRequests {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+planExecutionExpansions {"name": "planExecutionId_1", "background": true} {"planExecutionId": 1}
+planExecutionExpansions {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+planExecutions {"name": "accountId_priorityType_status_idx", "background": true} {"setupAbstractions.accountId": 1, "priorityType": 1, "status": 1}
+planExecutions {"name": "accountId_status_createdAt_idx", "background": true} {"setupAbstractions.accountId": 1, "status": 1, "createdAt": 1}
+planExecutions {"name": "endTs_idx", "background": true} {"endTs": 1}
+planExecutions {"name": "exec_tag_status_idx", "background": true} {"metadata.triggerInfo.triggeredBy.extraInfo.execution_trigger_tag_needed_for_abort": 1, "status": 1, "createdAt": -1}
+planExecutions {"name": "status_accountId", "background": true} {"status": 1, "setupAbstractions.accountId": 1}
+planExecutions {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+planExecutionsMetadata {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+planExecutionsMetadata {"name": "planExecutionId_idx", "unique": true} {"planExecutionId": 1}
+planExecutionsMetadata {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+planExecutionsSummary {"name": "accountId_createdAt", "background": true} {"accountId": 1, "createdAt": 1}
+planExecutionsSummary {"name": "accountId_endTs_idx", "background": true} {"accountId": 1, "endTs": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_createdAt_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "createdAt": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_createdAt_modules_idx", "background": true} {"modules": 1, "parentUniqueId": 1, "accountId": 1, "createdAt": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_isLatestExecution_startTs_executionMode_isChildPipeline", "background": true} {"accountId": 1, "parentUniqueId": 1, "isLatestExecution": 1, "startTs": -1, "executionMode": 1, "parentStageInfo.hasParentPipeline": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_name_startTs_repo_branch_pipelineIds_status_modules_parent_info_range_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "name": -1, "startTs": 1, "entityGitDetails.repoName": 1, "entityGitDetails.branch": 1, "pipelineIdentifier": 1, "status": 1, "modules": 1, "parentStageInfo.hasParentPipeline": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_pipelineId", "background": true} {"accountId": 1, "parentUniqueId": 1, "pipelineIdentifier": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_startTs_planExecutionId_status_pipelineIdentifier", "background": true} {"accountId": 1, "parentUniqueId": 1, "startTs": -1, "planExecutionId": -1, "status": 1, "pipelineIdentifier": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_startTs_repo_branch_pipelineIds_status_modules_parent_info_range_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "startTs": -1, "entityGitDetails.repoName": 1, "entityGitDetails.branch": 1, "pipelineIdentifier": 1, "status": 1, "modules": 1, "parentStageInfo.hasParentPipeline": 1}
+planExecutionsSummary {"name": "accountId_parentUniqueId_status_startTs_repo_branch_pipelineIds_modules_parent_info_range_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "status": -1, "startTs": 1, "entityGitDetails.repoName": 1, "entityGitDetails.branch": 1, "pipelineIdentifier": 1, "modules": 1, "parentStageInfo.hasParentPipeline": 1}
+planExecutionsSummary {"name": "createdAt_1", "background": true} {"createdAt": 1}
+planExecutionsSummary {"name": "endTs_idx", "background": true} {"endTs": 1}
+planExecutionsSummary {"name": "internalStatus_startTs_idx", "background": true} {"internalStatus": 1, "startTs": 1}
+planExecutionsSummary {"name": "planExecutionId_1", "unique": true} {"planExecutionId": 1}
+planExecutionsSummary {"name": "rootExecution_createdAt_id", "background": true} {"retryExecutionMetadata.rootExecutionId": 1, "createdAt": -1}
+planExecutionsSummary {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+plans {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+plans {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+pmsSdkInstances {"name": "name_1", "unique": true} {"name": 1}
+preFlightEntity {"name": "accountId_parentUniqueId_pipelineId_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "pipelineIdentifier": 1}
+preFlightEntity {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+primaryVersion {"name": "createdAt_1", "background": true} {"createdAt": 1}
+primaryVersion {"name": "lastUpdatedAt_1", "background": true} {"lastUpdatedAt": 1}
+progressUpdate {"name": "correlation", "background": true} {"correlationId": 1, "createdAt": -1}
+progressUpdate {"name": "createdAt_1", "background": true} {"createdAt": 1}
+progressUpdate {"name": "processAfter_1", "background": true} {"processAfter": 1}
+progressUpdate {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+resourceRestraintInstances {"name": "createdAt_1", "background": true} {"createdAt": 1}
+resourceRestraintInstances {"name": "next_iteration_idx", "background": true} {"state": 1, "nextIteration": 1}
+resourceRestraintInstances {"name": "releaseEntityId_state_idx", "background": true} {"releaseEntityId": 1, "state": 1}
+resourceRestraintInstances {"name": "releaseEntityType_releaseEntityId_idx", "background": true} {"releaseEntityType": 1, "releaseEntityId": 1}
+resourceRestraintInstances {"name": "resourceRestraintId_order_idx", "background": true} {"resourceRestraintId": 1, "order": 1}
+resourceRestraintInstances {"name": "resourceRestraintId_resourceUnit_order_idx", "unique": true} {"resourceRestraintId": 1, "resourceUnit": 1, "order": 1}
+resourceRestraintInstances {"name": "resourceRestraintId_resourceUnit_state_idx", "background": true} {"resourceRestraintId": 1, "resourceUnit": 1, "state": 1}
+resourceRestraintInstances {"name": "resourceRestraintId_state_idx", "background": true} {"resourceRestraintId": 1, "state": 1}
+resourceRestraintInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+resourceRestraints {"name": "uniqueName", "unique": true} {"accountId": 1, "name": 1}
+runtimeFileInputData {"name": "nodeExecutionId_1", "unique": true} {"nodeExecutionId": 1}
+runtimeFileInputData {"name": "planExecutionId_1", "background": true} {"planExecutionId": 1}
+runtimeFileInputData {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+searchIndexMigration {"name": "accountIdentifier_1", "unique": true} {"accountIdentifier": 1}
+stageExecutionEntity {"name": "stage_execution_entity_sorted_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+stepExecutionEntity {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+stepExecutionEntity {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+stepExecutionEntity {"name": "unique_accountIdentifier_parentUniqueId_stepExecutionId_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "stepExecutionId": 1}
+timeoutInstances {"name": "createdAt_1", "background": true} {"createdAt": 1}
+timeoutInstances {"name": "nextIteration_1", "background": true} {"nextIteration": 1}
+timeoutInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+transientExecutionDataInstance {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+transientExecutionDataInstance {"name": "unique_planExecutionId_name_levelRuntimeIdx", "unique": true} {"planExecutionId": 1, "name": 1, "levelRuntimeIdIdx": 1}
+transientExecutionDataInstance {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+triggerCustomWebhookEvents {"name": "accountId_processingStatus_idx", "background": true} {"accountId": 1, "processingStatus": 1}
+triggerCustomWebhookEvents {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+triggerCustomWebhookEvents {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+triggerEventHistory {"name": "accountId_createdAt_desc", "background": true} {"accountId": 1, "createdAt": -1}
+triggerEventHistory {"name": "accountId_eventCorrelationId", "background": true} {"accountId": 1, "eventCorrelationId": 1}
+triggerEventHistory {"name": "build_source_type_parentUniqueId", "background": true} {"parentUniqueId": 1, "targetIdentifier": 1, "buildSourceType": 1, "createdAt": -1}
+triggerEventHistory {"name": "las_execution_not_attempted_parentUniqueId", "background": true} {"parentUniqueId": 1, "triggerIdentifier": 1, "targetIdentifier": 1, "executionNotAttempted": 1, "createdAt": -1}
+triggerEventHistory {"name": "las_parentUniqueId", "background": true} {"parentUniqueId": 1, "triggerIdentifier": 1, "targetIdentifier": 1, "createdAt": -1}
+triggerEventHistory {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+triggerEventHistory {"name": "parentUniqueId_target_trigger_type_status", "background": true} {"parentUniqueId": 1, "targetIdentifier": 1, "triggerIdentifier": 1, "finalStatus": 1, "ngTriggerType": 1, "createdAt": -1}
+triggerEventHistory {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+triggerEventHistory {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+triggerFailureNotificationDetails {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+triggerFailureNotificationDetails {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+triggerFailureNotificationDetails {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+triggerWebhookEvents {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+triggersNG {"name": "accId_signature_index", "background": true} {"accountId": 1, "metadata.buildMetadata.pollingConfig.signature": 1}
+triggersNG {"name": "accId_signature_index_for_multibuildmetadata", "background": true} {"accountId": 1, "metadata.multiBuildMetadata.pollingConfig.signature": 1}
+triggersNG {"name": "accId_sourcerepo_index", "background": true} {"accountId": 1, "metadata.webhook.type": 1}
+triggersNG {"name": "accountId_parentUniqueId_createdAt_targetIdentifier", "background": true} {"accountId": 1, "parentUniqueId": 1, "createdAt": -1, "targetIdentifier": 1}
+triggersNG {"name": "accountId_parentUniqueId_type_buildSourceType_enabled_deleted", "background": true} {"accountId": 1, "parentUniqueId": 1, "type": 1, "metadata.buildMetadata.buildSourceType": 1, "enabled": 1, "deleted": 1}
+triggersNG {"name": "accountId_parentUniqueId_type_enabled_deleted", "background": true} {"accountId": 1, "parentUniqueId": 1, "type": 1, "enabled": 1, "deleted": 1}
+triggersNG {"name": "accountId_parentUniqueId_type_enabled_metadataWebhookType_harMetadata", "background": true} {"accountId": 1, "parentUniqueId": 1, "type": 1, "enabled": 1, "metadata.webhook.type": 1, "metadata.webhook.harMetadata.registryName": 1, "metadata.webhook.harMetadata.actions": 1}
+triggersNG {"name": "nextIterations_1", "background": true} {"nextIterations": 1}
+triggersNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+triggersNG {"name": "type_enabled_accountId", "background": true} {"type": 1, "enabled": 1, "accountId": 1}
+triggersNG {"name": "type_nextIterations", "background": true} {"type": 1, "nextIterations": 1}
+triggersNG {"name": "type_repoUrl_accountId_parentUniqueId", "background": true} {"type": 1, "metadata.webhook.git.connectorIdentifier": 1, "accountId": 1, "parentUniqueId": 1}
+triggersNG {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+triggersNG {"name": "unique_accountId_parentUniqueId_identifier", "background": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1}
+triggersNG {"name": "unique_accountId_parentUniqueId_targetIdentifier_triggerType_identifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "targetIdentifier": 1, "targetType": 1, "identifier": 1}
+triggersNG {"name": "webhookToken_index", "background": true} {"customWebhookToken": 1}
+uniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+waitInstances {"name": "correlationIds_1", "background": true} {"correlationIds": 1}
+waitInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+waitInstances {"name": "waitingOnCorrelationIds_1", "background": true} {"waitingOnCorrelationIds": 1}
+waitStepInstance {"name": "nodeExecutionId_1", "unique": true} {"nodeExecutionId": 1}
+waitStepInstance {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}

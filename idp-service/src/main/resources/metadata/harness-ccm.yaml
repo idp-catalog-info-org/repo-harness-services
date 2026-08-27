@@ -1,0 +1,36 @@
+identifier: harness-ccm
+name: Harness Cloud Cost Management
+description: This plugin helps you to visualize your cloud costs using Harness Cloud Cost Management module directly inside IDP.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: harness.io
+category:
+  Cloud Cost
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ccm
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-ccm
+config: |-
+  proxy:
+    endpoints:
+      '/harness/prod':
+        target: https://app.harness.io/
+        pathRewrite:
+          '/api/proxy/harness/prod/?': '/'
+        allowedHeaders:
+          - authorization
+          - Harness-Account
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityCcmContent
+      addByDefault: true
+      defaultRoute: /ccm
+      layoutSchemaSpecs:
+        name: EntityCcmContent
+        title: Cloud Cost Management
+        contents:
+          - component: EntityCcmContent

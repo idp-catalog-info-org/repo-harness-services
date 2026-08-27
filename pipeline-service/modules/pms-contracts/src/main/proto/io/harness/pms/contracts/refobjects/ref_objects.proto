@@ -1,0 +1,23 @@
+// Copyright 2020 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.refobjects;
+
+option java_multiple_files = true;
+
+message RefObject {
+  string name = 1;
+  string producerId = 2;
+  string key = 3;
+  RefType refType = 4;
+  string groupName = 5;
+  string levelRuntimeIdx = 6;
+}
+
+message RefType {
+  string type = 1;
+}

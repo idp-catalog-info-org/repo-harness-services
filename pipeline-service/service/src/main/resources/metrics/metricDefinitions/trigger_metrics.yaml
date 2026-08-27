@@ -1,0 +1,8 @@
+name: Trigger Metrics
+identifier: TriggerMetrics
+metricGroup: TriggerMetricsGroup
+metrics:
+  - metricName: active_triggers_gauge
+    metricDefinition: Number active triggers per account and trigger type
+    type: LastValue
+    unit: "1"

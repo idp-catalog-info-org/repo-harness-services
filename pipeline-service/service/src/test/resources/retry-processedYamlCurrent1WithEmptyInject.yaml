@@ -1,0 +1,63 @@
+pipeline:
+  identifier: dasdasd2
+  name: dasdasd2
+  projectIdentifier: test
+  orgIdentifier: default
+  tags:
+    __uuid: rSqiXa4KROawLJZM_o44fA
+  stages:
+    - stage:
+        identifier: dasd
+        type: Custom
+        name: dasd
+        description: ''
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: Wait_1
+                  type: Wait
+                  name: Wait_1
+                  spec:
+                    duration: 10m
+                    __uuid: d27gQb5OQFK2jIqeZ5JChg
+                  __uuid: 1xtwDBoGQrSf9pX4ljtj4A
+                __uuid: 1xSqCcp1Qvi1pfk3kifW0A
+            __uuid: njBkbPXDTDq8pphtP-37CQ
+          __uuid: aWW672mrQEC8IO0pQbahNw
+        tags:
+          __uuid: 20FT0oK1RmmFN9r1OhhgpQ
+        __uuid: o-qumBJeS_Wr7O7LZWITVg
+      __uuid: JrwmFa8ZRS6TgFiHGZTgag
+    - insert:
+        identifier: st12
+        name: st12
+        stages: ''
+        __uuid: HujzIbS7SMKVoyMHPci_2w
+      __uuid: 0wa1PriOSaar7rZGg_R_tw
+    - stage:
+        identifier: dasddsa
+        type: Custom
+        name: dasddsa
+        description: ''
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: Wait_1
+                  type: Wait
+                  name: Wait_1
+                  spec:
+                    duration: 10s
+                    __uuid: 2k-KgYv7RPKWkQpxN_aRlg
+                  __uuid: kONki5aYTh2zBNeKoS8SaA
+                __uuid: TtSnbXARTMyBkP90g0lzQg
+            __uuid: ZWreL2C2Q-6T2W5-pouDfw
+          __uuid: WKehwkeqSFmmUs_PUBMaKA
+        tags:
+          __uuid: eNGe1tXSRyuokN7q-kk09A
+        __uuid: nxyg0rXTR8qMk3yr-Jac8g
+      __uuid: SCyVS60iSbu8zoxyRwk7Yg
+  allowStageExecutions: true
+  __uuid: 6UyH8JKBS2ST8n0TiZFBZg
+__uuid: Dx3dOPC9SVCJtsu-RZgz4w

@@ -1,0 +1,56 @@
+---
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/gcs-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID:  ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME:  ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_PROJECT:  ${{serviceOutput.manifests.ID_PLACEHOLDER.store.project}}
+    PLUGIN_ARTIFACT_BUCKET_NAME:  ${{serviceOutput.manifests.ID_PLACEHOLDER.store.bucket}}
+    PLUGIN_ARTIFACT_CHART_NAME:  ${{serviceOutput.manifests.ID_PLACEHOLDER.chartName}}
+    PLUGIN_ARTIFACT_CHART_PATH:  ${{serviceOutput.manifests.ID_PLACEHOLDER.store.paths}}
+    PLUGIN_ARTIFACT_CHART_VERSION:  ${{serviceOutput.manifests.ID_PLACEHOLDER.chartVersion}}
+    PLUGIN_GCP_NAME:  ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).name}}
+    PLUGIN_GCP_SERVICE_ACCOUNT_KEY:  ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).jsonKey}}
+    PLUGIN_POOL_ID: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).workloadPoolId}}
+    PLUGIN_PROVIDER_ID: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).providerId}}
+    PLUGIN_PROJECT_NUMBER: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).gcpProjectId}}
+    PLUGIN_SERVICE_ACCOUNT_EMAIL: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).serviceAccountEmail}}
+    PLUGIN_OIDC_TOKEN_ID: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).oidcToken}}
+
+    PLUGIN_CACHE_DIR: ""
+    PLUGIN_CACHE_STORE_ENDPOINT_URL: ${{runtime.settings.ci_cache_s3_endpoint_url}}
+    PLUGIN_CACHE_STORE_REGION: ${{runtime.settings.ci_cache_s3_region}}
+    PLUGIN_CACHE_STORE_BUCKET: ${{runtime.settings.ci_cache_s3_bucket_name}}
+    PLUGIN_CACHE_STORE_USERNAME: ""
+    PLUGIN_CACHE_STORE_PASSWORD: ""
+
+    PLUGIN_CACHE_STORE_AWS_NAME: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).name}}
+    PLUGIN_CACHE_STORE_AWS_ACCESS_KEY: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).accessKey}}
+    PLUGIN_CACHE_STORE_AWS_SECRET_KEY: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).secretKey}}
+    PLUGIN_CACHE_STORE_AWS_SESSION_TOKEN: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).sessionToken}}
+    PLUGIN_CACHE_STORE_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).crossAccountRoleArn}}
+    PLUGIN_CACHE_STORE_AWS_EXTERNAL_ID: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).externalId}}
+    PLUGIN_CACHE_STORE_AWS_ASSUME_ROLE_SESSION_DURATION: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).assumeRoleSessionDuration}}
+    PLUGIN_CACHE_STORE_AWS_IAM_ROLE_ARN: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).iamRoleArn}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).sdkClientBackoffStrategyType}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).baseDelay}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).maxBackoffTime}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).retryCount}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).fixedBackoff}}
+
+    PLUGIN_CACHE_STORE_OIDC_TOKEN_ID: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).oidcToken}}
+
+    PLUGIN_CACHE_STORE_GCP_NAME: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).name}}
+    PLUGIN_CACHE_STORE_GCP_SERVICE_ACCOUNT_KEY: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).jsonKey}}
+    PLUGIN_CACHE_STORE_POOL_ID: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).workloadPoolId}}
+    PLUGIN_CACHE_STORE_PROVIDER_ID: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).providerId}}
+    PLUGIN_CACHE_STORE_PROJECT_NUMBER: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).gcpProjectId}}
+    PLUGIN_CACHE_STORE_SERVICE_ACCOUNT_EMAIL: ${{connectorInputs.get(${{runtime.settings.ci_cache_connector}}).serviceAccountEmail}}

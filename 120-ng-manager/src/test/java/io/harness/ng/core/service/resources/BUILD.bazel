@@ -1,0 +1,81 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/environment/resources:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/service/services:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/opa/gitx:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/featureFlag:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/hooks:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/manifest:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/manifest/yaml:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/opa/gitx:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/service:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/service/entity:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/service/services:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/service/services/impl:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/utils:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/repositories:module",
+        "//400-rest-commons/src/main/java/software/wings/beans:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/pms/rbac:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//900-git-sync-sdk/src/main/java/io/harness/gitsync:module",
+        "//950-ng-core/src/main/java/io/harness/ng/core/utils:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-ng-core-beans/src/main/java/io/harness/cdng/service/beans:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/k8s:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/opa:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/service/dto:module",
+        "//960-ng-core-beans/src/main/java/io/harness/unified/cd/service/spec:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/validator:module",
+        "//970-api-services-beans/src/main/java/io/harness/k8s/model:module",
+        "//970-ng-commons/src/main/java/io/harness/common:module",
+        "//970-ng-commons/src/main/java/io/harness/gitsync/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/common/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//970-ng-commons/src/main/java/io/serializer/mapper:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/exception/ngexception/beans/yamlschema:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/acl/api:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
+        "@maven//:com_google_inject_guice",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:junit_junit",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_jooq_joor",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_springframework_data_spring_data_commons",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+        "@maven//:pl_pragmatists_JUnitParams",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

@@ -1,0 +1,121 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Nexus connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  repository:
+    type: string
+    description: Nexus repository name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repository}}
+  repositoryFormat:
+    type: string
+    description: Repository format (docker, maven, npm, nuget, raw)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repositoryFormat}}
+  artifactPath:
+    type: string
+    description: Artifact path (spec.artifactPath for Docker)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.artifactPath}}
+  repositoryPort:
+    type: string
+    description: Repository port (spec.repositoryPort for Docker)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.repositoryPort}}
+  repositoryUrl:
+    type: string
+    description: Repository URL (spec.repositoryUrl for Docker)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.repositoryUrl}}
+  imageTag:
+    type: string
+    description: Image tag (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  imageTagRegex:
+    type: string
+    description: Image tag regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  imageDigest:
+    type: string
+    description: Image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+  groupId:
+    type: string
+    description: Maven groupId (spec.groupId for Maven)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.groupId}}
+  mavenArtifactId:
+    type: string
+    description: Maven artifactId (spec.artifactId for Maven)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.artifactId}}
+  extension:
+    type: string
+    description: Maven extension (spec.extension for Maven)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.extension}}
+  classifier:
+    type: string
+    description: Maven classifier (spec.classifier for Maven)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.classifier}}
+  version:
+    type: string
+    description: Version (tag for Docker/Maven/NPM/Nuget, file for Raw)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  versionRegex:
+    type: string
+    description: Version regex
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  packageName:
+    type: string
+    description: NPM/Nuget package name (spec.packageName)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.packageName}}
+  group:
+    type: string
+    description: Raw group (spec.group for Raw)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.spec.group}}
+  file:
+    type: string
+    description: Raw file (tag for Raw format)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/nexus3-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_REPOSITORY_NAME: ${{inputs.repository}}
+    PLUGIN_ARTIFACT_REPOSITORY_FORMAT: ${{inputs.repositoryFormat}}
+    PLUGIN_ARTIFACT_REPOSITORY_URL: ${{inputs.repositoryUrl}}
+    PLUGIN_ARTIFACT_REPOSITORY_PORT: ${{inputs.repositoryPort}}
+    PLUGIN_ARTIFACT_IMAGE_PATH: ${{inputs.artifactPath}}
+    PLUGIN_ARTIFACT_IMAGE_TAG: ${{inputs.imageTag}}
+    PLUGIN_ARTIFACT_IMAGE_TAG_REGEX: ${{inputs.imageTagRegex}}
+    PLUGIN_ARTIFACT_IMAGE_DIGEST: ${{inputs.imageDigest}}
+    PLUGIN_ARTIFACT_GROUP_ID: ${{inputs.groupId}}
+    PLUGIN_ARTIFACT_ARTIFACT_ID: ${{inputs.mavenArtifactId}}
+    PLUGIN_ARTIFACT_EXTENSION: ${{inputs.extension}}
+    PLUGIN_ARTIFACT_CLASSIFIER: ${{inputs.classifier}}
+    PLUGIN_ARTIFACT_VERSION: ${{inputs.version}}
+    PLUGIN_ARTIFACT_VERSION_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_ARTIFACT_PACKAGE_NAME: ${{inputs.packageName}}
+    PLUGIN_ARTIFACT_GROUP: ${{inputs.group}}
+    PLUGIN_ARTIFACT_FILE_NAME: ${{inputs.file}}
+    PLUGIN_ARTIFACT_FILE_NAME_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_NEXUS_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_NEXUS_USERNAME: ${{inputs.artifactConnector.username}}
+    PLUGIN_NEXUS_PASSWORD: ${{inputs.artifactConnector.password}}

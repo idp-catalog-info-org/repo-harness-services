@@ -1,0 +1,6 @@
+name: Step Concurrency Dequeue Metrics Group
+identifier: StepConcurrencyDequeueMetricsGroup
+labels:
+  - tier
+  - outcome
+  - skip_reason

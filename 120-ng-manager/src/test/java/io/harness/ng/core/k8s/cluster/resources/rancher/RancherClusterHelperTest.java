@@ -1,0 +1,299 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.core.k8s.cluster.resources.rancher;
+
+import static io.harness.rule.OwnerRule.ABHINAV2;
+import static io.harness.rule.OwnerRule.FERNANDOD;
+import static io.harness.utils.ApiUtils.X_PAGE_NUMBER;
+import static io.harness.utils.ApiUtils.X_PAGE_SIZE;
+import static io.harness.utils.ApiUtils.X_TOTAL_ELEMENTS;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import io.harness.CategoryTest;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.DecryptableEntity;
+import io.harness.beans.DelegateTaskRequest;
+import io.harness.beans.IdentifierRef;
+import io.harness.category.element.UnitTests;
+import io.harness.connector.ConnectorInfoDTO;
+import io.harness.connector.ConnectorResponseDTO;
+import io.harness.connector.services.ConnectorService;
+import io.harness.delegate.beans.DelegateResponseData;
+import io.harness.delegate.beans.ErrorNotifyResponseData;
+import io.harness.delegate.beans.connector.RancherConnectorDTO;
+import io.harness.delegate.beans.connector.rancher.RancherConnectorBearerTokenAuthenticationDTO;
+import io.harness.delegate.beans.connector.rancher.RancherListClustersTaskResponse;
+import io.harness.delegate.beans.connector.rancher.RancherTaskParams;
+import io.harness.delegate.beans.connector.utils.ConnectorType;
+import io.harness.delegate.constants.TaskBinaryName;
+import io.harness.delegate.constants.TaskName;
+import io.harness.delegate.service.DelegateTaskResponseV1;
+import io.harness.delegate.service.DelegateTaskServiceWrapper;
+import io.harness.delegate.utils.Outputs;
+import io.harness.encryption.SecretRefData;
+import io.harness.exception.DelegateServiceDriverException;
+import io.harness.exception.InvalidRequestException;
+import io.harness.exception.WingsException;
+import io.harness.exception.exceptionmanager.ExceptionManager;
+import io.harness.logging.CommandExecutionStatus;
+import io.harness.ng.core.BaseNGAccess;
+import io.harness.ng.core.NGAccess;
+import io.harness.rancher.RancherClusterItem;
+import io.harness.rule.Owner;
+import io.harness.secretmanagerclient.services.api.SecretManagerClientService;
+import io.harness.security.encryption.EncryptedDataDetail;
+import io.harness.utils.PmsFeatureFlagHelper;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.ws.rs.core.Response;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
+
+@OwnedBy(HarnessTeam.CDP)
+public class RancherClusterHelperTest extends CategoryTest {
+  @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+  @InjectMocks private RancherClusterHelper rancherClusterHelper = new RancherClusterHelper();
+
+  @Mock private ConnectorService connectorService;
+  @Mock private SecretManagerClientService secretManagerClientService;
+  @Mock private DelegateTaskServiceWrapper delegateTaskServiceWrapper;
+  @Mock private ExceptionManager exceptionManager;
+  @Mock private PmsFeatureFlagHelper pmsFeatureFlagHelper;
+  @Mock private Outputs outputs;
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testGetRancherListClustersTaskResponse_nonSuccessStatus() {
+    DelegateTaskResponseV1 responseV1 = DelegateTaskResponseV1.builder()
+                                            .commandExecutionStatus(CommandExecutionStatus.FAILURE)
+                                            .errorMessage("delegate error")
+                                            .build();
+
+    RancherListClustersTaskResponse result = rancherClusterHelper.getRancherListClustersTaskResponse(responseV1);
+
+    assertThat(result.getCommandExecutionStatus()).isEqualTo(CommandExecutionStatus.FAILURE);
+    assertThat(result.getErrorMessage()).isEqualTo("delegate error");
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testGetRancherListClustersTaskResponse_nullOutVars() {
+    DelegateTaskResponseV1 responseV1 =
+        DelegateTaskResponseV1.builder().commandExecutionStatus(CommandExecutionStatus.SUCCESS).outVars(null).build();
+
+    RancherListClustersTaskResponse result = rancherClusterHelper.getRancherListClustersTaskResponse(responseV1);
+
+    assertThat(result.getCommandExecutionStatus()).isEqualTo(CommandExecutionStatus.FAILURE);
+    assertThat(result.getErrorMessage()).isEqualTo("Task response output variables are empty");
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testGetRancherListClustersTaskResponse_emptyOutVars() {
+    DelegateTaskResponseV1 responseV1 = DelegateTaskResponseV1.builder()
+                                            .commandExecutionStatus(CommandExecutionStatus.SUCCESS)
+                                            .outVars(Map.of())
+                                            .build();
+
+    RancherListClustersTaskResponse result = rancherClusterHelper.getRancherListClustersTaskResponse(responseV1);
+
+    assertThat(result.getCommandExecutionStatus()).isEqualTo(CommandExecutionStatus.FAILURE);
+    assertThat(result.getErrorMessage()).isEqualTo("Task response output variables are empty");
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testGetRancherListClustersTaskResponse_nullDeserializedClusters() {
+    DelegateTaskResponseV1 responseV1 = DelegateTaskResponseV1.builder()
+                                            .commandExecutionStatus(CommandExecutionStatus.SUCCESS)
+                                            .outVars(Map.of("CLUSTERS", "null"))
+                                            .build();
+    doReturn(null).when(outputs).deserialize(eq("null"), any(TypeReference.class));
+
+    RancherListClustersTaskResponse result = rancherClusterHelper.getRancherListClustersTaskResponse(responseV1);
+
+    assertThat(result.getCommandExecutionStatus()).isEqualTo(CommandExecutionStatus.SUCCESS);
+    assertThat(result.getClusterItems()).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testGetRancherListClustersTaskResponse_withClusters() {
+    DelegateTaskResponseV1 responseV1 =
+        DelegateTaskResponseV1.builder()
+            .commandExecutionStatus(CommandExecutionStatus.SUCCESS)
+            .outVars(
+                Map.of("CLUSTERS", "[{\"name\":\"cluster1\",\"id\":\"id1\"},{\"name\":\"cluster2\",\"id\":\"id2\"}]"))
+            .build();
+    List<RancherClusterItem> clusterData = List.of(RancherClusterItem.builder().name("cluster1").id("id1").build(),
+        RancherClusterItem.builder().name("cluster2").id("id2").build());
+    doReturn(clusterData).when(outputs).deserialize(anyString(), any(TypeReference.class));
+
+    RancherListClustersTaskResponse result = rancherClusterHelper.getRancherListClustersTaskResponse(responseV1);
+
+    assertThat(result.getCommandExecutionStatus()).isEqualTo(CommandExecutionStatus.SUCCESS);
+    assertThat(result.getClusterItems()).hasSize(2);
+    assertThat(result.getClusterItems())
+        .containsExactly(RancherClusterItem.builder().name("cluster1").id("id1").build(),
+            RancherClusterItem.builder().name("cluster2").id("id2").build());
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testDelegateTaskResponseExceptions() {
+    DelegateResponseData errorResponse = ErrorNotifyResponseData.builder().build();
+    assertThatThrownBy(() -> RancherClusterHelper.throwExceptionIfTaskFailed(errorResponse))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageContaining("Failed to list rancher clusters");
+
+    DelegateResponseData failedTaskResponse =
+        RancherListClustersTaskResponse.builder().commandExecutionStatus(CommandExecutionStatus.FAILURE).build();
+    assertThatThrownBy(() -> RancherClusterHelper.throwExceptionIfTaskFailed(failedTaskResponse))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageContaining("Failed to list rancher clusters");
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testGetEncryptionDetailsWithNothingToDecrypt() {
+    RancherConnectorDTO rancherConnectorDTO = mock(RancherConnectorDTO.class);
+    doReturn(emptyList()).when(rancherConnectorDTO).getDecryptableEntities();
+    List<EncryptedDataDetail> encryptionDetails = rancherClusterHelper.getEncryptionDetails(rancherConnectorDTO, null);
+
+    assertThat(encryptionDetails).isEmpty();
+    verify(secretManagerClientService, times(0))
+        .getEncryptionDetails(any(NGAccess.class), any(DecryptableEntity.class));
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testGetEncryptionDetails() {
+    RancherConnectorDTO rancherConnectorDTO = mock(RancherConnectorDTO.class);
+    BaseNGAccess ngAccess = mock(BaseNGAccess.class);
+    List<EncryptedDataDetail> expectedEncryptedDetails = mock(List.class);
+    doReturn(List.of(RancherConnectorBearerTokenAuthenticationDTO.builder()
+                         .passwordRef(SecretRefData.builder().build())
+                         .build()))
+        .when(rancherConnectorDTO)
+        .getDecryptableEntities();
+    doReturn(expectedEncryptedDetails)
+        .when(secretManagerClientService)
+        .getEncryptionDetails(any(NGAccess.class), any(DecryptableEntity.class));
+    List<EncryptedDataDetail> actualEncryptedDetails =
+        rancherClusterHelper.getEncryptionDetails(rancherConnectorDTO, ngAccess);
+
+    assertThat(actualEncryptedDetails).isEqualTo(expectedEncryptedDetails);
+    verify(secretManagerClientService, times(1))
+        .getEncryptionDetails(any(NGAccess.class), any(DecryptableEntity.class));
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testGetRancherConnectorFailures() {
+    doReturn(Optional.empty()).when(connectorService).get(any(), any(), any(), any());
+    assertThatThrownBy(() -> rancherClusterHelper.getRancherConnector(IdentifierRef.builder().build()))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageContaining("Connector not found");
+
+    ConnectorResponseDTO rancherConnectorResponse = mock(ConnectorResponseDTO.class);
+    ConnectorInfoDTO connectorInfoDTO = mock(ConnectorInfoDTO.class);
+    doReturn(connectorInfoDTO).when(rancherConnectorResponse).getConnector();
+    doReturn(ConnectorType.ARTIFACTORY).when(connectorInfoDTO).getConnectorType();
+    doReturn(Optional.of(rancherConnectorResponse)).when(connectorService).get(any(), any(), any(), any());
+    assertThatThrownBy(() -> rancherClusterHelper.getRancherConnector(IdentifierRef.builder().build()))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageContaining("Connector not found");
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testGetRancherConnector() {
+    ConnectorResponseDTO rancherConnectorResponse = mock(ConnectorResponseDTO.class);
+    ConnectorInfoDTO connectorInfoDTO = mock(ConnectorInfoDTO.class);
+    RancherConnectorDTO connectorDTO = mock(RancherConnectorDTO.class);
+    doReturn(connectorInfoDTO).when(rancherConnectorResponse).getConnector();
+    doReturn(ConnectorType.RANCHER).when(connectorInfoDTO).getConnectorType();
+    doReturn(Optional.of(rancherConnectorResponse)).when(connectorService).get(any(), any(), any(), any());
+    doReturn(connectorDTO).when(connectorInfoDTO).getConnectorConfig();
+
+    assertThat(rancherClusterHelper.getRancherConnector(IdentifierRef.builder().build())).isEqualTo(connectorDTO);
+  }
+
+  @Test(expected = WingsException.class)
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testDelegateTaskExceptionProcessing() {
+    doThrow(WingsException.class)
+        .when(delegateTaskServiceWrapper)
+        .executeSyncTask(any(BaseNGAccess.class), anyString(), eq(TaskName.RANCHER_TASK), eq(TaskBinaryName.RANCHER),
+            any(), any(DelegateTaskRequest.class));
+    rancherClusterHelper.executeListClustersDelegateTask(
+        RancherTaskParams.builder()
+            .rancherConnectorDTO(RancherConnectorDTO.builder().delegateSelectors(emptySet()).build())
+            .build(),
+        BaseNGAccess.builder().build(), "connectorRef");
+    verify(exceptionManager, times(1))
+        .processException(
+            any(DelegateServiceDriverException.class), any(WingsException.ExecutionContext.class), any(Logger.class));
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testResponseCreationWithHeaders() {
+    List<String> clusters = List.of("c1", "c2");
+    RancherClusterListResponseDTO responseDTO = RancherClusterListResponseDTO.builder().clusters(clusters).build();
+
+    Response response = rancherClusterHelper.generateResponseWithHeaders(responseDTO, 1, 100);
+    assertThat(response.getHeaderString(X_TOTAL_ELEMENTS)).isEqualTo("2");
+    assertThat(response.getHeaderString(X_PAGE_NUMBER)).isEqualTo("1");
+    assertThat(response.getHeaderString(X_PAGE_SIZE)).isEqualTo("100");
+    assertThat(((RancherClusterListResponseDTO) response.getEntity()).getClusters()).isEqualTo(clusters);
+  }
+
+  @Test
+  @Owner(developers = ABHINAV2)
+  @Category(UnitTests.class)
+  public void testRancherPageRequestParamsMapCreation() {
+    Map<String, String> params = rancherClusterHelper.createPageRequestParamsMap(1, 10, "field1", "ASC");
+    assertThat(params).containsKeys("page", "limit", "order", "sort").containsValues("1", "10", "field1", "ASC");
+  }
+}

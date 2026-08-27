@@ -1,0 +1,37 @@
+identifier: new-relic
+name: New Relic
+description: Observability platform built to help engineers create and monitor their software.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: timwheelercom
+category: Monitoring
+source: https://github.com/backstage/community-plugins/tree/main/workspaces/newrelic/plugins/newrelic
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/new-relic
+config: |-
+  proxy:
+    endpoints:
+      '/newrelic/apm/api':
+        target: https://api.newrelic.com/v2
+        pathRewrite:
+          api/proxy/newrelic/apm/api?: /
+        headers:
+          X-Api-Key: ${NEW_RELIC_REST_API_KEY}
+        allowedHeaders:
+          - link
+environmentVariables:
+  - NEW_RELIC_REST_API_KEY
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: NewRelicPage
+      addByDefault: true
+      defaultRoute: /newrelic
+      layoutSchemaSpecs:
+        name: NewRelicPage
+        title: New Relic
+        contents:
+          - component: NewRelicPage

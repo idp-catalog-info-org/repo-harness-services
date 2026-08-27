@@ -1,0 +1,8 @@
+name: CI Manager System API Metrics
+identifier: CISystemApiMetrics
+metricGroup: CISystemApiMetricsGroup
+metrics:
+  - metricName: ci_system_api_call_count
+    metricDefinition: CI Manager system/infra API calls by operation, outcome, phase, and step type
+    type: Count
+    unit: "1"

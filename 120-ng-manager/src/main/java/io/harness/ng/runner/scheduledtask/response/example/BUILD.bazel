@@ -1,0 +1,30 @@
+# Copyright 2025 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//920-delegate-service-beans/src/main/proto:920_delegate_service_beans_java_proto",
+        "//950-delegate-task-sdk/java/io/harness/task/response/callback:module",
+        "//950-delegate-task-sdk/java/io/harness/task/response/grpc:module",
+        "//953-events-api/src/main/java/io/harness/eventsframework/api:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_google_protobuf_protobuf_java",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

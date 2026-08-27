@@ -1,0 +1,51 @@
+# Copyright 2023 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["**/*.java"]),
+    resources = [],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//332-idp/src/main/java/io/harness/steps/common:module",
+        "//332-idp/src/main/java/io/harness/steps/executions/plan:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/steps:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/steps/stepinfo:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/plan/creator/step:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/core:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/extended/ci/container:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema/beans:module",
+        "//967-walktree-visitor/src/main/java/io/harness/walktree/visitor/helper:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//979-recaster/src/main/java/io/harness/annotation:module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/filters:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/pipeline/variables:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/plan/creation/beans:module",
+        "//idp-service/modules/clients:module",
+        "//idp-service/src/main/java/io/harness/idp/common:module",
+        "//idp-service/src/main/java/io/harness/idp/common/accountdetails:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:io_swagger_swagger_annotations",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:org_json_json",
+        "@maven//:org_springframework_data_spring_data_commons",
+    ],
+)

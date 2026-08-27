@@ -1,0 +1,7 @@
+name: GitX Webhook Queue Metrics Group
+identifier: gitx_webhook_queue_metrics_group
+labels:
+  - accountId
+  - repoType
+#  - repoName
+#  - branchName

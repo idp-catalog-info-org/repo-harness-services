@@ -1,0 +1,7 @@
+name: OPA Evaluation Metrics Group
+identifier: OPAEvaluationMetricsGroup
+labels:
+  - account_id
+  - infra_type
+  - status
+

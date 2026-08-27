@@ -1,0 +1,7 @@
+name: Kafka Producer Metrics Group
+identifier: KafkaProducerMetricsGroup
+labels:
+  - level
+  - topic
+  - eventType
+  - status

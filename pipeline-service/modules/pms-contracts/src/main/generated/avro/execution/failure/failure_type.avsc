@@ -1,0 +1,30 @@
+/*
+ * Copyright 2025 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+{
+  "javaAnnotation": ["javax.annotation.Generated(\"avro\")"],
+  "type": "enum",
+  "name": "FailureTypeAvro",
+  "namespace": "io.harness.pms.contracts.execution.failure",
+  "symbols": [
+    "UNKNOWN_FAILURE",
+    "DELEGATE_PROVISIONING_FAILURE",
+    "CONNECTIVITY_FAILURE",
+    "AUTHENTICATION_FAILURE",
+    "VERIFICATION_FAILURE",
+    "APPLICATION_FAILURE",
+    "AUTHORIZATION_FAILURE",
+    "TIMEOUT_FAILURE",
+    "SKIPPING_FAILURE",
+    "POLICY_EVALUATION_FAILURE",
+    "INPUT_TIMEOUT_FAILURE",
+    "FREEZE_ACTIVE_FAILURE",
+    "APPROVAL_REJECTION",
+    "DELEGATE_RESTART",
+    "USER_MARKED_FAILURE"
+  ]
+}

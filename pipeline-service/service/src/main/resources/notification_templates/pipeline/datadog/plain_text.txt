@@ -1,0 +1,21 @@
+{
+    "title": "Pipeline Event for ${PIPELINE}",
+    "text": "Pipeline ${PIPELINE} ${NODE_STATUS}",
+    "tags": [
+        "pipeline:${PIPELINE}",
+        "project:${PROJECT_IDENTIFIER}",
+        "org:${ORG_IDENTIFIER}",
+        "ExecutionUrl:${URL}",
+        "status:${NODE_STATUS}",
+        "event_type:${EVENT_TYPE}",
+        "start_date:${START_DATE}",
+        "end_date:${END_DATE}",
+        "duration:${DURATION_READABLE}",
+        "image_status:${IMAGE_STATUS}",
+        "color:${COLOR}"
+    ],
+    "aggregation_key": "${PIPELINE}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

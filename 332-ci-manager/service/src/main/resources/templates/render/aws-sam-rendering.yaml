@@ -1,0 +1,11 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/harness-rendering:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{runtime.manifestPath}}
+    PLUGIN_FILES: template.yaml, template.yml, values.yaml, values.yml, <+serviceOutput.manifests.primary.inputs.samTemplateFile>
+    PLUGIN_OVERRIDES_PATH: ${{serviceOutput.manifests.overrides}}

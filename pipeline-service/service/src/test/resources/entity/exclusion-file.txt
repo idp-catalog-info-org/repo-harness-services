@@ -1,0 +1,9 @@
+unique-id-exclusion: io.harness.execution.stage.StageExecutionEntity
+unique-id-exclusion: io.harness.beans.GraphDeleteEvent
+unique-id-exclusion: io.harness.pms.pipeline.PipelineMetadata
+unique-id-exclusion: io.harness.dataretention.entity.ExecutionRetentionMetadata
+unique-id-exclusion: io.harness.reconciliation.entity.ExecutionRetentionReconciliationEntity
+
+parent-unique-id-exclusion: io.harness.execution.stage.StageExecutionEntity
+parent-unique-id-exclusion: io.harness.beans.GraphDeleteEvent
+parent-unique-id-exclusion: io.harness.reconciliation.entity.ExecutionRetentionReconciliationEntity

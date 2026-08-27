@@ -1,0 +1,16 @@
+name: Pipeline Service Mongo Metrics
+identifier: pipelineServiceMongoMetrics
+metricGroup: pipelineServiceMongoMetricsGroup
+metrics:
+  - metricName: pipeline_service_mongodb_connection_pool_max_size
+    metricDefinition: Connection Pool Max Size
+    type: LastValue
+    unit: count
+  - metricName: pipeline_service_mongodb_connection_pool_size
+    metricDefinition: Connection Pool Size
+    type: LastValue
+    unit: count
+  - metricName: pipeline_service_mongodb_connections_checked_out
+    metricDefinition: Connections Checked Out
+    type: LastValue
+    unit: count

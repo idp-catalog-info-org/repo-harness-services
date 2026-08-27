@@ -1,0 +1,33 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.registrars;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.engine.pms.execution.manual.facilitator.ManualExecutionFacilitator;
+import io.harness.pms.contracts.facilitators.FacilitatorType;
+import io.harness.pms.sdk.core.execution.events.node.facilitate.response.Facilitator;
+import io.harness.steps.approval.ApprovalFacilitator;
+import io.harness.steps.resourcerestraint.ResourceRestraintFacilitator;
+
+import java.util.HashMap;
+import java.util.Map;
+import lombok.experimental.UtilityClass;
+
+@OwnedBy(PIPELINE)
+@UtilityClass
+public class OrchestrationStepsModuleFacilitatorRegistrar {
+  public Map<FacilitatorType, Class<? extends Facilitator>> getEngineFacilitators() {
+    Map<FacilitatorType, Class<? extends Facilitator>> engineFacilitators = new HashMap<>();
+    engineFacilitators.put(ResourceRestraintFacilitator.FACILITATOR_TYPE, ResourceRestraintFacilitator.class);
+    engineFacilitators.put(ApprovalFacilitator.FACILITATOR_TYPE, ApprovalFacilitator.class);
+    engineFacilitators.put(ManualExecutionFacilitator.FACILITATOR_TYPE, ManualExecutionFacilitator.class);
+    return engineFacilitators;
+  }
+}

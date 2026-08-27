@@ -1,0 +1,1422 @@
+logging:
+  level: INFO
+  loggers:
+    org.glassfish.jersey: WARN
+    allbegray.slack: WARN
+    org.glassfish.jersey.server.ServerRuntime.Responder: "OFF"
+  appenders:
+    - type: console
+      threshold: TRACE
+      target: STDOUT
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+    - type: gke-console
+      threshold: TRACE
+      target: STDOUT
+      stackdriverLogEnabled: false
+    - type: file
+      threshold: TRACE
+      currentLogFilename: ${LOG_FILENAME:-/opt/harness/logs/pod.log}
+      archive: true
+      archivedLogFilenamePattern: /opt/harness/logs/pod.%d{yyyy-MM-dd}.%i.log
+      archivedFileCount: ${LOG_MAX_FILE_COUNT:-10}
+      maxFileSize: ${LOG_MAX_FILE_SIZE:-50MB}
+      totalSizeCap: ${LOG_TOTAL_FILE_SIZE_CAP:-1GB}
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+
+server:
+  applicationConnectors:
+    - type: http
+      # Defaults to 12001 so default-off deploys are unchanged (Service targetPort +
+      # readiness/liveness probes target 12001). When the Envoy rate-limit sidecar is
+      # enabled, the chart sets PMS_APPLICATION_PORT=<rateLimiting.appPort> (e.g. 12009)
+      # so the app moves off 12001 and Envoy takes over the Service port.
+      port: ${PMS_APPLICATION_PORT:-12001}
+      maxRequestHeaderSize: 100KiB
+  adminConnectors:
+    - type: http
+      port: 12002
+  requestLog:
+    appenders: []
+  maxThreads: 1024
+
+pipelineExecutionPoolConfig:
+  corePoolSize: ${PIPELINE_EXECUTION_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${PIPELINE_EXECUTION_POOL_MAX_SIZE:-10}
+  idleTime: ${PIPELINE_EXECUTION_POOL_IDLE_TIME:-10}
+  timeUnit: ${PIPELINE_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+gitAwareEntityHelperPoolConfig:
+  corePoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_MAX_SIZE:-10}
+  idleTime: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME:-10}
+  timeUnit: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+opaGitxStatusPoolConfig:
+  corePoolSize: ${OPA_GITX_STATUS_POOL_CORE_SIZE:-4}
+  maxPoolSize: ${OPA_GITX_STATUS_POOL_MAX_SIZE:-8}
+  idleTime: ${OPA_GITX_STATUS_POOL_IDLE_TIME:-60}
+  timeUnit: ${OPA_GITX_STATUS_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+workloadIdentityTokenPoolConfig:
+  corePoolSize: ${WORKLOAD_IDENTITY_TOKEN_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${WORKLOAD_IDENTITY_TOKEN_POOL_MAX_SIZE:-20}
+  idleTime: ${WORKLOAD_IDENTITY_TOKEN_POOL_IDLE_TIME:-30}
+  timeUnit: ${WORKLOAD_IDENTITY_TOKEN_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+commonPoolConfig:
+  corePoolSize: ${COMMON_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${COMMON_POOL_MAX_SIZE:-100}
+  idleTime: ${COMMON_POOL_IDLE_TIME:-500}
+  timeUnit: ${COMMON_POOL_IDLE_TIME_TIME_UNIT:-MILLISECONDS}
+
+pipelineYamlConversionPoolConfig:
+  corePoolSize: ${PIPELINE_YAML_CONVERSION_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PIPELINE_YAML_CONVERSION_POOL_MAX_SIZE:-5}
+  idleTime: ${PIPELINE_YAML_CONVERSION_POOL_IDLE_TIME:-500}
+  timeUnit: ${PIPELINE_YAML_CONVERSION_POOL_TIME_UNIT:-MILLISECONDS}
+
+orchestrationVisualizationThreadPoolConfig:
+  corePoolSize: ${ORCHESTRATION_VISUALIZATION_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${ORCHESTRATION_VISUALIZATION_POOL_MAX_SIZE:-10}
+  idleTime: ${ORCHESTRATION_VISUALIZATION_POOL_IDLE_TIME:-10}
+  timeUnit: ${ORCHESTRATION_VISUALIZATION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+orchestrationPoolConfig:
+  corePoolSize: ${ORCHESTRATION_POOL_CORE_SIZE:-20}
+  maxPoolSize: ${ORCHESTRATION_POOL_MAX_SIZE:-100}
+  idleTime: ${ORCHESTRATION_POOL_IDLE_TIME:-60}
+  timeUnit: ${ORCHESTRATION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${ORCHESTRATION_POOL_QUEUE_SIZE:-500}
+
+nodeExecutionObserverPoolConfig:
+  corePoolSize: ${NODE_EXECUTION_OBSERVER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${NODE_EXECUTION_OBSERVER_POOL_MAX_SIZE:-50}
+  idleTime: ${NODE_EXECUTION_OBSERVER_POOL_IDLE_TIME:-60}
+  timeUnit: ${NODE_EXECUTION_OBSERVER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${NODE_EXECUTION_OBSERVER_POOL_QUEUE_SIZE:-500}
+
+ciSecretResolutionPoolConfig:
+  corePoolSize: ${CI_SECRET_RESOLUTION_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${CI_SECRET_RESOLUTION_POOL_MAX_SIZE:-50}
+  idleTime: ${CI_SECRET_RESOLUTION_POOL_IDLE_TIME:-5}
+  timeUnit: ${CI_SECRET_RESOLUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${CI_SECRET_RESOLUTION_POOL_QUEUE_SIZE:-100}
+
+sdkResponseEventPoolConfig:
+  corePoolSize: ${SDK_RESPONSE_EVENT_POOL_CORE_SIZE:-20}
+  maxPoolSize: ${SDK_RESPONSE_EVENT_POOL_MAX_SIZE:-100}
+  idleTime: ${SDK_RESPONSE_EVENT_POOL_IDLE_TIME:-60}
+  timeUnit: ${SDK_RESPONSE_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${SDK_RESPONSE_EVENT_POOL_QUEUE_SIZE:-500}
+
+pmsSdkExecutionPoolConfig:
+  corePoolSize: ${PMS_SDK_EXECUTION_POOL_CORE_SIZE:-20}
+  maxPoolSize: ${PMS_SDK_EXECUTION_POOL_MAX_SIZE:-100}
+  idleTime: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_EXECUTION_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationEventPoolConfig:
+  corePoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_MAX_SIZE:-50}
+  idleTime: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_QUEUE_SIZE:-500}
+
+podCleanUpThreadPoolConfig:
+  corePoolSize: ${POD_CLEANUP_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${{POD_CLEANUP_POOL_MAX_SIZE:-10}
+  idleTime: ${{POD_CLEANUP_POOL_IDLE_TIME:-10}
+  timeUnit: ${{POD_CLEANUP_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+mongo:
+  uri: mongodb://localhost:27017/pms-harness
+  connectTimeout: 30000
+  serverSelectionTimeout: 90000
+  socketTimeout: 360000
+  maxConnectionIdleTime: 600000
+  connectionsPerHost: 300
+  indexManagerMode: AUTO
+  transactionsEnabled: false
+  aliasDBName: pms-harness
+  traceMode: DISABLED
+  maxStalenessSeconds: ${MAX_STALENESS_SECONDS:-90}
+  queryBudget:
+    # PIPE-35957 Mongo query-budget rollout. Defaults to DISABLED (no measurement, no enforcement) -- opt in
+    # per-environment by setting MONGO_QUERY_BUDGET_MODE to SHADOW (safe burn-in: measure/log/count breaches but
+    # never tighten maxTime) and only then ENFORCE. Mode is per-service and flippable via config (DISABLED | SHADOW
+    # | ENFORCE).
+    mode: ${MONGO_QUERY_BUDGET_MODE:-DISABLED}
+    budgets:
+      FAST: ${MONGO_QUERY_BUDGET_FAST_MS:-10000}
+      SLOW: ${MONGO_QUERY_BUDGET_SLOW_MS:-60000}
+
+executionStatusReconciliation:
+  enabled: ${ENABLE_EXECUTION_STATUS_RECONCILIATION:-true}
+  intervalInMins: ${EXECUTION_STATUS_RECONCILIATION_INTERVAL_IN_MINUTES:-360}
+
+elasticsearch:
+  enabled: ${ENABLE_ELASTIC_SEARCH:-false}
+  elasticSearchUrl: ${ELASTIC_SEARCH_URL:-http://localhost:9200}
+  apiKey: ${ELASTIC_SEARCH_API_KEY:-}
+  migrationJobEnabled: ${ENABLE_ELASTIC_SEARCH_MIGRATION_JOB:-false}
+
+dataRetention:
+  enabled: ${ENABLE_DATA_RETENTION:-false}
+  mongoTTLDays:
+    defaultTTL: ${DATA_RETENTION_MONGO_TTL_DAYS:-180}
+    executionGraph: ${DATA_RETENTION_EXECUTION_GRAPH_TTL_DAYS:-180}
+    executionMetadata: ${DATA_RETENTION_EXECUTION_METADATA_TTL_DAYS:-180}
+  cleanUpIntervalMinutes: ${DATA_RETENTION_CLEAN_UP_INTERVAL_IN_MINUTES:-360}
+  cleanUpEnabled: ${DATA_RETENTION_CLEAN_UP_ENABLED:-false}
+  reconciliationBatchProcessingSize: ${DATA_RETENTION_RECONCILIATION_BATCH_PROCESSING_SIZE:-10}
+  syncRecordsTimeoutMinutes: ${DATA_RETENTION_SYNC_RECORDS_TIMEOUT_MINUTES:-15}
+  cleanupEventEnabled: ${DATA_RETENTION_CLEANUP_EVENT_ENABLED:-true}
+  cleanupEventBatchSize: ${DATA_RETENTION_CLEANUP_EVENT_BATCH_SIZE:-500}
+
+orchestrationGraphCacheCleanup:
+  enabled: ${ENABLE_ORCHESTRATION_GRAPH_CACHE_CLEANUP:-false}
+  cleanUpEnabled: ${ORCHESTRATION_GRAPH_CACHE_CLEANUP_ENABLED:-false}
+  cleanUpIntervalMinutes: ${ORCHESTRATION_GRAPH_CACHE_CLEANUP_INTERVAL_IN_MINUTES:-1440}
+  batchSize: ${ORCHESTRATION_GRAPH_CACHE_CLEANUP_BATCH_SIZE:-5000}
+  maxJobDurationMinutes: ${ORCHESTRATION_GRAPH_CACHE_CLEANUP_MAX_JOB_DURATION_MINUTES:-55}
+
+objectStore:
+  storeConfig:
+    type: ${DATA_RETENTION_STORAGE_TYPE:-GCS}
+    storageClass: ${DATA_RETENTION_STORAGE_CLASS:-STANDARD}
+    location: ${DATA_RETENTION_STORAGE_LOCATION:-US}
+    projectId: ${DATA_RETENTION_GCS_PROJECT_ID:-qa-setup}
+    useWorkloadIdentity: ${DATA_RETENTION_GCS_USE_WORKLOAD_IDENTITY:-true}
+    region: ${DATA_RETENTION_AWS_REGION:-us-east-1}
+    useIamRole: ${DATA_RETENTION_AWS_USE_IAM_ROLE:-true}
+    accessKey: ${DATA_RETENTION_AWS_ACCESS_KEY:-}
+    secretKey: ${DATA_RETENTION_AWS_SECRET_KEY:-}
+  dataRetentionBucketConfig:
+    bucketName: ${DATA_RETENTION_BUCKET_NAME:-local-archive}
+  fileInputBucketConfig:
+    bucketName: ${FILE_INPUT_BUCKET_NAME:-local-file-input}
+    isEnabled: ${FILE_INPUT_IS_ENABLED:-false}
+  annotationsBucketConfig:
+    bucketName: ${ANNOTATIONS_BUCKET_NAME:-local-annotations}
+    isEnabled: ${ENABLE_ANNOTATIONS_GCS_STORAGE:-false}
+
+grpcServerConfig:
+  connectors:
+    - port: 12011
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+      threadPoolConfig:
+        maxPoolSize: ${GRPC_MAX_THREADS:-1500}
+
+grpcClientConfigs:
+  cd:
+    target: localhost:12101
+    authority: localhost
+  cv:
+    target: localhost:12401
+    authority: localhost
+  srm:
+    target: localhost:12401
+    authority: localhost
+  ci:
+    target: localhost:12301
+    authority: localhost
+  sto:
+    target: localhost:14301
+    authority: localhost
+  iacm:
+    target: localhost:15301
+    authority: localhost
+  idp:
+    target: ${IDP_SERVICE_TARGET:-localhost:12501}
+    authority: ${IDP_SERVICE_AUTHORITY:-localhost}
+  pms:
+    target: ${PIPELINE_SERVICE_TARGET:-localhost:15302}
+    authority: ${PIPELINE_SERVICE_AUTHORITY:-localhost}
+  fme:
+    target: ${FME_STEP_SERVICE_GRPC_TARGET:-localhost:16101}
+    authority: ${FME_STEP_SERVICE_GRPC_AUTHORITY:-localhost}
+
+
+moduleSpecificInfoMap:
+  cd:
+    pipelineSdkPriority: 1 #If more than one services can resolve the dependency then we fallback on the high priority service
+    planCreatorMergeServicePoolConfig:
+      corePoolSize: ${CD_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5} #Keeping base thread values as 5 and 10 will override in config with values 50 and 100
+      maxPoolSize: ${CD_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+      idleTime: ${CD_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+      timeUnit: ${CD_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+      queueSize: ${CD_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+  ci:
+    pipelineSdkPriority: 1
+    planCreatorMergeServicePoolConfig:
+      corePoolSize: ${CI_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+      maxPoolSize: ${CI_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+      idleTime: ${CI_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+      timeUnit: ${CI_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+      queueSize: ${CI_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+  pms:
+    planCreatorMergeServicePoolConfig:
+      corePoolSize: ${PIPELINE_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+      maxPoolSize: ${PIPELINE_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+      idleTime: ${PIPELINE_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+      timeUnit: ${PIPELINE_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+      queueSize: ${PIPELINE_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+  fme:
+    pipelineSdkPriority: 100
+  sto:
+    pipelineSdkPriority: 2
+    planCreatorMergeServicePoolConfig:
+      corePoolSize: ${STO_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+      maxPoolSize: ${STO_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+      idleTime: ${STO_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+      timeUnit: ${STO_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+      queueSize: ${STO_PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+  idp:
+    pipelineSdkPriority: 20
+
+
+yamlSchemaClientConfig:
+  yamlSchemaHttpClientMap:
+    ci:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:4457/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: CIManager
+    cd:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:7457/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: NextGenManager
+    cv:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:6457/cv/api/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: CVNextGen
+    srm:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:6457/cv/api/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: CVNextGen
+    sto:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:14057/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: STOManager
+    iacm:
+      serviceHttpClientConfig:
+        baseUrl: http://localhost:15057/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+      targetServiceId: IACMManager
+
+
+managerTarget: localhost:9879
+managerAuthority: localhost
+
+eventsFramework:
+  shouldUseKafka: ${PMS_SDK_EVENTS_USE_KAFKA:-false}
+  # Set to 'true' for registering SDK kafka consumers
+  shouldStartUsingKafkaConsumers: ${PMS_SDK_ENABLE_EVENTS_CONSUMERS:-false}
+  redis:
+    sentinel: false
+    masterName: "test"
+    redisUrl: "redis://localhost:6379"
+    sentinelUrls:
+      - "redis://redis1:26379"
+      - "redis://redis2:26379"
+      - "redis://redis3:26379"
+    envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-}
+    readMode: MASTER
+    nettyThreads: 16
+    useScriptCache: true
+    userName: ""
+    password: ""
+    sslConfig:
+      enabled: false
+      CATrustStorePath: "/tmp/ca_trust_store"
+      CATrustStorePassword: ""
+    cleanUpKeysAmount: ${PMS_REDIS_CACHE_CLEANUP_KEYS_AMOUNT:-1000}
+    maxCleanupDelay: ${PMS_REDIS_CACHE_CLEANUP_MAX_DELAY_SECONDS:-60}
+
+
+debeziumConsumersConfigs:
+  planExecutionsSummaryStreaming:
+    topic: ${DEBEZIUM_CONSUMER_TOPIC_NAME:-DEBEZIUM_pmsMongo.pms-harness.planExecutionsSummary}
+    batchSize: ${DEBEZIUM_CONSUMER_BATCH_SIZE:-100}
+  planExecutionsSummarySnapshot:
+    topic: ${DEBEZIUM_CONSUMER_SNAPSHOT_TOPIC_NAME:-DEBEZIUM_SNAPSHOT_pmsMongoSnapshot.pms-harness.planExecutionsSummary}
+    batchSize: ${DEBEZIUM_CONSUMER_SNAPSHOT_BATCH_SIZE:-100}
+
+managerClientConfig:
+  baseUrl: http://localhost:3457/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+managerServiceSecret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+
+fmeServiceClientConfig:
+  baseUrl: ${FME_SERVICE_CLIENT_BASE_URL:-https://api.split-stage.io}
+  secret: ${FME_SERVICE_CLIENT_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  connectTimeOutSeconds: ${FME_SERVICE_CLIENT_CONNECT_TIMEOUT_SECONDS:-30}
+  readTimeOutSeconds: ${FME_SERVICE_CLIENT_READ_TIMEOUT_SECONDS:-30}
+  tokenDurationHours: ${FME_SERVICE_CLIENT_TOKEN_DURATION_HOURS:-24}
+  honorRbac: ${FME_SERVICE_CLIENT_HONOR_RBAC:-true}
+
+aiSreServiceClientConfig:
+  baseUrl: ${AISRE_SERVICE_CLIENT_BASE_URL:-http://localhost:8080}
+  secret: ${AISRE_SERVICE_CLIENT_SECRET:-HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU=}
+  connectTimeOutSeconds: ${AISRE_SERVICE_CLIENT_CONNECT_TIMEOUT_SECONDS:-30}
+  readTimeOutSeconds: ${AISRE_SERVICE_CLIENT_READ_TIMEOUT_SECONDS:-30}
+  tokenDurationHours: ${AISRE_SERVICE_CLIENT_TOKEN_DURATION_HOURS:-24}
+  honorRbac: ${AISRE_SERVICE_CLIENT_HONOR_RBAC:-true}
+
+notificationClient:
+  messageBroker:
+    type: MONGO
+    uri: mongodb://localhost:27017/notification
+    connectTimeout: 30000
+    serverSelectionTimeout: 90000
+    socketTimeout: 360000
+    maxConnectionIdleTime: 600000
+    connectionsPerHost: 300
+  httpClient:
+    baseUrl: http://localhost:9005/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  secrets:
+    notificationClientSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+releaseManagementServiceClientConfig:
+  baseUrl: ${RELEASE_MANAGEMENT_SERVICE_BASE_URL:-http://localhost:5001/}
+  connectTimeOutSeconds: 30
+  readTimeOutSeconds: 60
+releaseManagementEventType: PIPELINE_STEP_WEBHOOK
+releaseManagementMaxArtifactsPerType: ${RO_NOTIFY_MAX_ARTIFACTS_PER_TYPE:-15}
+
+changeAdvisorServiceClientConfig:
+  baseUrl: ${CHANGE_ADVISOR_SERVICE_BASE_URL:-http://localhost:8080/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 30
+
+ngManagerServiceHttpClientConfig:
+  baseUrl: http://localhost:7457/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsClientConfig:
+  baseUrl: ${RHS_CLIENT_BASE_URL:-http://localhost:9009/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsEnabled: ${RHS_ENABLED:-false}
+
+rhsServiceSecret: ${RESOURCE_HIERARCHY_SERVICE_SECRET:-dummyRhsServiceSecret}
+
+secretConnectorServiceEnabled: ${SECRET_CONNECTOR_SERVICE_ENABLED:-false}
+secretConnectorServiceClientConfig:
+  baseUrl: ${SECRET_CONNECTOR_SERVICE_CLIENT_BASE_URL:-http://localhost:9008/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+secretConnectorServiceSecret: ${SECRET_CONNECTOR_SERVICE_SECRET:-dummySecretConnectorServiceSecret}
+
+platformConfigServiceEnabled: ${PLATFORM_CONFIG_SERVICE_ENABLED:-false}
+platformConfigServiceClientConfig:
+  baseUrl: ${PLATFORM_CONFIG_SERVICE_CLIENT_BASE_URL:-http://localhost:9010/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+platformConfigServiceSecret: ${PLATFORM_CONFIG_SERVICE_SECRET:-dummyPlatformConfigServiceSecret}
+
+pipelineServiceClientConfig:
+  baseUrl: http://localhost:12001/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+templateServiceClientConfig:
+  baseUrl: http://localhost:15001/api/
+  connectTimeOutSeconds: 120
+  readTimeOutSeconds: 120
+
+harnessCodeClientConfig:
+  baseUrl: ${HARNESS_CODE_INTERNAL_API_URL:-http://localhost:3000/ }
+  connectTimeOutSeconds: 120
+  readTimeOutSeconds: 120
+
+harnessRegistryClientConfig:
+  baseUrl: ${HARNESS_REGISTRY_URL:-http://localhost:3000 }
+  connectTimeOutSeconds: 120
+  readTimeOutSeconds: 120
+
+containerStepConfigureWithCi: ${SHOULD_CONFIGURE_WITH_CI:-false}
+ciServiceClientConfig:
+  baseUrl: http://localhost:4457/api/
+  connectTimeOutSeconds: 120
+  readTimeOutSeconds: 120
+
+goConvertConnectionConfig:
+  url: ${GO_CONVERT_SERVICE_GRPC_URL:-localhost:8090}
+
+queueServiceClientConfig:
+  httpClientConfig:
+    baseUrl: ${HSQS_BASE_URL:-http://localhost:9544/}
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  queueServiceSecret: ${HSQS_AUTH_TOKEN:-UeWgUReGXlbrB0zkDCBFz1EDfU1zrXbhAbGfQ8jsSCaA881SYFMlHqnn3OQnAKAU6hTQ5NniwuMeKSFW}
+  envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-localhost}
+  topic: ${HSQS_TOPIC:-pipeline}
+
+harnessCodeGitBaseUrl: ${HARNESS_CODE_GIT_BASE_URL:-http://localhost:3000/git}
+
+ngManagerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+annotationsSecret: ${ANNOTATIONS_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+pipelineServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+templateServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+harnessCodeServiceSecret: ${HARNESS_CODE_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+harnessRegistryServiceSecret: ${HARNESS_REGISTRY_JWT_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+ciServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+jwtAuthSecret: dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq
+jwtIdentityServiceSecret: HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU=
+
+harnessIdClientConfig:
+  grpcClientConfig:
+    target: ${HARNESS_ID_GRPC_TARGET:-localhost:8082}
+    authority: ${HARNESS_ID_GRPC_AUTHORITY:-harnessid}
+    serviceAuthSecret: ${HARNESS_ID_SERVICE_SECRET:-your-256-bit-secret-key-here-min-32-chars}
+    deadlineSeconds: ${HARNESS_ID_GRPC_DEADLINE_SECONDS:-30}
+  restClientConfig:
+    baseUrl: ${HARNESS_ID_REST_BASE_URL:-http://localhost:8081}
+    connectTimeOutSeconds: ${HARNESS_ID_REST_CONNECT_TIMEOUT_SECONDS:-5}
+    readTimeOutSeconds: ${HARNESS_ID_REST_READ_TIMEOUT_SECONDS:-10}
+
+allowedOrigins:
+  - "*"
+
+accessControlClient:
+  enableAccessControl: false
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+flexEnforcementClient:
+  enabled: ${FLEX_ENFORCEMENT_ENABLED:-false}
+  baseUrl: ${FLEX_ENFORCEMENT_BASE_URL:-http://localhost:7093/}
+  serviceSecret: ${FLEX_ENFORCEMENT_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  observeOnly: ${FLEX_ENFORCEMENT_OBSERVE_ONLY:-true}
+  connectTimeOutSeconds: ${FLEX_ENFORCEMENT_CONNECT_TIMEOUT_SECONDS:-5}
+  readTimeOutSeconds: ${FLEX_ENFORCEMENT_READ_TIMEOUT_SECONDS:-10}
+
+pipelineServiceBaseUrl: https://localhost:8181/#
+pmsApiBaseUrl: http://localhost:12001/api/
+idpBaseUrl: ${IDP_BASE_URL:-https://localhost:8181}
+idpServiceSecret: ${IDP_SERVICE_SECRET:-dummyIdpServiceSecret}
+
+triggerConfig:
+  webhookBaseUrl: http://localhost:7457/api/
+  customBaseUrl: http://localhost:12001/api/
+
+logStreamingServiceConfig:
+  baseUrl: http://localhost:8079
+  serviceToken: token
+  threadPoolConfig:
+    corePoolSize: ${LOG_STREAMING_CLIENT_POOL_CORE_SIZE:-10}
+  delayToClosePrefixLogStreamInSeconds: ${LOG_STREAMING_CLIENT_DELAY_TO_CLOSE_LOG_STREAM_IN_SECONDS:-5}
+
+# remove in a few cycles
+opaServerConfig:
+  baseUrl: http://localhost:3000
+  secret: secret
+
+policyManagerSecret: secret
+
+opaClientConfig:
+  baseUrl: http://localhost:3000
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+opaEvaluationPluginImage: ${OPA_EVALUATION_IMAGE:-plugins/policy-evaluator:1.36.2}
+
+iteratorsConfig:
+  webhook:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 5
+  scheduledTrigger:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 15
+  timeoutEngine:
+    threadPoolCount: 5
+    enabled: true
+    targetIntervalInSeconds: 10
+  timeoutEngineRedisMode:
+    threadPoolSize: ${TIMEOUT_ITERATOR_REDIS_MODE_THREAD_POOL_SIZE:-5}
+    enabled: true
+    targetIntervalInSeconds: 10
+    threadPoolIntervalInSeconds: 2
+    redisLockTimeout: 5
+    redisBatchSize: ${TIMEOUT_ITERATOR_REDIS_BATCH_SIZE:-10}
+  barrier:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 60
+  approvalInstance:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 60
+  fmeInstance:
+    threadPoolCount: 2
+    enabled: ${FME_ITERATOR_ENABLED:-false}
+    targetIntervalInSeconds: 60
+  resourceRestraint:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 300
+  interruptMonitor:
+    threadPoolCount: 2
+    enabled: true
+    targetIntervalInSeconds: 180
+  stuckNodeExecutionsRedisMode:
+    threadPoolSize: ${STUCK_NODE_EXECUTIONS_REDIS_MODE_THREAD_POOL_SIZE:-2}
+    enabled: ${PMS_ENABLE_STUCK_EXECUTIONS_MONITOR:-true}
+    targetIntervalInSeconds: 10
+    threadPoolIntervalInSeconds: 10
+    redisLockTimeout: 5
+    redisBatchSize: ${TIMEOUT_ITERATOR_REDIS_BATCH_SIZE:-10}
+  notifyResponse:
+    threadPoolSize: ${NOTIFY_RESPONSES_THREAD_POOL_SIZE:-2}
+    enabled: ${ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG:-false}
+    targetIntervalInSeconds: ${NOTIFY_RESPONSES_ITERATOR_TARGET_INTERVAL:-300}
+    threadPoolIntervalInSeconds: ${NOTIFY_RESPONSES_ITERATOR_THREAD_INTERVAL:-1}
+    redisLockTimeout: 10
+    redisBatchSize: ${NOTIFY_RESPONSES_ITERATOR_REDIS_BATCH_SIZE:-50}
+    threadSleepIntervalMs: ${NOTIFY_RESPONSES_ITERATOR_THREAD_SLEEP_INTERVAL:-50}
+  searchIndexMigration:
+    threadPoolSize: ${ELASTIC_SEARCH_INDEX_MIGRATION_ITERATOR_THREAD_POOL_SIZE:-1}
+    enabled: ${ENABLE_ELASTIC_SEARCH:-false}
+    targetIntervalInSeconds: ${ELASTIC_SEARCH_INDEX_MIGRATION_ITERATOR_TARGET_INTERVAL:-600}
+    threadPoolIntervalInSeconds: ${ELASTIC_SEARCH_INDEX_MIGRATION_ITERATOR_THREAD_INTERVAL:-300}
+    redisLockTimeout: ${ELASTIC_SEARCH_INDEX_MIGRATION_ITERATOR_REDIS_LOCK_TIMEOUT:-60}
+    redisBatchSize: 1
+  executionRetentionReconciliation:
+    threadPoolSize: ${EXECUTION_RETENTION_RECONCILIATION_ITERATOR_THREAD_POOL_SIZE:-2}
+    enabled: ${ENABLE_DATA_RECONCILIATION:-false}
+    targetIntervalInSeconds: ${EXECUTION_RETENTION_RECONCILIATION_ITERATOR_TARGET_INTERVAL:-21600}
+    threadPoolIntervalInSeconds: ${EXECUTION_RETENTION_RECONCILIATION_ITERATOR_THREAD_INTERVAL:-600}
+    redisLockTimeout: ${EXECUTION_RETENTION_RECONCILIATION_ITERATOR_REDIS_LOCK_TIMEOUT:-60}
+    redisBatchSize: 1
+  graphDelete:
+    threadPoolSize: 1
+    enabled: ${ENABLE_GRAPH_DELETE:-false}
+    targetIntervalInSeconds: ${GRAPH_DELETE_OPERATION_INTERVAL:-3600}
+    threadPoolIntervalInSeconds: ${GRAPH_DELETE_ITERATOR_THREAD_INTERVAL:-60}
+    redisLockTimeout: 10
+    redisBatchSize: 1
+  pipelineDelete:
+    threadPoolSize: ${PIPELINE_DELETE_THREAD_POOL_SIZE:-5}
+    enabled: ${ENABLE_PIPELINE_DELETE:-true}
+    targetIntervalInSeconds: ${PIPELINE_DELETE_OPERATION_INTERVAL:-10800}
+    threadPoolIntervalInSeconds: ${PIPELINE_DELETE_ITERATOR_THREAD_INTERVAL:-60}
+    redisLockTimeout: 10
+    redisBatchSize: 1
+  customWebhookRedisMode:
+    threadPoolSize: ${CUSTOM_WEBHOOK_REDIS_ITERATOR_THREAD_POOL_SIZE:-10}
+    enabled: ${CUSTOM_WEBHOOK_REDIS_MODE_ENABLED:-false}
+    targetIntervalInSeconds: ${CUSTOM_WEBHOOK_REDIS_ITERATOR_OPERATION_INTERVAL:-300}
+    threadPoolIntervalInSeconds: ${CUSTOM_WEBHOOK_REDIS_ITERATOR_THREAD_INTERVAL:-1}
+    redisLockTimeout: 10
+    redisBatchSize: 1
+  executionGitMetadataReconciliation:
+    threadPoolSize: ${EXECUTION_GIT_METADATA_RECONCILIATION_ITERATOR_THREAD_POOL_SIZE:-1}
+    enabled: ${ENABLE_EXECUTION_GIT_METADATA_RECONCILIATION:-true}
+    targetIntervalInSeconds: ${EXECUTION_GIT_METADATA_RECONCILIATION_ITERATOR_TARGET_INTERVAL:-21600}
+    threadPoolIntervalInSeconds: ${EXECUTION_GIT_METADATA_RECONCILIATION_ITERATOR_THREAD_INTERVAL:-600}
+    redisLockTimeout: ${EXECUTION_GIT_METADATA_RECONCILIATION_ITERATOR_REDIS_LOCK_TIMEOUT:-60}
+    redisBatchSize: 1
+  executionRetentionReconciliationMonitor:
+    threadPoolSize: ${EXECUTION_RECONCILIATION_MONITOR_ITERATOR_THREAD_POOL_SIZE:-1}
+    enabled: ${ENABLE_EXECUTION_RECONCILIATION_MONITOR:-true}
+    targetIntervalInSeconds: ${EXECUTION_RECONCILIATION_MONITOR_ITERATOR_TARGET_INTERVAL:-21600}
+    threadPoolIntervalInSeconds: ${EXECUTION_RECONCILIATION_MONITOR_ITERATOR_THREAD_INTERVAL:-600}
+    redisLockTimeout: ${EXECUTION_RECONCILIATION_MONITOR_ITERATOR_REDIS_LOCK_TIMEOUT:-60}
+    redisBatchSize: 1
+  progressUpdate:
+    threadPoolSize: ${PROGRESS_UPDATE_THREAD_POOL_SIZE:-2}
+    enabled: ${ENABLE_PROGRESS_UPDATE_ITERATOR_CONFIG:-false}
+    targetIntervalInSeconds: ${PROGRESS_UPDATE_ITERATOR_TARGET_INTERVAL:-30}
+    threadPoolIntervalInSeconds: ${PROGRESS_UPDATE_ITERATOR_THREAD_INTERVAL:-1}
+    redisLockTimeout: 10
+    redisBatchSize: ${PROGRESS_UPDATE_ITERATOR_REDIS_BATCH_SIZE:-50}
+  conversionJob:
+    threadPoolSize: ${CONVERSION_JOB_ITERATOR_THREAD_POOL_SIZE:-2}
+    enabled: ${ENABLE_CONVERSION_JOB_ITERATOR:-true}
+    targetIntervalInSeconds: ${CONVERSION_JOB_ITERATOR_TARGET_INTERVAL:-60}
+    threadPoolIntervalInSeconds: ${CONVERSION_JOB_ITERATOR_THREAD_INTERVAL:-30}
+    redisLockTimeout: ${CONVERSION_JOB_ITERATOR_REDIS_LOCK_TIMEOUT:-60}
+    redisBatchSize: ${CONVERSION_JOB_ITERATOR_REDIS_BATCH_SIZE:-5}
+
+enableDelegateResponseCleanupIterator: ${ENABLE_DELEGATE_RESPONSE_CLEANER:-false}
+
+enableWaitNotifyEngineOptimisation: ${ENABLE_WAIT_NOTIFY_OPTIMISATION:-false}
+
+enableCustomWebhookRedisBatchModeIterator: ${CUSTOM_WEBHOOK_REDIS_MODE_ENABLED:-false}
+
+stuckNodeExecutionsMarkingConfig:
+  enabled: ${PMS_ENABLE_STUCK_EXECUTIONS_MARKING:-true}
+  maxProcessingDurationMinutes: ${PMS_STUCK_EXECUTIONS_MAX_PROCESSING_DURATION_MINUTES:-5}
+
+stuckExecutionDetectorEnabled: ${PMS_STUCK_EXECUTION_DETECTOR_ENABLED:-false}
+
+orchestrationStepConfig:
+  ffServerBaseUrl: ${FF_SERVER_BASE_URL:-http://127.0.0.1:3000/api/1.0 }
+  ffServerApiKey: secret
+  ffServerSSLVerify: false
+  ffServerConnectionTimeout: ${FF_SERVER_CONNECTION_TIMEOUT:-30000}
+  ffServerReadTimeout: ${FF_SERVER_READ_TIMEOUT:-30000}
+  containerStepConfig:
+    addonImageTag: releaseBuild-30
+    liteEngineImageTag: releaseBuild-29
+    defaultMemoryLimit: 500
+    defaultCPULimit: 400
+    defaultInternalImageConnector: 'account.harnessImage'
+    pvcDefaultStorageSize: 25600
+    delegateServiceEndpointVariableValue: "delegate-service:8080"
+    addonImage: ${ADDON_IMAGE:-harness/ci-addon:1.18.20}
+    liteEngineImage: ${LE_IMAGE:-harness/ci-lite-engine:1.18.20}
+    isLocal: false
+    logStreamingContainerStepBaseUrl: ${LOG_STREAMING_CONTAINER_STEP_BASE_URL:-http://localhost:8079}
+    pluginConfig:
+      sscaOrchestrationConfig:
+        image: ${SSCA_ORCHESTRATION_IMAGE:-harness/ssca-plugin:0.11.0}
+      sscaEnforcementConfig:
+        image: ${SSCA_ENFORCEMENT_IMAGE:-harness/ssca-plugin:0.11.0}
+    #Todo: Move to config Management Service
+    moduleToSupportedSteps:
+      cd: [ "DownloadManifests", "AwsSamBuild", "AwsSamDeploy", "ServerlessAwsLambdaPrepareRollbackV2", "AzureFunctionDeploy", "AzureFunctionRollback", "ServerlessAwsLambdaDeployV2", "ServerlessAwsLambdaPackageV2", "AwsCdkBootstrap", "AwsCdkSynth", "AwsCdkDiff", "ServerlessAwsLambdaRollbackV2", "AwsCdkDeploy", "AwsCdkDestroy", "AwsCdkRollback", "DownloadAwsS3", "DownloadGcs", "DownloadHarnessStore", "DBSchemaApply", "DBCommand", "DBSchemaRollback", "LiquibaseCommand", "FlywayCommand", "GoogleCloudRunDeploy", "GoogleCloudRunPrepareRollbackData", "GoogleCloudRunTrafficShift", "GoogleCloudRunRollback", "GoogleCloudRunJob", "DeployGoogleAgentRuntimeRevision", "ShiftGoogleAgentRuntimeTraffic", "RollbackGoogleAgentRuntimeRevision", "DeployAwsAgentCoreRevision", "ShiftAwsAgentCoreTraffic", "RollbackAwsAgentCoreRevision", "DBSchemaUpdateSQL", "DBSchemaRollbackSQL", "AIExperiment", "DBTestAndPreview", "SalesforceApexTest", "SalesforceDeploy", "SalesforceRollback", "AIEvaluation", "SalesforceValidate", "SalesforceQuickDeploy", "SalesforceCreateScratchOrg", "SalesforceDeleteScratchOrg", "GoogleMigBlueGreenDeploy", "GoogleMigBlueGreenRollback", "GoogleMigDeploy", "GCEProvisionBackendService", "GoogleMigSteadyState", "GoogleMigTrafficShift", "AzureContainerAppsDeploy", "AzureContainerAppsPrepareRollbackData", "AzureContainerAppsTrafficShift", "AzureContainerAppsRollback", "AIVerifyNG", "SalesforceDownloadDeployables", "SalesforceDownloadOrg", "SalesforceEvaluateDiff", "SalesforceSourceBackup", "AgentGroup", "AiEvalGroup" ]
+      ci: [ "Background", "background", "GitClone", "Run", "Plugin", "Action", "SlsaVerification"]
+      pms: [ "OPAEvaluation", "HarnessApproval"]
+
+
+shouldDeployWithGitSync: true
+enableTenantIsolationFilter: ${ENABLE_TENANT_ISOLATION_FILTER:-true}
+
+gitSdkConfiguration:
+  gitSdkGrpcServerConfig:
+    connectors:
+      - port: 14002
+        maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+  gitManagerGrpcClientConfig:
+    target: localhost:13002
+    authority: localhost
+  scmConnectionConfig:
+    url: localhost:8091
+  throw424ForGITServerErrors: ${THROW_424_FOR_GIT_SERVER_ERRORS:-false}
+
+redisLockConfig:
+  sentinel: false
+  masterName: "test"
+  redisUrl: "redis://localhost:6379"
+  sentinelUrls:
+    - "redis://redis1:26379"
+    - "redis://redis2:26379"
+    - "redis://redis3:26379"
+  envNamespace: ${LOCK_CONFIG_ENV_NAMESPACE:-}
+  readMode: MASTER
+  nettyThreads: 16
+  useScriptCache: true
+  userName: ""
+  password: ""
+  timeout: 6000
+  subscriptionsPerConnection: 5
+  retryAttempts: ${REDIS_RETRY_ATTEMPTS:-3}
+  retryInterval: ${REDIS_RETRY_INTERVAL:-1500}
+
+distributedLockImplementation: REDIS
+
+enableDashboardTimescale: false
+
+enablePostgres: ${ENABLE_POSTGRES:-true}
+
+postgres:
+  postgresUrl: ${POSTGRES_PRIMARY_URL:-"jdbc:postgresql://localhost:5432/harness"}
+  postgresUsername: ${POSTGRES_PRIMARY_USERNAME:-"admin"}
+  postgresPassword: ${POSTGRES_PRIMARY_PASSWORD:-"password"}
+  sslMode: ${POSTGRES_SSL_MODE:-"disable"}
+  sslRootCert: ${POSTGRES_SSL_ROOT_CERT:-""}
+  connectTimeout: ${POSTGRES_PRIMARY_CONNECT_TIMEOUT:-15}
+  socketTimeout: ${POSTGRES_PRIMARY_SOCKET_TIMEOUT:-60}
+  logUnclosedConnections: false
+  loggerLevel: OFF
+  minIdle: ${POSTGRES_PRIMARY_MIN_IDLE:-0}
+  maxPoolSize: ${POSTGRES_PRIMARY_MAX_POOL_SIZE:-30}
+
+timescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: "postgres"
+  timescaledbPassword: ""
+  connectTimeout: ${TIMESCALEDB_PRIMARY_CONNECT_TIMEOUT:-10}
+  socketTimeout: ${TIMESCALEDB_PRIMARY_SOCKET_TIMEOUT:-30}
+  logUnclosedConnections: false
+  loggerLevel: OFF
+  minIdle: ${TIMESCALE_PRIMARY_MIN_IDLE:-0}
+  maxPoolSize: ${TIMESCALE_PRIMARY_MAX_POOL_SIZE:-30}
+
+secondaryTimescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: "postgres"
+  timescaledbPassword: ""
+  connectTimeout: ${TIMESCALEDB_SECONDARY_CONNECT_TIMEOUT:-10}
+  socketTimeout: ${TIMESCALEDB_SECONDARY_SOCKET_TIMEOUT:-180}
+  logUnclosedConnections: false
+  loggerLevel: OFF
+  secondary: true
+  minIdle: ${TIMESCALE_SECONDARY_MIN_IDLE:-0}
+  maxPoolSize: ${TIMESCALE_SECONDARY_MAX_POOL_SIZE:-30}
+
+auditClientConfig:
+  baseUrl: http://localhost:9005/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+enableAudit: false
+
+cacheConfig:
+  cacheBackend: REDIS
+  cacheNamespace: ""
+  disabledCaches: [ ]
+  enterpriseCacheEnabled: true
+
+hostname: ${HOSTNAME:-localhost}
+
+basePathPrefix: ${BASE_PATH_PREFIX:-""}
+
+pipelineEventConsumersConfig:
+  interrupt:
+    threads: 1
+  orchestrationEvent:
+    threads: 1
+  facilitatorEvent:
+    threads: 1
+  nodeStart:
+    threads: 1
+  progress:
+    threads: 1
+  advise:
+    threads: 1
+  resume:
+    threads: 1
+  sdkResponse:
+    threads: 1
+  graphUpdate:
+    threads: 1
+  pipelineExecutionEvent:
+    threads: 1
+  pipelineExecutionEventSnapshot:
+    threads: 1
+  partialPlanResponse:
+    threads: 1
+  createPlan:
+    threads: 1
+  planNotify:
+    threads: 1
+  pmsNotify:
+    threads: 1
+  webhookEvent:
+    threads: 1
+  initiateNode:
+    threads: 1
+  pollingEvent:
+    threads: 1
+  triggerExecutionEvent:
+    threads: ${TRIGGER_EXECUTION_EVENT_CONSUMER_THREAD_COUNT:-1}
+  asyncFilterCreationEvent:
+    threads: ${ASYNC_FILTER_CREATION_CONSUMER_THREAD_COUNT:-1}
+  sdkResponseSpawnEvent:
+    threads: ${SDK_RESPONSE_SPAWN_EVENT_CONSUMER_THREAD_COUNT:-1}
+  sdkStepResponseEvent:
+    threads: ${SDK_STEP_RESPONSE_EVENT_CONSUMER_THREAD_COUNT:-1}
+  systemEventTriggerEvent:
+    threads: ${SYSTEM_EVENT_TRIGGER_CONSUMER_THREAD_COUNT:-1}
+
+delegatePollingConfig:
+  syncDelay: 2000
+  asyncDelay: 2000
+  progressDelay: 2000
+
+segmentConfiguration:
+  enabled: false
+  url: https://api.segment.io/v1/
+  apiKey: ""
+
+enforcementClientConfiguration:
+  enforcementCheckEnabled: false
+
+shouldUseInstanceCache: ${SHOULD_USE_INSTANCE_CACHE:-false}
+
+skipSdkMongoRegistration: ${SKIP_SDK_MONGO_REGISTRATION:-false}
+
+pmsPlanCreatorServicePoolConfig:
+  corePoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE:-3}
+  idleTime: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+
+planCreatorMergeServicePoolConfig:
+  corePoolSize: ${PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+planCreationServicePoolConfig:
+  corePoolSize: ${PLAN_CREATION_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${PLAN_CREATION_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${PLAN_CREATION_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATION_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PLAN_CREATION_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-100}
+
+customWebhookTriggerExecutionPoolConfig:
+  corePoolSize: ${CUSTOM_WEBHOOK_TRIGGER_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${CUSTOM_WEBHOOK_TRIGGER_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${CUSTOM_WEBHOOK_TRIGGER_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${CUSTOM_WEBHOOK_TRIGGER_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${CUSTOM_WEBHOOK_TRIGGER_EXECUTOR_POOL_QUEUE_SIZE:-500}
+
+executionRetentionSyncServicePoolConfig:
+  corePoolSize: ${EXECUTION_RETENTION_SYNC_ITERATOR_EXECUTOR_POOL_CORE_SIZE:-1}
+  maxPoolSize: ${EXECUTION_RETENTION_SYNC_ITERATOR_EXECUTOR_POOL_MAX_SIZE:-20}
+  idleTime: ${EXECUTION_RETENTION_SYNC_ITERATOR_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${EXECUTION_RETENTION_SYNC_ITERATOR_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+variableCreatorMergeServicePoolConfig:
+  corePoolSize: ${VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+filterCreatorMergeServicePoolConfig:
+  corePoolSize: ${FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+yamlSchemaExecutorServiceConfig:
+  corePoolSize: ${YAML_SCHEMA_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${YAML_SCHEMA_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${YAML_SCHEMA_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${YAML_SCHEmA_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+dashboardExecutorServiceConfig:
+  corePoolSize: ${DASHBOARD_EXECUTOR_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${DASHBOARD_EXECUTOR_POOL_MAX_SIZE:-15}
+  idleTime: ${DASHBOARD_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${DASHBOARD_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+pipelineRedisEventsConfig:
+  setupUsage:
+    maxTopicSize: ${SETUP_USAGE_MAX_TOPIC_SIZE:-10000}
+  planNotifyEvent:
+    maxTopicSize: ${PLAN_NOTIFY_EVENT_MAX_TOPIC_SIZE:-5000}
+  webhookPayloadDetails:
+    maxTopicSize: ${WEBHOOK_REQUEST_PAYLOAD_DETAILS_MAX_TOPIC_SIZE:-10000}
+  entityCrud:
+    maxTopicSize: ${ENTITY_CRUD_MAX_TOPIC_SIZE:-100000}
+  orchestrationNotifyEvent:
+    maxTopicSize: ${PMS_ORCHESTRATION_NOTIFY_EVENT_MAX_TOPIC_SIZE:-5000}
+
+pipelineSdkRedisEventsConfig:
+  pipelineSdkResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkResponseSpawnEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkStepResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+
+orchestrationRedisEventsConfig:
+  pipelineInterruptEvent:
+    maxTopicSize: ${PIPELINE_INTERRUPT_EVENT_MAX_TOPIC_SIZE:-1000}
+  pipelineOrchestrationEvent:
+    maxTopicSize: ${PIPELINE_ORCHESTRATION_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineFacilitatorEvent:
+    maxTopicSize: ${PIPELINE_FACILITATOR_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineNodeStartEvent:
+    maxTopicSize: ${PIPELINE_NODE_START_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineProgressEvent:
+    maxTopicSize: ${PIPELINE_PROGRESS_MAX_TOPIC_SIZE:-5000}
+  pipelineNodeAdviseEvent:
+    maxTopicSize: ${PIPELINE_NODE_ADVISE_MAX_TOPIC_SIZE:-5000}
+  pipelineNodeResumeEvent:
+    maxTopicSize: ${PIPELINE_NODE_RESUME_MAX_TOPIC_SIZE:-5000}
+  pipelineStartPartialPlanCreator:
+    maxTopicSize: ${START_PARTIAL_PLAN_CREATOR_MAX_TOPIC_SIZE:-5000}
+  pipelineBackfillOrchestrationEvent:
+    maxTopicSize: ${PIPELINE_BACKFILL_ORCHESTRATION_EVENT_MAX_TOPIC_SIZE:-5000}
+
+orchestrationLogConfiguration:
+  orchestrationLogBatchSize: ${ORCHESTRATION_LOG_BATCH_SIZE:-5}
+  shouldUseExpiredListener: ${SHOULD_USE_ORCHESTRATION_LOG_EXPIRED_LISTENER:-true}
+  cacheExpiryTimeMinutes: ${ORCHESTRATION_LOG_CACHE_EXPIRY_TIME_IN_MINUTES:-2}
+  shouldRetryExpiredListenerRegistration: ${SHOULD_RETRY_ORCHESTRATION_LOG_CACHE_LISTENER_REGISTRATION:-true}
+
+flowGovernorConfig:
+  enabled: ${PIPELINE_EXECUTION_FLOW_GOVERNOR_ENABLED:-false}
+  # High default keeps NORMAL mode effectively a no-op until operators tune to 5× p99.
+  normalRps: ${FLOW_GOVERNOR_NORMAL_RPS:-10000}
+  normalRpsByConsumer: {}
+  throttledConsumerConfig:
+    workers: ${FLOW_GOVERNOR_WORKERS:-20}
+    queueCapacity: ${FLOW_GOVERNOR_QUEUE_CAPACITY:-200}
+    offerTimeoutMs: ${FLOW_GOVERNOR_OFFER_TIMEOUT_MS:-100}
+    highWatermarkPercent: ${FLOW_GOVERNOR_HIGH_WATERMARK_PERCENT:-80}
+    lowWatermarkPercent: ${FLOW_GOVERNOR_LOW_WATERMARK_PERCENT:-30}
+    modePollIntervalMs: ${FLOW_GOVERNOR_MODE_POLL_INTERVAL_MS:-5000}
+    rateLimiterRefreshPeriodMs: ${FLOW_GOVERNOR_RATE_LIMITER_REFRESH_PERIOD_MS:-1000}
+    permitAcquireTimeoutMs: ${FLOW_GOVERNOR_PERMIT_ACQUIRE_TIMEOUT_MS:-1000}
+
+planCreatorMergeServiceDependencyBatch: ${PLAN_CREATOR_DEPENDENCY_BATCH:-50}
+
+maxMultiArtifactTriggerSources: ${MAX_MULTI_ARTIFACT_TRIGGER_SOURCES:-10}
+
+enableOpentelemetry: false
+enableLoopDetection: false
+loopDetectionThreshold: 2
+
+############ Json Expansion Config variables #################
+
+jsonExpansionPoolConfig:
+  corePoolSize: ${JSON_EXPANSION_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${JSON_EXPANSION_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${JSON_EXPANSION_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${JSON_EXPANSION_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+jsonExpansionRequestBatchSize: ${JSON_EXPANSION_BATCH_SIZE:-50}
+
+#############################################################
+
+############ Inputs Metadata Config variables #################
+
+inputsMetadataPoolConfig:
+  corePoolSize: ${INPUTS_METADATA_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${INPUTS_METADATA_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${INPUTS_METADATA_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${INPUTS_METADATA_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+inputsMetadataRequestBatchSize: ${INPUTS_METADATA_BATCH_SIZE:-50}
+initiateNodeRequestBatchSize: ${INITIATE_NODE_REQUEST_BATCH_SIZE:-50}
+
+#############################################################
+
+orchestrationRestrictionConfiguration:
+  maxNestedLevelsCount: ${MAX_NESTED_LEVELS_COUNT:-25}
+  useRestrictionForFree: ${USE_RESTRICTION_FOR_FREE:-false}
+  useRestrictionForTeam: ${USE_RESTRICTION_FOR_TEAM:-false}
+  useRestrictionForEnterprise: ${USE_RESTRICTION_FOR_ENTERPRISE:-false}
+  useRestrictionForDevopsEssentials: ${USE_RESTRICTION_FOR_DEVOPS_ESSENTIALS:-false}
+  useRestrictionForEssentials: ${USE_RESTRICTION_FOR_ESSENTIALS:-false}
+  planExecutionRestriction:
+    free: ${PLAN_EXECUTION_RESTRICTION_FREE:-2}
+    team: ${PLAN_EXECUTION_RESTRICTION_TEAM:-200}
+    enterprise: ${PLAN_EXECUTION_RESTRICTION_ENTERPRISE:-500}
+    devops_essentials: ${PLAN_EXECUTION_RESTRICTION_DEVOPS_ESSENTIALS:-60}
+    essentials: ${PLAN_EXECUTION_RESTRICTION_ENTERPRISE:-500}
+  #remove below restriction
+  pipelineCreationRestriction:
+    free: ${PIPELINE_CREATION_RESTRICTION_FREE:-5}
+    team: ${PIPELINE_CREATION_RESTRICTION_TEAM:-5000}
+    enterprise: ${PIPELINE_CREATION_RESTRICTION_ENTERPRISE:-10000}
+    devops_essentials: ${PIPELINE_CREATION_RESTRICTION_DEVOPS_ESSENTIALS:-5000}
+    essentials: ${PIPELINE_CREATION_RESTRICTION_ENTERPRISE:-10000}
+  triggerCreationRestriction:
+    free: ${TRIGGER_CREATION_RESTRICTION_FREE:-100}
+    team: ${TRIGGER_CREATION_RESTRICTION_TEAM:-5000}
+    enterprise: ${TRIGGER_CREATION_RESTRICTION_ENTERPRISE:-10000}
+    devops_essentials: ${TRIGGER_CREATION_RESTRICTION_DEVOPS_ESSENTIALS:-5000}
+    essentials: ${TRIGGER_CREATION_RESTRICTION_ENTERPRISE:-10000}
+  #remove below restriction
+  maxConcurrencyRestriction:
+    free: ${MAX_CONCURRENCY_RESTRICTION_FREE:-2}
+    team: ${MAX_CONCURRENCY_RESTRICTION_TEAM:-50}
+    enterprise: ${MAX_CONCURRENCY_RESTRICTION_ENTERPRISE:-100}
+    devops_essentials: ${MAX_CONCURRENCY_RESTRICTION_DEVOPS_ESSENTIALS:-60}
+    essentials: ${MAX_CONCURRENCY_RESTRICTION_ENTERPRISE:-100}
+  maxInputParameterSizeRestriction:
+    free: ${MAX_INPUT_PARAMETER_SIZE_RESTRICTION_FREE:-10000} # 10KB
+    team: ${MAX_INPUT_PARAMETER_SIZE_RESTRICTION_TEAM:-100000} # 100KB
+    enterprise: ${MAX_INPUT_PARAMETER_SIZE_RESTRICTION_ENTERPRISE:-1000000} # 1MB
+    devops_essentials: ${MAX_INPUT_PARAMETER_SIZE_RESTRICTION_ENTERPRISE:-100000} # 100KB
+    essentials: ${MAX_INPUT_PARAMETER_SIZE_RESTRICTION_ENTERPRISE:-1000000}
+  maxExpressionCallsRestriction:
+    MONGO:
+      free: ${MAX_EXPRESSION_MONGO_CALLS_FREE:-25}
+      team: ${MAX_EXPRESSION_MONGO_CALLS_TEAM:-50}
+      enterprise: ${MAX_EXPRESSION_MONGO_CALLS_ENTERPRISE:-150}
+      devops_essentials: ${MAX_EXPRESSION_MONGO_CALLS_DEVOPS_ESSENTIALS:-100}
+      essentials: ${MAX_EXPRESSION_MONGO_CALLS_ESSENTIALS:-150}
+  maxExecutionOutcomeSizeRestriction:
+    free: ${MAX_EXEC_OUTCOME_SIZE_RESTRICTION_FREE:-10000} # 10KB
+    team: ${MAX_EXEC_OUTCOME_SIZE_RESTRICTION_TEAM:-100000} # 100KB
+    enterprise: ${MAX_EXEC_OUTCOME_SIZE_RESTRICTION_ENTERPRISE:-1000000} # 1MB
+    devops_essentials: ${MAX_EXEC_OUTCOME_SIZE_RESTRICTION_DEVOPS_ESSENTIALS:-100000} # 100KB
+    essentials: ${MAX_EXEC_OUTCOME_SIZE_RESTRICTION_ENTERPRISE:-1000000}
+  # Limits on the number of queued execution on an account
+  maxQueuedExecutionsRestriction:
+    free: ${MAX_QUEUED_EXECUTION_RESTRICTION_FREE:-10}
+    team: ${MAX_QUEUED_EXECUTION_RESTRICTION_TEAM:-1000}
+    enterprise: ${MAX_QUEUED_EXECUTION_RESTRICTION_ENTERPRISE:-2000}
+    devops_essentials: ${MAX_QUEUED_EXECUTION_RESTRICTION_DEVOPS_ESSENTIALS:-1000}
+    essentials: ${MAX_QUEUED_EXECUTION_RESTRICTION_ENTERPRISE:-2000}
+  # Parallelism hard limit on number of nodes at any place
+  totalParallelismStopRestriction:
+    free: ${TOTAL_PARALLELISM_RESTRICTION_FREE:-2}
+    team: ${TOTAL_PARALLELISM_RESTRICTION_TEAM:-256}
+    enterprise: ${TOTAL_PARALLELISM_RESTRICTION_ENTERPRISE:-256}
+    devops_essentials: ${TOTAL_PARALLELISM_RESTRICTION_DEVOPS_ESSENTIALS:-256}
+    essentials: ${TOTAL_PARALLELISM_RESTRICTION_ENTERPRISE:-256}
+  #TODO(archit): Add passing timeout to all planCreators to adopt
+  maxPipelineTimeoutInHours:
+    free: ${MAX_PIPELINE_TIMEOUT_FREE:-1}
+    team: ${MAX_PIPELINE_TIMEOUT_TEAM:-720}
+    enterprise: ${MAX_PIPELINE_TIMEOUT_ENTERPRISE:-840}
+    devops_essentials: ${MAX_PIPELINE_TIMEOUT_DEVOPS_ESSENTIALS:-720}
+    essentials: ${MAX_PIPELINE_TIMEOUT_ENTERPRISE:-840}
+  maxStageTimeoutInHours:
+    free: ${MAX_STAGE_TIMEOUT_FREE:-1}
+    team: ${MAX_STAGE_TIMEOUT_TEAM:-720}
+    enterprise: ${MAX_STAGE_TIMEOUT_ENTERPRISE:-840}
+    devops_essentials: ${MAX_STAGE_TIMEOUT_DEVOPS_ESSENTIALS:-720}
+    essentials: ${MAX_STAGE_TIMEOUT_ENTERPRISE:-840}
+  # 0 means no limit
+  maxStepTimeoutInHours:
+    free: ${MAX_STEP_TIMEOUT_FREE:-1}
+    team: ${MAX_STEP_TIMEOUT_TEAM:-0}
+    enterprise: ${MAX_STEP_TIMEOUT_ENTERPRISE:-0}
+    devops_essentials: ${MAX_STEP_TIMEOUT_DEVOPS_ESSENTIALS:-0}
+    essentials: ${MAX_STEP_TIMEOUT_ENTERPRISE:-0}
+  fileSizeRestriction:
+    free: ${FILE_SIZE_RESTRICTION_FREE:-100000} # 100KB
+    team: ${FILE_SIZE_RESTRICTION_TEAM:-500000} # 500KB
+    enterprise: ${FILE_SIZE_RESTRICTION_ENTERPRISE:-1000000} # 1MB
+    devops_essentials: ${FILE_SIZE_RESTRICTION_DEVOPS_ESSENTIALS:-500000} # 500KB
+    essentials: ${FILE_SIZE_RESTRICTION_ENTERPRISE:-1000000}
+  payloadSizeRestriction:
+    free: ${PAYLOAD_SIZE_RESTRICTION_FREE:-1000000} # 1MB
+    team: ${PAYLOAD_SIZE_RESTRICTION_TEAM:-5000000} # 5MB
+    enterprise: ${PAYLOAD_SIZE_RESTRICTION_ENTERPRISE:-10000000} # 10MB
+    devops_essentials: ${PAYLOAD_SIZE_RESTRICTION_DEVOPS_ESSENTIALS:-5000000} # 5MB
+    essentials: ${PAYLOAD_SIZE_RESTRICTION_ENTERPRISE:-10000000}
+
+grpcNegotiationType: ${GRPC_NEGOTIATION_TYPE:-TLS}
+
+lockNotifyResponseCleanup: ${LOCK_NOTIFY_RESPONSE_CLEANUP:-true}
+
+shouldUseEventsFrameworkSnapshotDebezium: ${SHOULD_USE_EVENTS_FRAMEWORK_SNAPSHOT_DEBEZIUM:-false}
+# Events framework configuration for debezium consumer in case of snapshotting
+eventsFrameworkSnapshotDebezium:
+  redis:
+    sentinel: false
+    masterName: "test"
+    redisUrl: "redis://localhost:6379"
+    sentinelUrls:
+      - "redis://redis1:26379"
+      - "redis://redis2:26379"
+      - "redis://redis3:26379"
+    envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-}
+    readMode: MASTER
+    nettyThreads: 16
+    useScriptCache: true
+    userName: ""
+    password: ""
+    sslConfig:
+      enabled: false
+      CATrustStorePath: "/tmp/ca_trust_store"
+      CATrustStorePassword: ""
+
+disableFreezeNotificationTemplate: ${DISABLE_FREEZE_NOTIFY_TEMPLATE:-true}
+
+cfClientConfig:
+  apiKey: ""
+  configUrl: "http://ff-proxy-v2-clusterip.harness-nextgen.svc.cluster.local:80"
+  eventUrl: "http://ff-proxy-v2-clusterip.harness-nextgen.svc.cluster.local:80"
+  analyticsEnabled: true
+  connectionTimeout: 10000
+  readTimeout: 45000
+  bufferSize: 10240
+  retries: 6
+  sleepInterval: 5000
+
+featureFlagConfig:
+  featureFlagSystem: LOCAL
+  syncFeaturesToCF: false
+
+resourceGroupClientConfig:
+  serviceConfig:
+    #Change this as needed to enable connection pooling
+    keepAliveSeconds: ${RESOURCE_GROUP_SERVICE_CONFIG_KEEP_ALIVE_SECONDS:-0}
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+sscaServiceConfig:
+  httpClientConfig:
+    baseUrl: http://localhost:8188
+    connectTimeOutSeconds: 40
+    readTimeOutSeconds: 40
+  serviceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+stoServiceConfig:
+  baseUrl: ${STO_SERVICE_ENDPOINT:-http://localhost:4000}
+  internalUrl: ${STO_SERVICE_INTERNAL_ENDPOINT:-""}
+  globalToken: ${STO_SERVICE_GLOBAL_TOKEN:-"token"}
+
+qwietServiceConfig:
+  baseUrl: ${QWIET_SERVICE_ENDPOINT:-https://app.stg.shiftleft.io}
+  globalToken: ${QWIET_SERVICE_GLOBAL_TOKEN:-"token"}
+
+cvngClientConfig:
+  baseUrl: ${CV_MANAGER_BASE_URL:-http://localhost:6457/cv/api/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+cvngServiceSecret: ${CV_MANAGER_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+
+pipelineAsyncValidationPoolConfig:
+  corePoolSize: ${PIPELINE_ASYNC_VALIDATION_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PIPELINE_ASYNC_VALIDATION_EXECUTOR_POOL_MAX_SIZE:-25}
+  idleTime: ${PIPELINE_ASYNC_VALIDATION_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PIPELINE_ASYNC_VALIDATION_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+triggerAuthenticationPoolConfig:
+  corePoolSize: ${TRIGGER_AUTHENTICATION_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${TRIGGER_AUTHENTICATION_EXECUTOR_POOL_MAX_SIZE:-25}
+  idleTime: ${TRIGGER_AUTHENTICATION_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${TRIGGER_AUTHENTICATION_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+pipelineSetupUsageCreationExecutorServiceConfig:
+  corePoolSize: ${PIPELINE_SETUP_USAGE_CREATION_EXECUTOR_POOL_CORE_SIZE:-1}
+  maxPoolSize: ${PIPELINE_SETUP_USAGE_CREATION_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${PIPELINE_SETUP_USAGE_CREATION_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PIPELINE_SETUP_USAGE_CREATION_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: 1
+
+outboxEventPollConfig:
+  executionOutbox:
+    initialDelayInSeconds: ${EXECUTION_OUTBOX_INITIAL_DELAY:-5}
+    pollingIntervalInSeconds: ${EXECUTION_OUTBOX_POLLING_INTERVAL:-5}
+    maximumRetryAttemptsForAnEvent: ${EXECUTION_OUTBOX_MAX_RETRY_ATTEMPTS:-7}
+    lockDuration: ${EXECUTION_OUTBOX_LOCK_DURATION:-15}
+    enableMetrics: ${EXECUTION_OUTBOX_ENABLE_METRICS:-false}
+    threadCount: ${EXECUTION_OUTBOX_THREAD_COUNT:-1}
+  kafkaOutbox:
+    initialDelayInSeconds: ${KAFKA_OUTBOX_INITIAL_DELAY:-5}
+    pollingIntervalInSeconds: ${KAFKA_OUTBOX_POLLING_INTERVAL:-5}
+    maximumRetryAttemptsForAnEvent: ${KAFKA_OUTBOX_MAX_RETRY_ATTEMPTS:-7}
+    lockDuration: ${KAFKA_OUTBOX_LOCK_DURATION:-15}
+    enableMetrics: ${KAFKA_OUTBOX_ENABLE_METRICS:-false}
+    threadCount: ${KAFKA_OUTBOX_THREAD_COUNT:-2}
+
+expandedJsonConfig:
+  lockTimeOutInMinutes: ${EXPANDED_JSON_LOCK_TIMEOUT_DURATION:-0}
+
+staticSchemaFileURL: ${STATIC_SCHEMA_FILE_URL:-"https://raw.githubusercontent.com/harness/harness-schema/main/%s/%s"}
+timeoutIteratorMode : ${TIMEOUT_ITERATOR_MODE:-LOOP}
+
+webhookEventHsqsDequeueConfig:
+  batchSize: ${WEBHOOK_EVENT_DEQUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${WEBHOOK_EVENT_DEQUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+useQueueServiceForWebhookTriggers: ${USE_QUEUE_SERVICE_FOR_WEBHOOK_TRIGGERS:-false}
+useQueueServiceForPlanCreation: ${USE_QUEUE_SERVICE_FOR_PLAN_CREATION:-false}
+useQueueServiceForCustomWebhookTriggers: ${USE_QUEUE_SERVICE_FOR_CUSTOM_WEBHOOK_TRIGGERS:-false}
+
+planCreationHsqsDequeueConfig:
+  batchSize: ${PLAN_CREATION_DEQUE_BATCH_SIZE:-10}
+  threadSleepTimeInMillis: ${PLAN_CREATION_DEQUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+graphConsumerSleepIntervalMs: ${GRAPH_CONSUMER_SLEEP_INTERVAL_MS:-0}
+
+asyncFilterCreationConsumerSleepIntervalMs: ${ASYNC_FILTER_CREATION_CONSUMER_SLEEP_INTERVAL_MS:-5000}
+
+streamPerServiceConfiguration: ${PIE_STREAM_PER_SERVICE:- false}
+
+publishAdviserEventForCustomAdvisers: ${PUBLISH_ADVISER_EVENT_FOR_CUSTOM_ADVISERS:-false}
+
+pipelineExecutionDetailsDeleteMaxBatchSize: ${PIPELINE_EXECUTION_DETAILS_DELETE_MAX_BATCH_SIZE:-200}
+
+pipelineExecutionClusterStepConcurrencyLimit: ${PIPELINE_CLUSTER_STEP_CONCURRENCY_LIMIT:-50000}
+
+pipelineExecutionDefaultMaxLeafStepConcurrency: ${PIPELINE_DEFAULT_MAX_LEAF_STEP_CONCURRENCY:-5000}
+
+stepConcurrencyCounterMutationEnabled: ${STEP_CONCURRENCY_COUNTER_MUTATION_ENABLED:-true}
+
+stepConcurrencyQueueStoreEnabled: ${STEP_CONCURRENCY_QUEUE_STORE_ENABLED:-true}
+
+stepConcurrencyGateMode: ${STEP_CONCURRENCY_GATE_MODE:-shadow}
+
+pipelineExecutionCounterRebuildJobEnabled: ${PIPELINE_COUNTER_REBUILD_JOB_ENABLED:-true}
+
+useDbQueueForPlanCreation: ${USE_DB_QUEUE_FOR_PLAN_CREATION:-false}
+planCreationDbQueueBatchSize: ${PLAN_CREATION_DB_QUEUE_BATCH_SIZE:-100}
+
+planConcurrencyCounterMutationEnabled: ${PLAN_CONCURRENCY_COUNTER_MUTATION_ENABLED:-true}
+
+planConcurrencyGateMode: ${PLAN_CONCURRENCY_GATE_MODE:-shadow}
+
+planConcurrencyRebuildJobEnabled: ${PLAN_CONCURRENCY_REBUILD_JOB_ENABLED:-false}
+
+useSchemaFromHarnessSchemaRepo: ${USE_SCHEMA_FROM_HARNESS_SCHEMA_REPO:-false}
+
+preflightConnectorTimeoutSeconds: ${PREFLIGHT_CONNECTOR_TEST_TIMEOUT_SECONDS:-30}
+
+bulkReconciliationConsumerSleepIntervalMs: ${BULK_RECONCILIATION_CONSUMER_SLEEP_INTERVAL_MS:-5000}
+
+policyEvaluationDetailsMaxPageSize: ${POLICY_EVALUATION_DETAILS_MAX_PAGE_SIZE:-500}
+
+pmsGrpcClientConfig:
+  target: ${PMS_TARGET:-localhost:12011}
+  authority: ${PMS_AUTHORITY:-localhost}
+
+pmsSdkGrpcServerConfig:
+  connectors:
+    - port: ${PMS_SDK_GRPC_SERVER_PORT:-15302}
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+      threadPoolConfig:
+        maxPoolSize: ${GRPC_MAX_THREADS:-1500}
+
+useRemoteGrpcForPipeline: ${USE_REMOTE_RPC_FOR_PIPELINE:-false}
+publishNodeExecutionTimeTakenDetails: ${PUBLISH_NODE_EXECUTION_TIME_TAKEN_DETAILS:-true}
+stepDataIngestionTopicName: ${STEP_DATA_INGESTION_TOPIC_NAME:-step_end_event_pms}
+stageDataIngestionTopicName: ${STAGE_DATA_INGESTION_TOPIC_NAME:-stage_end_event_pms}
+pipelineDataIngestionTopicName: ${PIPELINE_DATA_INGESTION_TOPIC_NAME:-pipeline_end_event_pms}
+# CDC Topic for node execution events - controlled by PMS_MANUAL_NODE_EXECUTION_CDC_EVENTS feature flag
+cdcNodeExecutionTopicName: ${CDC_NODE_EXECUTION_TOPIC_NAME:-data-platform-cdc-ingestion-request}
+
+kafkaModuleConfig:
+  enableConfluentKafkaProducer: ${ENABLE_CONFLUENT_KAFKA_PRODUCER:-false}
+  kafkaConfluentBaseConfig:
+    bootstrapServers: ${KAFKA_CONFLUENT_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_CONFLUENT_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_CONFLUENT_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_CONFLUENT_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_CONFLUENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_CONFLUENT_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-"test:letmein"}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-"USER_INFO"}
+  enableGeneralKafkaProducer: ${ENABLE_GENERAL_KAFKA_PRODUCER:-false}
+  kafkaGeneralBaseConfig:
+    bootstrapServers: ${KAFKA_GENERAL_BOOTSTRAP_SERVER_URLS:-"localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_GENERAL_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_GENERAL_SASL_JAAS_CONFIG:-""}
+    saslMechanism: ${KAFKA_GENERAL_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_GENERAL_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_GENERAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_GENERAL_SECURITY_PROTOCOL:-PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+    sslTruststoreLocation: ${KAFKA_GENERAL_SSL_TRUSTSTORE_LOCATION:-""}
+    sslTruststorePassword: ${KAFKA_GENERAL_SSL_TRUSTSTORE_PASSWORD:-""}
+    sslTruststoreType: ${KAFKA_GENERAL_SSL_TRUSTSTORE_TYPE:-""}
+    sslKeystoreLocation: ${KAFKA_GENERAL_SSL_KEYSTORE_LOCATION:-""}
+    sslKeystorePassword: ${KAFKA_GENERAL_SSL_KEYSTORE_PASSWORD:-""}
+    sslKeystoreType: ${KAFKA_GENERAL_SSL_KEYSTORE_TYPE:-""}
+    sslKeyPassword: ${KAFKA_GENERAL_SSL_KEY_PASSWORD:-""}
+    sslProtocol: ${KAFKA_GENERAL_SSL_PROTOCOL:-""}
+    sslEnabledProtocols: ${KAFKA_GENERAL_SSL_ENABLED_PROTOCOLS:-""}
+    sslProvider: ${KAFKA_GENERAL_SSL_PROVIDER:-""}
+
+# CDC Kafka consumers (Debezium + Kafka Connect migration from Redis Streams).
+# When `enabled` is true, the Kafka CDC consumer threads are started at boot alongside
+# the legacy Redis consumers. Actual processing is gated per-consumer by a global
+# Harness feature flag (see PIE_CDC_KAFKA_* flags). When `enabled` is false (default),
+# only the Redis consumers run. See CdcKafkaConfig for details.
+cdcKafkaConfig:
+  enabled: ${CDC_KAFKA_ENABLED:-false}
+  consumers:
+    - name: planExecutionsSummary
+      topic: ${CDC_KAFKA_PLAN_EXECUTIONS_SUMMARY_TOPIC:-pmsMongo.pms-harness.planExecutionsSummary}
+      maxPollRecords: ${CDC_KAFKA_PLAN_EXECUTIONS_SUMMARY_MAX_POLL_RECORDS:-100}
+      # Flip ON only after FF PIPE_CDC_KAFKA_PLAN_EXECUTIONS_SUMMARY is ON and Kafka consumer is verified healthy.
+      # Both this flag AND the FF must be true to stop the Redis consumer (AND condition).
+      redisShortCircuit: ${CDC_KAFKA_PLAN_EXECUTIONS_SUMMARY_REDIS_SHORT_CIRCUIT:-false}
+
+
+graphGenerationStreamsConfig:
+  enabled: ${GRAPH_GENERATION_STREAMS_ENABLED:-false}
+  kafkaBaseConfig:
+    bootstrapServers: ${KAFKA_GENERAL_BOOTSTRAP_SERVER_URLS:-"localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_GENERAL_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_GENERAL_SASL_JAAS_CONFIG:-""}
+    saslMechanism: ${KAFKA_GENERAL_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_GENERAL_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_GENERAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_GENERAL_SECURITY_PROTOCOL:-PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+    sslTruststoreLocation: ${KAFKA_GENERAL_SSL_TRUSTSTORE_LOCATION:-""}
+    sslTruststorePassword: ${KAFKA_GENERAL_SSL_TRUSTSTORE_PASSWORD:-""}
+    sslTruststoreType: ${KAFKA_GENERAL_SSL_TRUSTSTORE_TYPE:-""}
+    sslKeystoreLocation: ${KAFKA_GENERAL_SSL_KEYSTORE_LOCATION:-""}
+    sslKeystorePassword: ${KAFKA_GENERAL_SSL_KEYSTORE_PASSWORD:-""}
+    sslKeystoreType: ${KAFKA_GENERAL_SSL_KEYSTORE_TYPE:-""}
+    sslKeyPassword: ${KAFKA_GENERAL_SSL_KEY_PASSWORD:-""}
+    sslProtocol: ${KAFKA_GENERAL_SSL_PROTOCOL:-""}
+    sslEnabledProtocols: ${KAFKA_GENERAL_SSL_ENABLED_PROTOCOLS:-""}
+    sslProvider: ${KAFKA_GENERAL_SSL_PROVIDER:-""}
+  cdcTopic: ${GRAPH_GENERATION_CDC_TOPIC:-"cdc.graph-events"}
+  maxPollRecords: ${GRAPH_GENERATION_MAX_POLL_RECORDS:-500}
+  fetchMinBytes: ${GRAPH_GENERATION_FETCH_MIN_BYTES:-10000000}
+  fetchMaxWaitMs: ${GRAPH_GENERATION_FETCH_MAX_WAIT_MS:-1000}
+  maxPartitionFetchBytes: ${GRAPH_GENERATION_MAX_PARTITION_FETCH_BYTES:-10485760}
+
+gcsMigrationConfig:
+  enable: ${ENABLE_MIGRATION_JOB_FOR_GCS:-false}
+  batchSize: ${MIGRATION_JOB_BATCH_SIZE_FOR_GCS:-1000}
+  frequencyInMin: ${GCS_MIGRATION_JOB_FREQUENCY_MINUTES:-60}
+
+projectMovementEntityMigrationMetricsConfig:
+  enabled: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_ENABLED:-false}
+  initialDelayMinutes: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_INIT_DELAY:-60}
+  frequencyMinutes: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_FREQUENCY:-1440}
+
+ngBaseUrl: ${NG_BASE_URL:-https://localhost:8181/}
+
+pmsSdkTriggerActivationPoolConfig:
+  corePoolSize: ${TRIGGER_ACTIVATION_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${TRIGGER_ACTIVATION_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${TRIGGER_ACTIVATION_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${TRIGGER_ACTIVATION_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+pmsSdkOrchestrationHandlerPoolConfig:
+  corePoolSize: ${ORCHESTRATION_HANDLER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${ORCHESTRATION_HANDLER_POOL_MAX_SIZE:-30}
+  idleTime: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME:-60}
+  timeUnit: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+annotationsBaseUrl: ${ANNOTATIONS_SERVICE_BASE_URL:-http://localhost:12001}
+
+resourceRestraintReconciliation:
+  enabled: ${ENABLE_RESOURCE_RESTRAINT_RECONCILIATION:-false}
+  intervalInMins: ${RESOURCE_RESTRAINT_RECONCILIATION_INTERVAL_IN_MINUTES:-10}
+
+# SPIRE-based service-to-service mesh identity. Fully opt-in: with
+# MESH_IDENTITY_INBOUND_ENABLED=false (default), the service skips mesh wiring
+# and the existing HMAC path is unchanged. Enable via env vars after code ships.
+meshIdentity:
+  inboundEnabled: ${MESH_IDENTITY_INBOUND_ENABLED:-false}
+  outboundEnabled: ${MESH_IDENTITY_OUTBOUND_ENABLED:-false}
+  outboundOnly: ${MESH_IDENTITY_OUTBOUND_ONLY:-false}
+  # Fallback to HMAC when mesh validation fails. Keep true during rollout.
+  fallbackEnabled: ${MESH_IDENTITY_FALLBACK_ENABLED:-true}
+  rejectAuthorizationWithoutMeshHeader: ${MESH_IDENTITY_REJECT_AUTH_WITHOUT_MESH_HEADER:-false}
+  audience: ${MESH_IDENTITY_AUDIENCE:-PipelineService}
+  allowedAudiences: ${MESH_IDENTITY_ALLOWED_AUDIENCES:-gateway-internal-service}

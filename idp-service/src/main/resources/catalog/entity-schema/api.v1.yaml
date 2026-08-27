@@ -1,0 +1,9 @@
+apiVersion: "harness.io/v1"
+kind: api
+identifier: <identifier>
+name: <name>
+type: <type>
+owner: unknown
+spec:
+  lifecycle: unknown
+  definition: <definition>

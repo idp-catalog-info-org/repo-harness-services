@@ -1,0 +1,20 @@
+{
+    "title": "Token expiring in ${DURATION} — ${TOKEN_IDENTIFIER}",
+    "text": "The token ${TOKEN_IDENTIFIER} for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME} expires on ${EXPIRY_DATE}.\n\nUpdate the token before expiry to avoid authentication failures.\n\nAccount: ${ACCOUNT_NAME} | Account ID: ${ACCOUNT_IDENTIFIER} | Org: ${ORG_IDENTIFIER} | Project: ${PROJECT_IDENTIFIER} | Expires in: ${DURATION}",
+    "tags": [
+        "event_type:token_about_to_expire",
+        "token_identifier:${TOKEN_IDENTIFIER}",
+        "api_key_identifier:${API_KEY_IDENTIFIER}",
+        "service_account_name:${SERVICE_ACCOUNT_NAME}",
+        "expiry_date:${EXPIRY_DATE}",
+        "duration:${DURATION}",
+        "account_name:${ACCOUNT_NAME}",
+        "account_identifier:${ACCOUNT_IDENTIFIER}",
+        "org_identifier:${ORG_IDENTIFIER}",
+        "project_identifier:${PROJECT_IDENTIFIER}"
+    ],
+    "aggregation_key": "${TOKEN_IDENTIFIER}",
+    "priority": "normal",
+    "alert_type": "warning",
+    "source_type_name": "harness_notifications"
+}

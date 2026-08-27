@@ -1,0 +1,71 @@
+{
+  "catalog": {
+    "HarnessCD": {
+      "spec": {
+        "harnessService": {
+          "identifier": "",
+          "orgIdentifier": "",
+          "projectIdentifier": ""
+        }
+      },
+      "metadata": {
+        "annotations": {
+          "harness.io/services": "${identifier}: ${env:INTEGRATIONS_HARNESS_CI_CD_ANNOTATIONS_SERVICE_URL}"
+        }
+      }
+    },
+    "HarnessScope": {
+
+    },
+    "ServiceNow": {
+
+    },
+    "PagerDuty": {
+
+    },
+    "GitHub": {
+
+    },
+    "HarnessCI": {
+
+    },
+    "HarnessK8s": {
+
+    },
+    "GCP": {
+
+    },
+    "SonarQube": {
+
+    },
+    "BitbucketCloud": {
+
+    },
+    "DataDog": {
+
+    },
+    "DynaTrace": {
+
+    },
+    "CatalogInfo": {
+
+    }
+  },
+  "git": {
+    "github": {
+
+    },
+    "gitlab": {
+
+    },
+    "bitbucket_server": {
+
+    },
+    "bitbucket_cloud": {
+
+    },
+    "azure": {
+
+    }
+  }
+}

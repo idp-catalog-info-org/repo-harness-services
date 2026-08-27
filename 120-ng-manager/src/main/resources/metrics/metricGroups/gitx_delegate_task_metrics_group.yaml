@@ -1,0 +1,8 @@
+name: GitX Delegate Task Times in Metrics Group
+identifier: gitx_delegate_task_times_group
+labels:
+  - accountId
+  - taskType
+  - operationType
+  - status
+  - repoName

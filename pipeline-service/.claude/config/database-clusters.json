@@ -1,0 +1,40 @@
+{
+  "_doc": "Maps namespace → preferred DB cluster aliases for codepulse queries. Always try the first cluster listed for the matching service.",
+  "clusters": {
+    "prod1": {
+      "pipeline-service": ["prod1-pms", "prod1-cdng"],
+      "orchestration": ["prod1-pms"],
+      "default": ["prod1-cdng"]
+    },
+    "prod2": {
+      "pipeline-service": ["prod2-pms", "prod2-cdng"],
+      "orchestration": ["prod2-pms"],
+      "default": ["prod2-cdng"]
+    },
+    "prod3": {
+      "pipeline-service": ["prod3-pms", "prod3-cdng"],
+      "orchestration": ["prod3-pms"],
+      "default": ["prod3-cdng"]
+    },
+    "qa": {
+      "pipeline-service": ["qa-pms", "qa-cdng"],
+      "orchestration": ["qa-pms"],
+      "default": ["qa-cdng"]
+    }
+  },
+  "collections": {
+    "_doc": "Key MongoDB collections by service for debugging queries",
+    "pipeline-service": {
+      "nodeExecutions": "Node execution state, status, timestamps, retryIds, notifyId",
+      "planExecutions": "Top-level execution state, planId, status",
+      "outcomeInstances": "Step outcomes and output data",
+      "sweepingOutput": "Scoped output data shared between steps",
+      "timeoutInstances": "Registered timeouts for node executions"
+    }
+  },
+  "metadata": {
+    "created": "2026-03-18",
+    "last_updated": "2026-03-18",
+    "notes": "Database cluster mapping for debugger agent. For pipeline-service debugging, always query the -pms cluster first."
+  }
+}

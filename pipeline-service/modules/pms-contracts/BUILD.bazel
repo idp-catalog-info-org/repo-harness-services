@@ -1,0 +1,50 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/harness.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    visibility = ["//visibility:public"],
+    exports = [
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/accountoverrides:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/annotations:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/dashboards:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/execution:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/execution/resource:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/inputset:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/ngpipeline/inputset/beans/entity:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/ngpipeline/inputset/beans/resource:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/json:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/json/serializers:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/kryo:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/kryo/serializers:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/spring/converters/level:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/yaml:module",
+    ],
+)
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["src/test/**/*.java"]),
+    resources = ["//pipeline-service/modules/pms-contracts/src/test/resources:resource"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":module",
+        "//990-commons-test:module",
+    ],
+)
+
+run_tests()
+
+# run static analysis macro for pmd/checkstyle/sonarqube checks
+run_analysis(
+    run_pmd = False,
+)

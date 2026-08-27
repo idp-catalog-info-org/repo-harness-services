@@ -1,0 +1,22 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store Values manifest. The values content lives in the Harness File Store (files);
+# the manifest step fetches and writes it to the runner workspace.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: Values file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store values manifest 'ID_PLACEHOLDER' on the runner"

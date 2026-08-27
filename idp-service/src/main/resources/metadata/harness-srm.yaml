@@ -1,0 +1,36 @@
+identifier: harness-srm
+name: Harness Service Reliability
+description: This plugin tracks the defined SLOs and Error Budgets for your Monitored services in Harness SRM Module.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: harness.io
+category: Quality
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-srm
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-srm
+config: |-
+  proxy:
+    endpoints:
+      '/harness/prod':
+        target: 'https://app.harness.io/'
+        pathRewrite:
+          '/api/proxy/harness/prod/?': '/'
+        allowedHeaders:
+          - authorization
+          - Harness-Account
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityHarnessSrmContent
+      addByDefault: true
+      defaultRoute: /slos
+      layoutSchemaSpecs:
+        name: EntityHarnessSrmContent
+        title: SLOs
+        contents:
+          - component: EntityHarnessSrmContent

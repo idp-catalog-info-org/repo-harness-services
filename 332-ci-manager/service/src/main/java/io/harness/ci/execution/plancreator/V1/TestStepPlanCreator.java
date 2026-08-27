@@ -1,0 +1,114 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ci.execution.plancreator.V1;
+
+import io.harness.beans.steps.CIAbstractStepNode;
+import io.harness.beans.steps.CIStepInfoType;
+import io.harness.beans.steps.nodes.RunTestStepNode;
+import io.harness.beans.steps.nodes.V1.TestStepNode;
+import io.harness.beans.steps.stepinfo.RunTestsStepInfo;
+import io.harness.beans.steps.stepinfo.TestStepInfo;
+import io.harness.beans.yaml.extended.reports.JUnitTestReport;
+import io.harness.beans.yaml.extended.reports.UnitTestReport;
+import io.harness.ci.execution.integrationstage.V1.CIPlanCreatorUtils;
+import io.harness.ci.execution.serializer.SerializerUtils;
+import io.harness.ci.plan.creator.step.CIPMSStepPlanCreatorV2;
+import io.harness.exception.InvalidYamlException;
+import io.harness.pms.sdk.core.plan.creation.beans.PlanCreationContext;
+import io.harness.pms.sdk.core.plan.creation.beans.PlanCreationResponse;
+import io.harness.pms.utils.IdentifierGeneratorUtils;
+import io.harness.pms.yaml.HarnessYamlVersion;
+import io.harness.pms.yaml.ParameterField;
+import io.harness.pms.yaml.YamlField;
+import io.harness.pms.yaml.YamlUtils;
+
+import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class TestStepPlanCreator extends CIPMSStepPlanCreatorV2<TestStepNode> {
+  @Override
+  public Set<String> getSupportedStepTypes() {
+    return Sets.newHashSet(CIStepInfoType.TEST.getDisplayName());
+  }
+
+  @Override
+  public TestStepNode getFieldObject(YamlField field) {
+    try {
+      return YamlUtils.read(field.getNode().toString(), TestStepNode.class);
+    } catch (IOException e) {
+      throw new InvalidYamlException("Unable to parse test step yaml. Please ensure that it is in correct format", e);
+    }
+  }
+
+  @Override
+  public PlanCreationResponse createPlanForField(PlanCreationContext ctx, TestStepNode stepElement) {
+    return super.createPlanForFieldV2(ctx, stepElement);
+  }
+
+  @Override
+  public CIAbstractStepNode getStepNode(TestStepNode stepElement) {
+    TestStepInfo testStepInfo = stepElement.getTestStepInfo();
+    return RunTestStepNode.builder()
+        .uuid(stepElement.getUuid())
+        .identifier(IdentifierGeneratorUtils.getId(stepElement.getName()))
+        .name(stepElement.getName())
+        .failureStrategies(stepElement.getFailureStrategies())
+        .timeout(stepElement.getTimeout())
+        .runTestsStepInfo(
+            RunTestsStepInfo.builder()
+                .image(testStepInfo.getImage())
+                .envVariables(testStepInfo.getEnvs())
+                .resources(testStepInfo.getResources())
+                .retry(testStepInfo.getRetry())
+                .buildTool(testStepInfo.getUses() == null
+                        ? ParameterField.ofNull()
+                        : ParameterField.createValueField(testStepInfo.getUses().toTIBuildTool()))
+                .shell(CIPlanCreatorUtils.getShell(testStepInfo.getShell()))
+                .imagePullPolicy(CIPlanCreatorUtils.getImagePullPolicy(testStepInfo.getPull()))
+                .language(testStepInfo.getLanguage())
+                .args(SerializerUtils.getStringFieldFromJsonNodeMap(testStepInfo.getWith(), "args"))
+                .preCommand(SerializerUtils.getStringFieldFromJsonNodeMap(testStepInfo.getWith(), "pre_command"))
+                .postCommand(SerializerUtils.getStringFieldFromJsonNodeMap(testStepInfo.getWith(), "post_command"))
+                .runOnlySelectedTests(
+                    SerializerUtils.getBooleanFieldFromJsonNodeMap(testStepInfo.getWith(), "run_selected_tests"))
+                .packages(SerializerUtils.getListAsStringFromJsonNodeMap(testStepInfo.getWith(), "packages"))
+                .testAnnotations(SerializerUtils.getListAsStringFromJsonNodeMap(testStepInfo.getWith(), "annotations"))
+                .namespaces(SerializerUtils.getListAsStringFromJsonNodeMap(testStepInfo.getWith(), "namespaces"))
+                .testGlobs(SerializerUtils.getListAsStringFromJsonNodeMap(testStepInfo.getWith(), "globs"))
+                .runAsUser(testStepInfo.getUser())
+                .privileged(testStepInfo.getPrivileged())
+                .enableTestSplitting(testStepInfo.getSplitting().getEnabled())
+                .testSplitStrategy(testStepInfo.getSplitting().getStrategy() == null
+                        ? ParameterField.ofNull()
+                        : ParameterField.createValueField(
+                              testStepInfo.getSplitting().getStrategy().toTISplitStrategy()))
+                .reports(ParameterField.createValueField(
+                    testStepInfo.getReports()
+                        .getValue()
+                        .stream()
+                        .map(r
+                            -> UnitTestReport.builder()
+                                   .type(r.getType().toUnitTestReportType())
+                                   .spec(JUnitTestReport.builder().paths(r.getPath()).build())
+                                   .build())
+                        .collect(Collectors.toList())
+                        .stream()
+                        .findFirst()
+                        .orElse(null)))
+                .outputVariables(testStepInfo.getOutputs())
+                .build())
+        .build();
+  }
+
+  @Override
+  public Set<String> getSupportedYamlVersions() {
+    return Set.of(HarnessYamlVersion.V1);
+  }
+}

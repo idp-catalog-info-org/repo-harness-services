@@ -1,0 +1,241 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ngtriggers.resource;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.NGCommonEntityConstants;
+import io.harness.NGResourceFilterConstants;
+import io.harness.accesscontrol.AccountIdentifier;
+import io.harness.accesscontrol.NGAccessControlCheck;
+import io.harness.accesscontrol.OrgIdentifier;
+import io.harness.accesscontrol.ProjectIdentifier;
+import io.harness.accesscontrol.ResourceIdentifier;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.ScopeInfo;
+import io.harness.beans.ScopeInfoResolutionExemptedApi;
+import io.harness.dto.PollingInfoForTriggers;
+import io.harness.ng.core.dto.ErrorDTO;
+import io.harness.ng.core.dto.FailureDTO;
+import io.harness.ng.core.dto.ResponseDTO;
+import io.harness.ngtriggers.beans.dto.NGTriggerEventHistoryBaseDTO;
+import io.harness.ngtriggers.beans.dto.NGTriggerEventHistoryDTO;
+import io.harness.ngtriggers.beans.dto.NGTriggerEventsApiResponse;
+import io.harness.ngtriggers.beans.source.NGTriggerType;
+import io.harness.pms.annotations.PipelineServiceAuth;
+import io.harness.pms.pipeline.PipelineResourceConstants;
+import io.harness.pms.rbac.PipelineRbacPermissions;
+
+import com.codahale.metrics.annotation.ResponseMetered;
+import com.codahale.metrics.annotation.Timed;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import org.springframework.data.domain.Page;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_TRIGGERS})
+@Api("triggers/eventHistory")
+@Path("triggers/eventHistory")
+@Produces({"application/json", "application/yaml"})
+@Consumes({"application/json", "application/yaml"})
+@Tag(name = "TriggersEvents", description = "This contains APIs related to Trigger Event History.")
+@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad Request",
+    content =
+    {
+      @Content(mediaType = "application/json", schema = @Schema(implementation = FailureDTO.class))
+      , @Content(mediaType = "application/yaml", schema = @Schema(implementation = FailureDTO.class))
+    })
+@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error",
+    content =
+    {
+      @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))
+      , @Content(mediaType = "application/yaml", schema = @Schema(implementation = ErrorDTO.class))
+    })
+@ApiResponses(value =
+    {
+      @ApiResponse(code = 400, response = FailureDTO.class, message = "Bad Request")
+      , @ApiResponse(code = 500, response = ErrorDTO.class, message = "Internal server error")
+    })
+@PipelineServiceAuth
+@OwnedBy(PIPELINE)
+public interface NGTriggerEventHistoryResource {
+  @GET
+  @Path("{triggerIdentifier}")
+  @ApiOperation(value = "Get Trigger event history", nickname = "triggerEventHistoryNew")
+  @Operation(operationId = "triggerEventHistoryNew", summary = "Get event history for a trigger",
+      description = "Get event history for a trigger",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the Trigger Event History response")
+      })
+  @Timed
+  @ResponseMetered
+  @NGAccessControlCheck(resourceType = "PIPELINE", permission = PipelineRbacPermissions.PIPELINE_VIEW)
+  ResponseDTO<Page<NGTriggerEventHistoryDTO>>
+  getTriggerEventHistory(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ORG_KEY) @OrgIdentifier String orgIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.PROJECT_KEY) @ProjectIdentifier String projectIdentifier,
+      @Parameter(description = "Identifier of the target pipeline under which trigger resides") @NotNull @QueryParam(
+          "targetIdentifier") @ResourceIdentifier String targetIdentifier,
+      @PathParam("triggerIdentifier") String triggerIdentifier,
+      @Parameter(description = PipelineResourceConstants.PIPELINE_SEARCH_TERM_PARAM_MESSAGE) @QueryParam(
+          NGResourceFilterConstants.SEARCH_TERM_KEY) String searchTerm,
+      @Parameter(description = NGCommonEntityConstants.PAGE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PAGE) @DefaultValue("0") int page,
+      @Parameter(description = NGCommonEntityConstants.SIZE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.SIZE) @DefaultValue("10") int size,
+      @Parameter(description = NGCommonEntityConstants.SORT_PARAM_MESSAGE) @QueryParam("sort") List<String> sort,
+      @QueryParam("shouldSendTriggerPayload") @DefaultValue("true") boolean shouldSendTriggerPayload,
+      @Context ScopeInfo scopeInfo);
+
+  @GET
+  @Path("/artifact-manifest-info")
+  @ApiOperation(value = "Get artifact and manifest trigger event history based on build source type",
+      nickname = "triggerEventHistoryBuildSourceType")
+  @Operation(operationId = "triggerEventHistoryBuildSourceType",
+      summary = "Get artifact and manifest trigger event history based on build source type",
+      description = "Get artifact and manifest trigger event history based on build source type",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the Trigger Event History response")
+      })
+  @Timed
+  @ResponseMetered
+  ResponseDTO<Page<NGTriggerEventHistoryDTO>>
+  listTriggerEventHistory(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) @OrgIdentifier String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) @ProjectIdentifier String projectIdentifier,
+      @Parameter(description = "Identifier of the target pipeline under which trigger resides") @QueryParam(
+          "targetIdentifier") @ResourceIdentifier String targetIdentifier,
+      @Parameter(description = "Type of artifact source") @QueryParam("artifactType") String artifactType,
+      @Parameter(description = PipelineResourceConstants.PIPELINE_SEARCH_TERM_PARAM_MESSAGE) @QueryParam(
+          NGResourceFilterConstants.SEARCH_TERM_KEY) String searchTerm,
+      @Parameter(description = NGCommonEntityConstants.PAGE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PAGE) @DefaultValue("0") int page,
+      @Parameter(description = NGCommonEntityConstants.SIZE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.SIZE) @DefaultValue("10") int size,
+      @Parameter(description = NGCommonEntityConstants.SORT_PARAM_MESSAGE) @QueryParam("sort") List<String> sort,
+      @Context ScopeInfo scopeInfo);
+
+  @GET
+  @Path("/events")
+  @ApiOperation(value = "Get Trigger event history using filters", nickname = "triggerEventHistoryUsingFilters")
+  @Operation(operationId = "triggerEventHistoryUsingFilters",
+      summary = "Get event history for a trigger using filters.",
+      description = "Get event history for a trigger using filters.",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the Trigger Event History response")
+      })
+  @Timed
+  @ResponseMetered
+  @NGAccessControlCheck(resourceType = "PIPELINE", permission = PipelineRbacPermissions.PIPELINE_VIEW)
+  ResponseDTO<Page<NGTriggerEventsApiResponse>>
+  getTriggerEvents(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ORG_KEY) @OrgIdentifier String orgIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.PROJECT_KEY) @ProjectIdentifier String projectIdentifier,
+      @Parameter(description = "Identifier of the target pipeline under which trigger resides") @QueryParam(
+          "targetIdentifier") @NotNull @ResourceIdentifier String targetIdentifier,
+      @QueryParam(NGCommonEntityConstants.TRIGGER_IDENTIFIER_KEY) String triggerIdentifier,
+      @QueryParam(NGCommonEntityConstants.STATUS) List<String> status,
+      @QueryParam(NGCommonEntityConstants.TRIGGER_TYPE) NGTriggerType triggerType,
+      @Parameter(description = NGCommonEntityConstants.PAGE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PAGE) @DefaultValue("0") int page,
+      @Parameter(description = NGCommonEntityConstants.SIZE_PARAM_MESSAGE) @QueryParam(NGCommonEntityConstants.SIZE)
+      @DefaultValue("10") int size, @Context ScopeInfo scopeInfo);
+
+  @GET
+  @Path("/eventCorrelation/{eventCorrelationId}")
+  @ApiOperation(value = "Get Trigger history event correlation", nickname = "triggerHistoryEventCorrelation")
+  @Operation(operationId = "triggerHistoryEventCorrelation", summary = "Get Trigger history event correlation",
+      description = "Get Trigger history event correlation",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the Trigger catalogue response")
+      })
+  @ScopeInfoResolutionExemptedApi
+  ResponseDTO<Page<NGTriggerEventHistoryBaseDTO>>
+  getTriggerHistoryEventCorrelation(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @NotNull @PathParam("eventCorrelationId") String eventCorrelationId,
+      @Parameter(description = NGCommonEntityConstants.PAGE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PAGE) @DefaultValue("0") int page,
+      @Parameter(description = NGCommonEntityConstants.SIZE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.SIZE) @DefaultValue("10") int size,
+      @Parameter(description = NGCommonEntityConstants.SORT_PARAM_MESSAGE) @QueryParam("sort") List<String> sort);
+
+  @GET
+  @Path("/v2/eventCorrelation/{eventCorrelationId}")
+  @ApiOperation(value = "Get Trigger history event correlation V2", nickname = "triggerHistoryEventCorrelationV2")
+  @Operation(operationId = "triggerHistoryEventCorrelationV2", summary = "Get Trigger history event correlation V2",
+      description = "Get Trigger history event correlation V2",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the Trigger catalogue response")
+      })
+  @Timed
+  @ResponseMetered
+  @ScopeInfoResolutionExemptedApi
+  ResponseDTO<Page<NGTriggerEventHistoryDTO>>
+  getTriggerHistoryEventCorrelationV2(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @NotNull @PathParam("eventCorrelationId") String eventCorrelationId,
+      @Parameter(description = NGCommonEntityConstants.PAGE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PAGE) @DefaultValue("0") int page,
+      @Parameter(description = NGCommonEntityConstants.SIZE_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.SIZE) @DefaultValue("10") int size,
+      @Parameter(description = NGCommonEntityConstants.SORT_PARAM_MESSAGE) @QueryParam("sort") List<String> sort);
+
+  @GET
+  @Path("/polledResponse/{triggerIdentifier}")
+  @ApiOperation(value = "Get all the polled response for a given trigger", nickname = "polledResponseTriggerIdentifier")
+  @Operation(operationId = "polledResponseTriggerIdentifier",
+      summary = "Get all the polled response for a given trigger",
+      description = "Get all the polled response for a given trigger",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(responseCode = "default", description = "Returns the polled response")
+      })
+  @NGAccessControlCheck(resourceType = "PIPELINE", permission = PipelineRbacPermissions.PIPELINE_VIEW)
+  ResponseDTO<PollingInfoForTriggers>
+  getPolledResponseForTrigger(
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ORG_KEY) @OrgIdentifier String orgIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.PROJECT_KEY) @ProjectIdentifier String projectIdentifier,
+      @Parameter(description = "Identifier of the target pipeline under which trigger resides") @NotNull @QueryParam(
+          "targetIdentifier") @ResourceIdentifier String targetIdentifier,
+      @PathParam("triggerIdentifier") String triggerIdentifier, @Context ScopeInfo scopeInfo);
+}

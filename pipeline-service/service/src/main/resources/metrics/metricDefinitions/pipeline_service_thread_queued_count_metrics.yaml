@@ -1,0 +1,8 @@
+name: Pipeline Service Thread Queued Count Metrics
+identifier: PipelineServiceThreadQueuedCountMetrics
+metricGroup: PipelineServiceThreadMetricsGroup
+metrics:
+  - metricName: tasks_queued_count
+    metricDefinition: ThreadPool tasks in queue
+    type: LastValue
+    unit: count

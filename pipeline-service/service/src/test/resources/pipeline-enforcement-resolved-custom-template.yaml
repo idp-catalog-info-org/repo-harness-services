@@ -1,0 +1,19 @@
+pipeline:
+  name: CustomTemplatePipeline
+  identifier: CustomTemplatePipeline
+  projectIdentifier: testProject
+  orgIdentifier: testOrg
+  stages:
+    - stage:
+        name: CustomFromTemplate
+        identifier: CustomFromTemplate
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: RunScript
+                  identifier: RunScript
+                  spec:
+                    command: echo "hello from template"

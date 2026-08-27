@@ -1,0 +1,17 @@
+template:
+  inputs:
+    input1:
+      type: string
+    input2:
+      type: boolean
+    input3:
+      type: number
+  stage:
+    steps:
+      - group:
+          steps:
+            - name: Run
+              id: Run
+              run:
+                container:
+                  image: alpine

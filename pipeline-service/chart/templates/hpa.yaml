@@ -1,0 +1,6 @@
+{{- include "harnesscommon.hpa.renderHPA" (dict "ctx" $ "kind" "deployment") }}
+---
+# HorizontalPodAutoscaler for orchestration-engine worker service
+{{- if .Values.pipelineSplitting.enabled }}
+{{- include "harnesscommon.hpa.renderHPA" (dict "ctx" $ "kind" "deployment" "targetRefNameOverride" "orchestration-engine") }}
+{{- end }}

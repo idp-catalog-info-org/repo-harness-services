@@ -1,0 +1,10 @@
+{
+  "identifier": "PTEAM001",
+  "name": "Payments Team",
+  "pagerdutyUrl": "https://example.pagerduty.com/teams/PTEAM001",
+  "defaultRole": "manager",
+  "parentTeam": "Engineering",
+  "analyticsTotalIncidents": 18,
+  "analyticsMeanSecondsToResolve": 840,
+  "analyticsMeanSecondsToFirstAck": 38
+}

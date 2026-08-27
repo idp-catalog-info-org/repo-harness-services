@@ -1,0 +1,21 @@
+{
+  "description": "Payments service dashboards",
+  "monitorCount": 12,
+  "monitors_summary": {
+    "red": ["High error rate", "Database connection failures"],
+    "yellow": ["Slow API responses"],
+    "green": ["Service health check", "Payment queue depth"],
+    "others": []
+  },
+  "monitors_summary_count": {
+    "red": 2,
+    "yellow": 1,
+    "green": 2,
+    "others": 0
+  },
+  "contacts": ["team-payments@harness.io", "oncall-payments"],
+  "docs": ["https://docs.internal/payments", "https://runbook.internal/payments"],
+  "downstreamServiceNames": ["ledger", "notifications"],
+  "githubHtmlUrl": "https://github.com/harness/payments",
+  "languages": ["java", "go"]
+}

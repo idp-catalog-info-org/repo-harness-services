@@ -1,0 +1,65 @@
+{
+  "pipeline": {
+    "identifier": "generic_cache_pipeline",
+    "name": "pipeline_with_generic_save_and_restore_cache",
+    "stages": [
+      {
+        "stage": {
+          "identifier": "generic_cache",
+          "name": "generic_cache",
+          "type": "CI",
+          "spec": {
+            "execution": {
+              "steps": [
+                {
+                  "step": {
+                    "identifier": "saveCache",
+                    "name": "save cache",
+                    "type": "SaveCache",
+                    "spec": {
+                      "providerType": "S3",
+                      "connectorRef": "account.testAWSConnector",
+                      "bucket": "harness-generic-cache",
+                      "sourcePaths": [
+                        "src/main/resources",
+                        "src/main/java"
+                      ],
+                      "key": "generic-cache-key",
+                      "region": "us-west-2",
+                      "endpoint": "https://s3.us-west-2.amazonaws.com",
+                      "pathStyle": false,
+                      "override": true,
+                      "archiveFormat": "Tar",
+                      "runAsUser": 1000
+                    }
+                  }
+                },
+                {
+                  "step": {
+                    "identifier": "restoreCache",
+                    "name": "restore cache",
+                    "type": "RestoreCache",
+                    "spec": {
+                      "providerType": "S3",
+                      "connectorRef": "account.testAWSConnector",
+                      "bucket": "harness-generic-cache",
+                      "key": "generic-cache-key",
+                      "failIfKeyNotFound": true,
+                      "region": "us-west-2",
+                      "endpoint": "https://s3.us-west-2.amazonaws.com",
+                      "pathStyle": false,
+                      "archiveFormat": "Tar",
+                      "runAsUser": 1000
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+
+

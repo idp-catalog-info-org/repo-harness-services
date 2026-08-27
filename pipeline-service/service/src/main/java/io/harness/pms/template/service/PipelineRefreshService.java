@@ -1,0 +1,37 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.template.service;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.ScopeInfo;
+import io.harness.gitsync.interceptor.GitEntityUpdateInfoDTO;
+import io.harness.ng.core.template.refresh.ValidateTemplateInputsResponseDTO;
+import io.harness.ng.core.template.refresh.YamlDiffResponseDTO;
+
+@OwnedBy(HarnessTeam.CDC)
+public interface PipelineRefreshService {
+  boolean refreshTemplateInputsInPipeline(String accountId, String orgId, String projectId, String pipelineIdentifier,
+      String loadFromCache, ScopeInfo scopeInfo);
+
+  ValidateTemplateInputsResponseDTO validateTemplateInputsInPipeline(String accountId, String orgId, String projectId,
+      String pipelineIdentifier, String loadFromCache, ScopeInfo scopeInfo, boolean isParentIdQueryingEnabled);
+
+  ValidateTemplateInputsResponseDTO validateTemplateInputsInPipeline(String accountId, String orgId, String projectId,
+      String pipelineIdentifier, String loadFromCache, ScopeInfo scopeInfo);
+
+  YamlDiffResponseDTO getYamlDiff(String accountId, String orgId, String projectId, String pipelineIdentifier,
+      String loadFromCache, ScopeInfo scopeInfo);
+
+  boolean recursivelyRefreshAllTemplateInputsInPipeline(String accountId, String orgId, String projectId,
+      String pipelineIdentifier, GitEntityUpdateInfoDTO gitEntityBasicInfo, String loadFromCache, ScopeInfo scopeInfo);
+
+  boolean recursivelyRefreshAllTemplateInputsInPipelineAndUpdateReconcileEvent(String accountId, String orgId,
+      String projectId, String pipelineIdentifier, String bulkReconcileUUID, GitEntityUpdateInfoDTO gitEntityBasicInfo,
+      String loadFromCache, ScopeInfo scopeInfo);
+}

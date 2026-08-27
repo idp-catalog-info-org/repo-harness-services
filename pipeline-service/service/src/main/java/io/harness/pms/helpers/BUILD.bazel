@@ -1,0 +1,67 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/rbac:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/core:module",
+        "//955-account-mgmt/src/main/java/io/harness/account/services:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/common:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//970-ng-commons/src/main/java/io/harness/utils:module",
+        "//970-ng-commons/src/main/java/io/harness/utils/yaml:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/eraro:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/expression:module",
+        "//980-commons/src/main/java/io/harness/expression/common:module",
+        "//980-commons/src/main/java/io/harness/jackson:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/acl/api:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "//clients/scope/src/main/java/io/harness/scopeinfoclient/remote:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/expressions:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/pms/execution/utils:module",
+        "//pipeline-service/modules/orchestration-visualization/contracts/src/main/java/io/harness/pms/plan/execution/beans:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/pms/plan/execution/service:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/executions/node/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/pms/data/expression:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pipeline/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/yaml:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/sdk/helper:module",
+        "//pipeline-service/service/src/main/java/io/harness/rmg/helper:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_fasterxml_jackson_dataformat_jackson_dataformat_yaml",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

@@ -1,0 +1,116 @@
+{
+  "OPENID_CONFIGURATION" : {
+    "issuer": "https://overtolerant-uncorrupting-tobie.ngrok-free.dev/oidc/account/kmpySmUISimoRrJL6NL73w/",
+    "jwks_uri": "https://overtolerant-uncorrupting-tobie.ngrok-free.dev/oidc/account/kmpySmUISimoRrJL6NL73w/.wellknown/jwks",
+    "subject_types_supported":["public","pairwise"],
+    "response_types_supported":["id_token"],
+    "claims_supported":
+    [
+      "sub","aud","exp","iat","iss","account_id", "upn"
+    ],
+    "id_token_signing_alg_values_supported":["RS256"],
+    "scopes_supported":["openid"]
+  },
+  "AWS": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "aud": "https://sts.amazonaws.com",
+      "iss": "https://localhost:7457/oidc/account/kmpySmUISimoRrJL6NL73w",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    }
+  },
+  "CUSTOM": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "iss": "https://localhost:7457/oidc/account/kmpySmUISimoRrJL6NL73w",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    }
+  },
+  "GCP": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "aud": "https://iam.googleapis.com/projects/{gcp_project_id}/locations/global/workloadIdentityPools/{workload_pool_id}/providers/{provider_id}",
+      "iss": "https://overtolerant-uncorrupting-tobie.ngrok-free.dev/oidc/account/kmpySmUISimoRrJL6NL73w/",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    },
+    "access_token_sts_endpoint": "https://sts.googleapis.com",
+    "access_token_iam_sa_credentials_endpoint": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/",
+    "workload_access_token_config": {
+      "audience": "//iam.googleapis.com/projects/{gcp_project_id}/locations/global/workloadIdentityPools/{workload_pool_id}/providers/{provider_id}",
+      "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+      "requested_token_type": "urn:ietf:params:oauth:token-type:access_token",
+      "scope": "https://www.googleapis.com/auth/cloud-platform",
+      "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+      "subject_token": "{SUBJECT_TOKEN_TYPE}",
+      "options": {
+        "userProject": "{gcp_project_id}"
+      }
+    }
+  },
+  "VAULT": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "aud": "{vault_jwt_auth_path}",
+      "iss": "https://overtolerant-uncorrupting-tobie.ngrok-free.dev/oidc/account/kmpySmUISimoRrJL6NL73w/",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    }
+  },
+  "AZURE": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "aud": "{azure_audience}",
+      "iss": "https://3c0a-125-19-67-142.ngrok-free.app/oidc/account/kmpySmUISimoRrJL6NL73w/",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    }
+  },
+  "ARTIFACTORY": {
+    "header": {
+      "typ": "JWT",
+      "alg": "RS256",
+      "kid": "GENERATE_AT_RUNTIME"
+    },
+    "payload": {
+      "sub": "{account_id}",
+      "aud": "{artifactory_audience}",
+      "iss": "https://bed-celena-luridly.ngrok-free.dev/oidc/account/kmpySmUISimoRrJL6NL73w",
+      "exp": 3600,
+      "iat": 0,
+      "account_id": "{account_id}"
+    }
+  }
+}

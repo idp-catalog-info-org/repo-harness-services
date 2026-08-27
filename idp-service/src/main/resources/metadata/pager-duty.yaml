@@ -1,0 +1,42 @@
+identifier: pager-duty
+name: PagerDuty
+description: PagerDuty offers a simple way to identify any active incidents for an entity and the escalation policy.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Spotify
+category: Monitoring
+source: https://github.com/backstage/backstage/tree/master/plugins/pagerduty
+iconUrl: https://avatars2.githubusercontent.com/u/766800?s=200&v=4
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/
+config: |-
+  proxy:
+    endpoints:
+      '/pagerduty':
+        target: https://api.pagerduty.com
+        pathRewrite:
+          'api/proxy/pagerduty/?': '/'
+        headers:
+          Authorization: Token token=${PAGERDUTY_TOKEN}
+environmentVariables:
+  - PAGERDUTY_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityPagerDutyCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isPagerDutyAvailable
+              content:
+                component: EntityPagerDutyCard
+                specs:
+                  props:
+                    variant: gridItem
+                  gridProps:
+                    md: 6

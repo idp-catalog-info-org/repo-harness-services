@@ -1,0 +1,38 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.ambiance;
+
+option java_multiple_files = true;
+
+message IdentityExecutionContext {
+  HarnessIdApiConfig harness_id_api = 1;
+  map<string, IdentityEntry> identities = 2;
+}
+
+message IdentityEntry {
+  string identity_name = 1;
+  string workload_token = 2;
+  int64 workload_token_expires_at = 3;
+  repeated string audiences = 4;
+  map<string, string> custom_claims = 5;
+  string subject_template = 6;
+  bool disabled = 7;
+  IdentityDeclaredLevel declared_at_level = 8;
+  bool overridden_at_this_level = 9;
+}
+
+enum IdentityDeclaredLevel {
+  IDENTITY_LEVEL_UNKNOWN = 0;
+  IDENTITY_LEVEL_PIPELINE = 1;
+  IDENTITY_LEVEL_STAGE = 2;
+  IDENTITY_LEVEL_STEP = 3;
+}
+
+message HarnessIdApiConfig {
+  string token_generate_url = 1;
+}

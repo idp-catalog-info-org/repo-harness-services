@@ -1,0 +1,8 @@
+name: CI AIT Build Metrics
+identifier: CIAitBuildMetrics
+metricGroup: CIAitBuildMetricsGroup
+metrics:
+  - metricName: ait_ci_builds
+    metricDefinition: Number of CI builds triggered by AIT
+    type: Count
+    unit: "1"

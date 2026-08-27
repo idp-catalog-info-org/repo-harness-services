@@ -1,0 +1,98 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/kong-config-schema.json",
+  "title": "Kong Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kong"
+  ],
+  "properties": {
+    "kong": {
+      "$id": "#root/kong",
+      "title": "Kong Configuration",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instances"
+      ],
+      "properties": {
+        "instances": {
+          "$id": "#root/kong/instances",
+          "title": "Instances",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "apiBaseUrl",
+              "auth"
+            ],
+            "properties": {
+              "id": {
+                "$id": "#root/kong/instances/id",
+                "title": "Instance ID",
+                "type": "string",
+                "pattern": "^.+$"
+              },
+              "apiBaseUrl": {
+                "$id": "#root/kong/instances/apiBaseUrl",
+                "title": "API Base URL",
+                "type": "string",
+                "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+              },
+              "workspace": {
+                "$id": "#root/kong/instances/workspace",
+                "title": "Workspace (Optional for Kong Enterprise)",
+                "type": "string",
+                "default": "workspace",
+                "pattern": "^.+$"
+              },
+              "auth": {
+                "$id": "#root/kong/instances/auth",
+                "title": "Authentication",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kongAdmin": {
+                    "$id": "#root/kong/instances/auth/kongAdmin",
+                    "title": "Kong Admin Token (Optional for Kong Enterprise)",
+                    "type": "string",
+                    "pattern": "^.+$"
+                  },
+                  "custom": {
+                    "$id": "#root/kong/instances/auth/custom",
+                    "title": "Custom Authentication (Optional for Kong Community)",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["header", "value"],
+                    "properties": {
+                      "header": {
+                        "$id": "#root/kong/instances/auth/custom/header",
+                        "title": "Header",
+                        "type": "string",
+                        "pattern": "^.+$"
+                      },
+                      "value": {
+                        "$id": "#root/kong/instances/auth/custom/value",
+                        "title": "Authorization Value",
+                        "type": "string",
+                        "pattern": "^.+$"
+                      }
+                    }
+                  }
+                },
+                "anyOf": [
+                  { "required": ["kongAdmin"] },
+                  { "required": ["custom"] }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

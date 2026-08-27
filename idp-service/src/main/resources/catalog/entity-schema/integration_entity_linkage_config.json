@@ -1,0 +1,24 @@
+{
+  "catalog": {
+    "HarnessCD": "metadata.HarnessCD",
+    "HarnessScope": "metadata.HarnessScope",
+    "ServiceNow": "metadata.ServiceNow",
+    "PagerDuty": "metadata.PagerDuty",
+    "HarnessK8s": "metadata.HarnessK8s",
+    "GitHub": "metadata.GitHub",
+    "HarnessCI": "metadata.HarnessCI",
+    "GCP": "metadata.GCP",
+    "SonarQube": "metadata.SonarQube",
+    "DataDog": "metadata.DataDog",
+    "BitbucketCloud": "metadata.BitbucketCloud",
+    "DynaTrace": "metadata.DynaTrace",
+    "CatalogInfo": "metadata.CatalogInfo"
+  },
+  "git": {
+    "github": "",
+    "gitlab": "",
+    "bitbucket_server": "",
+    "bitbucket_cloud": "",
+    "azure": ""
+  }
+}

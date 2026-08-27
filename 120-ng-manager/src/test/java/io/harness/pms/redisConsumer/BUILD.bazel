@@ -1,0 +1,49 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    data = [
+        "//120-ng-manager/src/test/resources:resource",
+    ],
+    resources = [
+        "//120-ng-manager/src/test/resources:resource",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//120-ng-manager/src/main/java/io/harness/ng/gitops/kafka:module",
+        "//120-ng-manager/src/main/java/io/harness/pms/redisConsumer:module",
+        "//953-events-api/src/main/java/io/harness/eventsframework:module",
+        "//953-events-api/src/main/java/io/harness/eventsframework/api:module",
+        "//960-persistence/src/main/java/io/harness/queue:module",
+        "//970-ng-commons/src/main/java/io/serializer/mapper:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_guava_guava",
+        "@maven//:javax_cache_cache_api",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_jooq_jooq",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_mockito_mockito_junit_jupiter",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

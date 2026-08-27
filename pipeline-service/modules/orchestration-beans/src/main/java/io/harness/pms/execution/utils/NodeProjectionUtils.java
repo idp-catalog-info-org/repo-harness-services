@@ -1,0 +1,145 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+package io.harness.pms.execution.utils;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.execution.NodeExecution.NodeExecutionKeys;
+
+import com.google.common.collect.Sets;
+import java.util.Set;
+import lombok.experimental.UtilityClass;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
+@UtilityClass
+@OwnedBy(PIPELINE)
+public class NodeProjectionUtils {
+  public static final Set<String> withId = Sets.newHashSet(NodeExecutionKeys.uuid);
+
+  public static final Set<String> withParentId = Sets.newHashSet(NodeExecutionKeys.parentId);
+
+  public static final Set<String> withNextId = Sets.newHashSet(NodeExecutionKeys.nextId);
+
+  public static final Set<String> fieldsForRetryInterruptHandler = Sets.newHashSet(NodeExecutionKeys.status,
+      NodeExecutionKeys.oldRetry, NodeExecutionKeys.mode, NodeExecutionKeys.stepType, NodeExecutionKeys.group);
+
+  public static final Set<String> fieldsForInterruptPropagatorHandler = Sets.newHashSet(
+      NodeExecutionKeys.parentId, NodeExecutionKeys.status, NodeExecutionKeys.stepType, NodeExecutionKeys.mode);
+
+  public static final Set<String> fieldsForAllChildrenExtractor =
+      Sets.newHashSet(NodeExecutionKeys.parentId, NodeExecutionKeys.status, NodeExecutionKeys.stepType,
+          NodeExecutionKeys.advisorsProcessed, NodeExecutionKeys.oldRetry);
+
+  // Can be used for InterruptMonitor as parentId is used for interruptMonitor to check parents
+  public static final Set<String> fieldsForDiscontinuingNodes =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.status,
+          NodeExecutionKeys.executableResponses, NodeExecutionKeys.mode, NodeExecutionKeys.unitProgresses,
+          NodeExecutionKeys.parentId, NodeExecutionKeys.progressData);
+
+  public static final Set<String> fieldsForInstrumentationHandler =
+      Sets.newHashSet(NodeExecutionKeys.status, NodeExecutionKeys.identifier, NodeExecutionKeys.stepType);
+
+  public static final Set<String> withAmbianceAndStatus =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.status);
+
+  public static final Set<String> withAmbianceAndStatusProjected = Sets.newHashSet(
+      NodeExecutionKeys.stageExecutionId, NodeExecutionKeys.executionContextStageExecutionId, NodeExecutionKeys.status);
+
+  public static final Set<String> withAmbiance =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext);
+
+  public static final Set<String> withFailureInfo = Sets.newHashSet(NodeExecutionKeys.failureInfo);
+
+  public static final Set<String> withStatus = Sets.newHashSet(NodeExecutionKeys.status);
+  public static final Set<String> withStatusAndStepTypeAndAmbiance = Sets.newHashSet(NodeExecutionKeys.status,
+      NodeExecutionKeys.stepType, NodeExecutionKeys.executionContext, NodeExecutionKeys.ambiance);
+
+  public static final Set<String> withExecutableResponses = Sets.newHashSet(NodeExecutionKeys.executableResponses);
+
+  public static final Set<String> withStatusAndMode = Sets.newHashSet(NodeExecutionKeys.status, NodeExecutionKeys.mode);
+
+  public static final Set<String> withStatusAndAdviserResponse =
+      Sets.newHashSet(NodeExecutionKeys.status, NodeExecutionKeys.adviserResponse);
+  public static final Set<String> withStatusAndAdviserObtainment =
+      Sets.newHashSet(NodeExecutionKeys.status, NodeExecutionKeys.adviserObtainments);
+
+  public static final Set<String> fieldsForNodeUpdateObserver = Sets.newHashSet(NodeExecutionKeys.ambiance,
+      NodeExecutionKeys.executionContext, NodeExecutionKeys.status, NodeExecutionKeys.endTs, NodeExecutionKeys.oldRetry,
+      NodeExecutionKeys.stepType, NodeExecutionKeys.mode, NodeExecutionKeys.uuid, NodeExecutionKeys.advisorsProcessed);
+
+  public static final Set<String> fieldsForResume =
+      Sets.newHashSet(NodeExecutionKeys.status, NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext,
+          NodeExecutionKeys.executableResponses, NodeExecutionKeys.mode, NodeExecutionKeys.resolvedParams,
+          NodeExecutionKeys.module, NodeExecutionKeys.stepType, NodeExecutionKeys.originalNodeExecutionId);
+
+  public static final Set<String> fieldsForInterruptEventPublish = Sets.newHashSet(NodeExecutionKeys.status,
+      NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.executableResponses,
+      NodeExecutionKeys.mode, NodeExecutionKeys.resolvedParams, NodeExecutionKeys.module, NodeExecutionKeys.stepType);
+
+  public static final Set<String> fieldsForProgressEvent =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext,
+          NodeExecutionKeys.executableResponses, NodeExecutionKeys.mode, NodeExecutionKeys.resolvedParams,
+          NodeExecutionKeys.module, NodeExecutionKeys.originalNodeExecutionId, NodeExecutionKeys.stepType);
+
+  // NodeId is added to resolve expression within same step
+  public static final Set<String> fieldsForExpressionEngine = Sets.newHashSet(NodeExecutionKeys.status,
+      NodeExecutionKeys.mode, NodeExecutionKeys.startTs, NodeExecutionKeys.endTs, NodeExecutionKeys.parentId,
+      NodeExecutionKeys.resolvedParams, NodeExecutionKeys.oldRetry, NodeExecutionKeys.nodeId,
+      NodeExecutionKeys.retryIds, NodeExecutionKeys.skipExpressionChain, NodeExecutionKeys.identifier,
+      NodeExecutionKeys.group, NodeExecutionKeys.levelRuntimeIdx, NodeExecutionKeys.stepType,
+      NodeExecutionKeys.nodeType, NodeExecutionKeys.originalNodeExecutionId, NodeExecutionKeys.planExecutionId);
+
+  public static final Set<String> forFacilitation =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext,
+          NodeExecutionKeys.originalNodeExecutionId, NodeExecutionKeys.module, NodeExecutionKeys.resolvedParams);
+
+  public static final Set<String> fieldsForResponseNotifyData = Sets.newHashSet(NodeExecutionKeys.identifier,
+      NodeExecutionKeys.nodeId, NodeExecutionKeys.status, NodeExecutionKeys.adviserResponse,
+      NodeExecutionKeys.failureInfo, NodeExecutionKeys.oldRetry, NodeExecutionKeys.endTs);
+
+  public static final Set<String> fieldsForFetchingChildren = Sets.newHashSet(NodeExecutionKeys.uuid);
+
+  public static final Set<String> fieldsForExecutionStrategy =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.status,
+          NodeExecutionKeys.adviserResponse, NodeExecutionKeys.failureInfo, NodeExecutionKeys.notifyId,
+          NodeExecutionKeys.endTs, NodeExecutionKeys.mode, NodeExecutionKeys.advisorsProcessed);
+
+  public static final Set<String> fieldsForIdentityStrategyStep = Sets.newHashSet(NodeExecutionKeys.identifier,
+      NodeExecutionKeys.name, NodeExecutionKeys.nodeId, NodeExecutionKeys.status, NodeExecutionKeys.executableResponses,
+      NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.oldRetry,
+      NodeExecutionKeys.parentId, NodeExecutionKeys.stepType, NodeExecutionKeys.group);
+
+  public static final Set<String> fieldsForNodeExecutionDelete = Sets.newHashSet(NodeExecutionKeys.timeoutInstanceIds,
+      NodeExecutionKeys.adviserTimeoutInstanceIds, NodeExecutionKeys.nodeId, NodeExecutionKeys.notifyId,
+      NodeExecutionKeys.planId, NodeExecutionKeys.stepType, NodeExecutionKeys.executionInputConfigured);
+
+  public static final Set<String> fieldsForRollbackIdentityNodeCreation =
+      Sets.newHashSet(NodeExecutionKeys.uuid, NodeExecutionKeys.stepType, NodeExecutionKeys.planId,
+          NodeExecutionKeys.executionContextPlanId, NodeExecutionKeys.executionContextPlanId, NodeExecutionKeys.nodeId,
+          NodeExecutionKeys.name, NodeExecutionKeys.identifier);
+
+  public static final Set<String> fieldsForRollbackTransformer =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.stageFqn);
+
+  public static final Set<String> withGroupAndIdentifier =
+      Sets.newHashSet(NodeExecutionKeys.group, NodeExecutionKeys.identifier);
+
+  public static final Set<String> WithAmbianceAndFailureInfo =
+      Sets.newHashSet(NodeExecutionKeys.ambiance, NodeExecutionKeys.executionContext, NodeExecutionKeys.failureInfo);
+
+  public static final Set<String> fieldsForPreStepCheckPolicyEvaluation =
+      Sets.newHashSet(NodeExecutionKeys.name, NodeExecutionKeys.mode, NodeExecutionKeys.resolvedParams);
+  public static final Set<String> fieldsForForceAbort = Set.of(NodeExecutionKeys.uuid, NodeExecutionKeys.status,
+      NodeExecutionKeys.stepType, NodeExecutionKeys.executableResponses);
+  public static final Set<String> withStepTypeAndExecutableResponses =
+      Set.of(NodeExecutionKeys.stepType, NodeExecutionKeys.executableResponses);
+}

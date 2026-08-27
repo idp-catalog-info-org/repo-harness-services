@@ -1,0 +1,14 @@
+pipeline:
+  stages:
+    - name: stage1
+      id: st1
+      spec:
+        serviceConfig:
+          useFromStage:
+            stage: stage1_1
+    - name: stage1
+      steps:
+        - run:
+            script: echo 12345
+          id: shellscript_1
+      id: stage1_1

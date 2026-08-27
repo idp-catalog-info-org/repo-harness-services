@@ -1,0 +1,8 @@
+name: CI Manager VM Active Execution Count
+identifier: CIManagerVMActiveExecutionCount
+metricGroup: CIManagerVMExecutionCountGroup
+metrics:
+  - metricName: ci_active_vm_execution_count
+    metricDefinition: Active VM Execution count for OsType and Arch
+    type: LastValue
+    unit: count

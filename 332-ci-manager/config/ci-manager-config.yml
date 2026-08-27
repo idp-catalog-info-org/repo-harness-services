@@ -1,0 +1,1122 @@
+# Copyright 2021 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+server:
+  applicationConnectors:
+    - type: https
+      port: ${SERVER_APP_HTTPS_PORT:-7171}
+      keyStorePath: keystore.jks
+      keyStorePassword: password
+      trustStorePath: ${JAVA_HOME}/lib/security/cacerts
+      certAlias: localhost
+      validateCerts: false
+      maxRequestHeaderSize: 100KiB
+    - type: http
+      port: ${SERVER_APP_HTTP_PORT:-4457}
+      maxRequestHeaderSize: 100KiB
+  adminConnectors:
+    - type: https
+      port: ${SERVER_ADMIN_HTTPS_PORT:-7071}
+      keyStorePath: keystore.jks
+      keyStorePassword: password
+      trustStorePath: ${JAVA_HOME}/lib/security/cacerts
+      certAlias: localhost
+      validateCerts: false
+  requestLog:
+    appenders: []
+
+logging:
+  level: INFO
+  loggers:
+    org.glassfish.jersey: WARN
+    allbegray.slack: WARN
+    org.glassfish.jersey.server.ServerRuntime.Responder: "OFF"
+  appenders:
+    - type: console
+      threshold: TRACE
+      target: STDOUT
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+    - type: gke-console
+      threshold: TRACE
+      target: STDOUT
+      stackdriverLogEnabled: false
+    - type: file
+      threshold: TRACE
+      currentLogFilename: ${LOG_FILENAME:-/opt/harness/logs/pod.log}
+      archive: true
+      archivedLogFilenamePattern: /opt/harness/logs/pod.%d{yyyy-MM-dd}.%i.log
+      archivedFileCount: ${LOG_MAX_FILE_COUNT:-10}
+      maxFileSize: ${LOG_MAX_FILE_SIZE:-50MB}
+      totalSizeCap: ${LOG_TOTAL_FILE_SIZE_CAP:-1GB}
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+
+
+accessControlClient:
+  enableAccessControl: false
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+
+redisLockConfig:
+  sentinel: false
+  masterName: "test"
+  redisUrl: "redis://localhost:6379"
+  sentinelUrls:
+    - "redis://redis1:26379"
+    - "redis://redis2:26379"
+    - "redis://redis3:26379"
+  envNamespace: ""
+  readMode: MASTER
+  nettyThreads: 16
+  useScriptCache: true
+  userName: ""
+  password: ""
+  timeout: 6000
+
+distributedLockImplementation: REDIS
+
+
+harness-mongo:
+  uri: mongodb://localhost:27017/harness
+  connectTimeout: 30000
+  serverSelectionTimeout: 90000
+  socketTimeout: 360000
+  maxConnectionIdleTime: 600000
+  connectionsPerHost: 50
+  aliasDBName: harness
+cimanager-mongo:
+  uri: mongodb://localhost:27017/harnessci
+  connectTimeout: 30000
+  serverSelectionTimeout: 90000
+  socketTimeout: 360000
+  maxConnectionIdleTime: 600000
+  connectionsPerHost: 300
+  indexManagerMode: AUTO
+  aliasDBName: harnessci
+
+enableAuth: false
+
+scmConnectionConfig:
+  url: localhost:8091
+
+logServiceConfig:
+  internalUrl: ${CI_LOG_SERVICE_INTERNAL_URL:-""}
+  baseUrl: ${CI_LOG_SERVICE_BASE_URL:-"https://qa.harness.io/log-service/"}
+  globalToken: "c76e567a-b341-404d-a8dd-d9738714eb82"
+
+cacheServiceConfig:
+  internalUrl: ${CACHE_SERVICE_INTERNAL_ENDPOINT:-""}
+  baseUrl: ${CACHE_SERVICE_ENDPOINT:-http://localhost:8082}
+  globalToken: ${CACHE_SERVICE_GLOBAL_TOKEN:-"f47c6470-2483-4e06-8f44-3c35d6b55b26"}
+
+tiServiceConfig:
+  internalUrl: ""
+  baseUrl: http://localhost:8078
+  globalToken: "78d16b66-4b4c-11eb-8377-acde48001122"
+
+coverageServiceConfig:
+  baseUrl: ${COVERAGE_SERVICE_ENDPOINT:-"http://localhost:7050"}
+  token: ${COVERAGE_SERVICE_TOKEN:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+
+hsaServiceConfig:
+  httpClientConfig:
+    baseUrl: ${HSA_SERVICE_ENDPOINT:-http://localhost:8190}
+    connectTimeOutSeconds: 40
+    readTimeOutSeconds: 40
+  serviceSecret: ${HSA_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+
+sscaServiceConfig:
+  httpClientConfig:
+    baseUrl: http://localhost:8188
+    connectTimeOutSeconds: 40
+    readTimeOutSeconds: 40
+  serviceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+harnessFulcioServiceConfig:
+  httpClientConfig:
+    baseUrl: ${HARNESS_FULCIO_SERVICE_ENDPOINT:-http://localhost:8189}
+    connectTimeOutSeconds: 40
+    readTimeOutSeconds: 40
+  serviceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+stoServiceConfig:
+  baseUrl: ${STO_SERVICE_ENDPOINT:-http://localhost:4000}
+  internalUrl: ${STO_SERVICE_INTERNAL_ENDPOINT:-""}
+  globalToken: ${STO_SERVICE_GLOBAL_TOKEN:-"token"}
+
+qwietServiceConfig:
+  baseUrl: ${QWIET_SERVICE_ENDPOINT:-https://app.stg.shiftleft.io}
+  globalToken: "token"
+
+annotationsConfig:
+  baseUrl: ${ANNOTATIONS_SERVICE_ENDPOINT:-http://localhost:12001}
+  secret: ${ANNOTATIONS_SERVICE_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+
+ticketServiceConfig:
+  baseUrl: ${TICKET_SERVICE_ENDPOINT:-http://localhost:4444}
+  internalUrl: ${TICKET_SERVICE_INTERNAL_ENDPOINT:-""}
+  globalToken: ${TICKET_SERVICE_GLOBAL_TOKEN:-"token"}
+
+iacmServiceConfig:
+  baseUrl: ${IACM_SERVICE_ENDPOINT:-http://localhost:8080}
+  externalUrl: ${IACM_EXTERNAL_SERVICE_ENDPOINT:-http://localhost:8080}
+  globalToken: ${IACM_SERVICE_GLOBAL_TOKEN:-"token"}
+  costEstimationAPIIUrl: ${IACM_INFRACOST_API_ENDPOINT:-""}
+  costEstimationToken: ${IACM_HARNESS_INFRACOST_API:-""}
+
+managerTarget: localhost:9879
+managerAuthority: localhost
+managerServiceSecret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+jwtAuthSecret: "dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq"
+ngManagerServiceSecret: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+jwtIdentityServiceSecret: "HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU="
+jwtDataHandlerSecret: "RdL7j9ZdCz6TVSHO7obJRS6ywYLJjH8tdfPP39i4MbevKjVodvjdhakdhashsh4371dasjldas"
+
+ngManagerClientConfig:
+  baseUrl: http://localhost:7457/
+  connectTimeOutSeconds: 40
+  readTimeOutSeconds: 40
+
+# Workload Identity (OIDC-without-connector): HarnessID client. Disabled until serviceAuthSecret is set
+# (isEnabled() requires gRPC target + REST baseUrl + serviceAuthSecret all non-blank).
+harnessIdGrpcClientConfig:
+  target: ${HARNESS_ID_GRPC_TARGET:-localhost:8082}
+  authority: ${HARNESS_ID_GRPC_AUTHORITY:-localhost}
+  serviceAuthSecret: ${HARNESS_ID_SERVICE_SECRET:-}
+  deadlineSeconds: ${HARNESS_ID_GRPC_DEADLINE_SECONDS:-30}
+harnessIdRestClientConfig:
+  baseUrl: ${HARNESS_ID_REST_BASE_URL:-http://localhost:8081}
+  connectTimeOutSeconds: ${HARNESS_ID_REST_CONNECT_TIMEOUT_SECONDS:-5}
+  readTimeOutSeconds: ${HARNESS_ID_REST_READ_TIMEOUT_SECONDS:-10}
+
+rhsClientConfig:
+  baseUrl: ${RHS_CLIENT_BASE_URL:-http://localhost:9009/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsEnabled: ${RHS_ENABLED:-false}
+
+rhsServiceSecret: ${RESOURCE_HIERARCHY_SERVICE_SECRET:-"dummyRhsServiceSecret"}
+
+secretConnectorServiceEnabled: ${SECRET_CONNECTOR_SERVICE_ENABLED:-false}
+secretConnectorServiceClientConfig:
+  baseUrl: ${SECRET_CONNECTOR_SERVICE_CLIENT_BASE_URL:-http://localhost:9008/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+secretConnectorServiceSecret: ${SECRET_CONNECTOR_SERVICE_SECRET:-dummySecretConnectorServiceSecret}
+
+platformConfigServiceEnabled: ${PLATFORM_CONFIG_SERVICE_ENABLED:-false}
+platformConfigServiceClientConfig:
+  baseUrl: ${PLATFORM_CONFIG_SERVICE_CLIENT_BASE_URL:-http://localhost:9010/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+platformConfigServiceSecret: ${PLATFORM_CONFIG_SERVICE_SECRET:-dummyPlatformConfigServiceSecret}
+
+managerClientConfig:
+  baseUrl: http://localhost:3457/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+ciExecutionServiceConfig:
+  miningPatternConfig:
+    gcsCreds: null
+    projectId: null
+    bucketName: null
+  ipAllowlistConfig:
+    ipAddresses:
+      - "127.0.0.1"
+      - "127.0.0.2"
+      - "127.0.0.3"
+  queueServiceClientConfig:
+    httpClientConfig:
+      baseUrl: http://localhost:9544/
+      connectTimeOutSeconds: 15
+      readTimeOutSeconds: 15
+    queueServiceSecret: ThisIsMyUniqueJwtQueueServiceSecret
+    envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-localhost}
+    topic: ${HSQS_TOPIC:-ci}
+    batchSize: ${HSQS_BATCH_SIZE:-10}
+  aitCiLicenseBypassEnabled: ${AIT_CI_LICENSE_BYPASS_ENABLED:-false}
+  enableOpaEvaluation: ${ENABLE_OPA_EVALUATION:-false}
+  aitBypassServicePrincipals:
+    - "AITestExecutionNodeApiService"
+  globalQueueingConfig:
+    enableGlobalQueue: ${ENABLE_GLOBAL_QUEUE:-false}
+    capacityTaskRetryIntervalMs: ${CAPACITY_TASK_RETRY_INTERVAL_MS:-30000}
+    capacityTaskTimeoutMs: ${CAPACITY_TASK_TIMEOUT_MS:-300000}
+    capacityTaskMaxWaitTimeMs: ${CAPACITY_TASK_MAX_WAIT_TIME_MS:-480000}
+  addonImageTag: releaseBuild-30
+  liteEngineImageTag: releaseBuild-29
+  defaultMemoryLimit: 500
+  defaultCPULimit: 400
+  defaultInternalImageConnector: ''
+  # Workload Identity: HarnessID OIDC token-generate URL delivered to the in-pod engine broker. Empty disables minting.
+  harnessIdTokenGenerateUrl: ${HARNESS_WI_TOKEN_GENERATE_URL:-}
+  executionLimits:
+    freeNewUser:
+      dailyMaxBuildsCount: 0
+      monthlyMaxCreditsCount: 0
+    freeBasicUser:
+      dailyMaxBuildsCount: 25
+      monthlyMaxCreditsCount: 2000
+    free:
+      defaultTotalExecutionCount: 20
+      defaultMacExecutionCount: 1
+    team:
+      defaultTotalExecutionCount: 45
+      defaultMacExecutionCount: 5
+    enterprise:
+      defaultTotalExecutionCount: 65
+      defaultMacExecutionCount: 5
+    devopsEssentials:
+      defaultTotalExecutionCount: 65
+      defaultMacExecutionCount: 5
+    essentials:
+      defaultTotalExecutionCount: 65
+      defaultMacExecutionCount: 5
+    overrideConfig:
+      - "kmpySmUISimoRrJL6NL73w:1:1"
+  pvcDefaultStorageSize: 25600
+  delegateServiceEndpointVariableValue: "delegate-service:8080"
+  addonImage: harness/ci-addon:1.18.31
+  liteEngineImage: harness/ci-lite-engine:1.18.31
+  addonImageRootless: harness/ci-addon:rootless-1.18.31
+  liteEngineImageRootless: harness/ci-lite-engine:rootless-1.18.31
+  isLocal: ${CI_IS_LOCAL_DEVELOPMENT:-false}
+  remoteDebugTimeout: 3600
+  tmateEndpoint: ${TMATE_ENDPOINT:-"ssh.harness.io"}
+  cacheIntelligenceConfig:
+    bucket: "gcp_bucket"
+    serviceKey: "gcp_service_key"
+  cacheIntelligenceS3Config:
+    bucket: "s3_bucket"
+    accessKey: "s3_access_key"
+    accessSecret: "s3_access_secret"
+    region: "s3_bucket_region"
+    endpoint: "s3_endpoint"
+  dockerLayerCachingConfig:
+    endpoint: "endpoint"
+    bucket: "bucket"
+    accessKey: "access_key"
+    secretKey: "secret_key"
+    region: "region"
+  dockerLayerCachingGCSConfig:
+    endpoint: "endpoint"
+    bucket: "bucket"
+    accessKey: "access_key"
+    secretKey: "secret_key"
+    region: "region"
+    projectId: "project_id"
+  hostedVmConfig:
+    splitLinuxAmd64Pool: false
+    splitLinuxArm64Pool: false
+    splitWindowsAmd64Pool: false
+    internalAccounts:
+      - "kmpySmUISimoRrJL6NL73w"
+  byoiConfig:
+    gcpProject: ${BYOI_GCP_PROJECT:-ci-play}
+    gcpZone: ${BYOI_GCP_ZONE:-us-central1-a}
+    oidcProjectNumber: ${BYOI_OIDC_PROJECT_NUMBER:-725982156972}
+    oidcPoolId: ${BYOI_OIDC_POOL_ID:-}
+    oidcProviderId: ${BYOI_OIDC_PROVIDER_ID:-}
+    oidcServiceAccountEmail: ${BYOI_OIDC_SERVICE_ACCOUNT_EMAIL:-}
+    oidcAccountId: ${BYOI_ACCOUNT_ID:-}
+  stoStepConfig:
+    defaultTag: ${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+    defaultEntrypoint:
+      - /bin/start.sh
+      - "--run-strategy"
+      - single-container
+    images:
+      - product: anchore_.*
+        image: harness/anchore-job-runner
+      - product: aquasecurity_.*
+        image: harness/aqua-security-job-runner
+      - product: awsecr_default
+        image: harness/aws-ecr-job-runner
+      - product: awssecurityhub_default
+        image: harness/aws-security-hub-job-runner
+      - product: aquatrivy_.*
+        image: harness/aqua-trivy-job-runner
+      - product: bandit_default
+        image: harness/bandit-job-runner
+      - product: blackduck_default
+        image: harness/blackduckhub-job-runner
+      - product: brakeman_default
+        image: harness/brakeman-job-runner
+      - product: burp_.*
+        image: harness/burp-job-runner
+      - product: custom_.*
+        image: harness/sto-plugin
+        entrypoint:
+          - /bin/sto_plugin
+          - "--run-strategy"
+          - single-container
+      - product: codeql_.*
+        image: harness/sto-plugin
+        entrypoint:
+          - /bin/sto_plugin
+          - "--run-strategy"
+          - single-container
+      - product: coverity_.*
+        image: harness/sto-plugin
+        entrypoint:
+          - /bin/sto_plugin
+          - "--run-strategy"
+          - single-container
+      - product: githubadvancedsecurity_.*
+        image: harness/github-advanced-security-job-runner
+        entrypoint:
+          - /bin/sto_plugin
+          - "--run-strategy"
+          - single-container
+      - product: gitleaks_.*
+        image: harness/gitleaks-job-runner
+      - product: nexusiq_.*
+        image: harness/nexusiq-job-runner
+      - product: fossa_.*
+        image: harness/fossa-job-runner
+      - product: semgrep_.*
+        image: harness/semgrep-job-runner
+      - product: grype_default
+        image: harness/grype-job-runner
+      - product: nmap_.*
+        image: harness/nmap-job-runner
+      - product: nikto_.*
+        image: harness/nikto-job-runner
+      - product: metasploit_.*
+        image: harness/sto-plugin
+      - product: mythosagent_.*
+        image: harness/mythos-agent-job-runner
+      - product: openai_.*
+        image: harness/openai-job-runner
+      - product: claudecodesecurity_.*
+        image: harness/claude-code-security-job-runner
+      - product: osv.*
+        image: harness/osv-job-runner
+      - product: owasp_default
+        image: harness/owasp-dependency-check-job-runner
+      - product: snyk_.*
+        image: harness/snyk-job-runner
+      - product: sonarqube_.*
+        image: harness/sonarqube-agent-job-runner
+      - product: sysdig_default
+        image: harness/sysdig-job-runner
+      - product: prowler_.*
+        image: harness/prowler-job-runner
+      - product: prismacloud_default
+        image: harness/twistlock-job-runner
+      - product: checkmarxone_.*
+        image: harness/checkmarx-one-job-runner
+      - product: checkmarx_.*
+        image: harness/checkmarx-job-runner
+      - product: checkov_default
+        image: harness/checkov-job-runner
+      - product: cortexcloud_.*
+        image: harness/cortex-cloud-job-runner
+      - product: modelscan_.*
+        image: harness/modelscan-job-runner
+      - product: shiftleft.*
+        image: harness/shiftleft-job-runner
+      - product: harnesssast.*
+        image: harness/shiftleft-job-runner
+      - product: harnesssca.*
+        image: harness/shiftleft-job-runner
+      - product: veracode_.*
+        image: harness/veracode-agent-job-runner
+      - product: wiz.*
+        image: harness/wiz-job-runner
+      - product: zap_.*
+        image: harness/zap-job-runner
+      - product: traceable_.*
+        image: harness/traceable-job-runner
+      - product: mend_.*
+        image: harness/whitesource-agent-job-runner
+  applyCIPluginDefaults: ${APPLY_CI_PLUGIN_DEFAULTS:-false}
+  stepConfig:
+    # The below config is for K8 steps
+    gitCloneConfig:
+      # Use rootless image only for K8 git clone
+      image: harness/drone-git:1.7.25-rootless
+      entrypoint:
+        - /usr/local/bin/clone
+      windowsEntrypoint:
+        - "pwsh"
+        - "C:\\bin\\clone.ps1"
+    buildAndPushDockerRegistryConfig:
+      image: plugins/kaniko:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-docker
+    buildAndPushECRConfig:
+      image: plugins/kaniko-ecr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-ecr
+    buildAndPushGCRConfig:
+      image: plugins/kaniko-gcr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-gcr
+    buildAndPushGARConfig:
+      image: plugins/kaniko-gar:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-gar
+    buildAndPushACRConfig:
+      image: plugins/kaniko-acr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-acr
+    buildAndPushBuildxDockerRegistryConfig:
+      image: plugins/buildx:1.3.26
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-docker
+      windowsEntrypoint:
+        - "C:\\bin\\drone-docker.exe"
+    buildAndPushBuildxECRConfig:
+      image: plugins/buildx-ecr:1.5.6
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/buildx-ecr
+      windowsEntrypoint:
+        - "C:\\bin\\buildx-ecr.exe"
+    buildAndPushBuildxGCRConfig:
+      image: plugins/buildx-gcr:1.5.6
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/buildx-gcr
+      windowsEntrypoint:
+        - "C:\\bin\\buildx-gcr.exe"
+    buildAndPushBuildxGARConfig:
+      image: plugins/buildx-gar:1.5.6
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/buildx-gar
+      windowsEntrypoint:
+        - "C:\\bin\\buildx-gar.exe"
+    buildAndPushBuildxACRConfig:
+      image: plugins/buildx-acr:1.5.6
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/buildx-acr
+      windowsEntrypoint:
+        - "C:\\bin\\buildx-acr.exe"
+    gcsUploadConfig:
+      image: plugins/gcs:1.6.12
+      entrypoint:
+        - /bin/drone-gcs
+      windowsEntrypoint:
+        - "C:\\drone-gcs.exe"
+    s3UploadConfig:
+      image: plugins/s3:1.8.2
+      entrypoint:
+        - /bin/drone-s3
+      windowsEntrypoint:
+        - "C:\\drone-s3.exe"
+    securityConfig:
+      image: harness/sto-plugin:${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+      entrypoint:
+        - /bin/sh
+        - -c
+        - python3 ${DOCKER_ENTRYPOINT}
+    artifactoryUploadConfig:
+      image: plugins/artifactory:1.9.0
+      entrypoint:
+        - /bin/plugin
+      windowsEntrypoint:
+        - "C:\\bin\\drone-artifactory.exe"
+    harUploadConfig:
+      image: harness/har-plugin:1.0.5
+      entrypoint:
+        - /bin/har
+      windowsEntrypoint:
+        - "C:\\bin\\har.exe"
+    cacheGCSConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheS3Config:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheAzureConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheProxyConfig:
+      image: harness/harness-cache-server:1.7.25
+      entrypoint:
+        - /app/cache-proxy
+        - server
+    hsaRepositoryScanConfig:
+      image: harness/hsa-repo-scan-plugin:latest
+      entrypoint:
+        - /bin/hsa-repo-scan-plugin
+    sscaOrchestrationConfig:
+      image: harness/ssca-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-plugin
+        - orchestrate
+    sscaEnforcementConfig:
+      image: harness/ssca-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-plugin
+        - enforce
+    sscaArtifactSigningConfig:
+      image: harness/ssca-artifact-signing-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-artifact-signing-plugin
+        - sign
+    sscaArtifactVerificationConfig:
+      image: harness/ssca-artifact-signing-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-artifact-signing-plugin
+        - verify
+    sscaCdxgenOrchestrationConfig:
+      image: harness/ssca-cdxgen-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-plugin
+        - orchestrate
+    provenanceConfig:
+      image: harness/slsa-plugin:0.67.0
+      entrypoint:
+        - /bin/slsa-plugin
+        - attest
+    slsaVerificationConfig:
+      image: harness/slsa-plugin:0.67.0
+      entrypoint:
+        - /bin/slsa-plugin
+        - verify
+    sscaComplianceConfig:
+      image: harness/ssca-compliance-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-compliance-plugin
+        - scan
+    sscaPrAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - pr-attest
+    sscaJunitAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.67.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - junit-attest
+    deployAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - deploy-attest
+    sscaAibomOrchestrationConfig:
+      image: harness/ssca-ai-bom-plugin:0.67.0
+      entrypoint:
+        - /bin/ai-bom
+        - scan
+    enforceAttestationConfig:
+      image: harness/enforce-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/enforce-attestation-plugin
+        - enforce-attestation
+    iacmTerraformConfig:
+      image: plugins/harness_terraform:dev
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmAwsCdkConfig:
+      image: ${IACM_AWS_CDK_IMAGE:- plugins/harness_aws_cdk:dev}
+      entrypoint:
+        - /bin/harness-aws-cdk
+      windowsEntrypoint:
+        - "C:\\harness-aws-cdk.exe"
+    iacmOpenTofuConfig:
+      image: plugins/harness_terraform:dev
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmTFComplianceConfig:
+      image: plugins/harness_tf_compliance:dev
+      entrypoint:
+        - /bin/harness-tf-compliance
+      windowsEntrypoint:
+        - "C:\\harness-tf-compliance.exe"
+    iacmTFLintConfig:
+      image: plugins/harness_tf_lint:dev
+      entrypoint:
+        - /bin/harness-tf-lint
+      windowsEntrypoint:
+        - "C:\\harness-tf-lint.exe"
+    iacmTFSecConfig:
+      image: plugins/harness_tf_sec:dev
+      entrypoint:
+        - /bin/harness-tf-sec
+      windowsEntrypoint:
+        - "C:\\harness-tf-sec.exe"
+    iacmCheckovConfig:
+      image: plugins/harness_checkov:dev
+      entrypoint:
+        - /bin/harness-checkov
+      windowsEntrypoint:
+        - "C:\\harness-checkov.exe"
+    iacmModuleTestConfig:
+      image: ${IACM_MODULE_TEST_IMAGE:- plugins/harness_terraform:dev}
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmRemediationAgentConfig:
+      image: ${IACM_REMEDIATION_AGENT_IMAGE:- plugins/harness_remediation_agent:dev}
+      entrypoint: []
+      windowsEntrypoint: []
+    iacmBlastRadiusAgentConfig:
+      image: ${IACM_BLAST_RADIUS_AGENT_IMAGE:- plugins/harness_blast_radius_agent:dev}
+      entrypoint:
+        - /bin/blast-radius-agent
+      windowsEntrypoint:
+        - "C:\\blast-radius-agent.exe"
+    iacmAnsible:
+      image: ${IACM_ANSIBLE_IMAGE:- plugins/harness_ansible:dev}
+      entrypoint:
+        - /bin/harness-ansible
+      windowsEntrypoint:
+        - "C:\\harness-ansible.exe"
+    cookieCutter:
+      image: harness/cookiecutter:latest
+    createRepo:
+      image: harness/createrepo:latest
+    directPush:
+      image: harness/directpush:latest
+    registerCatalog:
+      image: harness/registercatalog:latest
+    createCatalog:
+      image: harness/createcatalog:latest
+    slackNotify:
+      image: harness/slacknotify:latest
+    createOrganisation:
+      image: harness/createorganisation:latest
+    createProject:
+      image: harness/createproject:latest
+    createResource:
+      image: harness/createresource:latest
+    updateCatalogProperty:
+      image: harness/updatecatalogproperty:latest
+    buildkitConfig:
+        image: harness/buildkit:1.0.21
+    vmImageConfig:
+      # Use root image for VM git clone
+      gitClone: harness/drone-git:1.7.25
+      buildAndPushDockerRegistry: plugins/docker:21.3.3
+      buildAndPushACR: plugins/acr:21.3.3
+      buildAndPushECR: plugins/ecr:21.3.3
+      buildAndPushGCR: plugins/gcr:21.3.3
+      buildAndPushGAR: plugins/gar:21.3.3
+      buildAndPushBuildxDockerRegistry: plugins/buildx:1.3.26
+      buildAndPushBuildxECR: plugins/buildx-ecr:1.5.6
+      buildAndPushBuildxACR: plugins/buildx-acr:1.5.6
+      buildAndPushBuildxGAR: plugins/buildx-gar:1.5.6
+      gcsUpload: plugins/gcs:1.6.12
+      s3Upload: plugins/s3:1.8.2
+      security: harness/sto-plugin:${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+      artifactoryUpload: plugins/artifactory:1.9.0
+      harUpload: harness/har-plugin:1.0.5
+      cacheGCS: plugins/cache:1.10.10
+      cacheS3: plugins/cache:1.10.10
+      cacheAzure: plugins/cache:1.10.10
+      cache: plugins/cache:1.10.10
+      cacheProxy: harness/harness-cache-server:1.7.25
+      hsaRepositoryScan: harness/hsa-repo-scan-plugin:latest
+      sscaOrchestration: harness/ssca-plugin:0.67.0
+      sscaEnforcement: harness/ssca-plugin:0.67.0
+      sscaArtifactSigning: harness/ssca-artifact-signing-plugin:0.67.0
+      sscaArtifactVerification: harness/ssca-artifact-signing-plugin:0.67.0
+      sscaCdxgenOrchestration: harness/ssca-cdxgen-plugin:0.67.0
+      provenance: harness/slsa-plugin:0.67.0
+      slsaVerification: harness/slsa-plugin:0.67.0
+      sscaCompliance: harness/ssca-compliance-plugin:0.67.0
+      sscaPrAttestation: harness/ssca-attestation-plugin:0.67.0
+      sscaJunitAttestation: harness/ssca-attestation-plugin:0.67.0
+      deployAttestation: harness/ssca-attestation-plugin:0.1.0
+      sscaAibomOrchestration: harness/ssca-ai-bom-plugin:0.67.0
+      enforceAttestation: harness/enforce-attestation-plugin:0.1.0
+      iacmTerraform: plugins/harness_terraform_vm:dev
+      iacmOpenTofu: plugins/harness_terraform_vm:dev
+      iacmAwsCdk: plugins/harness_aws_cdk_vm:dev
+      iacmTFCompliance: plugins/harness_tf_compliance:dev
+      iacmTFLint: plugins/harness_tf_lint:dev
+      iacmTFSec: plugins/harness_tf_sec:dev
+      iacmCheckov: plugins/harness_checkov:dev
+      iacmModuleTest: ${IACM_MODULE_TEST_VM_IMAGE:- plugins/harness_terraform_vm:dev}
+      iacmRemediationAgent: ${IACM_REMEDIATION_AGENT_VM_IMAGE:- plugins/harness_remediation_agent:dev}
+      iacmBlastRadiusAgent: ${IACM_BLAST_RADIUS_AGENT_VM_IMAGE:- plugins/harness_blast_radius_agent:dev}
+      iacmAnsible: ${IACM_ANSIBLE_VM_IMAGE:- plugins/harness_ansible_vm:dev}
+      cookieCutter: harness/cookiecutter:latest
+      createRepo: harness/createrepo:latest
+      directPush: harness/directpush:latest
+      registerCatalog: harness/registercatalog:latest
+      createCatalog: harness/createcatalog:latest
+      slackNotify: harness/slacknotify:latest
+      createOrganisation: harness/createorganisation:latest
+      createResource: harness/createresource:latest
+      updateCatalogProperty: harness/updatecatalogproperty:latest
+      createProject: harness/createproject:latest
+      buildkit: harness/buildkit:1.0.21
+      helmChartDownload: harnessdev/helm-fetch@sha256:c50b1ea34b9ff49d8df052c78a8d3e82cfa2c5dd4d3c5d249ba16b859f3cac88
+      k8sRendering: harnessdev/k8s-template@sha256:1f8f5c39648367237e5c165d9ee0ac635aebb424a008a2215496f23fea20ea1a
+      helmDeploy: harnessdev/helm-deploy@sha256:afb022170500ff14d3a0595945f9742d6240ea239583c1fd92d52562ac285ded
+      dockerArtifact: harnessdev/docker-artifact-dev:0.0.10
+      googleArtifactRegistryArtifact: harnessdev/gar-artifact-dev:linux-amd64-0.0.7
+      awsSamDeploy: harnessdev/aws-sam-dev:0.0.7
+      k8sDeploy: harnessdev/k8s-deploy@sha256:a4fec9b4d17022432f67e54223bf33f6e39454d2e429a33736fcd7461e8e63be
+      serverlessDeploy: harnessdev/serverless-plugin@sha256:a6fad287e8588393660eec17d3dde0f5cee9a1e990aca31288024819764402ba
+      ecrArtifact: harnessdev/ecr-artifact-dev:0.0.2
+      amazonS3Artifact: harnessdev/s3-artifact-dev:linux-amd64-0.0.3
+      artifactoryArtifact: harnessdev/artifactory-artifact-dev:0.0.2
+      acrArtifact: harnessdev/acr-artifact-dev:0.0.2
+      kubeconfig: harnessdev/kubeconfig:linux-amd64-0.0.2
+      nexus3Artifact: harnessdev/nexus3-artifact-dev:0.0.4
+      gcsArtifact: harnessdev/gcs-artifact-dev:linux-amd64-0.0.1
+      githubArtifact: harnessdev/github-artifact-dev:0.0.1
+      helmECRArtifact: harnessdev/ecr-artifact-plugin:linux-amd64-0.0.3
+      helmGARArtifact: harnessdev/gar-artifact-dev:linux-amd64-0.0.7
+      helmACRArtifact: harnessdev/acr-artifact-dev:linux-amd64-0.0.3
+      azureArtifactsArtifact: harnessdev/azure-artifacts-plugin:linux-amd64-0.0.1
+    vmContainerlessStepConfig:
+      s3UploadConfig:
+        name: github.com/drone-plugins/drone-s3@refs/tags/v1.8.2
+        disableClone: true
+        binarySuffix: drone-s3-{{ os }}-{{ arch }}.zst
+      gcsUploadConfig:
+        name: github.com/drone-plugins/drone-gcs@refs/tags/v1.6.12
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      cacheS3Config:
+        name: github.com/drone-plugins/drone-meltwater-cache@refs/tags/v1.10.10
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      cacheGCSConfig:
+        name: github.com/drone-plugins/drone-meltwater-cache@refs/tags/v1.10.10
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      cacheAzureConfig:
+        name: github.com/drone-plugins/drone-meltwater-cache@refs/tags/v1.10.10
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      cacheConfig:
+        name: github.com/drone-plugins/drone-meltwater-cache@refs/tags/v1.10.10
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      gitCloneConfig:
+        name: github.com/wings-software/drone-git@refs/tags/v1.7.25
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      dockerBuildxConfig:
+        name: github.com/drone-plugins/drone-buildx@refs/tags/v1.3.26
+        disableClone: true
+        binarySuffix: drone-buildx-{{ os }}-{{ arch }}.zst
+      dockerBuildxEcrConfig:
+        name: github.com/drone-plugins/drone-buildx-ecr@refs/tags/v1.5.6
+        disableClone: true
+        binarySuffix: drone-buildx-ecr-{{ os }}-{{ arch }}.zst
+      dockerBuildxGcrConfig:
+        name: github.com/drone-plugins/drone-buildx-gcr@refs/tags/v1.5.5
+      dockerBuildxGarConfig:
+        name: github.com/drone-plugins/drone-buildx-gar@refs/tags/v1.5.6
+        disableClone: true
+        binarySuffix: drone-buildx-gar-{{ os }}-{{ arch }}.zst
+      dockerBuildxAcrConfig:
+        name: github.com/drone-plugins/drone-buildx-acr@refs/tags/v1.5.6
+        disableClone: true
+        binarySuffix: drone-buildx-acr-{{ os }}-{{ arch }}.zst
+      stoPluginConfig:
+        name: ${STO_DRONE_REPOSITORY:-github.com/harness-sto/drone-sto-plugin@refs/tags/}${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+      artifactoryUploadConfig:
+        name: github.com/drone-plugins/drone-artifactory@refs/tags/v1.9.0
+        disableClone: false
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      harUploadConfig:
+        name: github.com/harness-community/drone-har@refs/tags/v1.0.0
+        disableClone: false
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+      buildCacheConfig:
+        name: github.com/wings-software/harness-cache@refs/tags/v1.7.19
+        disableClone: true
+        binarySuffix: cache-proxy-{{ os }}-{{ arch }}.zst
+  gitnessConfig:
+    jwtSecret: ${GITNESS_JWT_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+    httpClientConfig:
+      baseUrl: ${GITNESS_INTERNAL_URL:- http://localhost:3000}
+  harnessRegistryConfig:
+    jwtSecret: ${HARNESS_REGISTRY_JWT_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+    httpClientConfig:
+      baseUrl: ${HARNESS_REGISTRY_URL:- http://localhost:3000}
+
+harnessCodeGitUrl: ${HARNESS_CODE_GIT_URL:- http://localhost:3000/git}
+llmGatewayBaseUrl: ${LLM_GATEWAY_BASE_URL:-}
+
+pipelineSdkRedisEventsConfig:
+  pipelineSdkResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkResponseSpawnEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkStepResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+
+pmsSdkExecutionPoolConfig:
+  corePoolSize: ${PMS_SDK_EXECUTION_POOL_CORE_SIZE:-50}
+  maxPoolSize: ${PMS_SDK_EXECUTION_POOL_MAX_SIZE:-400}
+  idleTime: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_EXECUTION_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationEventPoolConfig:
+  corePoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_CORE_SIZE:-50}
+  maxPoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_MAX_SIZE:-300}
+  idleTime: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationHandlerPoolConfig:
+  corePoolSize: ${ORCHESTRATION_HANDLER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${ORCHESTRATION_HANDLER_POOL_MAX_SIZE:-30}
+  idleTime: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME:-60}
+  timeUnit: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+delegateResponseTaskExecutionPoolConfig:
+  corePoolSize: ${DELEGATE_RESPONSE_TASK_EXECUTION_POOL_CORE_SIZE:-50}
+  maxPoolSize: ${DELEGATE_RESPONSE_TASK_EXECUTION_POOL_MAX_SIZE:-300}
+  idleTime: ${DELEGATE_RESPONSE_TASK_EXECUTION_POOL_IDLE_TIME:-60}
+  timeUnit: ${DELEGATE_RESPONSE_TASK_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+asyncDelegateResponseConsumption:
+  corePoolSize: ${ASYNC_DELEGATE_RESPONSE_THREAD_COUNT:-1}
+
+pmsSdkGrpcServerConfig:
+  connectors:
+    - port: ${PMS_SDK_SERVER_CONFIG_PORT:-12301}
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+
+pmsGrpcClientConfig:
+  target: localhost:12011
+  authority: localhost
+
+apiUrl: https://localhost:8181/
+
+shouldConfigureWithPMS: ${SHOULD_CONFIGURE_WITH_PMS:-false}
+shouldDeregisterWithPMS: ${SHOULD_DEREGISTER_WITH_PMS:-false}
+
+enableDashboardTimescale: false
+
+timescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: "postgres"
+  timescaledbPassword: ""
+  connectTimeout: 10
+  socketTimeout: 30
+  logUnclosedConnections: false
+  loggerLevel: OFF
+
+eventsFramework:
+  shouldUseKafka: ${PMS_SDK_EVENTS_USE_KAFKA:-false}
+  redis:
+    sentinel: false
+    masterName: "test"
+    redisUrl: "redis://localhost:6379"
+    sentinelUrls:
+      - "redis://redis1:26379"
+      - "redis://redis2:26379"
+      - "redis://redis3:26379"
+    envNamespace: ""
+    readMode: MASTER
+    nettyThreads: 16
+    useScriptCache: true
+    userName: ""
+    password: ""
+    sslConfig:
+      enabled: false
+      CATrustStorePath: "/tmp/ca_trust_store"
+      CATrustStorePassword: ""
+    cleanUpKeysAmount: ${PMS_REDIS_CACHE_CLEANUP_KEYS_AMOUNT:-1000}
+    maxCleanupDelay: ${PMS_REDIS_CACHE_CLEANUP_MAX_DELAY_SECONDS:-60}
+
+hostname: ${HOSTNAME:-localhost}
+
+basePathPrefix: ${BASE_PATH_PREFIX:-""}
+
+segmentConfiguration:
+  enabled: false
+  url: "segment_url_place_holder"
+  apiKey: "segment_api_key"
+  certValidationRequired: false
+
+cacheConfig:
+  cacheBackend: REDIS
+  cacheNamespace: ""
+  disabledCaches: [ ]
+  enterpriseCacheEnabled: true
+
+enforcementClientConfiguration:
+  enforcementCheckEnabled: false
+
+pmsPlanCreatorServicePoolConfig:
+  corePoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE:-3}
+  idleTime: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+
+enableOpentelemetry: false
+enableLoopDetection: false
+loopDetectionThreshold: 2
+enableTelemetry: ${ENABLE_TELEMETRY:-false}
+
+policyManagerSecret: secret
+
+cvngClientConfig:
+  baseUrl: ${CVNG_SERVICE_ENDPOINT:-http://localhost:6457/cv/api/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+cvngServiceSecret: ${CVNG_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+
+aiTestAutomationClientConfig:
+  baseUrl: ${RELICX_BASE_URL:-http://localhost:13000}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+aitGcpClientConfig:
+  baseUrl: ${AIT_GCP_BASE_URL:-http://ait-node-api-service:8080}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+aiTestAutomationServiceSecret: ${JWT_RELICX_SECRET:-RdL7j9ZdCz6TVSHO7obJRS6ywYLJjH8tdfPP39i4MbesKxVp}
+
+logStreamingExecutorPoolConfig:
+  corePoolSize: ${LOG_STREAMING_CLIENT_POOL_CORE_SIZE:-10}
+
+opaClientConfig:
+  baseUrl: http://localhost:3000
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+cfClientConfig:
+  apiKey: ""
+  configUrl: "https://config.feature-flags.uat.harness.io/api/1.0"
+  eventUrl: "https://event.feature-flags.uat.harness.io/api/1.0"
+  analyticsEnabled: true
+  connectionTimeout: 10000
+  readTimeout: 45000
+  bufferSize: 10240
+  retries: 6
+  sleepInterval: 5000
+
+featureFlagConfig:
+  featureFlagSystem: LOCAL
+  syncFeaturesToCF: false
+  fmeConfig:
+    splitToken: "localhost"
+
+enableQueue: ${ENABLE_QUEUE:-false}
+
+streamPerServiceConfiguration: ${PIE_STREAM_PER_SERVICE:- false}
+
+asyncResourceCleanupPool:
+  corePoolSize: ${ASYNC_RESOURCE_CLEANUP_THREAD_COUNT:-2}
+
+enableAsyncResourceCleanup: ${ENABLE_ASYNC_RESOURCE_CLEANUP:-false}
+
+base: ${BASE:-app}
+
+notifyResponseIterator:
+  threadPoolSize: ${NOTIFY_RESPONSES_THREAD_POOL_SIZE:-2}
+  enabled: ${ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG:-false}
+  targetIntervalInSeconds: 300
+  threadPoolIntervalInSeconds: ${NOTIFY_RESPONSES_ITERATOR_THREAD_INTERVAL:-1}
+  redisLockTimeout: 10
+  redisBatchSize: ${NOTIFY_RESPONSES_ITERATOR_REDIS_BATCH_SIZE:-50}
+  threadSleepIntervalMs: ${NOTIFY_RESPONSES_ITERATOR_THREAD_SLEEP_INTERVAL:-50}
+  lockAcquireWarnThresholdMs: ${NOTIFY_RESPONSES_ITERATOR_LOCK_ACQUIRE_WARN_THRESHOLD_MS:-4500}
+
+enableDelegateResponseCleanupIterator: ${ENABLE_DELEGATE_RESPONSE_CLEANER:-false}
+
+enableWaitNotifyEngineOptimisation: ${ENABLE_WAIT_NOTIFY_OPTIMISATION:-false}
+
+gitAwareEntityHelperPoolConfig:
+  corePoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_MAX_SIZE:-10}
+  idleTime: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME:-10}
+  timeUnit: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+shouldDeployWithGitSync: false
+
+gitSdkConfiguration:
+  gitSdkGrpcServerConfig:
+    connectors:
+      - port: 16002
+  gitManagerGrpcClientConfig:
+    target: localhost:13002
+    authority: localhost
+  scmConnectionConfig:
+    url: localhost:8091
+  throw424ForGITServerErrors: ${THROW_424_FOR_GIT_SERVER_ERRORS:-false}
+
+kafkaModuleConfig:
+  enableConfluentKafkaProducer: ${ENABLE_CONFLUENT_KAFKA_PRODUCER:-false}
+  kafkaConfluentBaseConfig:
+    bootstrapServers: ${KAFKA_CONFLUENT_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_CONFLUENT_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_CONFLUENT_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_CONFLUENT_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_CONFLUENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_CONFLUENT_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+  enableGeneralKafkaProducer: ${ENABLE_GENERAL_KAFKA_PRODUCER:-false}
+  kafkaGeneralBaseConfig:
+    bootstrapServers: ${KAFKA_GENERAL_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_GENERAL_SCHEMA_REGISTRY_URL:-""}
+    saslJaasConfig: ${KAFKA_GENERAL_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_GENERAL_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_GENERAL_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_GENERAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_GENERAL_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+    sslTruststoreLocation: ${KAFKA_GENERAL_SSL_TRUSTSTORE_LOCATION:-""}
+    sslTruststorePassword: ${KAFKA_GENERAL_SSL_TRUSTSTORE_PASSWORD:-""}
+    sslTruststoreType: ${KAFKA_GENERAL_SSL_TRUSTSTORE_TYPE:-""}
+    sslKeystoreLocation: ${KAFKA_GENERAL_SSL_KEYSTORE_LOCATION:-""}
+    sslKeystorePassword: ${KAFKA_GENERAL_SSL_KEYSTORE_PASSWORD:-""}
+    sslKeystoreType: ${KAFKA_GENERAL_SSL_KEYSTORE_TYPE:-""}
+    sslKeyPassword: ${KAFKA_GENERAL_SSL_KEY_PASSWORD:-""}
+    sslProtocol: ${KAFKA_GENERAL_SSL_PROTOCOL:-""}
+    sslEnabledProtocols: ${KAFKA_GENERAL_SSL_ENABLED_PROTOCOLS:-""}
+    sslProvider: ${KAFKA_GENERAL_SSL_PROVIDER:-""}
+
+goConvertConnectionConfig:
+  url: ${GO_CONVERT_SERVICE_GRPC_URL:-localhost:8090}
+
+# SPIRE-based service-to-service mesh identity. Fully opt-in: with
+# MESH_IDENTITY_INBOUND_ENABLED=false (default), the service skips mesh wiring
+# and the existing HMAC path is unchanged. Enable via env vars after code ships.
+meshIdentity:
+  inboundEnabled: ${MESH_IDENTITY_INBOUND_ENABLED:-false}
+  outboundEnabled: ${MESH_IDENTITY_OUTBOUND_ENABLED:-false}
+  outboundOnly: ${MESH_IDENTITY_OUTBOUND_ONLY:-false}
+  # Fallback to HMAC when mesh validation fails. Keep true during rollout.
+  fallbackEnabled: ${MESH_IDENTITY_FALLBACK_ENABLED:-true}
+  rejectAuthorizationWithoutMeshHeader: ${MESH_IDENTITY_REJECT_AUTH_WITHOUT_MESH_HEADER:-false}
+  audience: ${MESH_IDENTITY_AUDIENCE:-CIManager}
+  allowedAudiences: ${MESH_IDENTITY_ALLOWED_AUDIENCES:-gateway-internal-service}

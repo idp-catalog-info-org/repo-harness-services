@@ -1,0 +1,7 @@
+name: Object Store Client Metrics Group
+identifier: ObjectStoreClientMetricsGroup
+labels:
+  - operation
+  - status
+  - bucketName
+  - provider

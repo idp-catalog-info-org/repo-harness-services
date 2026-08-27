@@ -1,0 +1,8 @@
+name: CI Error Categorization Rule Metrics
+identifier: CIErrorCategorizationRuleMetrics
+metricGroup: CIErrorCategorizationRuleMetricsGroup
+metrics:
+  - metricName: ci_error_categorization_matched_rule
+    metricDefinition: Error categorization matched rule count
+    type: Count
+    unit: "1"

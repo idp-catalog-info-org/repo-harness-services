@@ -1,0 +1,129 @@
+identifier: rafay
+name: Rafay Kubernetes Operations Platform
+description: Deploy and view clusters, namespaces, workloads and more using Rafay plugin
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Rafay Systems
+category: Deployment
+source: https://docs.rafay.co/backstage/setup/
+iconUrl: https://avatars.githubusercontent.com/u/33210764?s=200&v=4
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/rafay-kubernetes
+config: |-
+  proxy:
+    endpoints:
+      '/rs-plugin':
+        target: https://console.rafay.dev
+        pathRewrite:
+          /api/proxy/rs-plugin/?: /
+        headers:
+          X-RAFAY-API-KEYID: ${X-RAFAY-API-KEYID}
+environmentVariables:
+  - X-RAFAY-API-KEYID
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityNamespaceInfo
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeNamespace
+              content:
+                component: EntityNamespaceInfo
+                specs:
+                  gridProps:
+                    md: 6
+    - type: CARD
+      name: EntityNamespacePodList
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeNamespace
+              content:
+                component: EntityNamespacePodList
+                specs:
+                  gridProps:
+                    md: 6
+    - type: CARD
+      name: EntityWorkloadInfo
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeWorkload
+              content:
+                component: EntityWorkloadInfo
+                specs:
+                  gridProps:
+                    md: 6
+
+    - type: CARD
+      name: EntityWorkloadPodList
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeWorkload
+              content:
+                component: EntityWorkloadPodList
+                specs:
+                  gridProps:
+                    md: 6
+
+    - type: CARD
+      name: EntityClusterInfo
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeCluster
+              content:
+                component: EntityClusterInfo
+                specs:
+                  gridProps:
+                    md: 6
+
+
+    - type: CARD
+      name: EntityClusterNamespaceList
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeCluster
+              content:
+                component: EntityClusterNamespaceList
+                specs:
+                  gridProps:
+                    md: 6
+
+    - type: CARD
+      name: EntityClusterPodList
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntitySwitch
+        specs:
+          cases:
+            - if: isRafayPluginEntityTypeCluster
+              content:
+                component: EntityClusterPodList
+                specs:
+                  gridProps:
+                    md: 6
+
+    - type: PAGE
+      name: RafayPage
+      addByDefault: false
+      layoutSchemaSpecs:
+        name: RafayPage

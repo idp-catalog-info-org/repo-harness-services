@@ -1,0 +1,13 @@
+name: Queued Pipeline Bulk Abort Metrics
+identifier: QueuedPipelineBulkAbortMetrics
+metricGroup: QueuedPipelineBulkAbortMetricsGroup
+metrics:
+  - metricName: queued_pipelines_bulk_abort_count
+    metricDefinition: Number of individual executions processed by bulk abort, labeled by outcome
+    type: Sum
+    unit: "1"
+  - metricName: queued_pipelines_bulk_abort_duration
+    metricDefinition: End-to-end duration of bulk abort operation (includes failures)
+    type: Duration
+    distribution: [ 0ms, 100ms, 500ms, 1s, 2s, 5s, 10s, 30s ]
+    unit: "ms"

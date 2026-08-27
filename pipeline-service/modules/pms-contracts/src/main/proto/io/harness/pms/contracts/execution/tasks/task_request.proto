@@ -1,0 +1,28 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.execution.tasks;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/execution/tasks/delegate_task_request.proto";
+import "io/harness/pms/contracts/execution/tasks/skip_task_request.proto";
+
+message TaskRequest {
+  oneof request {
+    DelegateTaskRequest delegateTaskRequest = 1;
+    SkipTaskRequest skipTaskRequest = 3;
+  }
+  TaskCategory taskCategory = 2;
+  bool useReferenceFalseKryoSerializer = 4;
+}
+
+enum TaskCategory {
+  UNKNOWN_CATEGORY = 0;
+  DELEGATE_TASK_V1 = 1;
+  DELEGATE_TASK_V2 = 2;
+}

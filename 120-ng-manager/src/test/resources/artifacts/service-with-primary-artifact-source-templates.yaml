@@ -1,0 +1,55 @@
+service:
+  name: nginx
+  identifier: nginx
+  tags: {}
+  serviceDefinition:
+    spec:
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - template:
+                templateRef: nginx
+                versionLabel: v1
+                templateInputs:
+                  type: DockerRegistry
+                  spec:
+                    tag: <+input>
+              identifier: ft1
+              name: ft1
+            - template:
+                templateRef: nginx
+                versionLabel: v1
+                templateInputs:
+                  type: DockerRegistry
+                  spec:
+                    imagePath: library/nginx
+                    tag: <+input>
+              identifier: withInputs1
+              name: withInputs1
+            - template:
+                templateRef: nginx
+                versionLabel: v1
+                templateInputs:
+                  type: DockerRegistry
+                  spec:
+                    imagePath: <+input>
+                    tag: <+input>
+                    connectorRef: <+input>
+              identifier: withAllInputs
+              name: withAllInputs
+            - template:
+                templateRef: account.acctNginx
+                templateInputs:
+                  type: DockerRegistry
+                  spec:
+                    tag: <+input>
+              identifier: ft2
+              name: ft2
+            - spec:
+                connectorRef: dockerRegPublic
+                imagePath: redis
+                tag: <+input>
+              identifier: nontemp
+              type: DockerRegistry
+    type: Kubernetes

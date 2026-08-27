@@ -1,0 +1,62 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ci.execution.buildstate;
+
+import static io.harness.govern.Switch.unhandled;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.steps.stepinfo.InitializeStepInfo;
+import io.harness.beans.sweepingoutputs.LocalVmDriverType;
+import io.harness.ci.execution.integrationstage.DliteVmInitializeTaskParamsBuilder;
+import io.harness.ci.execution.integrationstage.DockerInitializeTaskParamsBuilder;
+import io.harness.ci.execution.integrationstage.K8InitializeTaskParamsBuilder;
+import io.harness.ci.execution.integrationstage.VmInitializeTaskParamsBuilder;
+import io.harness.delegate.beans.ci.CIInitializeTaskParams;
+import io.harness.pms.contracts.ambiance.Ambiance;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+
+@Singleton
+@Slf4j
+@OwnedBy(HarnessTeam.CI)
+public class BuildSetupUtils {
+  @Inject private K8InitializeTaskParamsBuilder k8InitializeTaskParamsBuilder;
+  @Inject private VmInitializeTaskParamsBuilder vmInitializeTaskParamsBuilder;
+  @Inject private DliteVmInitializeTaskParamsBuilder dliteVmInitializeTaskParamsBuilder;
+  @Inject private DockerInitializeTaskParamsBuilder dockerInitializeTaskParamsBuilder;
+
+  public CIInitializeTaskParams getBuildSetupTaskParams(
+      InitializeStepInfo initializeStepInfo, Ambiance ambiance, String logPrefix, boolean shouldRouteStageToRunner) {
+    return getBuildSetupTaskParams(
+        initializeStepInfo, ambiance, logPrefix, shouldRouteStageToRunner, LocalVmDriverType.NONE);
+  }
+
+  public CIInitializeTaskParams getBuildSetupTaskParams(InitializeStepInfo initializeStepInfo, Ambiance ambiance,
+      String logPrefix, boolean shouldRouteStageToRunner, LocalVmDriverType localVmDriverType) {
+    switch (initializeStepInfo.getInfrastructure().getType()) {
+      case KUBERNETES_DIRECT:
+        return k8InitializeTaskParamsBuilder.getK8InitializeTaskParams(
+            initializeStepInfo, ambiance, logPrefix, shouldRouteStageToRunner);
+      case VM:
+        return vmInitializeTaskParamsBuilder.getDirectVmInitializeTaskParams(
+            initializeStepInfo, ambiance, shouldRouteStageToRunner);
+      case DOCKER:
+        return dockerInitializeTaskParamsBuilder.getDockerInitializeTaskParams(
+            initializeStepInfo, ambiance, shouldRouteStageToRunner, localVmDriverType);
+      case HOSTED_VM:
+        return dliteVmInitializeTaskParamsBuilder.getDliteVmInitializeTaskParams(
+            initializeStepInfo, ambiance, shouldRouteStageToRunner);
+      default:
+        unhandled(initializeStepInfo.getBuildJobEnvInfo().getType());
+    }
+    return null;
+  }
+}

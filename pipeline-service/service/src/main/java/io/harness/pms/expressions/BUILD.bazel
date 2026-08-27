@@ -1,0 +1,52 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//884-pms-commons/src/main/java/io/harness/pms/plan/execution:module",
+        "//930-ng-core-clients/src/main/java/io/harness/organization/remote:module",
+        "//930-ng-core-clients/src/main/java/io/harness/project/remote:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",
+        "//955-account-mgmt/src/main/java/io/harness/account/services:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/expression:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/plan/creation/yaml:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/resolver/outputs:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/expressions/functors:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/pms/sdk:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/entities:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/pms/plan/execution/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/account/settings/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/dataretention:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/execution:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/executions/blockExecutionMetadata:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/executions/plan/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/evaluator:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/functors:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/functors/type:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/provider:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/pms/data/expression:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/expressions/functors:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/helpers:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/sdk:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:org_hibernate_validator_hibernate_validator",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

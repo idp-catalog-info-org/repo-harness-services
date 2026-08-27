@@ -1,0 +1,59 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  version:
+    type: string
+    description: Artifact version
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.version}}
+  versionRegex:
+    type: string
+    description: Version regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.versionRegex}}
+  script:
+    type: string
+    description: Custom artifact script (from scripts.fetchAllArtifacts)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.scripts.fetchAllArtifacts.spec.source.spec.script}}
+  path:
+    type: string
+    description: Artifacts array path (artifactsArrayPath)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.scripts.fetchAllArtifacts.artifactsArrayPath}}
+  versionPath:
+    type: string
+    description: Version path in script output
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.scripts.fetchAllArtifacts.versionPath}}
+  attributes:
+    type: string
+    description: Custom artifact attributes (JSON)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.scripts.fetchAllArtifacts.attributes}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/custom-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_SCRIPT: ${{inputs.script}}
+    PLUGIN_ARTIFACT_ARRAY_PATH: ${{inputs.path}}
+    PLUGIN_ARTIFACT_VERSION_PATH: ${{inputs.versionPath}}
+    PLUGIN_ARTIFACT_VERSION: ${{inputs.version}}
+    PLUGIN_ARTIFACT_VERSION_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_ARTIFACT_ATTRIBUTES: ${{json.format(${{inputs.attributes}})}}

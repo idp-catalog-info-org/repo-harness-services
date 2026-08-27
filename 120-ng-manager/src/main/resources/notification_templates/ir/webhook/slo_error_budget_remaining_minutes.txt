@@ -1,0 +1,46 @@
+{
+    "title": "Harness Incident Response",
+    "description": "The remaining minutes for the error budget of SLO ${SLO_NAME} are critically low under project ${SLO_PROJECT_NAME}, in organization ${SLO_ORG_NAME}.",
+    "fields": [
+        {
+            "label": "SLO Status",
+            "value": "Error Budget Remaining Minutes Critically Low"
+        },
+        {
+            "label": "Account ID",
+            "value": "${ACCOUNT_ID}"
+        },
+        {
+            "label": "Account Name",
+            "value": "${ACCOUNT_NAME}"
+        },
+        {
+            "label": "Organization ID",
+            "value": "${SLO_ORG_NAME}"
+        },
+        {
+            "label": "Project ID",
+            "value": "${SLO_PROJECT_NAME}"
+        },
+        {
+            "label": "SLO URL",
+            "value": "${SLO_URL}"
+        },
+        {
+            "label": "SLO ID",
+            "value": "${SLO_IDENTIFIER}"
+        },
+        {
+            "label": "SLO Name",
+            "value": "${SLO_NAME}"
+        },
+        {
+            "label": "Incident Unix Timestamp",
+            "value": "${INCIDENT_UNIX_TIMESTAMP}"
+        },
+        {
+            "label": "Incident Time",
+            "value": "Incident detected at ${INCIDENT_TIME}"
+        }
+    ]
+}

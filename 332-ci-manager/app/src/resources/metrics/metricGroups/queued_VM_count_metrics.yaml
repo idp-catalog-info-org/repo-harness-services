@@ -1,0 +1,6 @@
+name: CI Manager Queued VM execution task count
+identifier: CIQueuedVmCounter
+labels:
+  - osType
+  - accountId
+  - osArch

@@ -1,0 +1,11 @@
+integrations:
+  github:
+    - host: ${HOST}
+      apiBaseUrl: ${API_BASE_URL}
+      apps:
+        - appId: ${GITHUB_APP_APPLICATION_ID}
+          clientId: clientId
+          clientSecret: clientSecret
+          webhookSecret: webhookSecret
+          privateKey: |
+            ${GITHUB_APP_PRIVATE_KEY}

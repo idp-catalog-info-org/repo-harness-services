@@ -1,0 +1,102 @@
+ [
+   {
+     "moduleName": "CI",
+     "displayName": "Continuous Integration",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/continuous-integration",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "CD",
+     "displayName": "Continuous Delivery & GitOps",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/continuous-delivery",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "CE",
+     "displayName": "Cloud Cost Management",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/cloud-cost-management",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "CHAOS",
+     "displayName": "Chaos Engineering",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/chaos-engineering",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "CF",
+     "displayName": "Feature Flags",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/feature-flags",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "SRM",
+     "displayName": "Service Reliability Management",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/service-reliability-management",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "Platform",
+     "displayName": "Platform",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/platform",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "STO",
+     "displayName": "Security Testing Orchestration",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/security-testing-orchestration",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "DBOPS",
+     "displayName": "Database DevOps",
+     "version": "",
+     "lastModifiedAt": "",
+     "versionUrl": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/database-devops",
+     "microservicesVersionInfo": [
+     ]
+   },
+   {
+     "moduleName": "Delegate",
+     "displayName": "Delegate (if set to auto-upgrade)",
+     "version": "Coming Soon",
+     "lastModifiedAt": "",
+     "releaseNotesLink": "https://developer.harness.io/release-notes/delegate",
+     "versionUrl": "",
+     "microservicesVersionInfo": [
+     ]
+   }
+ ]

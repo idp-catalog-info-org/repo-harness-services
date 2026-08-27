@@ -1,0 +1,1821 @@
+[
+  {
+    "id": "64d4f26ed87dc387cb5ee933",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToMerge",
+    "name": "Mean time to merge Pull Request (in hours)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_mean_time_to_merge_pr",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Calculates average time taken to merge pull requests.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the average time for the last 100 pull requests.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the branch name in the conditional input field."
+  },
+  {
+    "id": "64d5c505c94f589f936c04d7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerdutyAnnotationExists",
+    "name": "Pagerduty is set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "outcomeExpression": "catalog.metadata.annotations.\"pagerduty.com/service-id\"!=null",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Checks if the catalog YAML file has the annotation pagerduty.com/service-id configured or not.",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the pagerduty.com/service-id is present under the metadata field.\n\n**Prerequisites:** The PagerDuty plugin needs to be configured and enabled in the admin section. Refer: [Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/)"
+  },
+  {
+    "id": "64d5f2bc387ee61486eed6f6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isBranchProtected",
+    "name": "Branch protection is set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_is_branch_protection_set",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Checks the branch protection rule if it is not allowed to force push and delete.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the branch protection rules.\n\n**Prerequisites:** GitHub Connector with Admin access. Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "64d5f56280f63a315c9e08b5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "techDocsAnnotationExists",
+    "name": "Documentation exists",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "outcomeExpression": "catalog.metadata.annotations.\"backstage.io/techdocs-ref\"!=null",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Checks if the catalog YAML file has the annotation backstage.io/techdocs-ref configured or not.",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the backstage.io/techdocs-ref is present under the metadata field.\n\n**Prerequisites:** The directory configured should have the mkdocs.yml file and a docs directory having all the documentation in markdown format."
+  },
+  {
+    "id": "64e44efc95107f65e31c51f7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "specOwnerExists",
+    "name": "Owner is defined and is not unknown",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "outcomeExpression": "catalog.spec.owner!=null && catalog.spec.owner!=\"Unknown\"",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Checks if the catalog YAML file has the owner configured or not",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the owner is under the spec field and the owner should not be Unknown."
+  },
+  {
+    "id": "6659c3d177e221f35b21f9d3",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "annotationExists",
+    "name": "Annotation exists",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "inputDetails": [
+      {
+        "key": "annotation",
+        "description": "Annotation (e.g. jira/project-key)",
+        "required": true
+      }
+    ],
+    "description": "Checks if the catalog YAML file has the given annotation configured or not",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the given annotation is under the metadata field and it should be configured."
+  },
+  {
+    "id": "6659c3d177e221f35b21f9d0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "systemIsDefinedAndItExists",
+    "name": "System is defined and it exists",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalogSystem",
+    "description": "Checks if your Component has `spec.system` defined and whether or not it is a valid entry in the Catalog.",
+    "detailedDescription": "**How it's calculated:** The Catalog YAML definition is inspected to check if the spec.system field is present and further this system should also exist in the Catalog as an entity of `kind: System`."
+  },
+  {
+    "id": "64ecede6b5fd454d919d01f0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isFileExists",
+    "name": "Does file exist",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_is_file_exists",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/index.js)",
+        "required": true
+      }
+    ],
+    "description": "Checks if the given filename exist or not.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and find if the file is present or not. Make sure to mention the filename with extension or relative path from the root folder (Eg: README.md or docs/README.md) in the conditional input field.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "64ef7973f616c89330020df5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "stoStageAdded",
+    "name": "STO stage added in pipeline",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_sto_scan_dsl",
+    "description": "Checks if STO stage is added in pipelines.",
+    "detailedDescription": "**How it's calculated:** Calculation is done for both CI and CD pipelines.The first pipeline mentioned in catalog info YAML for CI is considered for calculation and for CD, pipeline which did the latest deployment using the first mentioned service is considered.Pipelines are evaluated if they have STO stage added in them or not.\n\n**Prerequisites:** New annotation for Harness NextGen CI/CD plugin should be configured in catalog info YAML (harness.io/pipelines and harness.io/services).Annotation(harness.io/services) is optional and if not provided only first pipeline from harness.io/pipelines annotation will be considered.Refer: [Link](https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ci-cd)"
+  },
+  {
+    "id": "64ef79bbf616c89330020df6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isPolicyEvaluationSuccessful",
+    "name": "Policy evaluation successful",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_policy_evaluation_dsl",
+    "description": "Checks if policy evaluation is successful for pipelines.",
+    "detailedDescription": "**How it's calculated:** Calculation is done for both CI and CD pipelines.The first pipeline mentioned in catalog info YAML for CI is considered for calculation and for CD, pipeline which did the latest deployment using the first mentioned service is considered.Pipelines are evaluated if the policy evaluation is successful or not for the latest executions.\n\n**Prerequisites:** New annotation for Harness NextGen CI/CD plugin should be configured in catalog info YAML (harness.io/pipelines and harness.io/services).Annotation(harness.io/services) is optional and if not provided only first pipeline from harness.io/pipelines annotation will be considered.Refer: [Link](https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ci-cd)"
+  },
+  {
+    "id": "64ef7a5ff616c89330020df7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "PercentageOfCIPipelinePassingInPastSevenDays",
+    "name": "CI Pipeline success rate (last 7 days)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_ci_success_percent_in_seven_days",
+    "description": "Checks the pipeline success percent rate in last 7 days.",
+    "detailedDescription": "**How it's calculated:** Calculation is done for CI pipeline.The first pipeline mentioned in catalog info YAML for CI is considered for calculation. Pipeline is evaluted if the success rate of pipeline is more than the provided threshold value.\n\n**Prerequisites:** New annotation for Harness NextGen CI/CD plugin should be configured in catalog info YAML (harness.io/pipelines and harness.io/services).Refer: [Link](https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ci-cd)"
+  },
+  {
+    "id": "64ef7ac1f616c89330020df8",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "noTestsFailingInCiPipeline",
+    "name": "Tests passing on CI",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_test_passing_on_ci_is_zero",
+    "description": "Checks all the test cases passing on CI pipeline",
+    "detailedDescription": "**How it's calculated:** Calculation is done for CI pipeline.The first pipeline mentioned in catalog info YAML for CI is considered for calculation. Pipeline is evaluted if number of test failing on CI pipeline is zero for latest execution.\n\n**Prerequisites:** New annotation for Harness NextGen CI/CD plugin should be configured in catalog info YAML (harness.io/pipelines and harness.io/services).Refer: [Link](https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ci-cd)"
+  },
+  {
+    "id": "65006db0c28a1a3f5607e851",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isOnCallSet",
+    "name": "Is on-call set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_service_directory",
+    "description": "Checks if on call is set for given service.",
+    "detailedDescription": "**How it's calculated:** For the given service on PagerDuty it checks if on call is set or not.\n\n**Prerequisites:** The PagerDuty plugin needs to be configured and enabled in the admin section. Refer: [Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/)"
+  },
+  {
+    "id": "65009b5dc28a1a3f5607f808",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isEscalationPolicySet",
+    "name": "Is Escalation Policy set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_service_directory",
+    "description": "Checks if escalation policy is set for given service.",
+    "detailedDescription": "**How it's calculated:** For the given service on PagerDuty it checks if any escalation policy is set or not.\n\n**Prerequisites:** The PagerDuty plugin needs to be configured and enabled in the admin section. Refer: [Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/)"
+  },
+  {
+    "id": "6500ab758ea5a4798502f511",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "noOfIncidentsInLastThirtyDays",
+    "name": "Number of incidents in the last 30 days",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_incidents",
+    "description": "Checks the number for incidents created for given service in last 30 days.",
+    "detailedDescription": "**How it's calculated:** For the given service on PagerDuty it checks if the number of incidents created in last 30 days is less then given threshold input value.\n\n**Prerequisites:** The PagerDuty plugin needs to be configured and enabled in the admin section. Refer: [Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/)"
+  },
+  {
+    "id": "6500c08d8ea5a4798502f513",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "avgResolvedTimeForLastTenResolvedIncidentsInMinutes",
+    "name": "Average resolved time of the last 10 resolved incidents (in Minutes)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_resolved_incidents",
+    "description": "Calculates the average resolved time for last 10 incidents.",
+    "detailedDescription": "**How it's calculated:** For the given service on PagerDuty it calculates the average resolved time for last 10 incidents that are created within 30 days.\n\n**Prerequisites:** The PagerDuty plugin needs to be configured and enabled in the admin section. Refer: [Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/pagerduty/)"
+  },
+  {
+    "id": "64fec3d52d2a3d15f97b75a6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "replicas",
+    "name": "Replicas Count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "kubernetes",
+    "dataSourceLocationIdentifier": "kubernetes",
+    "outcomeExpression": "kubernetes.workload.spec.replicas",
+    "description": "Fetches the number of replicas configured for the given service.",
+    "detailedDescription": "**How it's calculated:** The label selector configured in the catalog YAML is used to identify the Kubernetes workload and the configured replica count is used. The cluster details configured in the Kubernetes plugin are used. If more than one cluster is configured, the workload search is done in each cluster and a minimum of all the replica counts is taken into consideration.\n\n**Prerequisites:** The Kubernetes plugin needs to be configured and enabled in the admin section. Refer:[Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/kubernetes/)"
+  },
+  {
+    "id": "65082c922e570ea8a97f4fec",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "daysSinceLastDeployed",
+    "name": "Days passed since the application was last deployed",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "kubernetes",
+    "dataSourceLocationIdentifier": "kubernetes",
+    "outcomeExpression": "kubernetes.workload.status.conditions",
+    "description": "Fetches the number of days since the most recent deployment was done.",
+    "detailedDescription": "**How it's calculated:** The label selector configured in the catalog YAML is used to identify the Kubernetes workload and the lastUpdateTime is used from the conditions section. The cluster details configured in the Kubernetes plugin are used. If more than one cluster is configured, the workload search is done in each cluster and the oldest deployment time of all is taken into consideration.\n\n**Prerequisites:** The Kubernetes plugin needs to be configured and enabled in the admin section. Refer:[Link](https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/kubernetes/)"
+  },
+  {
+    "id": "650afb9076990ecb89d7d502",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToMerge",
+    "name": "Mean time to merge Pull Request (in hours)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_mean_time_to_merge_pr",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Calculates average time taken to merge pull requests.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the average time for the last 100 pull requests.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Bitbucket repository. Make sure to mention the branch name in the conditional input field."
+  },
+  {
+    "id": "650afc30838d877cd2c8f881",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isBranchProtected",
+    "name": "Branch protection is set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_is_branch_protection_set",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Checks the branch protection rule if it is not allowed to merge pull requests without approvals.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the branch protection rules.\n\n**Prerequisites:** Bitbucket Connector with Admin access. Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Bitbucket repository."
+  },
+  {
+    "id": "64ecede6b5fd454d919d01f1",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isFileExists",
+    "name": "Does file exist",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_is_file_exists",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/index.js)",
+        "required": true
+      },
+      {
+        "key": "branchName",
+        "description": "Branch name (Optional)",
+        "required": false
+      }
+    ],
+    "description": "Checks if the given filename exist or not.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and find if the file is present or not. Make sure to mention the filename with extension or relative path from the root folder (Eg: README.md or docs/README.md) in the conditional input field.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Bitbucket repository."
+  },
+  {
+    "id": "65143c3d60a49366a99ff670",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToResolve",
+    "name": "Mean time to resolve (in hours)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "jira",
+    "dataSourceLocationIdentifier": "jira_mean_time_to_resolve",
+    "inputDetails": [
+      {
+        "key": "jql",
+        "description": "JQL (e.g. issuetype = Bug AND priority in (P0,P1) AND resolved >= -90d)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the average time taken to resolve issues for the given JQL query",
+    "detailedDescription": "**How it's calculated:** Fetches annotations from catalog YAML file to find project details and calculates average time. Make sure to provide JQL expression in the conditional input field.  \nMean time to resolve bugs:  issuetype = Bug AND priority in (P0,P1) AND resolved >= -90d  \nMake sure to wrap words within single quotes. Eg: 'New Feature''\n\n**Prerequisites:** Provide annotations like jira/project-key(required) and jira/component(optional) in the catalog YAML file."
+  },
+  {
+    "id": "65143c458e971e8c2943a216",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "issuesCount",
+    "name": "Issues count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "jira",
+    "dataSourceLocationIdentifier": "jira_issues_count",
+    "inputDetails": [
+      {
+        "key": "jql",
+        "description": "JQL (e.g. issuetype = Bug AND priority in (P0,P1) AND statusCategory != Done)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the total number of issues for the given JQL query",
+    "detailedDescription": "**How it's calculated:** Fetches annotations from the catalog YAML file to find project details and calculates the number of issues. Make sure to provide a JQL expression in the conditional input field.\n\n1. Open P0/P1 bugs: issuetype = Bug AND priority in (P0, P1) AND statusCategory != Done  \n2. Features delivered (last 90 days): issuetype in (Epic, 'New Feature') AND resolved >= -90d  \nMake sure to wrap words within single quotes. Eg: 'New Feature'\n\n**Prerequisites:** Provide annotations like jira/project-key (required) and jira/component (optional) in the catalog YAML file."
+  },
+  {
+    "id": "65155fa9d1b0fbf98d3a190e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "issuesOpenCloseRatio",
+    "name": "Issues Open/Close ratio",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "jira",
+    "dataSourceLocationIdentifier": "jira_issues_open_close_ratio",
+    "inputDetails": [
+      {
+        "key": "jql",
+        "description": "JQL (e.g issuetype = Bug AND priority in (P0,P1) AND created >= -90d)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the ratio between Open & Closed issues for the given JQL query",
+    "detailedDescription": "**How it's calculated:** How it's calculated: Fetches annotations from catalog YAML file to find project details and calculates the ratio. Make sure to provide JQL expression in the conditional input field.  \nP0 bugs Open/Close Ratio: issuetype = Bug AND priority = P0 AND created >= -90d  \nMake sure to wrap words within single quotes. Eg: 'New Feature'\n\n**Prerequisites:** Provide annotations like jira/project-key(required) and jira/component(optional) in the catalog YAML file."
+  },
+  {
+    "id": "651bf820d6134a3b8a9c5fcc",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToMerge",
+    "name": "Mean time to merge Pull Request (in hours)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "gitlab",
+    "dataSourceLocationIdentifier": "gitlab_mean_time_to_merge_pr",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Calculates average time taken to merge pull requests.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find project details and calculates the average time for the last 100 pull requests.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitLab project. Make sure to mention the branch name in the conditional input field."
+  },
+  {
+    "id": "651bf825fadf434321ebcc70",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isBranchProtected",
+    "name": "Branch protection is set",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "gitlab",
+    "dataSourceLocationIdentifier": "gitlab_is_branch_protection_set",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch name",
+        "required": true
+      }
+    ],
+    "description": "Checks the branch protection rule if it is not allowed to force push.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find project details and calculates the branch protection rules.\n\n**Prerequisites:** GitLab Connector with Admin access. Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitLab project."
+  },
+  {
+    "id": "651bf82aae1e3423b5b14add",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isFileExists",
+    "name": "Does file exist",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "gitlab",
+    "dataSourceLocationIdentifier": "gitlab_is_file_exists",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/index.js)",
+        "required": true
+      }
+    ],
+    "description": "Checks if the given filename exist or not.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find project details and find if the file is present or not. Make sure to mention the filename with extension or relative path from the root folder (Eg: README.md or docs/README.md) in the conditional input field.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitLab project."
+  },
+  {
+    "id": "6523d49c56e3f9544c9cfbc7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "workflowsCount",
+    "name": "Workflows count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_workflows_count",
+    "description": "Calculates total number of workflows",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the total number of workflows.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "6523d7dc378157e1d0db38e0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "workflowSuccessRate",
+    "name": "Workflow success rate",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_workflow_success_rate",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "YAML filename with extension (ci-workflow.yml)",
+        "required": true
+      }
+    ],
+    "description": "Calculates success rate for the given workflow",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the success rate for the workflow.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the workflow id or filename in the conditional input field."
+  },
+  {
+    "id": "6524005c0872d29391a44f83",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToCompleteWorkflowRuns",
+    "name": "Average time to complete workflow runs (in minutes)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_mean_time_to_complete_workflow_runs",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "YAML filename with extension (ci-workflow.yml)",
+        "required": true
+      }
+    ],
+    "description": "Calculates average time taken to complete workflow runs",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the average time for the last 100 workflow runs to complete.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the workflow id or filename in the conditional input field."
+  },
+  {
+    "id": "652651a5a9cd2b428a58f20b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "meanTimeToCompleteSuccessWorkflowRuns",
+    "name": "Average time to complete successful workflow runs (in minutes)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_mean_time_to_complete_success_workflow_runs",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "YAML filename with extension (ci-workflow.yml)",
+        "required": true
+      }
+    ],
+    "description": "Calculates average time taken to complete successful workflow runs",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the average time for the last 100 successful workflow runs to complete.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the workflow id or filename in the conditional input field."
+  },
+  {
+    "id": "652d12fb8da0cf2139e25da6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "openDependabotAlerts",
+    "name": "Open Dependabot alerts",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_open_dependabot_alerts",
+    "inputDetails": [
+      {
+        "key": "severityType",
+        "description": "Severity type (critical or high)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the total number of open alerts reported by Dependabot for the given severity",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the total number of open alerts reported by Dependabot.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the severity type in the conditional input field."
+  },
+  {
+    "id": "652d130036b16547e9de4673",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "openCodeScanningAlerts",
+    "name": "Open code scanning alerts",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_open_code_scanning_alerts",
+    "inputDetails": [
+      {
+        "key": "severityType",
+        "description": "Severity type (critical or high)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the total number of open alerts reported in code scanning for the given severity",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the total number of open alerts reported in code scanning.\n\n**Prerequisites:** GitHub Connector with read access for code scanning alerts. Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the severity type in the conditional input field."
+  },
+  {
+    "id": "652d1303fdd854b29ed62c06",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "openSecretScanningAlerts",
+    "name": "Open secret scanning alerts",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_open_secret_scanning_alerts",
+    "description": "Calculates the total number of open alerts reported in secret scanning",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the total number of open alerts reported in secret scanning.\n\n**Prerequisites:** GitHub Connector with read access for secret scanning alerts. Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "652d149b55368da81ac6804e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "openPullRequestsByAccount",
+    "name": "Open pull requests by account",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_open_pull_requests_by_account",
+    "inputDetails": [
+      {
+        "key": "accountName",
+        "description": "Account name (e.g: app/dependabot)",
+        "required": true
+      }
+    ],
+    "description": "Calculates the total number of open pull requests raised by the given account",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and calculates the total number of open pull requests raised by account.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository. Make sure to mention the username in the conditional input field."
+  },
+  {
+    "id": "653772979a42f41b2bd082fe",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "extractStringFromAFile",
+    "name": "Extract string from a file",
+    "type": "STRING",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to extract",
+        "required": true
+      }
+    ],
+    "description": "Gets the string matching the pattern from given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the designated pattern is then searched within the file contents and it's value is extracted and returned \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "6537ca6bf4f2d0d2eb140d32",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "matchStringInAFile",
+    "name": "Match string in a file",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to search for in the file",
+        "required": true
+      }
+    ],
+    "description": "Matches the pattern in the given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the contents are examined to find the pattern. Returns true/false based on whether the pattern was found or not. \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitHub repository."
+  },
+  {
+    "id": "6562ae81fad391b6ec156888",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "extractStringFromAFile",
+    "name": "Extract string from a file",
+    "type": "STRING",
+    "dataSourceIdentifier": "gitlab",
+    "dataSourceLocationIdentifier": "gitlab_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to extract",
+        "required": true
+      }
+    ],
+    "description": "Gets the string matching the pattern from given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the designated pattern is then searched within the file contents and it's value is extracted and returned \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitLab project."
+  },
+  {
+    "id": "6562ae88d9f2336978e150ef",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "matchStringInAFile",
+    "name": "Match string in a file",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "gitlab",
+    "dataSourceLocationIdentifier": "gitlab_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to search for in the file",
+        "required": true
+      }
+    ],
+    "description": "Matches the pattern in the given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the contents are examined to find the pattern. Returns true/false based on whether the pattern was found or not. \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source GitLab project."
+  },
+  {
+    "id": "6565b04674e52dedc44274ef",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "extractStringFromAFile",
+    "name": "Extract string from a file",
+    "type": "STRING",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to extract",
+        "required": true
+      }
+    ],
+    "description": "Gets the string matching the pattern from given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the designated pattern is then searched within the file contents and it's value is extracted and returned \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Bitbucket repository."
+  },
+  {
+    "id": "6565b04c5b5f410fe2f65d07",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "matchStringInAFile",
+    "name": "Match string in a file",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to search for in the file",
+        "required": true
+      }
+    ],
+    "description": "Matches the pattern in the given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the contents are examined to find the pattern. Returns true/false based on whether the pattern was found or not. \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Bitbucket repository."
+  },
+  {
+    "id": "65c08e419fea9dc97f7d46cd",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "evaluateExpression",
+    "name": "Evaluate expression (JEXL)",
+    "type": "STRING",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "inputDetails": [
+      {
+        "key": "jexl",
+        "description": "JEXL (e.g <+metadata.name>)",
+        "required": true
+      }
+    ],
+    "description": "Evaluate JEXL expression on the catalog YAML file",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to perform custom JEXL expression and returns the evaluated data."
+  },
+  {
+    "id": "66d068a1203f65f68b461486",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isFileExists",
+    "name": "(Code) Does file exist",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_code_is_file_exists",
+    "inputDetails": [
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/index.js)",
+        "required": true
+      },
+      {
+        "key": "branchName",
+        "description": "Branch name (Optional)",
+        "required": false
+      }
+    ],
+    "description": "Checks if the given filename exist or not.",
+    "detailedDescription": "**How it's calculated:** Fetches backstage.io/source-location annotation from catalog YAML file to find repository details and find if the file is present or not. Make sure to mention the filename with extension or relative path from the root folder (Eg: README.md or docs/README.md) in the conditional input field.\n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Harness Code repository."
+  },
+  {
+    "id": "66d068a5f9b88e661cbc99de",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "extractStringFromAFile",
+    "name": "(Code) Extract string from a file",
+    "type": "STRING",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_code_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to extract",
+        "required": true
+      }
+    ],
+    "description": "Gets the string matching the pattern from given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the designated pattern is then searched within the file contents and it's value is extracted and returned \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Harness Code repository."
+  },
+  {
+    "id": "66d068aac30776aba137b73f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "matchStringInAFile",
+    "name": "(Code) Match string in a file",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_code_file_contents",
+    "inputDetails": [
+      {
+        "key": "branchName",
+        "description": "Branch Name (Optional)",
+        "required": false
+      },
+      {
+        "key": "filePath",
+        "description": "File path (e.g. src/package.json)",
+        "required": true
+      },
+      {
+        "key": "pattern",
+        "description": "Regex Pattern to search for in the file",
+        "required": true
+      }
+    ],
+    "description": "Matches the pattern in the given file from the branch.",
+    "detailedDescription": "**How it's calculated:** If a branch name is specified, it is utilized. However, if no branch name is provided, the system retrieves information from the catalog YAML file using the backstage.io/source-location annotation to determine the branch name and repository details. It is essential to specify the filename with its extension or provide the relative path from the root folder (e.g., README.md or docs/README.md) in the conditional input field. After fetching the file, the contents are examined to find the pattern. Returns true/false based on whether the pattern was found or not. \n\n**Prerequisites:** Provide suitable backstage.io/source-location annotation if the catalog YAML file is present outside the source Harness Code repository."
+  },
+  {
+    "id": "6877e5423b626267ac019128",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "stoActiveVulnerabilities",
+    "name": "Number of Active Vulnerabilities (STO)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "harness",
+    "dataSourceLocationIdentifier": "harness_sto_active_vulnerabilities",
+    "inputDetails": [
+      {
+        "key": "scannerTool",
+        "description": "Scanner Tool (Optional) (e.g. snyk)",
+        "required": false
+      },
+      {
+        "key": "severity",
+        "description": "Severity (Optional) (e.g. critical)",
+        "required": false
+      }
+    ],
+    "description": "Calculates the total number of active vulnerabilities for the given scanner tool and severity",
+    "detailedDescription": "**How it's calculated:** Fetches the latest scanned results and calculates the total active vulnerabilities. Make sure to provide specific scanner tool and severity in the conditional input field if needed.  \nMake sure to use comma in between multiple values. Eg: 'snyk,wiz'\n\n**Prerequisites:** Ensure the annotation harness.io/sto-test-target is added or the connected code repo is being scanned by Harness STO."
+  },
+  {
+    "id": "6a119161f10811f671ad8c21",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "aiAssetSourceFilePatternMatch",
+    "name": "Source File Pattern Match (AIAsset)",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Check if the source_file path in catalog YAML file matches the convention for the AIAsset",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the given source_file under the metadata matches the convention for the AIAsset."
+  },
+  {
+    "id": "6a1196abe48c1ae7c446a2d3",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "aiAssetIdPrefixMatch",
+    "name": "Asset Id Prefix Match (AIAsset)",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Check if the asset_id prefix in catalog YAML file matches the convention for the AIAsset",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to check if the given asset_id under the metadata matches the convention for the AIAsset."
+  },
+  {
+    "id": "6a11a49c340d0644efec271e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "aiAssetProviderExists",
+    "name": "Provider is set (AIAsset)",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Checks if the catalog YAML file has the provider configured for the AIAsset or not",
+    "detailedDescription": "*How it's calculated:** The catalog YAML is inspected to check if the AIAsset provider is configured or not."
+  },
+  {
+    "id": "6a1420fa9e5380fbfa285291",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "aiAssetDiscoveredAt",
+    "name": "Days passed since last discovered (AIAsset)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "catalog",
+    "dataSourceLocationIdentifier": "catalog",
+    "description": "Fetches the number of days since the discovery was done",
+    "detailedDescription": "**How it's calculated:** The catalog YAML is inspected to determine when the AI Asset was discovered."
+  },
+  {
+    "id": "c09ad8dbfa4c178369d690ed",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "traceableAvgRiskScore",
+    "name": "Average risk score",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "traceable",
+    "dataSourceLocationIdentifier": "hql_traceable_risk_score",
+    "isConditional": false,
+    "description": "Fetches the average Traceable risk score across all API endpoints matched to this entity.",
+    "detailedDescription": "**How it's calculated:** The Traceable risk score of every API endpoint matched to this entity is fetched and averaged.\n\n**Prerequisites:** Configure the Traceable integration and ensure Traceable APIs are mapped to the corresponding catalog entity using its identifier and scope."
+  },
+  {
+    "id": "6a5a0a2a82fc8d4071d6c81e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "traceableTotIssues",
+    "name": "Total open issues",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "traceable",
+    "dataSourceLocationIdentifier": "hql_traceable_tot_issues",
+    "isConditional": false,
+    "description": "Fetches the total number of open issues across all API endpoints matched to this entity.",
+    "detailedDescription": "**How it's calculated:** The open issue count of every API endpoint matched to this entity is fetched and summed.\n\n**Prerequisites:** Configure the Traceable integration and ensure Traceable APIs are mapped to the corresponding catalog entity using its identifier and scope."
+  },
+  {
+    "id": "6a5a0aef82fc8d4071d6c824",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "traceableMaxIssues",
+    "name": "Highest open issues on an endpoint",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "traceable",
+    "dataSourceLocationIdentifier": "hql_traceable_max_issues",
+    "isConditional": false,
+    "description": "Fetches the open issue count of the API endpoint with the most open issues within this entity.",
+    "detailedDescription": "**How it's calculated:** The open issue count of every API endpoint matched to this entity is fetched, and the maximum value is returned.\n\n**Prerequisites:** Configure the Traceable integration and ensure Traceable APIs are mapped to the corresponding catalog entity using its identifier and scope."
+  },
+  {
+    "id": "6a5a0aef82fc8d4071d6c825",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "traceableMinIssues",
+    "name": "Lowest open issues on an endpoint",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "traceable",
+    "dataSourceLocationIdentifier": "hql_traceable_min_issues",
+    "isConditional": false,
+    "description": "Fetches the open issue count of the API endpoint with the fewest open issues within this entity.",
+    "detailedDescription": "**How it's calculated:** The open issue count of every API endpoint matched to this entity is fetched, and the minimum value is returned.\n\n**Prerequisites:** Configure the Traceable integration and ensure Traceable APIs are mapped to the corresponding catalog entity using its identifier and scope."
+  },
+  {
+    "id": "6a7025614165cc7818a74538",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "description",
+    "name": "Description",
+    "type": "STRING",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_description",
+    "isConditional": false,
+    "description": "Fetches description from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.description` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.description",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74539",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "monitorCount",
+    "name": "Monitor count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_monitor_count",
+    "isConditional": false,
+    "description": "Fetches monitor count from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.monitorCount` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.monitorCount",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7453c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "monitorsSummaryCountRed",
+    "name": "Red monitors count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_monitors_summary_count_red",
+    "isConditional": false,
+    "description": "Fetches red monitors count from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.monitors_summary_count.red` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.monitors_summary_count.red",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7453e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "contactsSize",
+    "name": "Contacts count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_contacts_size",
+    "isConditional": false,
+    "description": "Fetches contacts count from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.contacts.size()` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.contacts.size()",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74540",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "docsSize",
+    "name": "Docs count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_docs_size",
+    "isConditional": false,
+    "description": "Fetches docs count from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.docs.size()` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.docs.size()",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74542",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "githubHtmlUrl",
+    "name": "GitHub HTML URL",
+    "type": "STRING",
+    "dataSourceIdentifier": "datadog",
+    "dataSourceLocationIdentifier": "datadog_github_html_url",
+    "isConditional": false,
+    "description": "Fetches github html url from Datadog integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.Datadog.githubHtmlUrl` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Datadog integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.Datadog.githubHtmlUrl",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74546",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "monitorCount",
+    "name": "Monitor count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "dynatrace",
+    "dataSourceLocationIdentifier": "dynatrace_monitor_count",
+    "isConditional": false,
+    "description": "Fetches monitor count from Dynatrace integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.DynaTrace.monitorCount` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Dynatrace integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.DynaTrace.monitorCount",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74547",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sloCount",
+    "name": "SLO count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "dynatrace",
+    "dataSourceLocationIdentifier": "dynatrace_slo_count",
+    "isConditional": false,
+    "description": "Fetches slo count from Dynatrace integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.DynaTrace.sloCount` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Dynatrace integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.DynaTrace.sloCount",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74548",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "problemCount",
+    "name": "Problem count",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "dynatrace",
+    "dataSourceLocationIdentifier": "dynatrace_problem_count",
+    "isConditional": false,
+    "description": "Fetches problem count from Dynatrace integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.DynaTrace.problemCount` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Dynatrace integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.DynaTrace.problemCount",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7454c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "integrationUrl",
+    "name": "Repository URL",
+    "type": "STRING",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_integration_url",
+    "isConditional": false,
+    "description": "Fetches repository url from GitHub integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GitHub.url` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GitHub integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GitHub.url",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7454d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "primaryLanguageName",
+    "name": "Primary language",
+    "type": "STRING",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_primary_language_name",
+    "isConditional": false,
+    "description": "Fetches primary language from GitHub integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GitHub.primaryLanguageName` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GitHub integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GitHub.primaryLanguageName",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7454e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hasAgentsFile",
+    "name": "Has agents file",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_has_agents_file",
+    "isConditional": false,
+    "description": "Fetches has agents file from GitHub integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GitHub.hasAgentsFile` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GitHub integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GitHub.hasAgentsFile",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74550",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "latestReleasePublishedAt",
+    "name": "Latest release published at",
+    "type": "STRING",
+    "dataSourceIdentifier": "github",
+    "dataSourceLocationIdentifier": "github_latest_release_published_at",
+    "isConditional": false,
+    "description": "Fetches latest release published at from GitHub integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GitHub.latestRelease.publishedAt` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GitHub integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GitHub.latestRelease.publishedAt",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74556",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "description",
+    "name": "Repository description",
+    "type": "STRING",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_description",
+    "isConditional": false,
+    "description": "Fetches repository description from Bitbucket Cloud integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.BitbucketCloud.description` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Bitbucket Cloud integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.BitbucketCloud.description",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74557",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "defaultBranch",
+    "name": "Default branch",
+    "type": "STRING",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_default_branch",
+    "isConditional": false,
+    "description": "Fetches default branch from Bitbucket Cloud integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.BitbucketCloud.default_branch` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Bitbucket Cloud integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.BitbucketCloud.default_branch",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74559",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "projectKey",
+    "name": "Project key",
+    "type": "STRING",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_project_key",
+    "isConditional": false,
+    "description": "Fetches project key from Bitbucket Cloud integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.BitbucketCloud.project.key` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Bitbucket Cloud integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.BitbucketCloud.project.key",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7455a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "isPrivate",
+    "name": "Is private",
+    "type": "BOOLEAN",
+    "dataSourceIdentifier": "bitbucket",
+    "dataSourceLocationIdentifier": "bitbucket_is_private",
+    "isConditional": false,
+    "description": "Fetches is private from Bitbucket Cloud integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.BitbucketCloud.is_private` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Bitbucket Cloud integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.BitbucketCloud.is_private",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74560",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "qualityGateStatus",
+    "name": "Quality gate status",
+    "type": "STRING",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_quality_gate_status",
+    "isConditional": false,
+    "description": "Fetches quality gate status from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.qualityGateStatus` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.qualityGateStatus",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74561",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresReliabilityRating",
+    "name": "Reliability rating",
+    "type": "STRING",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_reliability_rating",
+    "isConditional": false,
+    "description": "Fetches reliability rating from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.reliabilityRating` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.reliabilityRating",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74562",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresSecurityRating",
+    "name": "Security rating",
+    "type": "STRING",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_security_rating",
+    "isConditional": false,
+    "description": "Fetches security rating from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.securityRating` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.securityRating",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74563",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresSqaleRating",
+    "name": "Maintainability rating",
+    "type": "STRING",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_sqale_rating",
+    "isConditional": false,
+    "description": "Fetches maintainability rating from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.sqaleRating` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.sqaleRating",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74564",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresLineCoverage",
+    "name": "Line coverage",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_line_coverage",
+    "isConditional": false,
+    "description": "Fetches line coverage from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.lineCoverage` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.lineCoverage",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74565",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresBranchCoverage",
+    "name": "Branch coverage",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_branch_coverage",
+    "isConditional": false,
+    "description": "Fetches branch coverage from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.branchCoverage` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.branchCoverage",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74566",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresDuplicatedLinesDensity",
+    "name": "Duplicated lines density",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_duplicated_lines_density",
+    "isConditional": false,
+    "description": "Fetches duplicated lines density from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.duplicatedLinesDensity` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.duplicatedLinesDensity",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74567",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresBugs",
+    "name": "Bugs",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_bugs",
+    "isConditional": false,
+    "description": "Fetches bugs from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.bugs` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.bugs",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74568",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresVulnerabilities",
+    "name": "Vulnerabilities",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_vulnerabilities",
+    "isConditional": false,
+    "description": "Fetches vulnerabilities from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.vulnerabilities` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.vulnerabilities",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74569",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresSecurityHotspots",
+    "name": "Security hotspots",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_security_hotspots",
+    "isConditional": false,
+    "description": "Fetches security hotspots from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.securityHotspots` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.securityHotspots",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7456a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresCodeSmells",
+    "name": "Code smells",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_code_smells",
+    "isConditional": false,
+    "description": "Fetches code smells from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.codeSmells` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.codeSmells",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7456b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "measuresNcloc",
+    "name": "Lines of code (NCLOC)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "sonarqube",
+    "dataSourceLocationIdentifier": "sonarqube_measures_ncloc",
+    "isConditional": false,
+    "description": "Fetches lines of code (ncloc) from SonarQube integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.SonarQube.measures.ncloc` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the SonarQube integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.SonarQube.measures.ncloc",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7456c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "identifier",
+    "name": "Service or team identifier",
+    "type": "STRING",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_identifier",
+    "isConditional": false,
+    "description": "Fetches service or team identifier from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.identifier` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.identifier",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7456d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "name",
+    "name": "Service or team name",
+    "type": "STRING",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_name",
+    "isConditional": false,
+    "description": "Fetches service or team name from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.name` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.name",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7456e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "status",
+    "name": "Service status",
+    "type": "STRING",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_status",
+    "isConditional": false,
+    "description": "Fetches service status from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.pagerdutyStatus` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.pagerdutyStatus",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74570",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "analyticsMeanSecondsToFirstAck",
+    "name": "Mean seconds to first ack",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_analytics_mean_seconds_to_first_ack",
+    "isConditional": false,
+    "description": "Fetches mean seconds to first ack from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToFirstAck` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToFirstAck",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74571",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "analyticsMeanSecondsToResolve",
+    "name": "Mean seconds to resolve",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_analytics_mean_seconds_to_resolve",
+    "isConditional": false,
+    "description": "Fetches mean seconds to resolve from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToResolve` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToResolve",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74572",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "analyticsTotalIncidents",
+    "name": "Total incidents",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_analytics_total_incidents",
+    "isConditional": false,
+    "description": "Fetches total incidents from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.analyticsTotalIncidents` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.analyticsTotalIncidents",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74574",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "defaultRole",
+    "name": "Default role",
+    "type": "STRING",
+    "dataSourceIdentifier": "pagerduty",
+    "dataSourceLocationIdentifier": "pagerduty_default_role",
+    "isConditional": false,
+    "description": "Fetches default role from PagerDuty integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.PagerDuty.defaultRole` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the PagerDuty integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.PagerDuty.defaultRole",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74575",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "deploymentFrequencyPerSprint",
+    "name": "Deployment frequency per sprint",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "harness_cd",
+    "dataSourceLocationIdentifier": "harness_cd_deployment_frequency_per_sprint",
+    "isConditional": false,
+    "description": "Fetches deployment frequency per sprint from Harness CD integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.HarnessCD.deploymentFrequencyPerSprint` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Harness CD integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.HarnessCD.deploymentFrequencyPerSprint",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74576",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "changeFailureRatePercent",
+    "name": "Change failure rate percent",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "harness_cd",
+    "dataSourceLocationIdentifier": "harness_cd_change_failure_rate_percent",
+    "isConditional": false,
+    "description": "Fetches change failure rate percent from Harness CD integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.HarnessCD.changeFailureRatePercent` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Harness CD integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.HarnessCD.changeFailureRatePercent",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74577",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "averageDeploymentDurationSeconds",
+    "name": "Average deployment duration (seconds)",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "harness_cd",
+    "dataSourceLocationIdentifier": "harness_cd_average_deployment_duration_seconds",
+    "isConditional": false,
+    "description": "Fetches average deployment duration (seconds) from Harness CD integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.HarnessCD.averageDeploymentDurationSeconds` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the Harness CD integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.HarnessCD.averageDeploymentDurationSeconds",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74578",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "assetType",
+    "name": "Asset type",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_asset_type",
+    "isConditional": false,
+    "description": "Fetches asset type from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.assetType` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.assetType",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a74579",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "displayName",
+    "name": "Display name",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_display_name",
+    "isConditional": false,
+    "description": "Fetches display name from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.displayName` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.displayName",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "resourceName",
+    "name": "Resource name",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_resource_name",
+    "isConditional": false,
+    "description": "Fetches resource name from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.resourceName` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.resourceName",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "state",
+    "name": "State",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_state",
+    "isConditional": false,
+    "description": "Fetches state from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.state` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.state",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "location",
+    "name": "Location",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_location",
+    "isConditional": false,
+    "description": "Fetches location from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.location` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.location",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "organization",
+    "name": "Organization",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_organization",
+    "isConditional": false,
+    "description": "Fetches organization from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.organization` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.organization",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "createTime",
+    "name": "Create time",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_create_time",
+    "isConditional": false,
+    "description": "Fetches create time from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.createTime` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.createTime",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a7025614165cc7818a7457f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "project",
+    "name": "Project",
+    "type": "STRING",
+    "dataSourceIdentifier": "gcp",
+    "dataSourceLocationIdentifier": "gcp_project",
+    "isConditional": false,
+    "description": "Fetches project from GCP integration properties.",
+    "detailedDescription": "**How it's calculated:** Reads `catalog.metadata.integration_properties.GCP.project` from the catalog entity's enriched integration properties.\n\n**Prerequisites:** Configure the GCP integration and ensure the catalog entity is enriched.",
+    "inputDetails": [
+      {
+        "key": "path",
+        "description": "default: catalog.metadata.integration_properties.GCP.project",
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "6a5a0aef82fc8d4071d6c826",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "traceableOwaspEndpointCount",
+    "name": "Endpoints with OWASP issues",
+    "type": "NUMBER",
+    "dataSourceIdentifier": "traceable",
+    "dataSourceLocationIdentifier": "hql_traceable_owasp_endpoint_count",
+    "inputDetails": [
+      {
+        "key": "owasp",
+        "description": "OWASP categories in HQL list format (e.g. ['A01','A02','A03'])",
+        "required": true
+      }
+    ],
+    "description": "Counts the number of API endpoints with open issues matching the specified OWASP categories.",
+    "detailedDescription": "**How it's calculated:** Filters open Traceable issues by the given OWASP categories and counts distinct API endpoints affected, among those matched to this catalog entity.\nProvide OWASP category values in HQL list format (e.g. ['A01','A02','A03']).\n\n**Prerequisites:** Configure the Traceable integration and ensure Traceable APIs are mapped to the corresponding catalog entity using its identifier and scope."
+  }
+]

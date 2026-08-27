@@ -1,0 +1,11 @@
+infrastructureDefinition:
+  name: salesforce_runtime
+  identifier: salesforce_runtime
+  orgIdentifier: __ORG_IDENTIFIER__
+  projectIdentifier: __PROJECT_IDENTIFIER__
+  environmentRef: salesforce_runtime
+  deploymentType: Salesforce
+  type: Salesforce
+  spec:
+    connectorRef: <+input>
+  allowSimultaneousDeployments: false

@@ -1,0 +1,24 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "title": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+  "summary": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+  "sections": [
+    {
+      "title": "Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+      "text": "A lifecycle rule dry run has completed with status: ${EXECUTION_STATUS}.<br>No artifacts were modified. The results below show what would have happened if the lifecycle rule had been executed.<br><br>Lifecycle Rule: ${POLICY_NAME}<br>Execution Type: Dry Run<br>Execution Start Time: ${EXECUTION_START_TIME}<br>Execution End Time: ${EXECUTION_END_TIME}<br>Scheduled Execution Time: ${SCHEDULED_EXECUTION_TIME}<br>Artifacts Protected (Protection Rule): ${ARTIFACTS_SKIPPED}<br>Artifacts That Would Be Deleted: ${ARTIFACTS_DELETED}<br>Registries Affected: ${REGISTRIES_AFFECTED}<br>Estimated Storage Reclamation: ${STORAGE_RECLAIMED}<br><br>View Details: ${EXECUTION_URL}",
+      "potentialAction": [
+        {
+            "@type": "OpenUri",
+            "name": "View Execution Details",
+            "targets": [
+                {
+                "os": "default",
+                "uri": "${EXECUTION_URL}"
+                }
+            ]
+        }
+      ]
+    }
+  ]
+}

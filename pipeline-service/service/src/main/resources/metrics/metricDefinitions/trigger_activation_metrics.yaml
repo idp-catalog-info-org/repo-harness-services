@@ -1,0 +1,19 @@
+name: Trigger Activation Process Time Metrics
+identifier: TriggerActivationProcessTime
+metricGroup: trigger_activation_times_group
+metrics:
+  - metricName: trigger_activation_time
+    metricDefinition: End-to-end time taken by a trigger to fire, from start of processing to pipeline execution creation.
+    type: Duration
+    distribution: [ 0ms, 200ms , 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 5m, 15m ]
+    unit: "ms"
+  - metricName: trigger_activation_trigger_execution_v1_process_time
+    metricDefinition: Time taken to process trigger activation v1.
+    type: Duration
+    distribution: [ 0ms, 200ms , 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 5m, 15m ]
+    unit: "ms"
+  - metricName: trigger_activation_authentication_process_time
+    metricDefinition: Time taken to process trigger activation authentication.
+    type: Duration
+    distribution: [ 0ms, 200ms , 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 5m, 15m ]
+    unit: "ms"

@@ -1,0 +1,59 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/services:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/ng/core/variable/services/impl:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ng-variables/src/test/java/io/harness/ng/core/config:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/remote/licenserestriction:module",
+        "//925-enforcement-service/src/main/java/io/harness/enforcement:module",
+        "//930-ng-license-manager/src/main/java/io/harness/licensing/services:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/annotation:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/annotation/interceptor:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/servicedependencies:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/services:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/services/impl:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/usage:module",
+        "//943-enforcement-beans/src/main/java/io/harness/enforcement/constants:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//955-account-mgmt/src/main/java/io/harness/account/services:module",
+        "//955-outbox-sdk/src/main/java/io/harness/outbox/module",
+        "//959-ng-persistence/src/main/java/io/harness/springdata:module",
+        "//960-persistence:supporter-test",
+        "//960-persistence/src/main/java/io/harness/mongo:module",
+        "//960-persistence/src/main/java/io/harness/persistence:module",
+        "//960-persistence/src/main/java/io/harness/serializer:module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/govern:module",
+        "//980-commons/src/main/java/io/harness/morphia:module",
+        "//980-commons/src/main/java/io/harness/serializer:module",
+        "//990-commons-test/src/main/java/io/harness/factory:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:dev_morphia_morphia_core",
+        "@maven//:junit_junit",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_springframework_spring_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

@@ -1,0 +1,93 @@
+// Copyright 2020 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.advisers;
+
+import "io/harness/pms/contracts/commons/repair_action_code.proto";
+import "io/harness/pms/contracts/execution/failure/failure_type.proto";
+
+option java_multiple_files = true;
+
+message AdvisorObtainmentList {
+  repeated AdviserObtainment adviserObtainments = 1;
+}
+
+message AdviserObtainment {
+  AdviserType type = 1;
+  bytes parameters = 2;  // Used for java services and is kryo based
+  oneof params {
+    NextStepAdviserParameters nextStepParams = 3;
+    OnFailPipelineRollbackParameters onFailPipelineRollbackParams = 4;
+    ManualInterventionActionConfigPostRetry manualInterventionParams = 5;
+    RetryAdviserParameters retryParams = 6;
+    RetryAdviserRollbackParameters retryRollbackParams = 7;
+    ManualInterventionAdviserRollbackParameters manualInterventionRollbackParams = 8;
+  }
+  DeserialisationMode deserialisationMode = 9;
+}
+
+message AdviserType {
+  string type = 1;
+}
+
+// This mode is used to determine how the adviser should be deserialised
+// For Cross Services, please set this mode.
+enum DeserialisationMode {
+  KRYO = 0;
+  PROTO = 1;
+}
+
+message NextStepAdviserParameters {
+  string nextNodeId = 1;
+}
+
+message OnFailPipelineRollbackParameters {
+  repeated io.harness.pms.contracts.execution.failure.FailureType applicableFailureTypes = 1;
+}
+
+enum RollbackStrategy {
+  UNKNOWN_ROLLBACK = 0;
+  STAGE_ROLLBACK = 1;
+  STEP_GROUP_ROLLBACK = 2;
+  PIPELINE_ROLLBACK = 3;
+}
+
+message ManualInterventionActionConfigPostRetry {
+  int64 timeoutInSeconds = 1;
+  io.harness.pms.contracts.commons.RepairActionCode actionAfterManualInterventionTimeout = 2;
+  repeated io.harness.pms.contracts.commons.RepairActionCode availableActions = 3;
+}
+
+message RetryAdviserParameters {
+  repeated int32 waitIntervalList = 1;
+  int32 retryCount = 2;
+  io.harness.pms.contracts.commons.RepairActionCode repairActionCodeAfterRetry = 3;
+  repeated io.harness.pms.contracts.execution.failure.FailureType applicableFailureTypes = 4;
+  string condition = 5;
+}
+
+message RetryAdviserRollbackParameters {
+  repeated int32 waitIntervalList = 1;
+  int32 retryCount = 2;
+  io.harness.pms.contracts.commons.RepairActionCode repairActionCodeAfterRetry = 3;
+  repeated io.harness.pms.contracts.execution.failure.FailureType applicableFailureTypes = 4;
+  string nextNodeId = 5;  // Only applicable if repairActionCodeAfterRetry is IGNORE
+  repeated RollbackStrategyMapping strategyToUuidMapping = 6;  // Only applicable for finding
+  string condition = 7;                                        // Condition expression for conditional retry logic
+}
+
+message RollbackStrategyMapping {
+  RollbackStrategy strategy = 1;
+  string uuid = 2;
+}
+
+message ManualInterventionAdviserRollbackParameters {
+  repeated io.harness.pms.contracts.execution.failure.FailureType applicableFailureTypes = 1;
+  int32 timeoutInSeconds = 2;
+  io.harness.pms.contracts.commons.RepairActionCode timeoutAction = 3;
+  RetryAdviserParameters retryAdviserParameters = 4;  // Only used when timeoutAction is RETRY
+}

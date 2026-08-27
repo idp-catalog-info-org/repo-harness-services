@@ -1,0 +1,41 @@
+approval:
+  uses: servicenow
+  with:
+    retry: 10m
+    change-window:
+      start: Opened
+      end: Closed
+    run:
+      download:
+        source: /binary/location/ServiceNow
+        target: /target/path
+        checksum: df6a4178aec9fbdc1d6d7e3634d1bc33
+      script: pwd && $PLUGIN_PATH
+      env:
+        PLUGIN_LOG_LEVEL: info
+        PLUGIN_TICKET_TYPE: incident
+        PLUGIN_TICKET_NUMBER: IncidentNumber
+        PLUGIN_SERVICENOW_NAME: ServiceNowConnector
+        PLUGIN_SERVICENOW_URL: ServiceNowURL
+        PLUGIN_SERVICENOW_USERNAME: ServiceNow_Username
+        PLUGIN_SERVICENOW_PASSWORD: ServiceNow_Pwd
+      delegate:
+        - primary
+    approve:
+      match-any-condition: true
+      conditions:
+        - state:
+            eq: Opened
+        - state:
+            in:
+              - Opened
+              - Closed
+        - state:
+            not:
+              in:
+                - Resolved
+                - In Progress
+        - state:
+            not:
+              eq: Resolved
+    reject: <+<+pipeline.name> == "ServiceNowApproval">

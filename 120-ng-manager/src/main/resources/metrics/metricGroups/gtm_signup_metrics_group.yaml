@@ -1,0 +1,5 @@
+name: GTM Signup Metrics Group
+identifier: gtm_signup_metrics_group
+labels:
+  - namespace
+  - serviceName

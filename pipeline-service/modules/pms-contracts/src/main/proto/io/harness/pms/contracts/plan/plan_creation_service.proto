@@ -1,0 +1,253 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.plan;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/plan/plan_node_proto.proto";
+import "io/harness/pms/contracts/plan/graph_layout.proto";
+import "io/harness/pms/contracts/plan/variables.proto";
+import "io/harness/pms/contracts/plan/execution_metadata.proto";
+import "io/harness/pms/contracts/triggers/trigger_payload.proto";
+import "io/harness/pms/contracts/plan/principal_info.proto";
+import "io/harness/pms/contracts/plan/trigger_info.proto";
+import "970-ng-commons/src/main/proto/io/harness/eventsframework/schemas/entity/entity_detail.proto";
+
+service PlanCreationService {
+  rpc createPlan(PlanCreationBlobRequest) returns (PlanCreationResponse);
+  rpc createFilter(FilterCreationBlobRequest) returns (FilterCreationResponse);
+  rpc createVariablesYaml(VariablesCreationBlobRequest) returns (VariablesCreationResponse);
+}
+
+message PlanCreationBlobRequest {
+  map<string, YamlFieldBlob> dependencies = 1 [deprecated = true];
+  map<string, PlanCreationContextValue> context = 4;
+  Dependencies deps = 5;
+  map<string, string> serviceAffinity = 6;
+}
+
+message PlanCreationResponse {
+  oneof response {
+    ErrorResponse errorResponse = 1;
+    PlanCreationBlobResponse blobResponse = 2;
+  }
+}
+
+message PlanCreationBlobResponse {
+  map<string, PlanNodeProto> nodes = 1;
+  map<string, YamlFieldBlob> dependencies = 2 [deprecated = true];
+  string startingNodeId = 3;
+  map<string, PlanCreationContextValue> context = 4;
+  GraphLayoutInfo graphLayoutInfo = 5;
+  Dependencies deps = 6;
+  YamlUpdates yamlUpdates = 7;
+  repeated string preservedNodesInRollbackMode = 8;
+  map<string, string> serviceAffinity = 9;
+}
+
+message GraphLayoutInfo {
+  string startingNodeId = 1;
+  map<string, GraphLayoutNode> layoutNodes = 2;
+  repeated string startingNodeIds = 3;
+  bool isDagEnabled = 4;
+  DependencyGraphProto dependencyGraph = 5;
+}
+
+message PlanCreationContextValue {
+  oneof value {
+    string stringValue = 1 [deprecated = true];
+  }
+  triggers.TriggerPayload triggerPayload = 3;
+  string accountIdentifier = 4;
+  string orgIdentifier = 5;
+  string projectIdentifier = 6;
+  bool isExecutionInputEnabled = 7;
+  Dependency globalDependency = 8;
+  PlanExecutionContext execution_context = 9;
+  string parentUniqueId = 10;
+}
+
+message PlanExecutionContext {
+  int32 runSequence = 1;
+  ExecutionTriggerInfo triggerInfo = 2;
+  string pipelineIdentifier = 3;
+  // Not used anymore so please don't use it during pipeline execution and only in planCreation.
+  string executionUuid = 4;
+  ExecutionPrincipalInfo principalInfo = 5;
+  bytes gitSyncBranchContext = 6;
+  PipelineStoreType pipelineStoreType = 7;
+  string pipelineConnectorRef = 8;
+
+  // Original entity version
+  string harnessVersion = 9;
+  // Processed/Resolved yaml version
+  string processedYamlVersion = 10;
+
+  ExecutionMode executionMode = 11;
+  // storing Pipeline and Stage timeout settings details
+  map<string, string> settingToValueMap = 12;
+  // storing featureFlags to value map used as per need in execution flow
+  map<string, bool> featureFlagToValueMap = 13;
+  PipelineStageInfo pipelineStageInfo = 14;
+  // Pipeline-level DAG configuration (from PipelineEntity.enableDAG)
+  bool enableDAG = 15;
+}
+
+message YamlFieldBlob {
+  string name = 1;
+  bytes blob = 2;
+}
+
+message FilterCreationBlobRequest {
+  map<string, YamlFieldBlob> dependencies = 1 [deprecated = true];
+  SetupMetadata setupMetadata = 2;
+  Dependencies deps = 3;
+}
+
+message FilterCreationResponse {
+  oneof response {
+    ErrorResponse errorResponse = 1;
+    FilterCreationBlobResponse blobResponse = 2;
+    ErrorResponseV2 errorResponseV2 = 3;
+  }
+}
+
+message ErrorResponseV2 {
+  repeated ErrorMetadata errors = 1;
+}
+
+message ErrorMetadata {
+  string wingsExceptionErrorCode = 1;
+  string errorMessage = 2;
+}
+
+message FilterCreationBlobResponse {
+  string filter = 1;
+  uint32 stageCount = 2;
+  map<string, YamlFieldBlob> dependencies = 3 [deprecated = true];
+  map<string, YamlFieldBlob> resolvedDependencies = 4 [deprecated = true];
+  string startingNodeId = 6;
+  repeated io.harness.eventsframework.schemas.entity.EntityDetailProtoDTO referredEntities = 7;
+  repeated string stageNames = 8;
+  Dependencies deps = 9;
+  YamlUpdates yamlUpdates = 10;
+  Dependencies resolvedDeps = 11;
+}
+
+message VariablesCreationBlobRequest {
+  map<string, YamlFieldBlob> dependencies = 1 [deprecated = true];
+  VariablesCreationMetadata metadata = 2;
+  Dependencies deps = 3;
+}
+
+message VariablesCreationResponse {
+  oneof response {
+    ErrorResponse errorResponse = 1;
+    VariablesCreationBlobResponse blobResponse = 2;
+  }
+}
+
+message VariablesCreationBlobResponse {
+  map<string, YamlProperties> yamlProperties = 1;
+  map<string, YamlFieldBlob> dependencies = 2 [deprecated = true];
+  map<string, YamlFieldBlob> resolvedDependencies = 3 [deprecated = true];
+  repeated ErrorResponse errorResponse = 4;
+  map<string, YamlOutputProperties> yamlOutputProperties = 5 [deprecated = true];
+  Dependencies deps = 6;
+  YamlUpdates yamlUpdates = 7;
+  Dependencies resolvedDeps = 8;
+  map<string, YamlExtraProperties> yamlExtraProperties = 9;
+}
+
+message ErrorResponse {
+  repeated string messages = 1;
+  string opa_on_save_status_json = 2;
+  bytes governance_metadata = 3;
+}
+
+message SetupMetadata {
+  string accountId = 1;
+  string projectId = 2;
+  string orgId = 3;
+  bytes gitSyncBranchContext = 4;
+  ExecutionPrincipalInfo principalInfo = 5;
+  TriggeredBy triggeredInfo = 6;
+  string parentUniqueId = 7;
+  string harnessVersion = 8;
+}
+
+message VariablesCreationMetadata {
+  bytes gitSyncBranchContext = 1;
+  map<string, string> metadata = 2;
+}
+
+message Dependencies {
+  string yaml = 1;
+  map<string, string> dependencies = 2;
+  // Metadata regarding the dependency added in above dependencies map
+  map<string, Dependency> dependencyMetadata = 3;
+}
+
+message Dependency {
+  map<string, bytes> metadata = 2;
+  RollbackModeBehaviour rollbackModeBehaviour = 3;
+  // used in place of metadata map in v1 -> metadata passed to immediate children
+  HarnessStruct nodeMetadata = 4;
+  // metadata passed to all the children and grandchildren until leaf
+  // only some reserved keys can be added in parent info, they are mentioned here in parentInfoKeysList
+  // clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/plan/creation/creators/PlanCreatorServiceHelper.java
+  HarnessStruct parentInfo = 5;
+}
+
+// We are not using this struct from protobuf library:
+// https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/struct.proto#L51 because it doesn't have a
+// type value bytes in the value which is required in our case for passing kryo serialized complex objects
+message HarnessStruct {
+  map<string, HarnessValue> data = 1;
+}
+
+message HarnessValue {
+  oneof kind {
+    NullValue nullValue = 1;
+    double numberValue = 2;
+    string stringValue = 3;
+    bool boolValue = 4;
+    HarnessStruct structValue = 5;
+    ListValue listValue = 6;
+    bytes bytesValue = 7;
+  }
+}
+
+enum NullValue {
+  NULL_VALUE = 0;
+}
+
+message ListValue {
+  repeated HarnessValue values = 1;
+}
+
+enum RollbackModeBehaviour {
+  UNDEFINED_BEHAVIOUR = 0;
+  PRESERVE = 2;
+}
+
+// TODO: Looking forward to implement this Dependency model
+// message Dependencies {
+//  string yaml = 1;
+//  repeated Dependency dependencies = 2;
+//}
+//
+// message Dependency {
+//  string fqn = 1;
+//  map<string, bytes> metadata = 2;
+//}
+
+message YamlUpdates {
+  // value can be json or yaml doesn't matter, but both structure should be interchangeable
+  map<string, string> fqnToYaml = 1;
+}

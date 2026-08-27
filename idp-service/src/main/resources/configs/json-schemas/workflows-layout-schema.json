@@ -1,0 +1,80 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1718704922.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "groups"
+  ],
+  "properties": {
+    "groups": {
+      "$id": "#root/groups",
+      "title": "Groups",
+      "type": "array",
+      "default": [],
+      "items":{
+        "$id": "#root/groups/items",
+        "title": "Items",
+        "type": "object",
+        "additionalProperties": false,
+        "anyOf": [
+          "title",
+          "description",
+          "icon",
+          "items"
+        ],
+        "properties": {
+          "title": {
+            "$id": "#root/groups/items/title",
+            "title": "Title",
+            "type": "string",
+            "default": "",
+            "examples": [
+              "Backend"
+            ],
+            "pattern": "^.*$"
+          },
+          "description": {
+            "$id": "#root/groups/items/description",
+            "title": "Description",
+            "type": "string",
+            "default": "",
+            "examples": [
+              "All service onboarding workflows for backend components"
+            ],
+            "pattern": "^.*$"
+          },
+          "icon": {
+            "$id": "#root/groups/items/icon",
+            "title": "Icon",
+            "type": "string",
+            "default": "",
+            "examples": [
+              "some-icon-id"
+            ],
+            "pattern": "^.*$"
+          },
+          "items": {
+            "$id": "#root/groups/items/items",
+            "title": "Items",
+            "type": "array",
+            "default": [],
+            "items":{
+              "$id": "#root/groups/items/items/items",
+              "title": "Items",
+              "type": "string",
+              "default": "",
+              "examples": [
+                "java-onboarding"
+              ],
+              "pattern": "^.*$"
+            }
+          }
+        }
+      }
+
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "harness-graph-cdc-connector",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSourceConnector",
+    "connection.uri": "mongodb://mongodb:27017/?replicaSet=rs0",
+
+    "database": "pms-harness",
+
+    "change.stream.full.document": "default",
+
+    "pipeline": "[{\"$match\": {\"ns.coll\": {\"$in\": [\"nodeExecutions\", \"planExecutions\", \"nodeExecutionsInfo\", \"outcomeInstances\", \"graphUpdateInfo\"]}}}]",
+
+    "startup.mode": "latest",
+
+    "tasks.max": 1,
+
+    "output.format.key": "json",
+    "output.format.value": "json",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "output.json.formatter": "com.mongodb.kafka.connect.source.json.formatter.SimplifiedJson",
+
+    "topic.prefix": "cdc",
+
+    "transforms": "routeAll",
+    "transforms.routeAll.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.routeAll.regex": "cdc\\.pms-harness\\..*",
+    "transforms.routeAll.replacement": "cdc.graph-events",
+
+    "heartbeat.interval.ms": "5000",
+
+    "topic.creation.enable": "true",
+    "topic.creation.default.partitions": 3,
+    "topic.creation.default.replication.factor": 1,
+    "topic.creation.default.compression.type": "snappy",
+    "topic.creation.default.cleanup.policy": "delete",
+    "topic.creation.default.retention.ms": "1800000",
+
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true"
+  }
+}

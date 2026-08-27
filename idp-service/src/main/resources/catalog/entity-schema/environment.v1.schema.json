@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "An Environment is the running infrastructure associated with the environment. Updating an environment directly results in the infrastructure being updated.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": ["apiVersion", "kind", "identifier", "owner", "spec"],
+      "properties": {
+        "apiVersion": {
+          "enum": ["harness.io/v1"]
+        },
+        "kind": {
+          "enum": ["ENVIRONMENT", "Environment", "environment"]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": ["string", "null"]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the component.",
+          "examples": ["artist-relations-team", "user:john.johnson"],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "config": {
+              "$ref": "#/definitions/environmentConfig"
+            },
+            "environmentBlueprint": {
+              "type": "object",
+              "properties": {
+                "identifier": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "The environment blueprint of the environment."
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "environmentConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "config": {
+          "type": "object"
+        },
+        "entities": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short (typically relatively few words, on one line) description of the Environment Blueprint."
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of single-valued strings, to for example classify catalog entities in various ways.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

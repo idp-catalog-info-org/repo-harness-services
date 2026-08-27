@@ -1,0 +1,44 @@
+identifier: rootly
+name: Rootly
+description: Import your Backstage entities into Rootly services and view incidents & analytics.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Rootly
+category: Monitoring
+source: https://github.com/rootlyhq/backstage-plugin
+iconUrl: https://raw.githubusercontent.com/rootlyhq/backstage-plugin/master/docs/logo.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/rootly/
+config: |-
+  proxy:
+    endpoints:
+      '/rootly/api':
+        target: https://api.rootly.com
+        pathRewrite:
+          /api/proxy/rootly/api/?: /
+        headers:
+          Authorization: Bearer ${ROOTLY_TOKEN}
+environmentVariables:
+  - ROOTLY_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: RootlyOverviewCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: RootlyOverviewCard
+        specs:
+          gridProps:
+            md: 6
+    - type: TAB_CONTENT
+      name: RootlyIncidentsPage
+      addByDefault: true
+      defaultRoute: /rootly
+      layoutSchemaSpecs:
+        name: RootlyIncidentsPage
+        title: Rootly
+        contents:
+          - component: RootlyIncidentsPage

@@ -1,0 +1,4 @@
+summary: "Harness Security Test Exemption Requested for Issue: ${ISSUE_TITLE} for the project - ${PROJECT} under the organization - ${ORG}"
+link:
+    href: ${EXEMPTION_URL}
+    text: Harness Exemption

@@ -1,0 +1,6 @@
+name: CI Error Categorization Rule Metrics Group
+identifier: CIErrorCategorizationRuleMetricsGroup
+labels:
+  - accountId
+  - category
+  - subcategory

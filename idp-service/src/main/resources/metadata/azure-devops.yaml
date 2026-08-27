@@ -1,0 +1,68 @@
+identifier: azure-devops
+name: Azure Devops
+description: Azure DevOps provides easy access to Azure services and resources for enhanced visibility and monitoring.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Spotify
+category: Monitoring
+source: https://github.com/backstage/backstage/blob/master/plugins/azure-devops/README.md
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/azure-devops/
+config: |-
+  azureDevOps:
+    host: <host-url>
+    token: ${AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN}
+    organization: <organization-name>
+environmentVariables:
+  - AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityAzurePipelinesContent
+      addByDefault: true
+      defaultRoute: /azure-pipelines
+      layoutSchemaSpecs:
+        name: EntityAzurePipelinesContent
+        title: CI/CD
+        contents:
+          - component: EntityAzurePipelinesContent
+    - type: TAB_CONTENT
+      name: EntityAzurePullRequestsContent
+      addByDefault: true
+      defaultRoute: /pull-requests
+      layoutSchemaSpecs:
+        name: EntityAzurePullRequestsContent
+        title: Pull Requests
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isAzureDevOpsAvailable
+                  content:
+                    component: EntityAzurePullRequestsContent
+    - type: TAB_CONTENT
+      name: EntityAzureGitTagsContent
+      addByDefault: true
+      defaultRoute: /git-tags
+      layoutSchemaSpecs:
+        name: EntityAzureGitTagsContent
+        title: Git Tags
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isAzureDevOpsAvailable
+                  content:
+                    component: EntityAzureGitTagsContent
+    - type: CARD
+      name: EntityAzureReadmeCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityAzureReadmeCard
+        specs:
+          gridProps:
+            md: 6

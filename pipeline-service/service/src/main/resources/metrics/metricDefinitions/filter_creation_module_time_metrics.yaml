@@ -1,0 +1,9 @@
+name: Filter Creation Module Metrics
+identifier: FilterCreationModuleMetrics
+metricGroup: PipelineModuleMetricsGroup
+metrics:
+  - metricName: filter_creation_module_time
+    metricDefinition: Time taken to complete filter creation for a single module (SDK service) per iteration
+    type: Duration
+    distribution: [ 0m, 1s, 5s, 10s, 20s, 30s, 1m, 2m, 4m ]
+    unit: "ms"

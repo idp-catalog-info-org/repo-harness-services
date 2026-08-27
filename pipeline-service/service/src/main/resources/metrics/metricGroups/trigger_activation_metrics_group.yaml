@@ -1,0 +1,5 @@
+name: Trigger Activation Times in Metrics Group
+identifier: trigger_activation_times_group
+labels:
+  - accountId
+  - triggerType

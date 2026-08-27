@@ -1,0 +1,8 @@
+name: GTM CDC Kafka Metrics
+identifier: gtm_cdc_kafka_metrics
+metricGroup: gtm_cdc_kafka_metrics_group
+metrics:
+  - metricName: gtm_module_licenses_kafka_consumer_error_count
+    metricDefinition: Number of times moduleLicenses Kafka CDC consumer exhausted all retries and failed to process an event
+    type: Count
+    unit: "1"

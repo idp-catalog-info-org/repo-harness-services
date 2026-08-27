@@ -1,0 +1,59 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: GCP connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  project:
+    type: string
+    description: GCP project
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.project}}
+  bucket:
+    type: string
+    description: GCS bucket name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.bucket}}
+  artifactPath:
+    type: string
+    description: Artifact path in bucket
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactPath}}
+  pathRegex:
+    type: string
+    description: File path regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.pathRegex}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/gcs-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_PROJECT: ${{inputs.project}}
+    PLUGIN_ARTIFACT_BUCKET_NAME: ${{inputs.bucket}}
+    PLUGIN_ARTIFACT_FILE_PATH_REGEX: ${{inputs.pathRegex}}
+    PLUGIN_ARTIFACT_FILE_PATH: ${{inputs.artifactPath}}
+    PLUGIN_GCP_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_GCP_SERVICE_ACCOUNT_KEY: ${{inputs.artifactConnector.jsonKey}}
+    PLUGIN_POOL_ID: ${{inputs.artifactConnector.workloadPoolId}}
+    PLUGIN_PROVIDER_ID: ${{inputs.artifactConnector.providerId}}
+    PLUGIN_PROJECT_NUMBER: ${{inputs.artifactConnector.gcpProjectId}}
+    PLUGIN_SERVICE_ACCOUNT_EMAIL: ${{inputs.artifactConnector.serviceAccountEmail}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.artifactConnector.oidcToken}}

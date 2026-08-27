@@ -1,0 +1,10 @@
+name: ID_PLACEHOLDER
+id: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/oc-template:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{serviceOutput.manifests.primary.paths}}
+    PLUGIN_PARAMS_PATH: ${{serviceOutput.manifests.overrides}}

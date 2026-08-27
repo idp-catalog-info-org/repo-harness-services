@@ -1,0 +1,17 @@
+{
+  "identifier": "harness.pipeline.execute",
+  "name": "Execute Pipeline",
+  "description": "Trigger a Harness pipeline and wait for completion.",
+  "version": "1.0.0",
+  "handler": "harness.pipeline.execute",
+  "category": "harness",
+  "inputSchema": {
+    "type": "object",
+    "required": ["pipelineRef"],
+    "properties": {
+      "pipelineRef":   { "type": "string" },
+      "inputSetRefs":  { "type": "array", "items": { "type": "string" } },
+      "runtimeInputs": { "type": "object" }
+    }
+  }
+}

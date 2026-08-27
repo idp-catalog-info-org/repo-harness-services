@@ -1,0 +1,6 @@
+name: Pipeline Execution Retention Metrics Group
+identifier: PipelineExecutionRetentionMetricsGroup
+labels:
+  - accountIdentifier
+  - syncMethod
+  - syncEntity

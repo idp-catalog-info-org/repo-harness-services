@@ -1,0 +1,60 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Artifact Registry Firewall Exemption Created"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "A firewall exemption has been created and waiting for your approval."
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Package Name:* ${PACKAGE_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Version List:* ${VERSION_LIST}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Registry:* ${REGISTRY_NAME} - ${REGISTRY_URL}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Reason:* ${REASON}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Created By:* ${CREATED_BY}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*View Details:* ${EXCEPTION_URL}"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Details"
+					},
+					"url": "${EXCEPTION_URL}"
+				}
+			]
+		}
+	]
+}

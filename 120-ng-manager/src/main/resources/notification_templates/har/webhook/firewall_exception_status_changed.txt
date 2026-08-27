@@ -1,0 +1,34 @@
+{
+    "title": "Harness Artifact Registry Firewall Exemption Status Changed",
+    "description": "Harness Artifact Registry Firewall Exemption Status Changed: ${PACKAGE_NAME}",
+    "fields": [
+        {
+            "label": "Package Name",
+            "value": "${PACKAGE_NAME}"
+        },
+        {
+            "label": "Version List",
+            "value": "${VERSION_LIST}"
+        },
+        {
+            "label": "Registry Name",
+            "value": "${REGISTRY_NAME}"
+        },
+        {
+            "label": "Registry URL",
+            "value": "${REGISTRY_URL}"
+        },
+        {
+            "label": "Status",
+            "value": "${STATUS}"
+        },
+        {
+            "label": "Changed By",
+            "value": "${CHANGED_BY}"
+        },
+        {
+            "label": "Exemption URL",
+            "value": "${EXCEPTION_URL}"
+        }
+    ]
+}

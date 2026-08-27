@@ -1,0 +1,1936 @@
+# Default values for ng-manager
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  autoscaling:
+    enabled: false
+  jfr:
+    enabled: true
+  fips: false
+  kubeVersion: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  cg:
+    enabled: false
+  secrets:
+    app:
+      external:
+        ## if FALSE, Generate all secrets within K8s Namespace
+        ## If TRUE, use one of the followings kids to inject
+        enabled: false
+        kind:
+          # use ExternalSecrets Operator
+          externalSecrets: false
+          # Use CSI Driver volume mount
+          csiSecretDriver: false
+    database:
+      external:
+        enabled: false
+        kind:
+          externalSecrets: false
+          csiSecretDriver: false
+  useExternalSecrets: false
+  loadbalancerURL: ""
+  # Canonical host for URLs that a third party compares byte-for-byte against a
+  # previously recorded value. Two distinct categories, both driven off this host:
+  #   1. OIDC issuer: the iss / issuer / jwks_uri claims in Harness-issued ID
+  #      tokens. Validated cryptographically by the relying party (e.g. GCP STS
+  #      checks iss == the issuer configured on the WIF provider).
+  #   2. SCM OAuth callbacks (BITBUCKET_SERVER / GITLAB_ON_PREM /
+  #      GITHUB_ENTERPRISE _OAUTH_CALLBACK_URL): passed as redirect_uri and
+  #      exact-matched by the SCM provider against the redirect URI registered
+  #      in its OAuth app (mismatch -> redirect_uri_mismatch).
+  # Both must keep matching what was originally registered, so this host must stay
+  # stable even when loadbalancerURL is repointed to a cell-local host during a
+  # migration. Setting issuerURL covers BOTH categories at once; do not set it for
+  # OIDC only. Falls back to loadbalancerURL when empty, preserving existing behavior.
+  issuerURL: ""
+  monitoring:
+    enabled: false
+    managedPlatform: ""
+  externalSecretsLoader:
+    enabled: false
+    provider: "vault"
+    image:
+      repository: "repo/image"
+      tag: "tag"
+      pullPolicy: "IfNotPresent"
+    vault:
+      address: ""
+      engine: ""
+      basePath: ""
+      auth:
+        method: "token"
+        # For Token auth:
+        token: "vault-token"
+        # For AppRole:
+        roleId: ""
+        secretId: ""
+        # For Kubernetes auth:
+        role: ""
+    databases:
+      mongo:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      redis:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      postgres:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+      timescaledb:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+  database:
+    postgres:
+      ## - installed = true if installed within cluster
+      installed: true
+      ## - protocol to use for connection
+      protocol: postgres
+      ## - host array for external
+      hosts:
+        - postgres:5432
+      ## - secret name containing external values
+      secretName: ""
+      ## - key within secret containing username
+      userKey: ""
+      ## - key within secret containing password
+      passwordKey: ""
+      ## - extra arguments set to connection string
+      extraArgs: ""
+    mongo:
+      installed: true
+      protocol: mongodb
+      # --  provide default values if mongo.installed is set to false
+      hosts:
+        - dummy.net
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    timescaledb:
+      installed: true
+      protocol: "jdbc:postgresql"
+      # --  provide default values if mongo.installed is set to false
+      hosts:
+        - timescaledb-single-chart:5432
+      # -- Enable TimescaleDB SSL
+      sslEnabled: false
+      # -- TimescaleDB secrets
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              TIMESCALEDB_USERNAME: ""
+              TIMESCALEDB_PASSWORD: ""
+              TIMESCALEDB_SSL_ROOT_CERT: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                TIMESCALEDB_USERNAME:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_PASSWORD:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_SSL_ROOT_CERT:
+                  name: ""
+                  property: ""
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      certName: ""
+      certKey: ""
+    alloydb:
+      installed: true
+      protocol: ""
+      hosts: [ ]
+      extraArgs: ""
+      database:
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              POSTGRES_USER: ""
+              POSTGRES_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                POSTGRES_USER:
+                  name: ""
+                  property: ""
+                POSTGRES_PASSWORD:
+                  name: ""
+                  property: ""
+    redis:
+      installed: true
+      protocol: "redis"
+      # --  provide default values if redis.installed is set to false
+      hosts:
+        - redis:6379
+      secretName: "redis-secret"
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      userKey: "redis-user"
+      passwordKey: "redis-password"
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+  license:
+    cg: ''
+    ng: ''
+    secrets:
+      kubernetesSecrets:
+        - secretName: ""
+          keys:
+            NG_LICENSE: ""
+      secretManagement:
+        externalSecretsOperator:
+          - secretStore:
+              name: ""
+              kind: ""
+            remoteKeys:
+              NG_LICENSE:
+                name: ""
+                property: ""
+  ccm:
+    enabled: false
+  opa:
+    enabled: false
+  chaos:
+    enabled: false
+  stackDriverLoggingEnabled: false
+  smtpCreateSecret:
+    enabled: false
+    SMTP_PASSWORD: ""
+    SMTP_HOST: ""
+    SMTP_USERNAME: ""
+    SMTP_USE_SSL: "true"
+    SMTP_PORT: "465"
+    secrets:
+      kubernetesSecrets:
+        - secretName: ""
+          keys:
+            SMTP_USERNAME: ""
+            SMTP_PASSWORD: ""
+            SMTP_HOST: ""
+            SMTP_PORT: ""
+            SMTP_USE_SSL: ""
+      secretManagement:
+        externalSecretsOperator:
+          - secretStore:
+              name: ""
+              kind: ""
+            remoteKeys:
+              SMTP_USERNAME:
+                name: ""
+                property: ""
+              SMTP_PASSWORD:
+                name: ""
+                property: ""
+              SMTP_HOST:
+                name: ""
+                property: ""
+              SMTP_PORT:
+                name: ""
+                property: ""
+              SMTP_USE_SSL:
+                name: ""
+                property: ""
+  ingress:
+    # -- create ingress objects
+    enabled: false
+    # -- set ingress object classname
+    className: harness
+    # -- set host of ingressObjects
+    hosts:
+      - my-host.example.org
+    # -- set tls for ingress objects
+    tls:
+      enabled: true
+      secretName: ''
+    # -- add annotations to ingress objects
+    objects:
+      annotations: {}
+    disableHostInIngress: false
+    pathPrefix: ""
+    pathType: ""
+  istio:
+    # -- create virtualServices objects
+    enabled: false
+    enableRegexRoutes: false
+    # -- create gateway and use in virtualservice
+    gateway:
+      create: false
+    # -- if gateway not created, use specified gateway and host
+    virtualService:
+      pathPrefix: ""
+      gateways:
+      hosts:
+  proxy:
+    enabled: false
+    host: localhost
+    port: 80
+    username: ""
+    password: ""
+    protocol: http
+  awsServiceEndpointUrls:
+    enabled: false
+    endPointRegion: us-east-2
+    stsEndPointUrl: https://sts.us-east-2.amazonaws.com
+    ecsEndPointUrl: https://ecs.us-east-2.amazonaws.com
+    cloudwatchEndPointUrl: https://monitoring.us-east-2.amazonaws.com
+  waitForInitContainer:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: harness/helm-init-container
+      pullPolicy: Always
+      tag: "latest"
+      digest: ""
+      imagePullSecrets: []
+  fileLogging:
+    enabled: false
+    logFilename: /opt/harness/logs/pod.log
+    maxFileSize: 50MB
+    maxBackupFileCount: 10
+    totalFileSizeCap: 1GB
+  pdb:
+    create: false
+
+progressDeadlineSeconds: 800
+
+monitoring:
+  port: 8889
+  path: /metrics
+
+timescaledb:
+  # -- TimescaleDB host names
+  hosts: []
+  # -- Enable TimescaleDB SSL
+  # sslEnabled: false
+  # -- TimescaleDB secrets
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          TIMESCALEDB_USERNAME: ""
+          TIMESCALEDB_PASSWORD: ""
+          TIMESCALEDB_SSL_ROOT_CERT: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            TIMESCALEDB_USERNAME:
+              name: ""
+              property: ""
+            TIMESCALEDB_PASSWORD:
+              name: ""
+              property: ""
+            TIMESCALEDB_SSL_ROOT_CERT:
+              name: ""
+              property: ""
+
+secondaryTimescaledb:
+  # -- TimescaleDB host names
+  hosts: []
+  protocol: "jdbc:postgresql2312321"
+  # -- Enable TimescaleDB SSL
+  # sslEnabled: false
+  # -- TimescaleDB secrets
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          TIMESCALEDB_USERNAME: ""
+          TIMESCALEDB_PASSWORD: ""
+          TIMESCALEDB_SSL_ROOT_CERT: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            TIMESCALEDB_USERNAME:
+              name: ""
+              property: ""
+            TIMESCALEDB_PASSWORD:
+              name: ""
+              property: ""
+            TIMESCALEDB_SSL_ROOT_CERT:
+              name: ""
+              property: ""
+
+database:
+  mongo:
+    ngharness:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    notifications:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+
+  redis:
+    events:
+      protocol: ""
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+    lock:
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+  alloydb:
+    harness:
+      enabled: false
+      protocol: ""
+      hosts: [ ]
+      extraArgs: ""
+      database:
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              POSTGRES_USER: ""
+              POSTGRES_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                POSTGRES_USER:
+                  name: ""
+                  property: ""
+                POSTGRES_PASSWORD:
+                  name: ""
+                  property: ""
+
+replicaCount: 1
+updateStrategy:
+  rollingUpdate:
+    maxSurge: 100%
+    maxUnavailable: 0
+  type: RollingUpdate
+
+podLabels: {}
+
+oidc:
+  enabled: true
+licenseManager:
+  enabled: true
+maxUnavailable: 0
+allowedOrigins: ""
+appLogLevel: "INFO"
+image:
+  registry: us.gcr.io/platform-205701
+  repository: ng-manager
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.19.2"
+  digest: ""
+  imagePullSecrets: []
+initContainer:
+  image:
+    registry: docker.io
+    repository: busybox
+    tag: "1.37.0"
+    digest: ""
+    imagePullSecrets: []
+mongoSecrets:
+  userName:
+    name: harness-secrets
+    key: mongodbUsername
+  password:
+    name: mongodb-replicaset-chart
+    key: mongodb-root-password
+ceSecret:
+  access_key:
+    name: nextgen-ce
+    key: AWS_ACCESS_KEY
+  secret_key:
+    name: nextgen-ce
+    key: AWS_SECRET_KEY
+  destination_bucket:
+    name: nextgen-ce
+    key: AWS_DESTINATION_BUCKET
+  template_url:
+    name: nextgen-ce
+    key: AWS_TEMPLATE_LINK
+ceGcpSetupConfigGcpProjectId: "placeHolderGcpProjectId"
+timescaleSecret:
+  password:
+    name: harness-secrets
+    key: timescaledbPostgresPassword
+java:
+  memory: "4096m"
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+podAnnotations: {}
+imagePullSecrets: {}
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext:
+  runAsUser: 65534
+  runAsNonRoot: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+probes:
+  livenessProbe:
+    httpGet:
+      path: /admin/healthcheck/liveness
+      port: 7458
+      scheme: HTTP
+    timeoutSeconds: 10
+    periodSeconds: 60
+    successThreshold: 1
+    failureThreshold: 5
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http-ng-manager
+      scheme: HTTP
+    timeoutSeconds: 1
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  startupProbe:
+    httpGet:
+      path: /health
+      port: http-ng-manager
+      scheme: HTTP
+    initialDelaySeconds: 25
+    timeoutSeconds: 1
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 40
+service:
+  annotations: {}
+  type: ClusterIP
+  protocol: TCP
+  port: 7090
+  grpcport: 9979
+  gitsyncgrpcport: 13002
+resources:
+  limits:
+    memory: 8192Mi
+  requests:
+    cpu: 2
+    memory: 200Mi
+autoscaling:
+  enabled: false
+  targetCPU: ""
+  targetMemory: ""
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 120
+
+terminationMessage: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+additionalConfigs: {}
+java17flags: ""
+# extraVolumes:
+# - name: volume-test
+#   configMap:
+#     name: test-config
+#     readOnly: true
+extraVolumes: []
+# extraVolumeMounts:
+# - name: test-volume-mount
+#   mountPath: /opt/harness/config
+extraVolumeMounts: []
+shutdownHooksEnabled: false
+# lifecycleHooks:
+#   postStart:
+#     exec:
+#       command:
+#   preStop:
+#     exec:
+#       command:
+
+# extraEnvVars:
+# - name: POD_NAME
+#   valueFrom:
+#     fieldRef:
+#       fieldPath: metadata.name
+extraEnvVars: []
+
+virtualService:
+  annotations: {}
+  objects:
+    - name: ng-manager
+      pathMatchType: prefix
+      pathRewrite: "/"
+      paths:
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/delegate-token-ng'
+          pathRewrite: "/api/delegate-token-ng"
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/download-delegates'
+          pathRewrite: "/api/download-delegates"
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/delegate-setup'
+          pathRewrite: "/api/delegate-setup"
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/delegate-group-tags'
+          pathRewrite: "/api/delegate-group-tags"
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/agent-mtls'
+          pathRewrite: "/api/agent-mtls"
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/api/'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng-dashboard/api/'
+          backend:
+            service:
+              name: ng-dashboard-aggregator
+              port: 7100
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ng/'
+          backend:
+            service:
+              name: next-gen-ui
+              port: 80
+    - name: ng-manager-v1-apis
+      pathMatchType: regex
+      pathRewrite: "/\\1"
+      paths:
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/rancher/environments/[^\/]+/infrastructure-definitions/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/acr/container-registries/[^\/]+/repositories)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/environments/[^\/]+/infrastructures/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/rancher/connectors/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/rancher/environments/[^\/]+/infrastructure-definitions/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/link/orgs/[^\/]+/projects/[^\/]+/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/unlink/orgs/[^\/]+/projects/[^\/]+/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/certificates/validate-unique-identifier/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/connectors/[^\/]+/test-connection)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/environments/[^\/]+/infrastructures)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/services/[^\/]+/primary-manifests)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/acr/container-registries/[^\/]+/repositories)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/environments/[^\/]+/infrastructures/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/acr/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/acr/container-registries)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/azure/subscriptions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/docker/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/githubpackages/last-successful-version)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/githubpackages/packages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/githubpackages/versions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/artifacts/nexus/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/certificates/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/connectors/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/environments/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/environments/search/filtered)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/favorites/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/gitx-webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/secrets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/services/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/deployables/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-comparison-pairs/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-changesets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-executions/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce/execute)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/dashboard/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/secrets/validate-secret-ref)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/webhooks/list)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/rancher/connectors/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/rancher/environments/[^\/]+/infrastructure-definitions/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/link/orgs/[^\/]+/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/unlink/orgs/[^\/]+/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/certificates/validate-unique-identifier/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/connectors/[^\/]+/test-connection)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/environments/[^\/]+/infrastructures)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/certificates)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/connectors)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/environments)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/favorites)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/scm-facilitator/list-branches)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/scm-facilitator/list-repos)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/scm-facilitator/create-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/scm-facilitator/get-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/user-source-code-manager)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/gitx-webhook-events)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/gitx-webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/secrets)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/deployables)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-comparison-pairs)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-changesets)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce-executions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce/default-pipelines)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/salesforce/pipeline-mappings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/services/[^\/]+/primary-manifests)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/acr/container-registries/[^\/]+/repositories)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments/[^\/]+/infrastructures/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/acr/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/acr/container-registries)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/azure/subscriptions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/docker/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/githubpackages/last-successful-version)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/githubpackages/packages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/githubpackages/versions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/artifacts/nexus/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/certificates/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/connectors/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/environments/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/environments/search/filtered)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/favorites/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/gitx-webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/secrets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/services/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/deployables/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/credits/allocation/export/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/dashboard/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/secrets/validate-secret-ref)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/webhooks/list)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/rancher/connectors/[^\/]+/clusters)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/banners/validate-unique-identifier/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/branding/assets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/certificates/validate-unique-identifier/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/connectors/[^\/]+/test-connection)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments/[^\/]+/infrastructures)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhook-events/[^\/]+/validation-info)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ip-allowlist/validate-unique-identifier/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/link/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/search-group/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/sync-group/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/unlink/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/licenseUsageActivity/export/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/moduleAccess/[^\/]+/filter)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/moduleAccess/[^\/]+/hasAnyAccess)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oidc-provider/[^\/]+/decrypt)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/certificates)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/connectors)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/environments)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/favorites)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/scm-facilitator/list-branches)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/scm-facilitator/list-repos)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/scm-facilitator/create-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/scm-facilitator/get-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/user-source-code-manager)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/gitx-webhook-events)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/gitx-webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/secrets)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/deployables)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/services/[^\/]+/primary-manifests)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/subscription/devops/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/unified/schemas/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/acr/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/acr/container-registries)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/azure/subscriptions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/docker/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/githubpackages/last-successful-version)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/githubpackages/packages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/githubpackages/versions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/artifacts/nexus/build-details)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/banners/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/certificates/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/connectors/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/creditOverUsage/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments/search/filtered)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/favorites/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhook-events/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ip-allowlist/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ip-allowlist/allowed/ip-address)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ip-allowlist/validate/ip-address)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/kubernetes/releases/service-mapping)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/validate/connection-settings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/validate/group-settings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/validate/user-settings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/licenseUsageActivity/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/notification-trigger/ir/slo-notification)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oidc-provider/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/secrets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/services/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/deployables/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/subscription/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/webhooks/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/banners/active)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/banners/allowed)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/branding/settings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/dashboard/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/eula/sign)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/eula/validate-sign)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/scm-facilitator/list-branches)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/scm-facilitator/list-repos)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/scm-facilitator/create-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/scm-facilitator/get-pull-request)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/user-source-code-manager)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhook-events/list-branches)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/iro/get-sync-data-collection-result)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/iterations)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/ldap-login-test)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings/sync-groups)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oauth/confluence)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oauth/msteams)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oauth/slack)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oauth/zoom)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/secrets/validate-secret-ref)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/webhooks/list)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/banners)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/branding)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/certificates)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/connectors)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/dailyModuleAccountAccess)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/devSubscriptions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/favorites)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhook-events)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-health)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-health/repo)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-health/rate-limits)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/gitx-health/rate-limits/timeline)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ip-allowlist)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/ldap-settings)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/licensedModules)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/listPrincipalsWithAccess)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/module-versions)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/moduleLicenseUtilization)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/oidc-provider)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/salesforce-metadata-types)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/secrets)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/services)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/deployables)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/updateModuleAccess)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/webhooks)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/favorites/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/projects/favorites/[^\/]+)\/?$'
+
+ingress:
+  annotations: {}
+  objects:
+    - name: harness-manager-ng-delegate-token
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/rewrite-target: /api/delegate-token-ng$1$2
+      paths:
+        - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api/delegate-token-ng(/|$)(.*)'
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+    - name: harness-manager-ng-delegate-download
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/rewrite-target: /api/download-delegates$1$2
+      paths:
+        - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api/download-delegates(/|$)(.*)'
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+    - name: harness-manager-ng-delegate-setup
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/rewrite-target: /api/delegate-setup$1$2
+      paths:
+        - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api/delegate-setup(/|$)(.*)'
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+    - name: harness-manager-ng-delegate-group-tags
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/rewrite-target: /api/delegate-group-tags$1$2
+      paths:
+        - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api/delegate-group-tags(/|$)(.*)'
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+    - name: harness-manager-ng-agent-mtls
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/rewrite-target: /api/agent/mtls$1$2
+      paths:
+        - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api/agent/mtls(/|$)(.*)'
+          backend:
+            service:
+              name: harness-manager
+              port: 9090
+    - name: ng-manager
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      paths:
+      - path: '{{ .Values.global.ingress.pathPrefix }}/ng/api(/|$)(.*)'
+    - name: ng-manager-v1-apis
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+      paths:
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/secrets)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/secrets/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/secrets)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/secrets/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/secrets)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/secrets/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/connectors)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/connectors/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/connectors)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/connectors/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/connectors)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/connectors/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/services)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/services/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/services)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/services/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/services)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/services/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/deployables)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/deployables/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/deployables)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/deployables/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/deployables)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/deployables/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-comparison-pairs)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-comparison-pairs/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-changesets)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-changesets/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-executions)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce-executions/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce/execute)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce/default-pipelines)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/salesforce/pipeline-mappings)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/dashboard/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/dashboard/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/dashboard/.+)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/environments/.+)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/.+/environments)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/.+/environments/.+)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/.+/projects/.+/environments)'
+      - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/.+/projects/.+/environments/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/ip-allowlist)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/ip-allowlist/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/favorites)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/favorites/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/eula/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-webhooks/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-webhook-events)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-webhook-events/list-branches)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-webhook-events/.+/validation-info)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-health)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-health/repo)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-health/rate-limits)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/gitx-health/rate-limits/timeline)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/scm-facilitator/list-branches)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/scm-facilitator/list-repos)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/scm-facilitator/create-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/scm-facilitator/get-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/user-source-code-manager)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/scm-facilitator/list-branches)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/scm-facilitator/list-repos)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/scm-facilitator/create-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/scm-facilitator/get-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/user-source-code-manager)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/scm-facilitator/list-branches)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/scm-facilitator/list-repos)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/scm-facilitator/create-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/scm-facilitator/get-pull-request)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/user-source-code-manager)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/certificates)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/certificates/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/certificates)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/certificates/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/certificates)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/certificates/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/rancher/connectors/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/rancher/connectors/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/rancher/connectors/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/rancher/environments/.+/infrastructure-definitions/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/rancher/environments/.+/infrastructure-definitions/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/rancher/environments/.+/infrastructure-definitions/.+/clusters)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/ldap-settings)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/ldap-settings/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/licenseUsageActivity/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/devSubscriptions)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/moduleLicenseUtilization)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/updateModuleAccess)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/moduleAccess/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/listPrincipalsWithAccess)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/creditOverUsage/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/credits/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/webhooks/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/webhooks/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/webhooks/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/create-webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/create-webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/create-webhooks)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/webhooks/list)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/webhooks/list)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/webhooks/list)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/licensedModules)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/dailyModuleAccountAccess)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/banners)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/banners/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/branding)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/branding/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/oidc-provider)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/oidc-provider/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/subscription/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/subscription/devops/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/kubernetes/releases/.+)'
+
+secrets:
+  fileSecret: []
+  conditions:
+    CE_AWS_ACCESS_KEY: "global.ccm.enabled"
+    CE_AWS_SECRET_KEY: "global.ccm.enabled"
+  default:
+    LOG_STREAMING_SERVICE_TOKEN: c76e567a-b341-404d-a8dd-d9738714eb82
+    OPA_SERVER_SECRET: dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq
+    GITOPS_SERVICE_SECRET: HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU=
+    CE_AWS_ACCESS_KEY: ""
+    CE_AWS_SECRET_KEY: ""
+    HSQS_AUTH_TOKEN: UeWgUReGXlbrB0zkDCBFz1EDfU1zrXbhAbGfQ8jsSCaA881SYFMlHqnn3OQnAKAU6hTQ5NniwuMeKSFW
+    STRIPE_API_KEY: ""
+    DEVOPS_STRIPE_API_KEY: ""
+    APPSEC_SERVICE_SECRET: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+    RESOURCE_HIERARCHY_SERVICE_SECRET: dummyRhsServiceSecret
+    CHAOS_SERVICE_SECRET: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+    SERVICE_DISCOVERY_SERVICE_SECRET: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+    LOAD_TEST_MANAGER_SERVICE_SECRET: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  kubernetesSecrets:
+    - secretName: ""
+      keys:
+        LOG_STREAMING_SERVICE_TOKEN: ""
+        OPA_SERVER_SECRET: ""
+        GITOPS_SERVICE_SECRET: ""
+        HSQS_AUTH_TOKEN: ""
+        STRIPE_API_KEY: ""
+        DEVOPS_STRIPE_API_KEY: ""
+        APPSEC_SERVICE_SECRET: ""
+        RESOURCE_HIERARCHY_SERVICE_SECRET: ""
+        CHAOS_SERVICE_SECRET: ""
+        SERVICE_DISCOVERY_SERVICE_SECRET: ""
+        LOAD_TEST_MANAGER_SERVICE_SECRET: ""
+    - secretName: "nextgen-ce"
+      keys:
+        CE_AWS_ACCESS_KEY: "AWS_ACCESS_KEY"
+        CE_AWS_SECRET_KEY: "AWS_SECRET_KEY"
+  secretManagement:
+    externalSecretsOperator:
+      - secretStore:
+          name: ""
+          kind: ""
+        remoteKeys:
+          LOG_STREAMING_SERVICE_TOKEN:
+            name: ""
+            property: ""
+          OPA_SERVER_SECRET:
+            name: ""
+            property: ""
+          GITOPS_SERVICE_SECRET:
+            name: ""
+            property: ""
+          CE_AWS_ACCESS_KEY:
+            name: ""
+            property: ""
+          CE_AWS_SECRET_KEY:
+            name: ""
+            property: ""
+          HSQS_AUTH_TOKEN:
+            name: ""
+            property: ""
+          STRIPE_API_KEY:
+            name: ""
+            property: ""
+          DEVOPS_STRIPE_API_KEY:
+            name: ""
+            property: ""
+          APPSEC_SERVICE_SECRET:
+            name: ""
+            property: ""
+          RESOURCE_HIERARCHY_SERVICE_SECRET:
+            name: ""
+            property: ""
+          CHAOS_SERVICE_SECRET:
+            name: ""
+            property: ""
+          SERVICE_DISCOVERY_SERVICE_SECRET:
+            name: ""
+            property: ""
+          LOAD_TEST_MANAGER_SERVICE_SECRET:
+            name: ""
+            property: ""
+
+cd_plugin_images:
+  git_clone:
+    image:
+      registry: docker.io
+      repository: harness/drone-git
+      tag: "1.4.1-rootless"
+      digest: ""
+  download_aws_s3:
+    image:
+      registry: docker.io
+      repository: harness/download-aws-s3
+      tag: "1.3.0-rootless-linux"
+      digest: ""
+  download_harness_store:
+    image:
+      registry: docker.io
+      repository: harness/download-harness-store
+      tag: "1.0.0-rootless-linux"
+      digest: ""
+  download_gcs:
+    image:
+      registry: docker.io
+      repository: harness/download-google-cloud-storage
+      tag: "0.0.4-linux-amd64"
+      digest: ""
+  sam_build:
+    image:
+      registry: docker.io
+      repository: harness/aws-sam-plugin
+      tag: "nodejs20.x-1.162.1-1.4.0-beta-linux-amd64"
+      digest: ""
+  sam_deploy:
+    image:
+      registry: docker.io
+      repository: harness/aws-sam-plugin
+      tag: "nodejs20.x-1.162.1-1.4.0-beta-linux-amd64"
+      digest: ""
+  serverless:
+    image:
+      registry: docker.io
+      repository: harness/serverless-plugin
+      digest: ""
+
+config:
+  EVENTS_FRAMEWORK_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  EVENTS_FRAMEWORK_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  EVENTS_FRAMEWORK_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  EVENTS_FRAMEWORK_SENTINEL_MASTER_NAME: harness-redis
+  LOCK_CONFIG_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "lock") }}'
+  LOCK_CONFIG_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  LOCK_CONFIG_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  LOCK_CONFIG_SENTINEL_MASTER_NAME: harness-redis
+  CACHE_BACKEND: REDIS
+  ACCESS_CONTROL_BASE_URL: 'http://access-control.{{ .Release.Namespace }}.svc.cluster.local:9006/api/'
+  ACCESS_CONTROL_ENABLED: "true"
+  AI_VERIFY_AGENTS_SERVICE_URL: '{{ .Values.global.loadbalancerURL }}/gateway/ai-verify-agents'
+  ALLOWED_ORIGINS: '{{ .Values.allowedOrigins | default .Values.global.loadbalancerURL }}'
+  AUDIT_CLIENT_BASEURL: 'http://platform-service.{{ .Release.Namespace }}.svc.cluster.local:9005/api/'
+  AUDIT_ENABLED: "true"
+  AUTH_ENABLED: "true"
+  AWS_SERVICE_ENDPOINT_URLS_CLOUDWATCH_ENDPOINT_URL: '{{ .Values.global.awsServiceEndpointUrls.cloudwatchEndPointUrl }}'
+  AWS_SERVICE_ENDPOINT_URLS_ECS_ENDPOINT_URL: '{{ .Values.global.awsServiceEndpointUrls.ecsEndPointUrl }}'
+  AWS_SERVICE_ENDPOINT_URLS_ENABLED: '{{ .Values.global.awsServiceEndpointUrls.enabled }}'
+  AWS_SERVICE_ENDPOINT_URLS_ENDPOINT_REGION: '{{ .Values.global.awsServiceEndpointUrls.endPointRegion }}'
+  AWS_SERVICE_ENDPOINT_URLS_STS_ENDPOINT_URL: '{{ .Values.global.awsServiceEndpointUrls.stsEndPointUrl }}'
+  CENG_CLIENT_BASEURL: 'http://nextgen-ce.{{ .Release.Namespace }}.svc.cluster.local:6340/ccm/api/'
+  CE_NG_CLIENT_BASEURL: 'http://nextgen-ce.{{ .Release.Namespace }}.svc.cluster.local:6340/ccm/api/'
+  CE_SETUP_CONFIG_GCP_PROJECT_ID: '{{ .Values.ceGcpSetupConfigGcpProjectId }}'
+  CHAOS_SERVICE_BASE_URL: 'http://chaos-web-service.{{ .Release.Namespace }}.svc.cluster.local:8184/'
+  LOAD_TEST_MANAGER_SERVICE_BASE_URL: 'http://load-test-manager-service.{{ .Release.Namespace }}.svc.cluster.local:8090/'
+  RELICX_BASE_URL: 'http://localhost:13000' # dummy URL
+  AIT_GCP_BASE_URL: 'http://ait-node-api-service.{{ .Release.Namespace }}.svc.cluster.local:8080'
+  IRO_MANAGER_SERVICE_BASE_URL: 'http://iro-manager.{{ .Release.Namespace }}.svc.cluster.local:8080/'
+  CI_MANAGER_SERVICE_CLIENT_BASEURL: http://ci-manager:7090/
+  CURRENT_GEN_UI_URL: '{{ .Values.global.loadbalancerURL }}/#/'
+  CVNG_SERVICE_CLIENT_BASEURL: http://cv-nextgen:6060/cv/api/
+  DEPLOY_MODE: KUBERNETES_ONPREM
+  DISTRIBUTED_LOCK_IMPLEMENTATION: "REDIS"
+  ENABLE_DASHBOARD_TIMESCALE: "true"
+  ENABLE_DEFAULT_RESOURCE_GROUP_CREATION: "true"
+  ENFORCEMENT_CHECK_ENABLED: "true"
+  GITOPS_SERVICE_CLIENT_BASEURL: http://gitops:7908/api/v1/
+  GIT_SERVICE_CACHING_MAX_CACHE_DURATION: "2592000000"
+  GIT_SERVICE_CACHING_VALID_CACHE_DURATION: "7200000"
+  GRPC_SERVER_PORT: "9979"
+  HARNESS_CODE_EXTERNAL_API_URL: '{{ .Values.global.loadbalancerURL }}/gateway/code/'
+  HARNESS_CODE_GIT_URL: '{{ .Values.global.loadbalancerURL }}/code/git'
+  HARNESS_ENABLE_NG_AUTH_UI_PLACEHOLDER: "true"
+  HARNESS_NG_MANAGER_INTERNAL_URL: 'http://ng-manager.{{ .Release.Namespace }}.svc.cluster.local:7090'
+  HARNESS_SCM_API_INTERNAL_URL: 'http://code-api.{{ .Release.Namespace }}.svc.cluster.local:80'
+  HSQS_BASE_URL: 'http://queue-service:9091/'
+  IACM_SERVICE_BASE_URL: 'http://iac-server.{{ .Release.Namespace }}.svc.cluster.local:8080/api/'
+  IDP_SERVICE_CLIENT_BASE_URL: http://idp-service:12003/
+  INTERNAL_MANAGER_AUTHORITY: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  INTERNAL_MANAGER_TARGET: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_AUTHORITY: '{{ ternary "ng-manager:13002" "dns:///ng-manager-headless:13002" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_TARGET: '{{ ternary "ng-manager:13002" "dns:///ng-manager-headless:13002" .Values.global.istio.enabled }}'
+  INTERNAL_PMS_AUTHORITY: '{{ ternary "pipeline-service:12011" "dns:///pipeline-service-headless:12011" .Values.global.istio.enabled }}'
+  INTERNAL_PMS_GITSYNC_AUTHORITY: '{{ ternary "pipeline-service:14002" "dns:///pipeline-service-headless:14002" .Values.global.istio.enabled }}'
+  INTERNAL_PMS_GITSYNC_TARGET: '{{ ternary "pipeline-service:14002" "dns:///pipeline-service-headless:14002" .Values.global.istio.enabled }}'
+  INTERNAL_PMS_TARGET: '{{ ternary "pipeline-service:12011" "dns:///pipeline-service-headless:12011" .Values.global.istio.enabled }}'
+  INTERNAL_TEMPLATE_GITSYNC_AUTHORITY: template-service:16002
+  INTERNAL_TEMPLATE_GITSYNC_TARGET: template-service:16002
+  JAVA_ADVANCED_FLAGS: '{{- include "harnesscommon.jfr.v1.printJavaAdvancedFlags" (dict "ctx" $) }}'
+  LOGGING_LEVEL: '{{ .Values.appLogLevel }}'
+  LOG_STREAMING_SERVICE_BASEURL: 'http://log-service.{{ .Release.Namespace }}.svc.cluster.local:8079/'
+  MALLOC_ARENA_MAX: "4"
+  MANAGER_AUTHORITY: harness-manager:9879
+  MANAGER_CLIENT_BASEURL: http://harness-manager.{{ .Release.Namespace }}.svc.cluster.local:9090/api/
+  MANAGER_TARGET: harness-manager:9879
+  MANAGER_UI_URL: '{{ .Values.global.loadbalancerURL }}'
+  MEMORY: '{{ .Values.java.memory }}'
+  MOCK_ACCESS_CONTROL_SERVICE: "false"
+  MONGO_MAX_DOCUMENT_LIMIT: "10000"
+  MONGO_MAX_OPERATION_TIME_IN_MILLIS: "40000"
+  MONGO_TRANSACTIONS_ALLOWED: "false"
+  MONITORING_MANAGER_SERVICE_BASE_URL: 'http://monitoring-manager.{{ .Release.Namespace }}.svc.cluster.local:8092/'
+  NG_MANAGER_API_URL: http://ng-manager:7090/
+  NG_MANAGER_AUTHORITY: ng-manager:13002
+  NG_MANAGER_CLIENT_BASEURL: http://ng-manager:7090/
+  RHS_CLIENT_BASE_URL: http://resource-hierarchy-service:9009/
+  RHS_ENABLED: "false"
+  DBOPS_SERVICE_CLIENT_BASEURL: http://db-devops-service:5001/
+  AIMLOPS_SERVICE_CLIENT_BASEURL: http://ai-agent-ops-service:9550/
+  NG_MANAGER_TARGET: ng-manager:13002
+  NG_MANAGER_UI_URL: '{{ .Values.global.loadbalancerURL }}/ng/#/'
+  NEXT_GEN_UI_URL: '{{ .Values.global.loadbalancerURL }}/ng/#/'
+  NOTIFICATION_BASE_URL: http://platform-service:9005/api/
+  OIDC_CONFIG_PATH: /opt/harness/config
+  DEVOPS_ESSENTIAL_CONFIG_PATH: /opt/harness/devops
+  OPA_CONNECTIVITY_ENABLED: '{{.Values.global.opa.enabled }}'
+  OPA_SERVER_BASEURL: 'http://policy-mgmt.{{ .Release.Namespace }}.svc.cluster.local:3000/'
+  PIPELINE_SERVICE_CLIENT_BASEURL: http://pipeline-service:12001/api/
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE: "150"
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE: "200"
+  PMS_AUTHORITY: pipeline-service:12011
+  PMS_GITSYNC_AUTHORITY: pipeline-service:14002
+  PMS_GITSYNC_TARGET: pipeline-service:14002
+  PMS_TARGET: pipeline-service:12011
+  PROXY_ENABLED: '{{ .Values.global.proxy.enabled }}'
+  PROXY_HOST: '{{ .Values.global.proxy.host }}'
+  PROXY_PASSWORD: '{{ .Values.global.proxy.password }}'
+  PROXY_PORT: '{{ .Values.global.proxy.port }}'
+  PROXY_PROTOCOL: '{{ .Values.global.proxy.protocol }}'
+  PROXY_USERNAME: '{{ .Values.global.proxy.username }}'
+  RESOURCE_GROUP_BASE_URL: 'http://access-control.{{ .Release.Namespace }}.svc.cluster.local:9006/api/'
+  SCM_SERVICE_URI: '{{ ternary "scm-service:8091" "dns:///scm-service-headless:8091" .Values.global.istio.enabled }}'
+  SERVICE_DISCOVERY_SERVICE_BASE_URL: http://service-discovery-manager:8080/
+  SHOULD_CONFIGURE_WITH_PMS: "true"
+  STACK_DRIVER_LOGGING_ENABLED: '{{ .Values.global.stackDriverLoggingEnabled }}'
+  STO_CORE_SERVICE_CLIENT_BASEURL: http://sto-core:4000/api/
+  TEMPLATE_GITSYNC_AUTHORITY: template-service:16002
+  TEMPLATE_GITSYNC_TARGET: template-service:16002
+  TEMPLATE_SERVICE_ENDPOINT: http://template-service:15002/api/
+  USE_QUEUE_SERVICE_FOR_GITX_WEBHOOK: "true"
+  USE_REDIS_FOR_SDK_RESPONSE_EVENTS: "true"
+  ENABLE_DEFAULT_USER_GROUPS_CREATION_JOB: "true"
+  DAILY_ACCOUNT_USERS_JOB_INITIAL_DELAY_IN_MINUTES: "1"
+  TOTAL_ACCOUNT_USERS_JOB_INITIAL_DELAY_IN_MINUTES: "1"
+  WEBHOOK_BASE_URL: '{{ .Values.global.loadbalancerURL }}/gateway/ng/api/'
+  GRPC_MAX_CONNECTION_AGE: "30"
+  REDISSON_PING_CONNECTION_INTERVAL_IN_MILLIS: "0"
+  HARNESS_ARTIFACT_REGISTRY_SERVICE_URL: 'http://registry-api.{{ .Release.Namespace }}.svc.cluster.local:80'
+  BITBUCKET_SERVER_OAUTH_CALLBACK_URL: '{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/gateway/api/secret/oauth2/bitbucket_server'
+  GITLAB_ON_PREM_OAUTH_CALLBACK_URL: '{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/gateway/api/secret/oauth2/gitlab_on_prem'
+  GITHUB_ENTERPRISE_OAUTH_CALLBACK_URL: '{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/gateway/api/secret/oauth2/github_enterprise'
+  PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  GITOPS_RESOURCE_CLIENT_CONNECT_TIMEOUT_SECONDS: "15"
+  PLATFORM_READ_TIMEOUT: "10"
+  GITOPS_RESOURCE_CLIENT_READ_TIMEOUT_SECONDS: "15"
+  ACCESS_CONTROL_READ_TIMEOUT: "10"
+  STRIPE_IDEMPOTENCY_KEY: "sandboxIdempotencyKey"
+  STRIPE_ACCOUNT: "sandboxAccount"
+  STRIPE_INVOICE_EMAIL: "test@harness.io"
+  STRIPE_DISABLE_METERS: "false"
+  INSTANCE_SYNC_PERPETUAL_TASK_INTERVAL_SECONDS: "600"
+  INSTANCE_SYNC_PERPETUAL_TASK_TIMEOUT_SECONDS: "600"
+  IR_DCT_ENABLED: "true"
+  IR_DCT_INITIAL_DELAY_SECONDS: "0"
+  IR_DCT_SCHEDULER_PERIOD_SECONDS: "30"
+  IR_DCT_LIMIT_PER_API_CALL: "25"
+  IR_DCT_MAX_COUNT_PER_ITERATION: "100"
+  IR_DCT_SLEEP_MILLI_SECONDS: "5000"
+  IR_ENABLE_DCT: "true"
+  CGI_TASK_CONFIG_PATH: "/opt/harness/cgi-config"
+  TASK_BINARY_CONFIG_PATH: "/opt/harness/task-binary-config"
+  FIPS_ENABLED: '{{ .Values.global.fips }}'
+  # In-cluster FME proxy origin. SDK keys stay in pl-infra secret overrides.
+  FME_PROXY_URL: 'http://proxy-sdk-svc.{{ .Release.Namespace }}.svc.cluster.local:3000'
+  ENABLE_LICENSE_MANAGER: '{{ .Values.licenseManager.enabled }}'
+  LICENSE_MANAGER_BASE_URL: 'http://license-manager:7093/'
+  AZURE_STORAGE_SUFFIX: "blob.core.windows.net"
+  AZURE_AUTHORITY_HOST: "https://login.microsoftonline.com"
+  EXPORT_METRICS_TO_STACK_DRIVER: "true"
+  ENABLE_CDC_MIGRATION_BY_CREATING_CHANGE_EVENTS_IN_MONGO: "true"
+  ENABLE_TSDB_MIGRATION_FOR_PARENT_UNIQUE_ID: "true"
+  ENABLE_WAIT_NOTIFY_OPTIMISATION: "true"
+  ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG: "true"
+  NOTIFY_RESPONSES_THREAD_POOL_SIZE: "100"
+  CD_GIT_CLONE_IMAGE: '{{ .Values.cd_plugin_images.git_clone.image.repository }}:{{ .Values.cd_plugin_images.git_clone.image.tag }}'
+  CD_DOWNLOAD_AWS_S3_IMAGE: '{{ .Values.cd_plugin_images.download_aws_s3.image.repository }}:{{ .Values.cd_plugin_images.download_aws_s3.image.tag }}'
+  CD_DOWNLOAD_HARNESS_STORE_IMAGE: '{{ .Values.cd_plugin_images.download_harness_store.image.repository }}:{{ .Values.cd_plugin_images.download_harness_store.image.tag }}'
+  CD_DOWNLOAD_GCS_IMAGE: '{{ .Values.cd_plugin_images.download_gcs.image.repository }}:{{ .Values.cd_plugin_images.download_gcs.image.tag }}'
+  CD_SAM_BUILD_IMAGE: '{{ .Values.cd_plugin_images.sam_build.image.repository }}:{{ .Values.cd_plugin_images.sam_build.image.tag }}'
+  CD_SAM_DEPLOY_IMAGE: '{{ .Values.cd_plugin_images.sam_deploy.image.repository }}:{{ .Values.cd_plugin_images.sam_deploy.image.tag }}'
+  CD_SERVERLESS_BASE_REPOSITORY: '{{ .Values.cd_plugin_images.serverless.image.repository }}'
+
+rbac:
+  rules: []
+
+jfr:
+  image:
+    registry: registry.access.redhat.com
+    repository: ubi8/ubi-minimal
+    pullPolicy: Always
+    tag: "8.9-1029"
+    digest: ""
+    imagePullSecrets: []
+
+pdb:
+  create: false
+
+devopsEssentials:
+  enabled: false
+
+# CGI Configs
+# To add a new CGI config, add a new entry under the executables section
+# The key (type) of the entry should be the same as the one
+# provided in the code.
+# For more information, consider this document
+# https://harness.atlassian.net/wiki/spaces/PLATFORM/pages/22304555165/CGI+Tasks+Configuration+in+Helm+Charts
+# What does each key mean:
+# type: The name of the CGI, same as used when submitting CGI tasks.
+# version: The version to be used. Update this whenever upgrading CGI
+# cgiTaskExecutables: list of maps containing os, arch and url for each of the CGI's executables.
+cgiConfig:
+  - type: "AwsSecretManager"
+    version: 0.0.2
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-linux-arm64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-windows-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-windows-amd64
+  - type: "GcpSecretManager"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm1.0.0/gcpSm-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-linux-arm64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-windows-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-windows-amd64
+  - type: "AzureKeyVault"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-linux-arm64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-windows-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-windows-amd64
+  - type: "Vault"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-linux-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-windows-amd64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-windows-arm64
+  - type: "DockerRegistry"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-linux-arm64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-windows-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-windows-amd64
+  - type: "SCM"
+    version: 0.0.4
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/darwin/amd64/scm
+      - os: darwin
+        arch: arm64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/darwin/arm64/scm
+      - os: linux
+        arch: amd64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/linux/amd64/scm
+      - os: linux
+        arch: arm64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/linux/arm64/scm
+      - os: windows
+        arch: arm64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/windows/amd64/scm
+      - os: windows
+        arch: amd64
+        url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/windows/amd64/scm
+  - type: "AwsKms"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-linux-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-windows-amd64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-windows-arm64
+  - type: "GcpKms"
+    version: 0.0.1
+    cgiTaskExecutables:
+      - os: darwin
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-darwin-amd64
+      - os: darwin
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-darwin-arm64
+      - os: linux
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-linux-amd64
+      - os: linux
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-linux-arm64
+      - os: windows
+        arch: amd64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-windows-amd64
+      - os: windows
+        arch: arm64
+        url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-windows-arm64
+
+
+taskBinaryConfig:
+  - name: "docker-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/docker-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "ecr-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/ecr-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "s3-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/s3-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "nexus3-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/nexus3-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "artifactory-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/artifactory-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gcp-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gcp-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "bamboo-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/bamboo-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "http-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/http-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gar-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gar-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gcp"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gcp/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "rancher"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/rancher/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "aws"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/aws/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "azure"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/azure/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "servicenow"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/servicenow/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "tas"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/tas/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  - name: "acr-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/acr-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "azure-artifacts-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/azure-artifacts-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "github-packages-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/github-packages-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "ami-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/ami-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "custom-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/custom-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "oci-helm-chart-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/oci-helm-chart-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "jenkins-artifact"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/jenkins-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "nexus-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/nexus-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "azure-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/azure-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "artifactory-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/artifactory-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "jenkins-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/jenkins-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "jdbc-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/jdbc-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "jira-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/jira-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "azureartifacts-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/azureartifacts-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "spot-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/spot-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "httphelm-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/httphelm-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "ocihelm-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/ocihelm-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "servicenow-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/servicenow-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "bamboo-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/bamboo-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "rancher-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/rancher-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "azurerepo-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/azurerepo-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gitlab-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gitlab-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "tanzu-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/tanzu-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "docker-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/docker-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "git-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/git-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "github-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/github-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "bitbucket-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/bitbucket-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "aws-connector-validator"
+    version: "0.0.2"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/aws-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gcp-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gcp-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "kubernetes-connector-validator"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/kubernetes-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "ecr-docker-auth-token"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/ecr-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-k8s"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-k8s/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-aws-sam"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-aws-sam/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-aws-lambda"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-aws-lambda/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-serverless"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-serverless/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-helm"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-helm/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "instance-sync-cloudrun"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/instance-sync-cloudrun/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "gar-docker-auth-token"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/gar-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "acr-docker-auth-token"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/acr-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "jira"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/jira/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false
+  - name: "ssh"
+    version: "0.0.1"
+    source:
+      - "https://storage.googleapis.com/unified-plugins/ssh/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+    compressed: false

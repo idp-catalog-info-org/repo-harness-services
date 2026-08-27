@@ -1,0 +1,6 @@
+name: Elasticsearch Filter Metrics Group
+identifier: ElasticSearchFilterGroup
+labels:
+  - operator
+  - status
+  - property

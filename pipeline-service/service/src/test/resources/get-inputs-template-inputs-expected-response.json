@@ -1,0 +1,35 @@
+{
+  "inputs": {
+    "jlXCbJSIT8GCuyHkN9e1NA": {
+      "required": true,
+      "default": "abcdefault",
+      "type": "string",
+      "description": "this is variable from template",
+      "pattern": "^[a-z]+$",
+      "enum": [
+        "abc",
+        "cde",
+        "fgh"
+      ]
+    },
+    "wIjhc89gRReYQh1e42q4RQ": {
+      "required": true,
+      "default": "abcdefault",
+      "type": "string",
+      "description": "this is variable from template",
+      "pattern": "^[a-z]+$",
+      "enum": [
+        "abc",
+        "cde",
+        "fgh"
+      ]
+    }
+  },
+  "template_yaml": "pipeline:\n  stages:\n    - steps:\n        - group:\n            steps:\n              - template:\n                  with:\n                    abc: <+inputs.jlXCbJSIT8GCuyHkN9e1NA>\n                id: injected_template_1\n              - template:\n                  with:\n                    abc: <+inputs.wIjhc89gRReYQh1e42q4RQ>\n                id: injected_template_2\n          id: group_1\n        - run:\n            script: <+input>\n          id: run_1\n      id: stage_1\n",
+  "resolved_yaml": "pipeline:\n  clone:\n    disabled: true\n  stages:\n    - steps:\n        - group:\n            steps:\n              - group:\n                  steps:\n                    - run: echo hello_1\n                      id: run_1\n                      name: run_1\n                    - run: echo hello_2\n                      id: run_2\n                      name: run_2\n                parent-template-type: template\n                id: group_steps_1\n                name: group_steps_1\n              - group:\n                  steps:\n                    - run: echo hello_1\n                      id: run_1\n                      name: run_1\n                    - run: echo hello_2\n                      id: run_2\n                      name: run_2\n                parent-template-type: template\n                id: group_steps_2\n                name: group_steps_2\n          id: group_1\n          name: group_1\n        - run:\n            script: <+input>\n          id: run_1\n          name: run_1\n      runtime: shell\n      id: stage_1\n      name: stage_1\n",
+  "has_input_sets": false,
+  "replaced_expressions": [],
+  "replaced_expressions_per_stage": {},
+  "modules": []
+}
+

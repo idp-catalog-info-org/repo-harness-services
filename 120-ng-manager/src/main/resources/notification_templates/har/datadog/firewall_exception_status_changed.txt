@@ -1,0 +1,15 @@
+{
+    "title": "Harness Artifact Registry Firewall Exemption Status Changed: ${PACKAGE_NAME}",
+    "text": "Firewall Exemption Status Changed for package ${PACKAGE_NAME} in registry ${REGISTRY_NAME}. Versions: ${VERSION_LIST}. Status: ${STATUS}. Changed By: ${CHANGED_BY}. View details: ${EXCEPTION_URL}",
+    "tags": [
+        "package:${PACKAGE_NAME}",
+        "registry:${REGISTRY_NAME}",
+        "status:${STATUS}",
+        "event_type:firewall_exemption_status_changed",
+        "exception_url:${EXCEPTION_URL}"
+    ],
+    "aggregation_key": "${PACKAGE_NAME}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

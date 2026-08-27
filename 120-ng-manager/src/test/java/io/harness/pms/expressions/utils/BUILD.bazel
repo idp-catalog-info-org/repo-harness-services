@@ -1,0 +1,80 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//120-ng-manager/src/main/java/io/harness/ng/config:module",
+        "//120-ng-manager/src/main/java/io/harness/pms/expressions/utils:module",
+        "//125-cd-nextgen/modules/common/core/src/main/java/io/harness/ng:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/artifact/bean/yaml/harnessartifact:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/aws/utils:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/azure:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/common/beans:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector/services:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/cdng/artifact/outcome:module",
+        "//910-delegate-service-driver/src/main/java/io/harness/service:module",
+        "//920-delegate-service-beans/src/main/java/io/harness/exception:module",
+        "//940-secret-manager-client/src/main/java/io/harness/secretmanagerclient/services/api:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/azure/response:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts/ecr:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts/gar:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts/gcr:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts/response:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/artifacts/source:module",
+        "//951-delegate-task-commons/src/main/java/io/harness/delegate/beans:module",
+        "//954-connector-beans/src/main/java/io/harness/connector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/artifactoryconnector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/awsconnector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/azureconnector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/azureconnector/constants:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/docker:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/gcpconnector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/nexusconnector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/scm:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/scm/github:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/dto:module",
+        "//970-api-services-beans/src/main/java/io/harness/azure:module",
+        "//970-api-services-beans/src/main/java/io/harness/k8s/model:module",
+        "//970-api-services-beans/src/main/java/io/harness/logging:module",
+        "//970-api-services-beans/src/main/java/io/harness/security/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/remote:module",
+        "//980-commons/src/main/java/io/harness/encryption:module",
+        "//980-commons/src/main/java/io/harness/eraro:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/exception/exceptionmanager:module",
+        "//980-commons/src/main/java/io/harness/expression:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//980-commons/src/main/java/io/harness/serializer:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//oidc-core/src/main/java/io/harness/oidc/helpers:module",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

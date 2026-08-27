@@ -1,0 +1,4 @@
+summary: "Harness Artifact Registry Firewall Exemption Created: A firewall exemption has been created and waiting for your approval. Package: ${PACKAGE_NAME}. Version List: ${VERSION_LIST} - Registry: ${REGISTRY_NAME}. Created By: ${CREATED_BY}"
+link:
+    href: ${EXCEPTION_URL}
+    text: View Details

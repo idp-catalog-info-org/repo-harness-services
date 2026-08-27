@@ -1,0 +1,55 @@
+{
+  "environments": {
+    "qa": {
+      "project_id": "qa-setup",
+      "cluster_name": "qa-private",
+      "region": "us-west1",
+      "namespace": "harness-helm-new",
+      "description": "QA environment",
+      "connect_command": "gcloud container clusters get-credentials qa-private --region us-west1 --project qa-setup",
+      "console_url": "https://console.cloud.google.com/kubernetes/clusters/details/us-west1/qa-private/overview?project=qa-setup"
+    },
+    "harness0": {
+      "project_id": "harness-zero-harness0-1391",
+      "cluster_name": "harness0",
+      "region": "us-west1",
+      "namespace": "harness",
+      "description": "Harness0 environment",
+      "connect_command": "gcloud container clusters get-credentials harness0 --region us-west1 --project harness-zero-harness0-1391",
+      "console_url": "https://console.cloud.google.com/kubernetes/clusters/details/us-west1/harness0/overview?project=harness-zero-harness0-1391"
+    },
+    "prod1": {
+      "project_id": "prod-setup-205416",
+      "cluster_name": "prod-private-uswest1-primary",
+      "region": "us-west1",
+      "namespace": "prod1",
+      "description": "Production 1 environment",
+      "connect_command": "gcloud container clusters get-credentials prod-private-uswest1-primary --region us-west1 --project prod-setup-205416",
+      "console_url": "https://console.cloud.google.com/kubernetes/clusters/details/us-west1/prod-private-uswest1-primary/overview?project=prod-setup-205416"
+    },
+    "prod2": {
+      "project_id": "prod-setup-205416",
+      "cluster_name": "prod-private-uswest1-primary",
+      "region": "us-west1",
+      "namespace": "prod2",
+      "description": "Production 2 environment",
+      "connect_command": "gcloud container clusters get-credentials prod-private-uswest1-primary --region us-west1 --project prod-setup-205416",
+      "console_url": "https://console.cloud.google.com/kubernetes/clusters/details/us-west1/prod-private-uswest1-primary/overview?project=prod-setup-205416"
+    },
+    "prod3": {
+      "project_id": "prod-setup-205416",
+      "cluster_name": "prod-private-uswest1-primary",
+      "region": "us-west1",
+      "namespace": "prod3",
+      "description": "Production 3 environment",
+      "connect_command": "gcloud container clusters get-credentials prod-private-uswest1-primary --region us-west1 --project prod-setup-205416",
+      "console_url": "https://console.cloud.google.com/kubernetes/clusters/details/us-west1/prod-private-uswest1-primary/overview?project=prod-setup-205416"
+    }
+  },
+  "metadata": {
+    "created": "2026-02-04",
+    "last_updated": "2026-02-04",
+    "notes": "GKE cluster configuration for debugging across environments",
+    "default_service": "release-management"
+  }
+}

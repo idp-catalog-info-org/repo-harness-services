@@ -1,0 +1,6 @@
+name: Queued Pipeline List Metrics Group
+identifier: QueuedPipelineListMetricsGroup
+labels:
+  - accountId
+  - source
+  - status

@@ -1,0 +1,18 @@
+pipeline:
+  clone:
+    disabled: true
+  stages:
+    - runtime: shell
+      steps:
+        - template:
+            uses: org.OrgStepTemplate
+            with:
+              input1: <+input>
+        - template:
+            uses: account.AccountStepTemplate
+            with:
+              input2: <+input>
+        - template:
+            uses: ProjectStepTemplate
+            with:
+              input3: <+input>

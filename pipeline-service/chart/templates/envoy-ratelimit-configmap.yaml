@@ -1,0 +1,290 @@
+{{- if .Values.rateLimiting.enabled }}
+# Envoy sidecar config — templated so the ports are configurable from values
+# (single source of truth):
+#   listener port  = .Values.service.port        (the port Envoy owns / gateway hits)
+#   forward port   = .Values.rateLimiting.appPort (where the app now listens)
+#   admin port     = .Values.rateLimiting.adminPort
+#   RLS address    = .Values.rateLimiting.rlsHost + .Release.Namespace
+# No more hand-syncing hardcoded ports between this file and the app-port env var.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pipeline-service-envoy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pipeline-service.labels" . | nindent 4 }}
+data:
+  envoy.yaml: |
+    admin:
+      address:
+        socket_address: { address: 0.0.0.0, port_value: {{ .Values.rateLimiting.adminPort }} }
+
+    static_resources:
+      listeners:
+        - name: listener_http
+          address:
+            socket_address: { address: 0.0.0.0, port_value: {{ .Values.service.port }} }
+          filter_chains:
+            - filters:
+                - name: envoy.filters.network.http_connection_manager
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                    stat_prefix: ingress_http
+                    route_config:
+                      name: local_route
+                      virtual_hosts:
+                        - name: pipeline_vhost
+                          domains: ["*"]
+                          routes:
+                            # List Executions (100/min) — exact paths, MUST precede Graph
+                            - match: { path: "/api/pipelines/execution/executionSummary" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: &list_executions
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: list_executions }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+                            - match: { path: "/api/pipelines/execution/summary" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *list_executions
+                            - match: { path: "/api/pipelines/execution/summary/outline" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *list_executions
+
+                            # Passthrough guards — fixed-string endpoints NOT in scope (before the {id} catch-all)
+                            - match: { path: "/api/pipelines/execution/url" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                            - match: { path: "/api/pipelines/execution/list-branches" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                            - match: { path: "/api/pipelines/execution/list-repositories" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                            - match: { path: "/api/pipelines/execution/v2/summary" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+
+                            # Fetch Execution Graph (1000/min)
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/v2/[^/]+$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: &execution_graph
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: execution_graph }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/subGraph/[^/]+/[^/]+$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/[^/]+/metadata$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/[^/]+/inputsetV2$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/[^/]+/notes$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/[^/]+/annotations$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/pipelines/execution/[^/]+$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/v1/orgs/[^/]+/projects/[^/]+/execution/[^/]+(/inputset)?$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+                            - match: { safe_regex: { regex: "^/api/v1/orgs/[^/]+/projects/[^/]+/execution/[^/]+/dynamic/[^/]+$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *execution_graph
+
+                            # Pipeline execute (100/min)
+                            - match: { prefix: "/api/pipeline/execute/" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: &pipeline_execute
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: pipeline_execute }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+                            - match: { safe_regex: { regex: "^/api/v1/orgs/[^/]+/projects/[^/]+/pipelines/[^/]+/execute.*" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *pipeline_execute
+
+                            # Input Set (1000/min)
+                            - match: { prefix: "/api/inputSets/" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: &input_set
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: input_set }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+                            - match: { safe_regex: { regex: "^/api/v1/orgs/[^/]+/projects/[^/]+/input-sets(/.*)?$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *input_set
+
+                            # Template — pipeline-owned refresh-template only (1000/min)
+                            - match: { prefix: "/api/refresh-template/" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits:
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: template }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+
+                            # Pipeline bucket (1000/min)
+                            - match: { prefix: "/api/triggers" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: &pipeline_bucket
+                                  - actions:
+                                      - generic_key: { descriptor_key: bucket, descriptor_value: pipeline }
+                                      - metadata:
+                                          descriptor_key: account_id
+                                          metadata_key: { key: envoy.rl, path: [ { key: account } ] }
+                                          skip_if_absent: true
+                            - match: { prefix: "/api/input-file/" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *pipeline_bucket
+                            - match: { path: "/api/pipelines/list" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *pipeline_bucket
+                            - match: { safe_regex: { regex: "^/api/v1/orgs/[^/]+/projects/[^/]+/pipelines/[^/]+/inputs-schema$" } }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                                rate_limits: *pipeline_bucket
+
+                            # Everything else: proxy through, NO limit
+                            - match: { prefix: "/" }
+                              route:
+                                cluster: pipeline_app
+                                timeout: {{ .Values.rateLimiting.routeTimeout }}
+                    http_filters:
+                      - name: envoy.filters.http.lua
+                        typed_config:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                          default_source_code:
+                            inline_string: |
+                              function urldecode(s)
+                                s = s:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h,16)) end)
+                                return s
+                              end
+                              function queryParam(path, name)
+                                local q = string.match(path, "?(.*)$")
+                                if q == nil then return nil end
+                                for pair in string.gmatch(q, "[^&]+") do
+                                  local k, v = string.match(pair, "^([^=]+)=(.*)$")
+                                  if k == name then return urldecode(v) end
+                                end
+                                return nil
+                              end
+                              function envoy_on_request(handle)
+                                local account = queryParam(handle:headers():get(":path") or "", "accountIdentifier")
+                                if account == nil or account == "" then
+                                  account = handle:headers():get("Harness-Account")
+                                end
+                                if account ~= nil and account ~= "" then
+                                  handle:streamInfo():dynamicMetadata():set("envoy.rl", "account", account)
+                                end
+                              end
+                      - name: envoy.filters.http.ratelimit
+                        typed_config:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+                          domain: pipeline
+                          # GitHub-style X-RateLimit-Limit / -Remaining / -Reset on the response
+                          # (Envoy appends them from the RLS reply; the app is untouched).
+                          enable_x_ratelimit_headers: DRAFT_VERSION_03
+                          failure_mode_deny: false
+                          timeout: 0.05s
+                          rate_limit_service:
+                            transport_api_version: V3
+                            grpc_service:
+                              envoy_grpc: { cluster_name: ratelimit_grpc }
+                      - name: envoy.filters.http.router
+                        typed_config:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+      clusters:
+        - name: pipeline_app
+          type: STATIC
+          lb_policy: ROUND_ROBIN
+          connect_timeout: 1s
+          load_assignment:
+            cluster_name: pipeline_app
+            endpoints:
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address: { address: 127.0.0.1, port_value: {{ .Values.rateLimiting.appPort }} }
+        - name: ratelimit_grpc
+          type: STRICT_DNS
+          lb_policy: ROUND_ROBIN
+          connect_timeout: 1s
+          typed_extension_protocol_options:
+            envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+              "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+              explicit_http_config:
+                http2_protocol_options: {}
+          load_assignment:
+            cluster_name: ratelimit_grpc
+            endpoints:
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: {{ .Values.rateLimiting.rlsHost }}.{{ .Release.Namespace }}.svc.cluster.local
+                          port_value: {{ .Values.rateLimiting.rlsPort }}
+{{- end }}

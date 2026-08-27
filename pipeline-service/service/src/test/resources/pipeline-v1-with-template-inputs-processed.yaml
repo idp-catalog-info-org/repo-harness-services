@@ -1,0 +1,39 @@
+pipeline:
+  inputs:
+    jlXCbJSIT8GCuyHkN9e1NA:
+      type: string
+      description: this is variable from template
+      required: true
+      default: abcdefault
+      pattern: ^[a-z]+$
+      enum:
+        - abc
+        - cde
+        - fgh
+    wIjhc89gRReYQh1e42q4RQ:
+      type: string
+      description: this is variable from template
+      required: true
+      default: abcdefault
+      pattern: ^[a-z]+$
+      enum:
+        - abc
+        - cde
+        - fgh
+  clone: false
+  stages:
+    - steps:
+        - group:
+            steps:
+              - template:
+                  uses: group_steps
+                  with:
+                    abc: <+inputs.jlXCbJSIT8GCuyHkN9e1NA>
+              - template:
+                  uses: group_steps
+                  with:
+                    abc: <+inputs.wIjhc89gRReYQh1e42q4RQ>
+        - run:
+            script: <+input>
+      runtime: shell
+

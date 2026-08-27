@@ -1,0 +1,76 @@
+{
+  "values_1" : {
+    "id" : "values_1",
+    "uses" : "values",
+    "store" : {
+      "uses" : "git",
+      "connector" : "values-git-connector",
+      "type" : "branch",
+      "branch" : "main_1",
+      "repo" : "repo_1"
+    },
+    "values" : [ "value_1_a", "value_1_b" ],
+    "overrides" : [ "/base/path/values_1/value_1_a", "/base/path/values_1/value_1_b" ]
+  },
+  "values" : {
+    "paths" : [ "/base/path/values_1/value_1_a", "/base/path/values_1/value_1_b", "/base/path/values_2/value_2_a", "/base/path/values_2/value_2_b" ]
+  },
+  "k8s" : {
+    "id" : "k8s_code",
+    "uses" : "k8s",
+    "store" : {
+      "uses" : "github",
+      "connector" : "manifest-github-connector",
+      "fetch" : "BRANCH",
+      "branch" : "main",
+      "path" : [ "k8s/manifest-path" ]
+    },
+    "values" : [ "k8s/defaultValues.yaml" ],
+    "path" : [ "/base/path/k8s_code/k8s/manifest-path" ],
+    "overrides" : [ "/base/path/k8s_code/k8s/defaultValues.yaml" ]
+  },
+  "k8s_code" : {
+    "id" : "k8s_code",
+    "uses" : "k8s",
+    "store" : {
+      "uses" : "github",
+      "connector" : "manifest-github-connector",
+      "fetch" : "BRANCH",
+      "branch" : "main",
+      "path" : [ "k8s/manifest-path" ]
+    },
+    "values" : [ "k8s/defaultValues.yaml" ],
+    "path" : [ "/base/path/k8s_code/k8s/manifest-path" ],
+    "overrides" : [ "/base/path/k8s_code/k8s/defaultValues.yaml" ]
+  },
+  "values_2" : {
+    "id" : "values_2",
+    "uses" : "values",
+    "store" : {
+      "uses" : "git",
+      "connector" : "values-git-connector",
+      "type" : "branch",
+      "branch" : "main_2",
+      "repo" : "repo_2"
+    },
+    "values" : [ "value_2_a", "value_2_b" ],
+    "overrides" : [ "/base/path/values_2/value_2_a", "/base/path/values_2/value_2_b" ]
+  },
+  "overrides" : [ "/base/path/k8s_code/k8s/defaultValues.yaml", "/base/path/values_1/value_1_a", "/base/path/values_1/value_1_b", "/base/path/values_2/value_2_a", "/base/path/values_2/value_2_b" ],
+  "toRender" : [ "/base/path/k8s_code/k8s/defaultValues.yaml", "/base/path/values_1/value_1_a", "/base/path/values_1/value_1_b", "/base/path/values_2/value_2_a", "/base/path/values_2/value_2_b" ],
+  "toTemplate": [ "/base/path/k8s_code/k8s/defaultValues.yaml", "/base/path/values_1/value_1_a", "/base/path/values_1/value_1_b", "/base/path/values_2/value_2_a", "/base/path/values_2/value_2_b" ],
+  "primary" : {
+    "id" : "k8s_code",
+    "uses" : "k8s",
+    "store" : {
+      "uses" : "github",
+      "connector" : "manifest-github-connector",
+      "fetch" : "BRANCH",
+      "branch" : "main",
+      "path" : [ "k8s/manifest-path" ]
+    },
+    "values" : [ "k8s/defaultValues.yaml" ],
+    "path" : [ "/base/path/k8s_code/k8s/manifest-path" ],
+    "overrides" : [ "/base/path/k8s_code/k8s/defaultValues.yaml" ]
+  }
+}

@@ -1,0 +1,16 @@
+name: CI Error Categorization Metrics
+identifier: CIErrorCategorizationMetrics
+metricGroup: CIErrorCategorizationMetricsGroup
+metrics:
+  - metricName: ci_error_categorization_total
+    metricDefinition: Error categorization evaluations count
+    type: Count
+    unit: "1"
+  - metricName: ci_error_categorization_duration_ms
+    metricDefinition: Error categorization evaluation duration in milliseconds
+    type: LastValue
+    unit: count
+  - metricName: ci_error_categorization_timed_out
+    metricDefinition: Error categorization timeout count
+    type: Count
+    unit: "1"

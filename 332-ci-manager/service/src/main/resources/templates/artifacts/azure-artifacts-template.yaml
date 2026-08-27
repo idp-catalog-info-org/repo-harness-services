@@ -1,0 +1,68 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Azure Artifacts connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  packageType:
+    type: string
+    description: Package type (maven, nuget, upack)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.packageType}}
+  scope:
+    type: string
+    description: Feed scope (project, org)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.scope}}
+  project:
+    type: string
+    description: Azure DevOps project (optional for org scope)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.project}}
+  feed:
+    type: string
+    description: Azure Artifacts feed
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.feed}}
+  package:
+    type: string
+    description: Package name (JsonProperty package in AzureArtifactsConfig)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.package}}
+  version:
+    type: string
+    description: Package version (optional, mutually exclusive with versionRegex)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.version}}
+  versionRegex:
+    type: string
+    description: Version regex (optional, mutually exclusive with version)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.versionRegex}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/azureartifacts-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_FEED: ${{inputs.feed}}
+    PLUGIN_ARTIFACT_PROJECT: ${{inputs.project}}
+    PLUGIN_ARTIFACT_PACKAGE: ${{inputs.package}}
+    PLUGIN_ARTIFACT_PACKAGE_TYPE: ${{inputs.packageType}}
+    PLUGIN_ARTIFACT_VERSION: ${{inputs.version}}
+    PLUGIN_ARTIFACT_VERSION_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_AZUREARTIFACTS_ORG_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_AZUREARTIFACTS_TOKEN: ${{inputs.artifactConnector.token}}

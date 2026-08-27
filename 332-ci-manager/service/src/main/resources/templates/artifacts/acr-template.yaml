@@ -1,0 +1,70 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Azure connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  subscriptionId:
+    type: string
+    description: Azure subscription ID
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.subscriptionId}}
+  registry:
+    type: string
+    description: ACR registry name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.registry}}
+  repository:
+    type: string
+    description: ACR repository name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repository}}
+  imageTag:
+    type: string
+    description: Image tag (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  imageTagRegex:
+    type: string
+    description: Image tag regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  imageDigest:
+    type: string
+    description: Image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/acr-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SUBSCRIPTION_ID: ${{inputs.subscriptionId}}
+    PLUGIN_ARTIFACT_REGISTRY_NAME: ${{inputs.registry}}
+    PLUGIN_ARTIFACT_REPOSITORY: ${{inputs.repository}}
+    PLUGIN_ARTIFACT_IMAGE_TAG: ${{inputs.imageTag}}
+    PLUGIN_ARTIFACT_IMAGE_TAG_REGEX: ${{inputs.imageTagRegex}}
+    PLUGIN_ARTIFACT_IMAGE_DIGEST: ${{inputs.imageDigest}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_AZURE_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_AZURE_CLIENT_ID: ${{inputs.artifactConnector.clientId}}
+    PLUGIN_AZURE_TENANT_ID: ${{inputs.artifactConnector.tenantId}}
+    PLUGIN_AZURE_ENV: ${{inputs.artifactConnector.envType}}
+    PLUGIN_AZURE_SECRET: ${{inputs.artifactConnector.clientSecret}}
+    PLUGIN_AZURE_CERTIFICATE_DATA: ${{inputs.artifactConnector.clientCertificate}}
+    PLUGIN_AZURE_OIDC_TOKEN: ${{inputs.artifactConnector.oidcToken}}
+    PLUGIN_AZURE_AUDIENCE: ${{inputs.artifactConnector.audience}}

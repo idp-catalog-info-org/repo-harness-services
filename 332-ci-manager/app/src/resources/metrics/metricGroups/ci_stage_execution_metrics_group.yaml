@@ -1,0 +1,7 @@
+name: CI Manager Stage Execution Metrics Group
+identifier: CIStageExecutionMetricsGroup
+labels:
+  - accountId
+  - infraType
+  - status
+  - phase

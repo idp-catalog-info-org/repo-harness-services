@@ -1,0 +1,9 @@
+name: GitX Cache Operation Times in Metrics Group
+identifier: gitx_cache_operation_times_group
+labels:
+  - accountId
+  - operationType
+  - status
+#  - repoName
+#  - gitProvider
+  - cacheMiss

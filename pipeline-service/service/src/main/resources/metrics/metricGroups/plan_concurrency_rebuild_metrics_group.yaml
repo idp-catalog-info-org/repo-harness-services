@@ -1,0 +1,6 @@
+name: Plan Concurrency Rebuild Metrics Group
+identifier: PlanConcurrencyRebuildMetricsGroup
+labels:
+  - scope
+  - accountId
+  - outcome

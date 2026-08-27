@@ -1,0 +1,2 @@
+subject: ${PIPELINE} ${EVENT_TYPE}
+body: ${OUTER_DIV}${COLOR};"><div style="font-size:15px;">Pipeline <a href="${PIPELINE_URL}" target="_blank" style="text-decoration:none;color:#1A89BF;"><b>${PIPELINE}</b></a> from Org <b>${ORG}</b> failed to start <br>trigger <a href="${TRIGGER_ACTIVITY_URL}" target="_blank" style="text-decoration:none;color:#1A89BF;"><b>${TRIGGER}</b></a> failed <br>Error details - ${ERROR}</div><div><i>Triggered on ${START_DATE}</i></div></div>

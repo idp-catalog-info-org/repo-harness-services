@@ -1,0 +1,16 @@
+name: Pipeline Delete Cleanup Metrics
+identifier: PipelineDeleteCleanupMetrics
+metricGroup: PipelineDeleteCleanupMetricsGroup
+metrics:
+  - metricName: pipeline_delete_cleanup_backlog_count
+    metricDefinition: Number of pending pipeline-delete cleanup records
+    type: LastValue
+    unit: count
+  - metricName: pipeline_delete_cleanup_max_lag_ms
+    metricDefinition: Age in milliseconds of the oldest pending pipeline-delete cleanup record
+    type: LastValue
+    unit: ms
+  - metricName: pipeline_delete_cleanup_stale_count
+    metricDefinition: Number of pipeline-delete cleanup records older than the stale threshold
+    type: LastValue
+    unit: count

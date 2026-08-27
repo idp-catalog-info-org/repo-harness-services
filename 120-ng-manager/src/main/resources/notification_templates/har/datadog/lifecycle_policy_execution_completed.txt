@@ -1,0 +1,13 @@
+{
+    "title": "Harness Artifact Registry Lifecycle Rule Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+    "text": "A lifecycle rule execution has completed with status: ${EXECUTION_STATUS}. Lifecycle Rule: ${POLICY_NAME}. Start Time: ${EXECUTION_START_TIME}. End Time: ${EXECUTION_END_TIME}. Artifacts Protected (Protection Rule): ${ARTIFACTS_SKIPPED}. Artifacts Soft Deleted: ${ARTIFACTS_DELETED}. Registries Affected: ${REGISTRIES_AFFECTED}. Storage Reclaimed: ${STORAGE_RECLAIMED}. View Details: ${EXECUTION_URL}",
+    "tags": [
+        "policy:${POLICY_NAME}",
+        "status:${EXECUTION_STATUS}",
+        "event_type:lifecycle_policy_execution_completed"
+    ],
+    "aggregation_key": "${POLICY_NAME}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

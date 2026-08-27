@@ -1,0 +1,50 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//315-sto-manager/contracts/src/main/java/io/harness/beans/steps/nodes:module",
+        "//332-ci-manager/service/src/main/java/io/harness/ci/beans:module",
+        "//332-ci-manager/service/src/main/java/io/harness/ci/beans/steps/nodes:module",
+        "//332-ci-manager/service/src/main/java/io/harness/ci/execution/aitestautomation:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/beans/steps/nodes:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/config:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/execution:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/execution/intfc:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/integrationstage/vm:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/integrationstage/vm/intfc:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/serializer:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/utils/validation:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/utils/validation/intfc:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/workloadidentity:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/iacm/execution:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/steps/nodes:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/steps/stepinfo:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/metrics:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/serializer:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/plugin/service:module",
+        "//950-wait-engine/src/main/java/io/harness/waiter:module",
+        "//950-wait-engine/src/main/java/io/harness/waiter/module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/exception/exceptionmanager/exceptionhandler:module",
+        "//980-commons/src/main/java/io/harness/threading:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/queue-service/java-client/src/main/java/io/harness/hsqs/client:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

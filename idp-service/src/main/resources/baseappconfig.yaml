@@ -1,0 +1,16 @@
+proxy:
+  endpoints:
+    '/harness/${HARNESS_PROXY_END_POINT}':
+      target: '${HARNESS_BASE_URL}/'
+      pathRewrite:
+        '/api/proxy/harness/${HARNESS_PROXY_END_POINT}/?': '/'
+      allowedHeaders:
+        - authorization
+        - Harness-Account
+    '/harness/scorecard':
+      target: '${HARNESS_BASE_URL}/'
+      pathRewrite:
+        '/api/proxy/harness/scorecard/?': '/'
+      allowedHeaders:
+        - authorization
+        - Harness-Account

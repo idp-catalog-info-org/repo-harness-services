@@ -1,0 +1,84 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//120-ng-manager/src/main/java/io/harness/ng:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/api/impl:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/modules:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/eventsframework:module",
+        "//120-ng-manager/src/main/java/io/harness/pms/redisConsumer:module",
+        "//120-ng-manager/src/main/java/io/harness/serializer:module",
+        "//440-certificate-nextgen/src/main/java/io/harness/ngcertificates/services:module",
+        "//440-certificate-nextgen/src/main/java/io/harness/ngcertificates/services/impl:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector/services:module",
+        "//440-connector-nextgen/src/main/java/io/harness/repositories:module",
+        "//440-secret-management-service/src/main/java/io/harness/repositories/ng/core/spring:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/engine/expressions:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/opa:module",
+        "//910-delegate-service-driver/src/main/java/io/harness/service:module",
+        "//940-feature-flag/src/main/java/io/harness/ff:module",
+        "//940-secret-manager-client/src/main/java/io/harness/ng/core/api:module",
+        "//940-secret-manager-client/src/main/java/io/harness/secretmanagerclient:module",
+        "//940-secret-manager-client/src/main/java/io/harness/secretmanagerclient/services/api:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/ng/core:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/secretmanagerclient:module",
+        "//950-ng-core/src/main/java/io/harness/ng/core/activityhistory/service:module",
+        "//950-ng-core/src/main/java/io/harness/repositories/accountsetting:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/impl:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//950-opa-client/src/main/java/io/harness/opaclient:module",
+        "//950-wait-engine/src/main/java/io/harness/waiter:module",
+        "//950-wait-engine/src/main/java/io/harness/waiter/persistence/interfaces:module",
+        "//953-events-api/src/main/java/io/harness/eventsframework:module",
+        "//955-account-mgmt/src/main/java/io/harness/account/services:module",
+        "//955-outbox-sdk/src/main/java/io/harness/outbox/api:module",
+        "//955-setup-usage-sdk/src/main/java/io/harness/ng/core/entitysetupusage/service:module",
+        "//959-file-service-commons/src/main/java/io/harness/file:module",
+        "//959-file-service-commons/src/main/java/software/wings/service/intfc:module",
+        "//960-persistence/src/main/java/io/harness/cache:module",
+        "//960-persistence/src/main/java/io/harness/persistence:module",
+        "//960-persistence/src/main/java/io/harness/redis:module",
+        "//970-api-services-beans/src/main/java/io/harness/security/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness:module",
+        "//970-ng-commons/src/main/java/io/harness/constants:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//980-commons/src/main/java/io/harness/configuration:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/exception/exceptionmanager/exceptionhandler:module",
+        "//980-commons/src/main/java/io/harness/fips:bouncycastle_tests",
+        "//980-commons/src/main/java/io/harness/govern:module",
+        "//980-commons/src/main/java/io/harness/serializer:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "//clients/ngsettings/src/main/java/io/harness/ngsettings/client/remote:module",
+        "//clients/template-service/src/main/java/io/harness/template/remote:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:junit_junit",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+        "@maven//:org_springframework_spring_tx",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

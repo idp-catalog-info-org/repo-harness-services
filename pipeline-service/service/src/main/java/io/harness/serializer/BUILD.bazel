@@ -1,0 +1,45 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//136-git-sync-manager/src/main/java/io/harness/serializer/morphia:module",
+        "//440-connector-nextgen/src/main/java/io/harness/serializer:module",
+        "//900-git-sync-sdk/src/main/java/io/harness/gitsync/serializer:module",
+        "//920-delegate-agent-beans/src/main/java/io/harness/serializer/kryo:module",
+        "//920-delegate-service-beans/src/main/java/io/harness/serializer/kryo:module",
+        "//940-primary-version-manager/src/main/java/io/harness/serializer:module",
+        "//955-filters-sdk/src/main/java/io/harness/filter/serializer/morphia:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema/beans:module",
+        "//970-watcher-beans/src/main/java/io/harness/serializer/kryo:module",
+        "//980-commons/src/main/java/io/harness/morphia:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/service/src/main/java/io/harness/serializer/kryo:module",
+        "//pipeline-service/service/src/main/java/io/harness/serializer/morphia:module",
+        "//platform-service/modules/notification-service/contracts/src/main/java/io/harness/serializer/kryo:module",
+        "//platform-service/modules/notification-service/contracts/src/main/java/io/harness/serializer/morphia:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:dev_morphia_morphia_core",
+        "@maven//:org_springframework_spring_core",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

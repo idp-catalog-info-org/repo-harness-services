@@ -1,0 +1,78 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_binary")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    srcs = glob(["src/main/java/**/*.java"]),
+    visibility = ["//pipeline-service:__subpackages__"],
+    exports = [
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/dataretention/config:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/dataretention/entity:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/dataretention/entity/beans:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/reconciliation/entity:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/reconciliation/entity/beans:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/retention:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/search/entity:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/search/entity/beans:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/search/entity/beans/cd:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/search/entity/beans/ci:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/serializer/kryo:module",
+        "//pipeline-service/modules/retention/contracts/src/main/java/io/harness/serializer/morphia:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/cleanup:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/beans:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/jobs/service:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/jobs/service/impl:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/service:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/service/impl:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/dataretention/utils:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/logger:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/mappers:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/reconciliation/jobs:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/reconciliation/service:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/reconciliation/service/impl:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/repositories/dataretention:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/repositories/reconciliation:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/repositories/search:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/search/jobs:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/search/mappers:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/search/service:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/search/service/impl:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/search/utils:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/retention/src/main/java/io/harness/utils:module",
+    ],
+)
+
+java_library(
+    name = "tests",
+    testonly = True,
+    visibility = ["//pipeline-service:__subpackages__"],
+    exports = [
+        "//pipeline-service/modules/retention/src/test/java/io/harness/dataretention/service/impl:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/dataretention/utils:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/mappers:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/reconciliation/jobs:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/reconciliation/service/impl:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/search/jobs:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/search/mappers:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/search/service/impl:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/search/utils:tests",
+        "//pipeline-service/modules/retention/src/test/java/io/harness/utils:tests",
+    ],
+)
+
+run_tests()
+
+# run static analysis macro for pmd/checkstyle/sonarqube checks
+run_analysis(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

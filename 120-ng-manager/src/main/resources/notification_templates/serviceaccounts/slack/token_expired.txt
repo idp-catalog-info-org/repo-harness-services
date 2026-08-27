@@ -1,0 +1,45 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Token Expired",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "The token *${TOKEN_IDENTIFIER}* for API Key *${API_KEY_IDENTIFIER}* in Service Account *${SERVICE_ACCOUNT_NAME}* expired on *${EXPIRY_DATE}*.\n\nAny pipelines or integrations using this token will fail. Create a new token to avoid failures."
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Account:*\n${ACCOUNT_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Account ID:*\n${ACCOUNT_IDENTIFIER}"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Org:*\n${ORG_IDENTIFIER}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Project:*\n${PROJECT_IDENTIFIER}"
+				}
+			]
+		}
+	]
+}

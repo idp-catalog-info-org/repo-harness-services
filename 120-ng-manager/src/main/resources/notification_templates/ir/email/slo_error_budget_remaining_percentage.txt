@@ -1,0 +1,133 @@
+subject: >-
+  Harness Incident Response: Low Remaining Percentage for SLO ${SLO_NAME} Error Budget
+body: >-
+  <html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <meta name="format-detection" content="telephone=no">
+    <style>
+      @media all and (max-width: 580px) {
+        a.logo img {
+          margin-left: 15px !important;
+        }
+      }
+      /* Button styling */
+      .button {
+        background-color: #00ade4;
+        color: white;
+        padding: 12px 30px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 20px;
+      }
+      .button:hover {
+        background-color: #007bb5;
+      }
+    </style>
+    <title>Harness</title>
+  </head>
+
+  <body style="min-width: 100%; border-collapse: collapse; background-color: #EFEFF1; color: #000000;">
+    <table width="100%" align="center" border="0" cellpadding="0" cellspacing="0" style="border-spacing: 0; margin: 0; padding: 0;">
+      <tr>
+        <td align="center" valign="top" bgcolor="#EFEFF1">
+          <!-- Banner -->
+          <table border="0" cellpadding="0" cellspacing="0" align="center" style="display: block; max-width: 580px;">
+            <tr>
+              <td valign="top">
+                <a target="_blank" href="https://harness.io">
+                  <img border="0" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/ng-background.png" alt="Harness Banner" width="580" style="width: 100%; max-width: 580px;">
+                </a>
+              </td>
+            </tr>
+          </table>
+          <!-- Content -->
+          <table border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#FFFFFF" width="580" style="max-width: 580px;">
+            <tr>
+              <td align="center" valign="middle" style="padding: 25px 20px;">
+                <h2 style="color: #333333; font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; margin: 0;">Harness Incident Response</h2>
+                <p style="font-family: Arial, sans-serif; font-size: 14px; color: #555555; margin: 10px 0;">
+                  The remaining percentage for the error budget of SLO <b>${SLO_NAME}</b> is critically low under project <b>${SLO_PROJECT_NAME}</b>, in organization <b>${SLO_ORG_NAME}</b>.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="padding: 10px 20px;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                  <tr>
+                    <td style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; color: #333333; padding: 5px 0;">
+                      <b>Trigger:</b> The error budget for SLO <b>${SLO_NAME}</b> is critically low, requiring immediate attention under project <b>${SLO_PROJECT_NAME}</b> in organization <b>${SLO_ORG_NAME}</b>.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; color: #333333; padding: 5px 0;">
+                      <b>Incident Time:</b> Incident occurred at ${INCIDENT_TIME}.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; color: #333333; padding: 5px 0;">
+                      <b>Account Name:</b> ${ACCOUNT_NAME}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; color: #333333; padding: 5px 0;">
+                      <b>Organization Name:</b> ${SLO_ORG_NAME}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; color: #333333; padding: 5px 0;">
+                      <b>Project Name:</b> ${SLO_PROJECT_NAME}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- View SLO Details Button -->
+            <tr>
+              <td align="center" valign="top">
+                <a href="${SLO_URL}" class="button" target="_blank">View SLO Details</a>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="padding-top: 25px;">
+                <hr color="#DBDCDD" align="center" width="100%" size="1">
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="font-size: 14px; font-weight: 600; line-height: 33px; padding: 20px 0; color: #000000; font-family: Arial, sans-serif;">
+                Have a question? <a href="mailto:support@harness.io" target="_blank" style="text-decoration: none; color: #00ade4;">support@harness.io</a>
+              </td>
+            </tr>
+          </table>
+          <!-- Footer -->
+          <table border="0" cellpadding="0" cellspacing="0" align="center" width="580" style="max-width: 580px;">
+            <tr>
+              <td align="center" valign="top" style="padding: 20px;">
+                <table width="256" border="0" cellpadding="0" cellspacing="0" align="center">
+                  <tr>
+                    <td align="center"><a target="_blank" href="https://www.facebook.com/harnessinc/"><img src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logofb.png" width="44" height="44"></a></td>
+                    <td align="center"><a target="_blank" href="https://www.linkedin.com/company/18249313/"><img src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logolinkedin.png" width="44" height="44"></a></td>
+                    <td align="center"><a target="_blank" href="https://www.instagram.com/harness.io/"><img src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logoinstagram.png" width="44" height="44"></a></td>
+                    <td align="center"><a target="_blank" href="https://twitter.com/harnessio"><img src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logotwitter.png" width="44" height="44"></a></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="font-size: 13px; font-weight: 400; line-height: 150%; padding: 20px; color: #999999; font-family: Arial, sans-serif;">
+                <a href="https://www.google.com/maps/place/116+New+Montgomery+St+%23200,+San+Francisco,+CA+94105/" target="_blank" style="text-decoration: none; color: #999999;">
+                  Harness.io 116 New Montgomery Street, Suite 200 San Francisco, CA 94105
+                </a>
+                <br> Copyright &copy; 2024 Harness Inc.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>

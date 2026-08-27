@@ -1,0 +1,25 @@
+apiVersion: harness.io/v1
+kind: Environment
+owner: {user}
+identifier: {environmentIdentifier}
+name: {environmentName}
+scope: {scope}
+orgIdentifier: {orgIdentifier}
+projectIdentifier: {projectIdentifier}
+spec:
+  environmentBlueprint:
+    identifier: {environmentBlueprintIdentifier}
+    orgIdentifier: ""
+    projectIdentifier: ""
+    version: {environmentBlueprintVersion}
+  basedOn:
+    identifier: {basedOnIdentifier}
+    orgIdentifier: {basedOnOrgIdentifier}
+    projectIdentifier: {basedOnProjectIdentifier}
+  overrides:
+    {configBlock}
+  targetState:
+    state: {targetState}
+  inputs:
+    {inputs}
+type: {type}

@@ -1,0 +1,46 @@
+template:
+  name: Invalid Conf
+  identifier: Invalid_Conf
+  versionLabel: v1
+  type: MonitoredService
+  projectIdentifier: testnotify
+  orgIdentifier: default
+  tags: {}
+  spec:
+    serviceRef: notifysvc
+    environmentRef: <+input>
+    type: Application
+    sources:
+      healthSources:
+        - type: DatadogMetrics
+          identifier: ddghs
+          name: ddg-hs
+          spec:
+            connectorRef: ddgconn
+            feature: Datadog Cloud Metrics
+            metricDefinitions:
+              - identifier: cpu.usage
+                dashboardName: g1
+                metricPath: cpu.usage
+                metricName: cpu.usage
+                metric: container.cpu.usage
+                metricTags: []
+                aggregation: avg
+                isManualQuery: true
+                isCustomCreatedMetric: true
+                query: avg:container.cpu.usage{*}.rollup(avg, 60)
+                sli:
+                  enabled: false
+                analysis:
+                  riskProfile:
+                    riskCategory: Performance_Other
+                    thresholdTypes:
+                      - ACT_WHEN_HIGHER
+                  liveMonitoring:
+                    enabled: false
+                  deploymentVerification:
+                    enabled: true
+                    serviceInstanceFieldName: host
+            metricPacks:
+              - identifier: Custom
+                metricThresholds: []

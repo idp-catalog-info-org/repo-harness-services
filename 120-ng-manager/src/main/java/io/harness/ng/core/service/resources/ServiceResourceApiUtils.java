@@ -1,0 +1,257 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.core.service.resources;
+
+import static io.harness.data.structure.EmptyPredicate.isEmpty;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+import static io.harness.ng.core.mapper.TagMapper.convertToList;
+import static io.harness.ng.core.mapper.TagMapper.convertToMap;
+
+import io.harness.accesscontrol.acl.api.AccessControlDTO;
+import io.harness.accesscontrol.acl.api.PermissionCheckDTO;
+import io.harness.accesscontrol.acl.api.ResourceScope;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.ScopeInfo;
+import io.harness.exception.InvalidRequestException;
+import io.harness.ng.core.service.dto.ServiceRequestDTO;
+import io.harness.ng.core.service.entity.NGServiceEntityMapper;
+import io.harness.ng.core.service.entity.ServiceEntity;
+import io.harness.ng.core.service.entity.ServiceEntity.ServiceEntityKeys;
+import io.harness.ng.core.service.yaml.NGServiceConfig;
+import io.harness.ng.core.service.yaml.NGServiceV2InfoConfig;
+import io.harness.pms.rbac.CDNGRbacPermissions;
+import io.harness.pms.rbac.NGResourceType;
+import io.harness.pms.yaml.HarnessYamlVersion;
+import io.harness.spec.server.ng.v1.model.Service;
+import io.harness.spec.server.ng.v1.model.ServiceCreateRequest;
+import io.harness.spec.server.ng.v1.model.ServiceResponse;
+import io.harness.spec.server.ng.v1.model.ServiceUpdateRequest;
+
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import io.dropwizard.jersey.validation.JerseyViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true,
+    components = {HarnessModuleComponent.CDS_SERVICE_ENVIRONMENT})
+@Singleton
+public class ServiceResourceApiUtils {
+  private final Validator validator;
+
+  @Inject
+  public ServiceResourceApiUtils(Validator validator) {
+    this.validator = validator;
+  }
+
+  @Deprecated
+  public ServiceResponse mapToServiceResponse(ServiceEntity serviceEntity) {
+    ServiceResponse serviceResponse = new ServiceResponse();
+    Service service = new Service();
+    service.setAccount(serviceEntity.getAccountId());
+    service.setIdentifier(serviceEntity.getIdentifier());
+    service.setOrg(serviceEntity.getOrgIdentifier());
+    service.setProject(serviceEntity.getProjectIdentifier());
+    service.setName(serviceEntity.getName());
+    service.setDescription(serviceEntity.getDescription());
+    service.setTags(convertToMap(serviceEntity.getTags()));
+    service.setYaml(serviceEntity.getYaml(serviceEntity.getHarnessVersion()));
+    service.setHarnessVersion(serviceEntity.getHarnessVersion());
+    serviceResponse.setService(service);
+    serviceResponse.setCreated(serviceEntity.getCreatedAt());
+    serviceResponse.setUpdated(serviceEntity.getLastModifiedAt());
+    Set<ConstraintViolation<ServiceResponse>> violations = validator.validate(serviceResponse);
+    if (!violations.isEmpty()) {
+      throw new JerseyViolationException(violations, null);
+    }
+    return serviceResponse;
+  }
+
+  public ServiceResponse mapToServiceResponse(ServiceEntity serviceEntity, ScopeInfo scopeInfo) {
+    ServiceResponse serviceResponse = new ServiceResponse();
+    Service service = new Service();
+    service.setAccount(serviceEntity.getAccountId());
+    service.setIdentifier(serviceEntity.getIdentifier());
+    service.setOrg(scopeInfo.getOrgIdentifier());
+    service.setProject(scopeInfo.getProjectIdentifier());
+    service.setName(serviceEntity.getName());
+    service.setDescription(serviceEntity.getDescription());
+    service.setTags(convertToMap(serviceEntity.getTags()));
+    service.setYaml(serviceEntity.getYaml(serviceEntity.getHarnessVersion()));
+    service.setHarnessVersion(serviceEntity.getHarnessVersion());
+    serviceResponse.setService(service);
+    serviceResponse.setCreated(serviceEntity.getCreatedAt());
+    serviceResponse.setUpdated(serviceEntity.getLastModifiedAt());
+    Set<ConstraintViolation<ServiceResponse>> violations = validator.validate(serviceResponse);
+    if (!violations.isEmpty()) {
+      throw new JerseyViolationException(violations, null);
+    }
+    return serviceResponse;
+  }
+
+  public ServiceResponse mapToAccessListResponse(ServiceEntity serviceEntity) {
+    ServiceResponse serviceResponse = new ServiceResponse();
+    Service service = new Service();
+    service.setAccount(serviceEntity.getAccountId());
+    service.setOrg(serviceEntity.getOrgIdentifier());
+    service.setProject(serviceEntity.getProjectIdentifier());
+    service.setIdentifier(serviceEntity.getIdentifier());
+    service.setName(serviceEntity.getName());
+    service.setDescription(serviceEntity.getDescription());
+    service.setTags(convertToMap(serviceEntity.getTags()));
+    service.setHarnessVersion(serviceEntity.getHarnessVersion());
+    serviceResponse.setService(service);
+    serviceResponse.setCreated(serviceEntity.getCreatedAt());
+    serviceResponse.setUpdated(serviceEntity.getLastModifiedAt());
+    Set<ConstraintViolation<ServiceResponse>> violations = validator.validate(serviceResponse);
+    if (!violations.isEmpty()) {
+      throw new JerseyViolationException(violations, null);
+    }
+    return serviceResponse;
+  }
+
+  public ServiceEntity mapToServiceEntity(
+      ServiceCreateRequest serviceRequest, String org, String project, String account, ScopeInfo scopeInfo) {
+    boolean useScopeInfo = scopeInfo != null;
+    ServiceEntity serviceEntity = ServiceEntity.builder()
+                                      .identifier(serviceRequest.getIdentifier())
+                                      .accountId(account)
+                                      .orgIdentifier(useScopeInfo ? scopeInfo.getOrgIdentifier() : org)
+                                      .projectIdentifier(useScopeInfo ? scopeInfo.getProjectIdentifier() : project)
+                                      .name(serviceRequest.getName())
+                                      .description(serviceRequest.getDescription())
+                                      .tags(convertToList(serviceRequest.getTags()))
+                                      .yaml(serviceRequest.getYaml())
+                                      .harnessVersion(serviceRequest.getHarnessVersion())
+                                      .build();
+    // This also validates the service yaml
+    validateAndSetFieldsInEntity(serviceEntity, scopeInfo);
+
+    return serviceEntity;
+  }
+
+  public ServiceEntity mapToServiceEntity(
+      ServiceUpdateRequest serviceRequest, String org, String project, String account, ScopeInfo scopeInfo) {
+    boolean useScopeInfo = scopeInfo != null;
+    ServiceEntity serviceEntity = ServiceEntity.builder()
+                                      .identifier(serviceRequest.getIdentifier())
+                                      .accountId(account)
+                                      .orgIdentifier(useScopeInfo ? scopeInfo.getOrgIdentifier() : org)
+                                      .projectIdentifier(useScopeInfo ? scopeInfo.getProjectIdentifier() : project)
+                                      .name(serviceRequest.getName())
+                                      .description(serviceRequest.getDescription())
+                                      .tags(convertToList(serviceRequest.getTags()))
+                                      .yaml(serviceRequest.getYaml())
+                                      .harnessVersion(serviceRequest.getHarnessVersion())
+                                      .build();
+    // This also validates the service yaml
+    validateAndSetFieldsInEntity(serviceEntity, scopeInfo);
+    return serviceEntity;
+  }
+
+  private void validateAndSetFieldsInEntity(ServiceEntity serviceEntity, ScopeInfo scopeInfo) {
+    boolean useScopeInfo = scopeInfo != null;
+    final NGServiceConfig ngServiceConfig = useScopeInfo
+        ? NGServiceEntityMapper.toNGServiceConfig(serviceEntity, scopeInfo)
+        : NGServiceEntityMapper.toNGServiceConfig(serviceEntity);
+    final NGServiceV2InfoConfig ngServiceV2InfoConfig = ngServiceConfig.getNgServiceV2InfoConfig();
+    if (isEmpty(useScopeInfo ? serviceEntity.getYaml(scopeInfo) : serviceEntity.getYaml())) {
+      if (!HarnessYamlVersion.V0.equals(serviceEntity.getHarnessVersion())) {
+        throw new InvalidRequestException("yaml is required for harness yaml version > 0");
+      }
+      serviceEntity.setYaml(NGServiceEntityMapper.toYaml(ngServiceConfig));
+    }
+    serviceEntity.setGitOpsEnabled(ngServiceV2InfoConfig.getGitOpsEnabled());
+    if (ngServiceV2InfoConfig.getServiceDefinition() != null) {
+      serviceEntity.setType(ngServiceV2InfoConfig.getServiceDefinition().getType());
+    }
+    Set<ConstraintViolation<ServiceEntity>> violations = validator.validate(serviceEntity);
+    if (!violations.isEmpty()) {
+      throw new JerseyViolationException(violations, null);
+    }
+  }
+
+  public PermissionCheckDTO serviceResponseToPermissionCheckDTO(ServiceResponse serviceResponse) {
+    return PermissionCheckDTO.builder()
+        .permission(CDNGRbacPermissions.SERVICE_RUNTIME_PERMISSION)
+        .resourceIdentifier(serviceResponse.getService().getIdentifier())
+        .resourceScope(ResourceScope.builder()
+                           .accountIdentifier(serviceResponse.getService().getAccount())
+                           .orgIdentifier(serviceResponse.getService().getOrg())
+                           .projectIdentifier(serviceResponse.getService().getProject())
+                           .build())
+        .resourceType(NGResourceType.SERVICE)
+        .build();
+  }
+
+  public String mapSort(String sort, String order) {
+    String property;
+    switch (sort) {
+      case "identifier":
+        property = ServiceEntityKeys.identifier;
+        break;
+      case "harness_account":
+        property = ServiceEntityKeys.accountId;
+        break;
+      case "org":
+        property = ServiceEntityKeys.orgIdentifier;
+        break;
+      case "project":
+        property = ServiceEntityKeys.projectIdentifier;
+        break;
+      case "created":
+        property = ServiceEntityKeys.createdAt;
+        break;
+      case "updated":
+        property = ServiceEntityKeys.lastModifiedAt;
+        break;
+      default:
+        property = sort;
+    }
+    return property + ',' + order;
+  }
+
+  static void validateServiceScope(ServiceRequestDTO requestDTO) {
+    try {
+      Preconditions.checkArgument(isNotEmpty(requestDTO.getOrgIdentifier()),
+          "org identifier must be specified. Services can only be created at Project scope");
+      Preconditions.checkArgument(isNotEmpty(requestDTO.getProjectIdentifier()),
+          "project identifier must be specified. Services can only be created at Project scope");
+    } catch (Exception ex) {
+      throw new InvalidRequestException(ex.getMessage());
+    }
+  }
+
+  public void throwExceptionForNoRequestDTO(ServiceCreateRequest dto) {
+    if (dto == null) {
+      throw new InvalidRequestException(
+          "No request body sent in the API. Following field is required: identifier. Other optional fields: name, "
+          + "orgIdentifier, projectIdentifier, tags, description, version");
+    }
+  }
+
+  public List<ServiceResponse> filterByPermissionAndId(
+      List<AccessControlDTO> accessControlList, List<ServiceResponse> serviceList) {
+    List<ServiceResponse> filteredAccessControlDtoList = new ArrayList<>();
+    for (int i = 0; i < accessControlList.size(); i++) {
+      AccessControlDTO accessControlDTO = accessControlList.get(i);
+      ServiceResponse serviceResponse = serviceList.get(i);
+      if (accessControlDTO.isPermitted()
+          && serviceResponse.getService().getIdentifier().equals(accessControlDTO.getResourceIdentifier())) {
+        filteredAccessControlDtoList.add(serviceResponse);
+      }
+    }
+    return filteredAccessControlDtoList;
+  }
+}

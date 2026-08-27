@@ -1,0 +1,7 @@
+name: IDP Service Dropwizard Metrics Group per resource method per status codes
+identifier: IdpServiceDwResourcesWithStatusMetricsGroup
+labels:
+  - method
+  - resource
+  - container
+  - statusCode

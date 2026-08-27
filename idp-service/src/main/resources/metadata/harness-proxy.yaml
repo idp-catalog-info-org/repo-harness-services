@@ -1,0 +1,21 @@
+identifier: harness-proxy
+name: Configure Backend Proxies
+description: Configure Backend Proxies in Harness IDP to be used by your plugins and Dynamic workflow pickers.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Harness
+category: Utility
+source: ''
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/delegate-proxy/
+config: |-
+  proxy:
+    endpoints:
+      '/test':
+        target: <target-url>
+        pathRewrite:
+          /api/proxy/test/?: /
+        headers:
+          Authorization: Api-Token ${TOKEN}

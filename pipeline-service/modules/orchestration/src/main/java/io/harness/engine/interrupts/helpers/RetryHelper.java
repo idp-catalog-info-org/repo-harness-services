@@ -1,0 +1,267 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.engine.interrupts.helpers;
+
+import static io.harness.annotations.dev.HarnessTeam.CDC;
+import static io.harness.data.structure.EmptyPredicate.isEmpty;
+import static io.harness.data.structure.UUIDGenerator.generateUuid;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.FeatureName;
+import io.harness.beans.stepDetail.NodeExecutionsInfo;
+import io.harness.beans.stepDetail.NodeExecutionsInfo.NodeExecutionsInfoKeys;
+import io.harness.constants.OrchestrationPublisherName;
+import io.harness.data.structure.UUIDGenerator;
+import io.harness.delay.DelayEventHelper;
+import io.harness.engine.OrchestrationEngine;
+import io.harness.engine.execution.ExecutionInputService;
+import io.harness.engine.executions.node.service.NodeExecutionService;
+import io.harness.engine.executions.plan.service.PlanExecutionService;
+import io.harness.engine.executions.plan.service.PlanService;
+import io.harness.engine.observers.NodeCreateInfo;
+import io.harness.engine.observers.NodeExecutionCreateObserver;
+import io.harness.engine.pms.data.ResolverUtils;
+import io.harness.engine.pms.execution.modifier.ambiance.AmbianceExecutionContextHelper;
+import io.harness.engine.pms.execution.modifier.ambiance.AmbianceModifier;
+import io.harness.engine.pms.execution.modifier.ambiance.AmbianceModifierFactory;
+import io.harness.engine.pms.resume.callback.waitretry.v2.EngineWaitRetryCallbackV2;
+import io.harness.engine.utils.PmsLevelUtils;
+import io.harness.execution.ExecutionInputInstance;
+import io.harness.execution.NodeExecution;
+import io.harness.execution.NodeExecution.NodeExecutionBuilder;
+import io.harness.execution.NodeExecution.NodeExecutionKeys;
+import io.harness.graph.stepDetail.service.NodeExecutionInfoService;
+import io.harness.interrupts.InterruptEffect;
+import io.harness.observer.Subject;
+import io.harness.plan.Node;
+import io.harness.plancreator.constants.NGCommonUtilPlanCreationConstants;
+import io.harness.pms.contracts.advisers.InterventionWaitAdvise;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.ambiance.Level;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.execution.StrategyMetadata;
+import io.harness.pms.contracts.interrupts.InterruptConfig;
+import io.harness.pms.contracts.interrupts.InterruptType;
+import io.harness.pms.contracts.interrupts.RetryInterruptConfig;
+import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.waiter.WaitNotifyEngine;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true,
+    components = {HarnessModuleComponent.CDS_PIPELINE, HarnessModuleComponent.CDS_FIRST_GEN})
+@OwnedBy(CDC)
+@Slf4j
+public class RetryHelper {
+  @Inject private PlanService planService;
+  @Inject private NodeExecutionService nodeExecutionService;
+  @Inject private OrchestrationEngine engine;
+  @Inject @Named("EngineExecutorService") private ExecutorService executorService;
+  @Inject private ExecutionInputService executionInputService;
+  @Inject private DelayEventHelper delayEventHelper;
+  @Inject private WaitNotifyEngine waitNotifyEngine;
+  @Inject @Named(OrchestrationPublisherName.PUBLISHER_NAME) private String publisherName;
+  @Inject private PlanExecutionService planExecutionService;
+  @Inject private NodeExecutionInfoService nodeExecutionInfoService;
+  @Inject private AmbianceModifierFactory ambianceModifierFactory;
+  @Inject private AmbianceExecutionContextHelper ambianceExecutionContextHelper;
+  @Getter private final Subject<NodeExecutionCreateObserver> nodeExecutionCreateObserverSubject = new Subject<>();
+
+  public void retryNodeExecution(String nodeExecutionId, String interruptId, InterruptConfig interruptConfig) {
+    NodeExecution nodeExecution = Preconditions.checkNotNull(nodeExecutionService.get(nodeExecutionId));
+    Node node = planService.fetchNode(nodeExecution.getPlanId(), nodeExecution.getNodeId());
+    String newUuid = generateUuid();
+
+    Ambiance oldAmbiance = nodeExecutionService.getAmbiance(nodeExecution);
+    NodeExecution updatedRetriedNode = updateRetriedNodeMetadata(nodeExecution);
+
+    Level currentLevel = AmbianceUtils.obtainCurrentLevel(oldAmbiance);
+    Ambiance ambiance = AmbianceUtils.cloneForFinish(oldAmbiance);
+    StrategyMetadata strategyMetadata = null;
+    if (currentLevel != null && AmbianceUtils.hasStrategyMetadata(currentLevel)) {
+      strategyMetadata = nodeExecutionInfoService.getStrategyMetadata(currentLevel);
+    }
+    int newRetryIndex = currentLevel != null ? currentLevel.getRetryIndex() + 1 : 0;
+    Ambiance finalAmbiance =
+        ambiance.toBuilder()
+            .addLevels(PmsLevelUtils.buildLevelFromNode(newUuid, newRetryIndex, node, strategyMetadata,
+                AmbianceUtils.checkIfFeatureFlagEnabled(
+                    ambiance, FeatureName.PIPE_REMOVE_STRATEGY_METADATA_POPULATION.name())))
+            .build();
+    // TODO: Move nodeExecution creation to AbstractNodeExecutionStrategy
+    // ambiance could be modified by this clone method
+    NodeExecution newNodeExecution =
+        cloneForRetry(updatedRetriedNode, newUuid, finalAmbiance, interruptConfig, interruptId);
+    NodeExecution savedNodeExecution = nodeExecutionService.save(newNodeExecution);
+    nodeExecutionInfoService.saveNodeExecutionInfo(
+        newUuid, ambiance.getPlanExecutionId(), strategyMetadata, AmbianceUtils.getAccountId(finalAmbiance));
+    nodeExecutionCreateObserverSubject.fireInform(NodeExecutionCreateObserver::onNodeCreate,
+        NodeCreateInfo.builder()
+            .nodeExecutionId(newUuid)
+            .ambiance(ambiance)
+            .planExecutionId(ambiance.getPlanExecutionId())
+            .node(node)
+            .build());
+
+    nodeExecutionService.updateRelationShipsForRetryNode(updatedRetriedNode.getUuid(), savedNodeExecution.getUuid());
+    if (nodeExecution.getGroup().equals(AmbianceUtils.STEP_GROUP)
+        || nodeExecution.getGroup().equals(NGCommonUtilPlanCreationConstants.GROUP)) {
+      nodeExecutionService.markCurrentNodeExecutionAndChildrenRetried(
+          updatedRetriedNode.getUuid(), updatedRetriedNode.getPlanExecutionId());
+    } else {
+      nodeExecutionService.markRetried(updatedRetriedNode.getUuid());
+    }
+
+    boolean cacheCurrentStatusEnabled =
+        AmbianceUtils.checkIfFeatureFlagEnabled(ambiance, FeatureName.PIPE_CACHE_CURRENT_STATUS.name());
+    Optional<Level> stageLevel = AmbianceUtils.getStageLevelFromAmbiance(ambiance);
+    if (cacheCurrentStatusEnabled && stageLevel.isPresent() && currentLevel != null) {
+      NodeExecutionsInfo executionsInfo = nodeExecutionInfoService.getNodeExecutionsInfoWithProjections(
+          stageLevel.get().getRuntimeId(), Set.of(NodeExecutionsInfoKeys.failedChildIdChain));
+      if (executionsInfo != null
+          && AmbianceUtils.isCurrentLevelAncestorOfRuntimeId(
+              executionsInfo.getFailedChildIdChain(), currentLevel, oldAmbiance.getLevelsList())) {
+        // only when first unsuccessful belongs to the retry ancestor, we clean it up
+        nodeExecutionInfoService.clearFirstUnsuccessfulRuntimeIdChain(stageLevel.get().getRuntimeId());
+      }
+    }
+
+    if (interruptConfig.getRetryInterruptConfig().getWaitInterval() > 0) {
+      log.info("Retry Wait Interval : {}", interruptConfig.getRetryInterruptConfig().getWaitInterval());
+      String resumeId =
+          delayEventHelper.delay(interruptConfig.getRetryInterruptConfig().getWaitInterval(), Collections.emptyMap());
+      waitNotifyEngine.waitForAllOn(
+          publisherName, new EngineWaitRetryCallbackV2(nodeExecutionService.getAmbiance(newNodeExecution)), resumeId);
+      return;
+    }
+    // Todo: Check with product if we want to stop again for execution time input
+    executorService.submit(() -> engine.queueOrStartExecution(nodeExecutionService.getAmbiance(newNodeExecution)));
+  }
+
+  private NodeExecution updateRetriedNodeMetadata(NodeExecution nodeExecution) {
+    NodeExecution updatedNodeExecution = updateRetriedNodeStatusIfInterventionWaiting(nodeExecution);
+    if (updatedNodeExecution != null && updatedNodeExecution.getEndTs() == null) {
+      updatedNodeExecution = nodeExecutionService.update(
+          updatedNodeExecution.getUuid(), ops -> ops.set(NodeExecutionKeys.endTs, System.currentTimeMillis()));
+    }
+    return updatedNodeExecution == null ? nodeExecution : updatedNodeExecution;
+  }
+
+  // Update the status of older retried node to true status from interventionWaiting if retry is on intervention waiting
+  // node.
+  private NodeExecution updateRetriedNodeStatusIfInterventionWaiting(NodeExecution nodeExecution) {
+    if (nodeExecution.getStatus() == Status.INTERVENTION_WAITING
+        && nodeExecution.getAdviserResponse().hasInterventionWaitAdvise()) {
+      InterventionWaitAdvise interventionWaitAdvise = nodeExecution.getAdviserResponse().getInterventionWaitAdvise();
+      NodeExecution updatedNodeExecution =
+          nodeExecutionService.updateStatusWithOps(nodeExecution.getUuid(), interventionWaitAdvise.getFromStatus(),
+              ops -> ops.set(NodeExecutionKeys.endTs, System.currentTimeMillis()), EnumSet.noneOf(Status.class));
+      if (updatedNodeExecution == null) {
+        log.warn("Cannot conclude node execution. Status update failed From :{}, To:{}", nodeExecution.getStatus(),
+            interventionWaitAdvise.getFromStatus());
+      }
+      return updatedNodeExecution;
+    }
+    return nodeExecution;
+  }
+
+  @VisibleForTesting
+  NodeExecution cloneForRetry(NodeExecution nodeExecution, String newUuid, Ambiance ambiance,
+      InterruptConfig interruptConfig, String interruptId) {
+    AmbianceModifier ambianceModifier = ambianceModifierFactory.obtainModifier(
+        AmbianceUtils.obtainCurrentLevel(ambiance).getStepType().getStepCategory());
+    if (ambianceModifier != null) {
+      ambiance = ambianceModifier.modify(ambiance, planExecutionService);
+    }
+
+    List<String> retryIds = isEmpty(nodeExecution.getRetryIds()) ? new LinkedList<>() : nodeExecution.getRetryIds();
+    retryIds.add(nodeExecution.getUuid());
+    InterruptConfig newInterruptConfig =
+        InterruptConfig.newBuilder()
+            .setIssuedBy(interruptConfig.getIssuedBy())
+            .setRetryInterruptConfig(RetryInterruptConfig.newBuilder().setRetryId(nodeExecution.getUuid()).build())
+            .build();
+    InterruptEffect interruptEffect = InterruptEffect.builder()
+                                          .interruptType(InterruptType.RETRY)
+                                          .tookEffectAt(System.currentTimeMillis())
+                                          .interruptId(interruptId)
+                                          .interruptConfig(newInterruptConfig)
+                                          .build();
+
+    List<InterruptEffect> interruptHistories =
+        isEmpty(nodeExecution.getInterruptHistories()) ? new LinkedList<>() : nodeExecution.getInterruptHistories();
+    interruptHistories.add(interruptEffect);
+    cloneAndSaveInputInstanceForRetry(nodeExecution.getUuid(), newUuid);
+
+    NodeExecutionBuilder builder = NodeExecution.builder()
+                                       .uuid(newUuid)
+                                       .levelCount(ambiance.getLevelsCount())
+                                       .mode(null)
+                                       .endTs(null)
+                                       .initialWaitDuration(null)
+                                       .resolvedStepParameters(null)
+                                       .resolvedParams(nodeExecution.getResolvedParams())
+                                       .excludedKeysFromStepInputs(nodeExecution.getExcludedKeysFromStepInputs())
+                                       .notifyId(nodeExecution.getNotifyId())
+                                       .parentId(nodeExecution.getParentId())
+                                       .nextId(nodeExecution.getNextId())
+                                       .previousId(nodeExecution.getPreviousId())
+                                       .lastUpdatedAt(null)
+                                       .version(null)
+                                       .executableResponses(new ArrayList<>())
+                                       .interruptHistories(interruptHistories)
+                                       .failureInfo(null)
+                                       .status(Status.QUEUED)
+                                       .timeoutInstanceIds(new ArrayList<>())
+                                       .timeoutDetails(null)
+                                       .retryIds(retryIds)
+                                       .oldRetry(false)
+                                       .originalNodeExecutionId(nodeExecution.getOriginalNodeExecutionId())
+                                       .module(nodeExecution.getModule())
+                                       .name(nodeExecution.getName())
+                                       .skipGraphType(nodeExecution.getSkipGraphType())
+                                       .identifier(nodeExecution.getIdentifier())
+                                       .stepType(nodeExecution.getStepType())
+                                       .nodeId(nodeExecution.getNodeId())
+                                       .stageFqn(nodeExecution.getStageFqn())
+                                       .group(nodeExecution.getGroup())
+                                       .skipExpressionChain(nodeExecution.getSkipExpressionChain())
+                                       .levelRuntimeIdx(ResolverUtils.prepareLevelRuntimeIdIndices(ambiance))
+                                       .nodeType(AmbianceUtils.obtainNodeType(ambiance));
+    ambianceExecutionContextHelper.setAmbianceAndExecutionContextValues(ambiance, builder);
+    return builder.build();
+  }
+
+  @VisibleForTesting
+  ExecutionInputInstance cloneAndSaveInputInstanceForRetry(String originalNodeExecutionId, String newNodeExecutionId) {
+    ExecutionInputInstance inputInstance = executionInputService.getExecutionInputInstance(originalNodeExecutionId);
+    if (inputInstance == null) {
+      log.info("ExecutionInput instance is null for nodeExecutionId: {}", originalNodeExecutionId);
+      return null;
+    }
+    inputInstance.setInputInstanceId(UUIDGenerator.generateUuid());
+    inputInstance.setNodeExecutionId(newNodeExecutionId);
+    return executionInputService.save(inputInstance);
+  }
+}

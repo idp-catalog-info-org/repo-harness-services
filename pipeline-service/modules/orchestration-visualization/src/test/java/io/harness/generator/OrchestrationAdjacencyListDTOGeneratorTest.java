@@ -1,0 +1,662 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.generator;
+
+import static io.harness.rule.OwnerRule.ALEXEI;
+import static io.harness.rule.OwnerRule.MEENA;
+import static io.harness.steps.StepUtils.PIE_SIMPLIFY_LOG_BASE_KEY;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import io.harness.OrchestrationVisualizationTestBase;
+import io.harness.beans.GraphVertex;
+import io.harness.beans.OrchestrationAdjacencyListInternal;
+import io.harness.beans.converter.GraphVertexConverter;
+import io.harness.beans.internal.EdgeListInternal;
+import io.harness.beans.stepDetail.NodeExecutionsInfo;
+import io.harness.category.element.UnitTests;
+import io.harness.engine.pms.data.outcome.PmsOutcomeService;
+import io.harness.execution.NodeExecution;
+import io.harness.graph.stepDetail.service.NodeExecutionInfoService;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.ambiance.Level;
+import io.harness.pms.contracts.execution.ExecutionMode;
+import io.harness.pms.contracts.execution.StrategyMetadata;
+import io.harness.pms.contracts.plan.ExecutionMetadata;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.sdk.core.resolver.outcome.mapper.PmsOutcomeMapper;
+import io.harness.pms.sdk.core.steps.io.StepParameters;
+import io.harness.rule.Owner;
+import io.harness.serializer.recaster.RecastOrchestrationUtils;
+import io.harness.utils.DummyForkStepParameters;
+import io.harness.utils.DummySectionStepParameters;
+import io.harness.utils.DummyVisualizationOutcome;
+
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+/**
+ * Test class for {@link OrchestrationAdjacencyListGenerator}
+ */
+public class OrchestrationAdjacencyListDTOGeneratorTest extends OrchestrationVisualizationTestBase {
+  private static final String PLAN_EXECUTION_ID = "planId";
+  private static final String STARTING_EXECUTION_NODE_ID = "startID";
+
+  private static final StepType DUMMY_STEP_TYPE =
+      StepType.newBuilder().setType("DUMMY").setStepCategory(StepCategory.STEP).build();
+
+  @Mock private PmsOutcomeService pmsOutcomeService;
+  @Mock private NodeExecutionInfoService pmsGraphStepDetailsService;
+  @Inject private GraphVertexConverter graphVertexConverter;
+  @InjectMocks @Inject private OrchestrationAdjacencyListGenerator orchestrationAdjacencyListGenerator;
+
+  @Before
+  public void setUp() {
+    when(pmsOutcomeService.findAllByRuntimeId(anyString(), anyString()))
+        .thenReturn(Collections.singletonList(
+            PmsOutcomeMapper.convertOutcomeValueToJson(new DummyVisualizationOutcome("outcome"))));
+  }
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void shouldGenerateOrchestrationAdjacencyListInternalWithSection() {
+    NodeExecution dummyStart =
+        NodeExecution.builder()
+            .uuid("node1")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(Collections.singletonList(
+                              Level.newBuilder().setSetupId(STARTING_EXECUTION_NODE_ID).build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.SYNC)
+            .nextId("node2")
+            .build();
+    Map<String, Object> sectionStepParams =
+        RecastOrchestrationUtils.toMap(DummySectionStepParameters.builder().childNodeId("child_section_2").build());
+    NodeExecution section =
+        NodeExecution.builder()
+            .uuid("node2")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(Collections.singletonList(Level.newBuilder().setSetupId("section_2").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.CHILD)
+            .resolvedStepParameters(sectionStepParams)
+            .previousId(dummyStart.getUuid())
+            .build();
+    NodeExecution sectionChild =
+        NodeExecution.builder()
+            .uuid("node_child_2")
+            .ambiance(
+                Ambiance.newBuilder()
+                    .setPlanExecutionId(PLAN_EXECUTION_ID)
+                    .addAllLevels(Collections.singletonList(Level.newBuilder().setSetupId("child_section_2").build()))
+                    .setMetadata(ExecutionMetadata.newBuilder()
+                                     .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                     .build())
+                    .build())
+            .mode(ExecutionMode.SYNC)
+            .parentId(section.getUuid())
+            .build();
+    List<NodeExecution> nodeExecutions = Lists.newArrayList(dummyStart, section, sectionChild);
+    doReturn(NodeExecutionsInfo.builder().build()).when(pmsGraphStepDetailsService).getNodeExecutionsInfo(anyString());
+
+    OrchestrationAdjacencyListInternal adjacencyList =
+        orchestrationAdjacencyListGenerator.generateAdjacencyList(dummyStart.getUuid(), nodeExecutions, false);
+
+    assertThat(adjacencyList).isNotNull();
+
+    assertThat(adjacencyList.getGraphVertexMap().size()).isEqualTo(3);
+    assertThat(adjacencyList.getGraphVertexMap().keySet())
+        .containsExactlyInAnyOrder(dummyStart.getUuid(), section.getUuid(), sectionChild.getUuid());
+
+    assertThat(adjacencyList.getAdjacencyMap().size()).isEqualTo(3);
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyStart.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(section.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(section.getUuid()).getEdges())
+        .containsExactlyInAnyOrder(sectionChild.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(sectionChild.getUuid()).getEdges()).isEmpty();
+    assertThat(adjacencyList.getAdjacencyMap().get(sectionChild.getUuid()).getNextIds()).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void shouldGenerateOrchestrationAdjacencyListInternalWithChildChain() {
+    String dummyNode1Uuid = "dummyNode1";
+    String dummyNode2Uuid = "dummyNode2";
+
+    NodeExecution sectionChainParentNode =
+        NodeExecution.builder()
+            .uuid("section_chain_start")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(Collections.singletonList(
+                              Level.newBuilder().setSetupId("section_chain_plan_node").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.CHILD_CHAIN)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+
+    NodeExecution sectionChain1 =
+        NodeExecution.builder()
+            .uuid("section_chain_child1")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(Collections.singletonList(
+                              Level.newBuilder().setSetupId("section_chain_child1_plan_node").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.TASK)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .parentId(sectionChainParentNode.getUuid())
+            .nextId(dummyNode1Uuid)
+            .build();
+
+    NodeExecution sectionChain2 =
+        NodeExecution.builder()
+            .uuid("section_chain_child2")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(Collections.singletonList(
+                              Level.newBuilder().setSetupId("section_chain_child2_plan_node").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.TASK)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .parentId(sectionChainParentNode.getUuid())
+            .nextId(dummyNode2Uuid)
+            .build();
+
+    NodeExecution dummyNode1 =
+        NodeExecution.builder()
+            .uuid(dummyNode1Uuid)
+            .ambiance(
+                Ambiance.newBuilder()
+                    .setPlanExecutionId(PLAN_EXECUTION_ID)
+                    .addAllLevels(Collections.singletonList(Level.newBuilder().setSetupId("dummy_plan_node_1").build()))
+                    .setMetadata(ExecutionMetadata.newBuilder()
+                                     .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                     .build())
+                    .build())
+            .mode(ExecutionMode.SYNC)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .parentId(sectionChainParentNode.getUuid())
+            .previousId(sectionChain1.getUuid())
+            .build();
+
+    NodeExecution dummyNode2 =
+        NodeExecution.builder()
+            .uuid(dummyNode2Uuid)
+            .ambiance(
+                Ambiance.newBuilder()
+                    .setPlanExecutionId(PLAN_EXECUTION_ID)
+                    .addAllLevels(Collections.singletonList(Level.newBuilder().setSetupId("dummy_plan_node_2").build()))
+                    .setMetadata(ExecutionMetadata.newBuilder()
+                                     .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                     .build())
+                    .build())
+            .mode(ExecutionMode.SYNC)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .parentId(sectionChainParentNode.getUuid())
+            .previousId(sectionChain2.getUuid())
+            .build();
+
+    List<NodeExecution> nodeExecutions =
+        Lists.newArrayList(sectionChainParentNode, sectionChain1, sectionChain2, dummyNode1, dummyNode2);
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId(sectionChainParentNode.getUuid())
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo(sectionChainParentNode.getUuid());
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId(sectionChain1.getUuid())
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo(sectionChain1.getUuid());
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId(sectionChain2.getUuid())
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo(sectionChain2.getUuid());
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId(dummyNode1Uuid)
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .strategyMetadata(StrategyMetadata.newBuilder().setCurrentIteration(0).build())
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo(dummyNode1Uuid);
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId(dummyNode2Uuid)
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .strategyMetadata(StrategyMetadata.newBuilder().setCurrentIteration(1).build())
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo(dummyNode2Uuid);
+
+    OrchestrationAdjacencyListInternal adjacencyList = orchestrationAdjacencyListGenerator.generateAdjacencyList(
+        sectionChainParentNode.getUuid(), nodeExecutions, true);
+    assertThat(adjacencyList).isNotNull();
+
+    assertThat(adjacencyList.getGraphVertexMap().size()).isEqualTo(5);
+    assertThat(adjacencyList.getGraphVertexMap().keySet())
+        .containsExactlyInAnyOrder(sectionChainParentNode.getUuid(), sectionChain1.getUuid(), sectionChain2.getUuid(),
+            dummyNode1.getUuid(), dummyNode2.getUuid());
+    assertThat(adjacencyList.getGraphVertexMap().get(dummyNode1Uuid).getStrategyMetadata())
+        .isEqualTo(StrategyMetadata.newBuilder().setCurrentIteration(0).build());
+    assertThat(adjacencyList.getGraphVertexMap().get(dummyNode2Uuid).getStrategyMetadata())
+        .isEqualTo(StrategyMetadata.newBuilder().setCurrentIteration(1).build());
+
+    assertThat(adjacencyList.getAdjacencyMap().size()).isEqualTo(5);
+    assertThat(adjacencyList.getAdjacencyMap().get(sectionChainParentNode.getUuid()).getEdges())
+        .containsExactlyInAnyOrder(sectionChain1.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(sectionChain1.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(dummyNode1.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode1.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(sectionChain2.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(sectionChain2.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(dummyNode2.getUuid());
+  }
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void shouldGenerateOrchestrationGraphWithFork() {
+    StepParameters forkStepParams =
+        DummyForkStepParameters.builder().parallelNodeId("parallel_node_1").parallelNodeId("parallel_node_2").build();
+    NodeExecution fork = NodeExecution.builder()
+                             .uuid("node1")
+                             .ambiance(Ambiance.newBuilder()
+                                           .setPlanExecutionId(PLAN_EXECUTION_ID)
+                                           .addAllLevels(Collections.singletonList(
+                                               Level.newBuilder().setSetupId(STARTING_EXECUTION_NODE_ID).build()))
+                                           .setMetadata(ExecutionMetadata.newBuilder()
+                                                            .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                                            .build())
+                                           .build())
+                             .mode(ExecutionMode.CHILDREN)
+                             .resolvedStepParameters(RecastOrchestrationUtils.toMap(forkStepParams))
+                             .createdAt(System.currentTimeMillis())
+                             .lastUpdatedAt(System.currentTimeMillis())
+                             .build();
+    NodeExecution parallelNode1 =
+        NodeExecution.builder()
+            .uuid("parallel_node_1")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(
+                              Collections.singletonList(Level.newBuilder().setSetupId("parallel_plan_node_1").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.SYNC)
+            .parentId(fork.getUuid())
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+    NodeExecution parallelNode2 =
+        NodeExecution.builder()
+            .uuid("parallel_node_2")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(
+                              Collections.singletonList(Level.newBuilder().setSetupId("parallel_plan_node_2").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.SYNC)
+            .parentId(fork.getUuid())
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+    List<NodeExecution> nodeExecutions = Lists.newArrayList(fork, parallelNode1, parallelNode2);
+    doReturn(NodeExecutionsInfo.builder().nodeExecutionId("parallel_node_1").planExecutionId(PLAN_EXECUTION_ID).build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("parallel_node_1");
+    doReturn(NodeExecutionsInfo.builder().nodeExecutionId("parallel_node_2").planExecutionId(PLAN_EXECUTION_ID).build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("parallel_node_2");
+    doReturn(NodeExecutionsInfo.builder().nodeExecutionId("node1").planExecutionId(PLAN_EXECUTION_ID).build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("node1");
+
+    OrchestrationAdjacencyListInternal adjacencyList =
+        orchestrationAdjacencyListGenerator.generateAdjacencyList(fork.getUuid(), nodeExecutions, false);
+    assertThat(adjacencyList).isNotNull();
+
+    assertThat(adjacencyList.getGraphVertexMap().size()).isEqualTo(3);
+    assertThat(adjacencyList.getGraphVertexMap().keySet())
+        .containsExactlyInAnyOrder(fork.getUuid(), parallelNode1.getUuid(), parallelNode2.getUuid());
+
+    assertThat(adjacencyList.getAdjacencyMap().get(fork.getUuid())).isNotNull();
+    assertThat(adjacencyList.getAdjacencyMap().get(fork.getUuid()).getNextIds()).isEmpty();
+    assertThat(adjacencyList.getAdjacencyMap().get(fork.getUuid()).getEdges())
+        .containsExactlyInAnyOrder(parallelNode1.getUuid(), parallelNode2.getUuid());
+  }
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void shouldGeneratePartialOrchestrationGraphWithFork() {
+    NodeExecution dummyNode1 =
+        NodeExecution.builder()
+            .uuid("dummy_node_1")
+            .ambiance(
+                Ambiance.newBuilder()
+                    .setPlanExecutionId(PLAN_EXECUTION_ID)
+                    .addAllLevels(Collections.singletonList(Level.newBuilder().setSetupId("dummy_plan_node_1").build()))
+                    .setMetadata(ExecutionMetadata.newBuilder()
+                                     .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                     .build())
+                    .build())
+            .mode(ExecutionMode.SYNC)
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+    StepParameters forkStepParams =
+        DummyForkStepParameters.builder().parallelNodeId("parallel_node_1").parallelNodeId("parallel_node_2").build();
+    NodeExecution fork = NodeExecution.builder()
+                             .uuid("node1")
+                             .ambiance(Ambiance.newBuilder()
+                                           .setPlanExecutionId(PLAN_EXECUTION_ID)
+                                           .addAllLevels(Collections.singletonList(
+                                               Level.newBuilder().setSetupId(STARTING_EXECUTION_NODE_ID).build()))
+                                           .setMetadata(ExecutionMetadata.newBuilder()
+                                                            .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                                            .build())
+                                           .build())
+                             .mode(ExecutionMode.CHILDREN)
+                             .resolvedStepParameters(RecastOrchestrationUtils.toMap(forkStepParams))
+                             .createdAt(System.currentTimeMillis())
+                             .lastUpdatedAt(System.currentTimeMillis())
+                             .build();
+    NodeExecution parallelNode1 =
+        NodeExecution.builder()
+            .uuid("parallel_node_1")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(
+                              Collections.singletonList(Level.newBuilder().setSetupId("parallel_plan_node_1").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.SYNC)
+            .parentId(fork.getUuid())
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+    NodeExecution parallelNode2 =
+        NodeExecution.builder()
+            .uuid("parallel_node_2")
+            .ambiance(Ambiance.newBuilder()
+                          .setPlanExecutionId(PLAN_EXECUTION_ID)
+                          .addAllLevels(
+                              Collections.singletonList(Level.newBuilder().setSetupId("parallel_plan_node_2").build()))
+                          .setMetadata(ExecutionMetadata.newBuilder()
+                                           .putFeatureFlagToValueMap(PIE_SIMPLIFY_LOG_BASE_KEY, false)
+                                           .build())
+                          .build())
+            .mode(ExecutionMode.SYNC)
+            .parentId(fork.getUuid())
+            .nextId(dummyNode1.getUuid())
+            .createdAt(System.currentTimeMillis())
+            .lastUpdatedAt(System.currentTimeMillis())
+            .build();
+    List<NodeExecution> nodeExecutions = Lists.newArrayList(fork, parallelNode1, parallelNode2, dummyNode1);
+    doReturn(NodeExecutionsInfo.builder().nodeExecutionId("parallel_node_1").planExecutionId(PLAN_EXECUTION_ID).build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("parallel_node_1");
+    doReturn(NodeExecutionsInfo.builder().nodeExecutionId("parallel_node_2").planExecutionId(PLAN_EXECUTION_ID).build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("parallel_node_2");
+    doReturn(NodeExecutionsInfo.builder()
+                 .nodeExecutionId("dummy_node_1")
+                 .planExecutionId(PLAN_EXECUTION_ID)
+                 .strategyMetadata(StrategyMetadata.newBuilder().build())
+                 .build())
+        .when(pmsGraphStepDetailsService)
+        .getNodeExecutionsInfo("dummy_node_1");
+
+    OrchestrationAdjacencyListInternal adjacencyList =
+        orchestrationAdjacencyListGenerator.generateAdjacencyList(parallelNode2.getUuid(), nodeExecutions, true);
+    assertThat(adjacencyList).isNotNull();
+
+    assertThat(adjacencyList.getGraphVertexMap().size()).isEqualTo(2);
+    assertThat(adjacencyList.getGraphVertexMap().keySet())
+        .containsExactlyInAnyOrder(parallelNode2.getUuid(), dummyNode1.getUuid());
+    assertThat(adjacencyList.getGraphVertexMap().get(dummyNode1.getUuid()).getStrategyMetadata())
+        .isEqualTo(StrategyMetadata.newBuilder().build());
+
+    assertThat(adjacencyList.getAdjacencyMap().get(parallelNode2.getUuid()).getEdges()).isEmpty();
+    assertThat(adjacencyList.getAdjacencyMap().get(parallelNode2.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(dummyNode1.getUuid());
+
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode1.getUuid()).getEdges()).isEmpty();
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode1.getUuid()).getNextIds()).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void shouldGeneratePartialAdjacencyListWithFork() {
+    GraphVertex fork = GraphVertex.builder()
+                           .uuid("fork1")
+                           .planNodeId(STARTING_EXECUTION_NODE_ID)
+                           .mode(ExecutionMode.CHILDREN)
+                           .lastUpdatedAt(System.currentTimeMillis())
+                           .build();
+    GraphVertex parallelNode1 = GraphVertex.builder()
+                                    .uuid("parallel_node_1")
+                                    .planNodeId("parallel_plan_node_1")
+                                    .mode(ExecutionMode.SYNC)
+                                    .lastUpdatedAt(System.currentTimeMillis())
+                                    .build();
+    GraphVertex parallelNode2 = GraphVertex.builder()
+                                    .uuid("parallel_node_2")
+                                    .planNodeId("parallel_plan_node_2")
+                                    .mode(ExecutionMode.SYNC)
+                                    .lastUpdatedAt(System.currentTimeMillis())
+                                    .build();
+    GraphVertex dummyNode1 = GraphVertex.builder()
+                                 .uuid("dummy_node_1")
+                                 .planNodeId("dummy_plan_node_1")
+                                 .mode(ExecutionMode.SYNC)
+                                 .lastUpdatedAt(System.currentTimeMillis())
+                                 .build();
+    GraphVertex dummyNode2 = GraphVertex.builder()
+                                 .uuid("dummy_node_2")
+                                 .planNodeId("dummy_plan_node_2")
+                                 .mode(ExecutionMode.SYNC)
+                                 .lastUpdatedAt(System.currentTimeMillis())
+                                 .build();
+    GraphVertex dummyNode3 = GraphVertex.builder()
+                                 .uuid("dummy_node_3")
+                                 .planNodeId("dummy_plan_node_3")
+                                 .mode(ExecutionMode.SYNC)
+                                 .lastUpdatedAt(System.currentTimeMillis())
+                                 .build();
+    List<GraphVertex> vertices =
+        Lists.newArrayList(fork, parallelNode1, parallelNode2, dummyNode1, dummyNode2, dummyNode3);
+
+    Map<String, GraphVertex> graphVertexMap =
+        vertices.stream().collect(Collectors.toMap(GraphVertex::getUuid, Function.identity()));
+    Map<String, EdgeListInternal> adjacencyMap = new HashMap<>();
+    adjacencyMap.put(fork.getUuid(),
+        EdgeListInternal.builder()
+            .edges(Arrays.asList(parallelNode1.getUuid(), parallelNode2.getUuid()))
+            .nextIds(new ArrayList<>())
+            .prevIds(new ArrayList<>())
+            .parentId(null)
+            .build());
+    adjacencyMap.put(parallelNode1.getUuid(),
+        EdgeListInternal.builder()
+            .edges(new ArrayList<>())
+            .nextIds(new ArrayList<>())
+            .prevIds(new ArrayList<>())
+            .parentId(fork.getUuid())
+            .build());
+    adjacencyMap.put(parallelNode2.getUuid(),
+        EdgeListInternal.builder()
+            .edges(Collections.singletonList(dummyNode2.getUuid()))
+            .nextIds(Collections.singletonList(dummyNode1.getUuid()))
+            .prevIds(new ArrayList<>())
+            .parentId(fork.getUuid())
+            .build());
+    adjacencyMap.put(dummyNode1.getUuid(),
+        EdgeListInternal.builder()
+            .edges(new ArrayList<>())
+            .nextIds(new ArrayList<>())
+            .prevIds(Collections.singletonList(parallelNode2.getUuid()))
+            .parentId(null)
+            .build());
+    adjacencyMap.put(dummyNode2.getUuid(),
+        EdgeListInternal.builder()
+            .edges(new ArrayList<>())
+            .nextIds(Collections.singletonList(dummyNode3.getUuid()))
+            .prevIds(new ArrayList<>())
+            .parentId(parallelNode2.getUuid())
+            .build());
+    adjacencyMap.put(dummyNode3.getUuid(),
+        EdgeListInternal.builder()
+            .edges(new ArrayList<>())
+            .nextIds(new ArrayList<>())
+            .prevIds(Collections.singletonList(dummyNode2.getUuid()))
+            .parentId(null)
+            .build());
+
+    OrchestrationAdjacencyListInternal listInternal =
+        OrchestrationAdjacencyListInternal.builder().graphVertexMap(graphVertexMap).adjacencyMap(adjacencyMap).build();
+
+    OrchestrationAdjacencyListInternal adjacencyList =
+        orchestrationAdjacencyListGenerator.generatePartialAdjacencyList(parallelNode2.getUuid(), listInternal);
+    assertThat(adjacencyList).isNotNull();
+
+    assertThat(adjacencyList.getGraphVertexMap().size()).isEqualTo(3);
+    assertThat(adjacencyList.getGraphVertexMap().keySet())
+        .containsExactlyInAnyOrder(parallelNode2.getUuid(), dummyNode2.getUuid(), dummyNode3.getUuid());
+
+    assertThat(adjacencyList.getAdjacencyMap().get(parallelNode2.getUuid()).getEdges())
+        .containsExactlyInAnyOrder(dummyNode2.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(parallelNode2.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(dummyNode1.getUuid());
+
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode2.getUuid()).getNextIds())
+        .containsExactlyInAnyOrder(dummyNode3.getUuid());
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode2.getUuid()).getEdges()).isEmpty();
+
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode3.getUuid()).getNextIds()).isEmpty();
+    assertThat(adjacencyList.getAdjacencyMap().get(dummyNode3.getUuid()).getEdges()).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = MEENA)
+  @Category(UnitTests.class)
+  public void testGenerateAdjacencyList() {
+    String startingNodeId = "stepGroupNodeId";
+    List<NodeExecution> nodeExecutions = List.of(
+        NodeExecution.builder()
+            .uuid("shellScript1WithinStepGroup")
+            .parentId("stepsNodeWithinStepGroup")
+            .identifier("ShellScript_2")
+            .group("STEP")
+            .nextId("shellScript2WithinStepGroup")
+            .createdAt(1721322139816L)
+            .ambiance(Ambiance.newBuilder().addAllLevels(Collections.singletonList(Level.newBuilder().build())).build())
+            .build(),
+        NodeExecution.builder()
+            .uuid("stepGroupNodeId")
+            .parentId("fkBvrVkQQR-wfH4r2VFbKw")
+            .identifier("test")
+            .group("STEP_GROUP")
+            .nextId("shellScript4NextToStepGroup")
+            .previousId("us_k6DGhTyqIfU2Y1Wigyg")
+            .createdAt(1721322139169L)
+            .ambiance(Ambiance.newBuilder().addAllLevels(Collections.singletonList(Level.newBuilder().build())).build())
+            .build(),
+        NodeExecution.builder()
+            .uuid("stepsNodeWithinStepGroup")
+            .parentId("stepGroupNodeId")
+            .identifier("steps")
+            .createdAt(1721322139608L)
+            .ambiance(Ambiance.newBuilder().addAllLevels(Collections.singletonList(Level.newBuilder().build())).build())
+            .build(),
+        NodeExecution.builder()
+            .uuid("shellScript2WithinStepGroup")
+            .parentId("stepsNodeWithinStepGroup")
+            .identifier("ShellScript_3")
+            .group("STEP")
+            .parentId("shellScript1WithinStepGroup")
+            .createdAt(1721322143106L)
+            .ambiance(Ambiance.newBuilder().addAllLevels(Collections.singletonList(Level.newBuilder().build())).build())
+            .build(),
+        NodeExecution.builder()
+            .uuid("shellScript4NextToStepGroup")
+            .parentId("fkBvrVkQQR-wfH4r2VFbKw")
+            .identifier("ShellScript_4")
+            .group("STEP")
+            .previousId("stepGroupNodeId")
+            .createdAt(1721322147286L)
+            .ambiance(Ambiance.newBuilder().addAllLevels(Collections.singletonList(Level.newBuilder().build())).build())
+            .build());
+    when(pmsGraphStepDetailsService.getNodeExecutionsInfo(anyString()))
+        .thenReturn(NodeExecutionsInfo.builder().build());
+    OrchestrationAdjacencyListInternal orchestrationAdjacencyListInternal =
+        orchestrationAdjacencyListGenerator.generateAdjacencyList(startingNodeId, nodeExecutions, false);
+    Map<String, EdgeListInternal> adjacencyMap = orchestrationAdjacencyListInternal.getAdjacencyMap();
+    assertThat(adjacencyMap.get(startingNodeId).getEdges()).containsAll(List.of("stepsNodeWithinStepGroup"));
+    assertThat(adjacencyMap.get("stepsNodeWithinStepGroup").getEdges())
+        .containsAll(List.of("shellScript1WithinStepGroup"));
+    assertThat(adjacencyMap.get("shellScript1WithinStepGroup").getEdges())
+        .containsAll(List.of("shellScript2WithinStepGroup"));
+    assertThat(adjacencyMap.get("shellScript1WithinStepGroup").getNextIds())
+        .containsAll(List.of("shellScript2WithinStepGroup"));
+    assertThat(orchestrationAdjacencyListInternal).isNotNull();
+  }
+}

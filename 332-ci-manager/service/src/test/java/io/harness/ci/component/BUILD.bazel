@@ -1,0 +1,62 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    resources = [
+        "//332-ci-manager/service/src/test/resources:resource",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//332-ci-manager/service/src/test/java/io/harness/ci/executionplan/base:tests",
+        "//980-commons/src/main/java/io/harness/testing:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+java_test(
+    name = "CIExecutionComponentTest",
+    srcs = ["CIExecutionComponentTest.java"],
+    resources = [
+        "//332-ci-manager/service/src/test/resources:resource",
+    ],
+    tags = ["component_test"],
+    test_class = "io.harness.ci.component.CIExecutionComponentTest",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//310-iacm-manager/contracts/src/main/java/io/harness/beans/stages:module",
+        "//310-iacm-manager/contracts/src/main/java/io/harness/beans/steps/nodes/iacm:module",
+        "//315-sto-manager/contracts/src/main/java/io/harness/beans/stages:module",
+        "//332-ci-manager/service/src/main/java/io/harness/ci/beans/steps/nodes/V1:module",
+        "//332-ci-manager/service/src/main/java/io/harness/ci/execution/plan/creator/execution:module",
+        "//332-ci-manager/service/src/test/java/io/harness/ci/executionplan/base:tests",
+        "//332-idp/src/main/java/io/harness/steps/beans/stepnode:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/steps/plugin/infrastructure/volumes:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/instancesync:module",
+        "//953-yaml-commons/src/main/java/io/harness/plancreator/stages:module",
+        "//953-yaml-commons/src/main/java/io/harness/plancreator/stages/parallel:module",
+        "//980-commons/src/main/java/io/harness/testing:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+    ],
+)

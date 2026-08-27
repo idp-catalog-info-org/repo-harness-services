@@ -1,0 +1,5 @@
+name: Group by module for pipeline filter creation metrics
+identifier: PipelineModuleMetricsGroup
+labels:
+  - module
+  - status

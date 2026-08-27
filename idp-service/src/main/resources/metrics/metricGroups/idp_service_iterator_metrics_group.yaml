@@ -1,0 +1,5 @@
+name: IDP Service Iterator Metrics Group
+identifier: IdpServiceIteratorMetricsGroup
+labels:
+  - accountIdentifier
+  - iteratorName

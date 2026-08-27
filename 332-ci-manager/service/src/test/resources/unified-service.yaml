@@ -1,0 +1,44 @@
+service:
+  uses: kubernetes
+  with:
+    manifests:
+      sources:
+        - id: k8s_code
+          uses: k8s
+          with:
+            store:
+              uses: github
+              with:
+                type: branch
+                branch: main
+                path:
+                  - k8s/manifest-path
+                connector: manifest-github-connector
+            values:
+              - k8s/defaultValues.yaml
+        - id: values_1
+          uses: values
+          with:
+            store:
+              uses: git
+              with:
+                connector: values-git-connector
+                type: branch
+                branch: main_1
+                repo: repo_1
+            values:
+              - value_1_a
+              - value_1_b
+        - id: values_2
+          uses: values
+          with:
+            store:
+              uses: git
+              with:
+                connector: values-git-connector
+                type: branch
+                branch: main_2
+                repo: repo_2
+            values:
+              - value_2_a
+              - value_2_b

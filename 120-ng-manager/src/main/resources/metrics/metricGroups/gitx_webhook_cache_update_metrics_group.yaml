@@ -1,0 +1,8 @@
+name: GitX Webhook Cache Update Time Metrics Group
+identifier: gitx_webhook_cache_update_time_group
+labels:
+  - accountId
+#  - repoName
+#  - connectorRef
+  - status
+  - cacheUpdateFailed

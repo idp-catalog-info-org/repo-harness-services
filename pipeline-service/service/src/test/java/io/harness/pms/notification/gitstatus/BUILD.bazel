@@ -1,0 +1,52 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    resources = [
+        "//pipeline-service/service/src/main/resources:resource",
+        "//pipeline-service/service/src/main/resources:static_resource",
+        "//pipeline-service/service/src/test/resources:resource",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//125-cd-nextgen/src/main/java/io/harness/cdng/gitops/gitstatus:module",
+        "//125-cd-nextgen/src/main/java/io/harness/cdng/gitops/outcomes:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/cdstage:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/data:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/plan/creation/yaml:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/resolver:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/resolver/outputs:module",
+        "//pipeline-service/modules/orchestration-visualization/contracts/src/main/java/io/harness/pms/plan/execution/beans:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/notification/gitstatus:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/service/intfc:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

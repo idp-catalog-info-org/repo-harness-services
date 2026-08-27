@@ -1,0 +1,284 @@
+name: IDP Service Dropwizard Metrics
+identifier: IdpServiceDwMetrics
+metricGroup: IdpServiceDwMetricsGroup
+metrics:
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_4xx_responses_count
+    metricDefinition: IDP Service Total number of 4xx error responses
+    type: LastValue
+    unit: count
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_5xx_responses_count
+    metricDefinition: IDP Service Total number of 5xx error responses
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_total_init
+    metricDefinition: IDP Service JVM Memory - Init
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_total_max
+    metricDefinition: IDP Service JVM Memory - Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_total_committed
+    metricDefinition: IDP Service JVM Memory - Total Committed
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_total_used
+    metricDefinition: IDP Service JVM Memory - Used Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_non_heap_init
+    metricDefinition: IDP Service JVM Memory - Init Non-Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_non_heap_max
+    metricDefinition: IDP Service JVM Memory - Max Non-Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_non_heap_committed
+    metricDefinition: IDP Service JVM Memory - Committed Non-Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_non_heap_used
+    metricDefinition: IDP Service JVM Memory - Non-Heap Memory Usage
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_non_heap_usage
+    metricDefinition: IDP Service JVM Memory - Non-Heap Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_heap_init
+    metricDefinition: IDP Service JVM Memory - Init Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_heap_max
+    metricDefinition: IDP Service JVM Memory - Max Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_heap_committed
+    metricDefinition: IDP Service JVM Memory - Committed Heap Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_heap_used
+    metricDefinition: IDP Service JVM Memory - Heap Memory Usage
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_heap_usage
+    metricDefinition: IDP Service JVM Memory - Heap Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Metaspace_committed
+    metricDefinition: IDP Service JVM Memory - Committed Metaspace Memory
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Metaspace_used
+    metricDefinition: IDP Service JVM Memory - Metaspace Memory Usage
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Metaspace_max
+    metricDefinition: IDP Service JVM Memory - Metaspace Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Metaspace_usage
+    metricDefinition: IDP Service JVM Memory - Metaspace Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Eden_Space_used
+    metricDefinition: IDP Service JVM Memory - G1 Eden Space Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Eden_Space_committed
+    metricDefinition: IDP Service JVM Memory - G1 Eden Space Committed
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Eden_Space_max
+    metricDefinition: IDP Service JVM Memory - G1 Eden Space Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Eden_Space_usage
+    metricDefinition: IDP Service JVM Memory - G1 Eden Space Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Eden_Space_used_after_gc
+    metricDefinition: IDP Service JVM Memory - G1 Eden Space Used After GC
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Old_Gen_used
+    metricDefinition: IDP Service JVM Memory - G1 Old Gen Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Old_Gen_committed
+    metricDefinition: IDP Service JVM Memory - G1 Old Gen Committed
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Old_Gen_max
+    metricDefinition: IDP Service JVM Memory - G1 Old Gen Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Old_Gen_usage
+    metricDefinition: IDP Service JVM Memory - G1 Old Gen Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Old_Gen_used_after_gc
+    metricDefinition: IDP Service JVM Memory - G1 Old Gen Used After GC
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Survivor_Space_used
+    metricDefinition: IDP Service JVM Memory - G1 Survivor Space Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Survivor_Space_committed
+    metricDefinition: IDP Service JVM Memory - G1 Survivor Space Committed
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Survivor_Space_max
+    metricDefinition: IDP Service JVM Memory - G1 Survivor Space Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Survivor_Space_usage
+    metricDefinition: IDP Service JVM Memory - G1 Survivor Space Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_G1_Survivor_Space_used_after_gc
+    metricDefinition: IDP Service JVM Memory - G1 Survivor Space Used After GC
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Compressed_Class_Space_used
+    metricDefinition: IDP Service JVM Memory - Compressed Class Space Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Compressed_Class_Space_max
+    metricDefinition: IDP Service JVM Memory - Compressed Class Space Max
+    type: LastValue
+    unit: count
+  - metricName: jvm_memory_pools_Compressed_Class_Space_usage
+    metricDefinition: IDP Service JVM Memory - Compressed Class Space Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_gc_G1_Young_Generation_count
+    metricDefinition: IDP Service JVM GC - G1 Young Generation Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_gc_G1_Young_Generation_time
+    metricDefinition: IDP Service JVM GC - G1 Young Generation Time
+    type: LastValue
+    unit: count
+  - metricName: jvm_gc_G1_Old_Generation_count
+    metricDefinition: IDP Service JVM GC - G1 Old Generation Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_gc_G1_Old_Generation_time
+    metricDefinition: IDP Service JVM GC - G1 Old Generation Time
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_direct_count
+    metricDefinition: IDP Service JVM Buffers - Direct Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_direct_used
+    metricDefinition: IDP Service JVM Buffers - Direct Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_direct_capacity
+    metricDefinition: IDP Service JVM Buffers - Direct Capacity
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_mapped_count
+    metricDefinition: IDP Service JVM Buffers - Mapped Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_mapped_used
+    metricDefinition: IDP Service JVM Buffers - Mapped Used
+    type: LastValue
+    unit: count
+  - metricName: jvm_buffers_mapped_capacity
+    metricDefinition: IDP Service JVM Buffers - Mapped Capacity
+    type: LastValue
+    unit: count
+  - metricName: jvm_classloader_loaded
+    metricDefinition: IDP Service JVM Classloader - Loaded Classes
+    type: LastValue
+    unit: count
+  - metricName: jvm_classloader_unloaded
+    metricDefinition: IDP Service JVM Classloader - Unloaded Classes
+    type: LastValue
+    unit: count
+  - metricName: jvm_attribute_uptime
+    metricDefinition: IDP Service JVM Attribute - Uptime
+    type: LastValue
+    unit: count
+  - metricName: jvm_filedescriptor
+    metricDefinition: IDP Service JVM File Descriptor Usage Ratio
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_count
+    metricDefinition: IDP Service JVM Threads - Total Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_blocked_count
+    metricDefinition: IDP Service JVM Threads - Blocked Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_daemon_count
+    metricDefinition: IDP Service JVM Threads - Daemon Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_deadlock_count
+    metricDefinition: IDP Service JVM Threads - Deadlocked Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_peak_count
+    metricDefinition: IDP Service JVM Threads - Peak Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_runnable_count
+    metricDefinition: IDP Service JVM Threads - Runnable Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_terminated_count
+    metricDefinition: IDP Service JVM Threads - Terminated Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_timed_waiting_count
+    metricDefinition: IDP Service JVM Threads - Timed_Wait Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_total_started_count
+    metricDefinition: IDP Service JVM Threads - Total Started Count
+    type: LastValue
+    unit: count
+  - metricName: jvm_threads_waiting_count
+    metricDefinition: IDP Service JVM Threads - Wait Count
+    type: LastValue
+    unit: count
+  - metricName: org_eclipse_jetty_util_thread_QueuedThreadPool_dw_size
+    metricDefinition: IDP Service Number of threads in (Jetty) web server pool that are servicing requests
+    type: LastValue
+    unit: count
+  - metricName: org_eclipse_jetty_util_thread_QueuedThreadPool_dw_utilization
+    metricDefinition: IDP Service Number of threads in (Jetty) web server that are currently being used
+    type: LastValue
+    unit: count
+  - metricName: org_eclipse_jetty_util_thread_QueuedThreadPool_dw_jobs
+    metricDefinition: IDP Service Number of jobs queued waiting for a thread from (Jetty) web server
+    type: LastValue
+    unit: count
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_requests_count
+    metricDefinition: IDP Service Total number of Requests Count
+    type: LastValue
+    unit: count
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_requests_snapshot_999thPercentile
+    metricDefinition: IDP Service Jetty - P999 Response Time
+    type: LastValue
+    unit: count
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_requests_snapshot_99thPercentile
+    metricDefinition: IDP Service Jetty - P99 Response Time
+    type: LastValue
+    unit: count
+  - metricName: io_dropwizard_jetty_MutableServletContextHandler_requests_snapshot_95thPercentile
+    metricDefinition: IDP Service Jetty - P95 Response Time
+    type: LastValue
+    unit: count
+  - metricName: org_eclipse_jetty_server_HttpConnectionFactory_7090_connections_count
+    metricDefinition: IDP Service Jetty - Connection Count
+    type: LastValue
+    unit: count

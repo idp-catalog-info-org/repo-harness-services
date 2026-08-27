@@ -1,0 +1,8 @@
+name: GTM Signup Metrics
+identifier: gtm_signup_metrics
+metricGroup: gtm_signup_metrics_group
+metrics:
+  - metricName: ng_signup_utm_persist_failure_count
+    metricDefinition: Number of times persistUtmMetadata failed to write UTM attribution to license-manager during signup
+    type: Count
+    unit: "1"

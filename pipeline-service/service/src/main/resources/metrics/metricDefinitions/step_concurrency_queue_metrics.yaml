@@ -1,0 +1,13 @@
+name: Step Concurrency Queue Store Metrics
+identifier: StepConcurrencyQueueMetrics
+metricGroup: StepConcurrencyQueueMetricsGroup
+metrics:
+  - metricName: pipeline_step_concurrency_queue_operations_total
+    metricDefinition: Postgres queue-store operations for the counter-based step-concurrency gate. operation in {insert, delete, fetch_batch}; outcome in {success, error}.
+    type: Count
+    unit: "1"
+  - metricName: pipeline_step_concurrency_queue_fetch_batch_size
+    metricDefinition: Number of rows returned by a tier-2 fetchBatch call.
+    type: Distribution
+    distribution: ["0", "10", "25", "50", "100"]
+    unit: "1"

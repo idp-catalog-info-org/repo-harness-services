@@ -1,0 +1,94 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: GitHub connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  packageType:
+    type: string
+    description: Package type (npm, maven, rubygems, nuget, container)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.packageType}}
+  packageName:
+    type: string
+    description: Package name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.packageName}}
+  org:
+    type: string
+    description: GitHub organization (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.org}}
+  version:
+    type: string
+    description: Package version (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.version}}
+  versionRegex:
+    type: string
+    description: Version regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.versionRegex}}
+  digest:
+    type: string
+    description: Image digest (optional, for container type)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+  groupId:
+    type: string
+    description: Maven groupId (optional, for maven type)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.groupId}}
+  mavenArtifactId:
+    type: string
+    description: Maven artifactId (optional, for maven type)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactId}}
+  user:
+    type: string
+    description: User (optional, for maven type)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.user}}
+  extension:
+    type: string
+    description: File extension (optional, for maven type)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.extension}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/github-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_PACKAGE_TYPE: ${{inputs.packageType}}
+    PLUGIN_ARTIFACT_ORG: ${{inputs.org}}
+    PLUGIN_ARTIFACT_USER: ${{inputs.user}}
+    PLUGIN_ARTIFACT_PACKAGE: ${{inputs.packageName}}
+    PLUGIN_ARTIFACT_GROUP_ID: ${{inputs.groupId}}
+    PLUGIN_ARTIFACT_ARTIFACT_ID: ${{inputs.mavenArtifactId}}
+    PLUGIN_ARTIFACT_EXTENSION: ${{inputs.extension}}
+    PLUGIN_ARTIFACT_VERSION: ${{inputs.version}}
+    PLUGIN_ARTIFACT_VERSION_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_ARTIFACT_VERSION_DIGEST: ${{inputs.digest}}
+    PLUGIN_GITHUB_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_GITHUB_ACCOUNT_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_GITHUB_REPOSITORY_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_GITHUB_USERNAME: ${{inputs.artifactConnector.username}}
+    PLUGIN_GITHUB_TOKEN: ${{inputs.artifactConnector.token}}
+    PLUGIN_GITHUB_APP_INSTALLATION_ID: ${{inputs.artifactConnector.installationId}}
+    PLUGIN_GITHUB_APP_ID: ${{inputs.artifactConnector.applicationId}}
+    PLUGIN_GITHUB_OAUTH_TOKEN: ${{inputs.artifactConnector.oauthToken}}
+    PLUGIN_GITHUB_SSH_KEY: ${{inputs.artifactConnector.sshKey}}
+    PLUGIN_GITHUB_API_TOKEN: ${{inputs.artifactConnector.token}}
+    PLUGIN_GITHUB_API_APP_ID: ${{inputs.artifactConnector.applicationId}}
+    PLUGIN_GITHUB_API_APP_INSTALLATION_ID: ${{inputs.artifactConnector.installationId}}

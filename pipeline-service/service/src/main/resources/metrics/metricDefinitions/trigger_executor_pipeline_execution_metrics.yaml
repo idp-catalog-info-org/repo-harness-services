@@ -1,0 +1,8 @@
+name: Trigger Executor Pipeline Execution Metrics
+identifier: TriggerExecutorPipelineExecution
+metricGroup: trigger_executor_pipeline_execution_group
+metrics:
+  - metricName: trigger_executor_pipeline_execution_end_count
+    metricDefinition: Number of terminal pipeline executions started by triggers with an executor, tagged by status and failure reason.
+    type: Count
+    unit: "1"

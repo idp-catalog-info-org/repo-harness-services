@@ -1,0 +1,1223 @@
+server:
+  applicationConnectors:
+    - type: https
+      port: 7090
+      keyStorePath: keystore.jks
+      keyStorePassword: password
+      trustStorePath: ${JAVA_HOME}/lib/security/cacerts
+      certAlias: localhost
+      validateCerts: false
+      maxRequestHeaderSize: 100KiB
+    - type: http
+      port: 7457
+      maxRequestHeaderSize: 100KiB
+  adminConnectors:
+    - type: https
+      port: 7091
+      keyStorePath: keystore.jks
+      keyStorePassword: password
+      trustStorePath: ${JAVA_HOME}/lib/security/cacerts
+      certAlias: localhost
+      validateCerts: false
+    - type: http
+      port: 7092
+      maxRequestHeaderSize: 100KiB
+  requestLog:
+    appenders: []
+  maxThreads: 1024
+
+commonPoolConfig:
+  corePoolSize: ${COMMON_POOL_CORE_SIZE:-20}
+  maxPoolSize: ${COMMON_POOL_MAX_SIZE:-1000}
+  idleTime: ${COMMON_POOL_IDLE_TIME:-500}
+  timeUnit: ${COMMON_POOL_IDLE_TIME_TIME_UNIT:-MILLISECONDS}
+
+disableResourceValidation: ${DISABLE_RESOURCE_VALIDATION:-false}
+
+pmsSdkExecutionPoolConfig:
+  corePoolSize: ${PMS_SDK_EXECUTION_POOL_CORE_SIZE:-20}
+  maxPoolSize: ${PMS_SDK_EXECUTION_POOL_MAX_SIZE:-100}
+  idleTime: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_EXECUTION_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationEventPoolConfig:
+  corePoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_MAX_SIZE:-50}
+  idleTime: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationHandlerPoolConfig:
+  corePoolSize: ${ORCHESTRATION_HANDLER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${ORCHESTRATION_HANDLER_POOL_MAX_SIZE:-30}
+  idleTime: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME:-60}
+  timeUnit: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+pmsSdkBackfillOrchestrationEventPoolConfig:
+  corePoolSize: ${PMS_SDK_BACKFILL_ORCHESTRATION_EVENT_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${PMS_SDK_BACKFILL_ORCHESTRATION_EVENT_POOL_MAX_SIZE:-50}
+  idleTime: ${PMS_SDK_BACKFILL_ORCHESTRATION_EVENT_POOL_IDLE_TIME:-60}
+  timeUnit: ${PMS_SDK_BACKFILL_ORCHESTRATION_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_BACKFILL_ORCHESTRATION_EVENT_POOL_QUEUE_SIZE:-500}
+
+pipelineSdkRedisEventsConfig:
+  pipelineSdkResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkResponseSpawnEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkStepResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+
+ldapGroupSyncPoolConfig:
+  corePoolSize: ${LDAP_GROUP_SYNC_EXECUTOR_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${LDAP_GROUP_SYNC_EXECUTOR_POOL_MAX_SIZE:-10}
+  idleTime: ${LDAP_GROUP_SYNC_EXECUTOR_POOL_IDLE_TIME:-60}
+  timeUnit: ${LDAP_GROUP_SYNC_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+opaGitxStatusPoolConfig:
+  corePoolSize: ${OPA_GITX_STATUS_POOL_CORE_SIZE:-4}
+  maxPoolSize: ${OPA_GITX_STATUS_POOL_MAX_SIZE:-8}
+  idleTime: ${OPA_GITX_STATUS_POOL_IDLE_TIME:-60}
+  timeUnit: ${OPA_GITX_STATUS_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+nextGen:
+  managerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  userVerificationSecret: dyBvaWVmbGRrYyB6aHpjeHZvaWxzamt6ZGN6c2RhZmh5dBrebhmnjryRe54rX43W3565ytgbsDvnjws5
+  ngManagerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  pipelineServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  jwtAuthSecret: dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq
+  jwtIdentityServiceSecret: HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU=
+  ciManagerSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  ceNextGenServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  ffServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  iacmServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  templateServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  cvngServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM #get secret value.
+  chaosServiceSecret: ${CHAOS_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  loadTestManagerServiceSecret: ${LOAD_TEST_MANAGER_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  relicxSecret: ${JWT_RELICX_SECRET:-RdL7j9ZdCz6TVSHO7obJRS6ywYLJjH8tdfPP39i4MbesKxVp}
+  serviceDiscoveryServiceSecret: ${SERVICE_DISCOVERY_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  idpServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  dbOpsServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  monitoringManagerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  iroManagerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  harnessRegistryServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  harnessCodeServiceSecret: ${HARNESS_CODE_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  directoryServiceSecret: ${DIRECTORY_SERVICE_SECRET:-MKda6fWe3Ija06YKTwbAoDxve5IbwA6t2ciMuF74RHUFeLh_lH82sP4C2rpy79JV}
+  jwtDataHandlerSecret: ${JWT_DATA_HANDLER_SECRET:-RdL7j9ZdCz6TVSHO7obJRS6ywYLJjH8tdfPP39i4MbevKjVodvjdhakdhashsh4371dasjldas}
+  aiMLOpsServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  gitOpsServiceSecret: ${NEXT_GEN_MANAGER_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  resourceHierarchyServiceSecret: ${RESOURCE_HIERARCHY_SERVICE_SECRET:-dummyRhsServiceSecret}
+  platformConfigServiceSecret: ${PLATFORM_CONFIG_SERVICE_SECRET:-dummyPlatformConfigServiceSecret}
+  appsecServiceSecret: ${APPSEC_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+  harnessStatuspageServiceSecret: ${HARNESS_STATUSPAGE_SERVICE_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+
+enableAudit: false
+
+exportMetricsToStackDriver: false
+
+allowedOrigins:
+  - https://localhost:8181
+  - https://127.0.0.1:8181
+  - http://localhost:8000
+  - http://127.0.0.1:8000
+  - https://localhost:8000
+  - https://127.0.0.1:8000
+
+logging:
+  level: INFO
+  loggers:
+    org.glassfish.jersey: WARN
+    allbegray.slack: WARN
+    org.glassfish.jersey.server.ServerRuntime.Responder: "OFF"
+  appenders:
+    - type: console
+      threshold: TRACE
+      target: STDOUT
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+    - type: gke-console
+      threshold: TRACE
+      target: STDOUT
+      stackdriverLogEnabled: false
+    - type: file
+      threshold: TRACE
+      currentLogFilename: ${LOG_FILENAME:-/opt/harness/logs/pod.log}
+      archive: true
+      archivedLogFilenamePattern: /opt/harness/logs/pod.%d{yyyy-MM-dd}.%i.log
+      archivedFileCount: ${LOG_MAX_FILE_COUNT:-10}
+      maxFileSize: ${LOG_MAX_FILE_SIZE:-50MB}
+      totalSizeCap: ${LOG_TOTAL_FILE_SIZE_CAP:-1GB}
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+
+mongo:
+  uri: mongodb://localhost:27017/ng-harness
+  connectTimeout: 30000
+  serverSelectionTimeout: 90000
+  socketTimeout: 360000
+  maxConnectionIdleTime: 600000
+  connectionsPerHost: 300
+  indexManagerMode: AUTO
+  transactionsEnabled: false
+  aliasDBName: ng-harness
+  traceMode: DISABLED
+  maxOperationTimeInMillis: 300000
+  maxDocumentsToBeFetched: 2147483647
+
+accountConfig:
+  deploymentClusterName: ""
+
+ngIteratorsConfig:
+  ngVaultSecretManagerRenewalIteratorConfig:
+    threadPoolSize: ${NG_VAULT_ITERATOR_THREAD_POOL_SIZE:-5}
+  webhookEventProcessingServiceIteratorConfig:
+    threadPoolSize: ${WEBHOOK_EVENT_PROCESSING_SERVICE_THREAD_SIZE:-20}
+  gitFullSyncEntityIteratorConfig:
+    threadPoolSize: ${GIT_FULLSYNC_ENTITY_ITERATOR_THREAD_POOL_SIZE:-5}
+  oauthTokenRefreshIteratorConfig:
+    threadPoolSize: ${NG_TOKEN_REFRESH_THREAD_POOL_SIZE:-2}
+  gitOpsRolloutInstanceIteratorConfig:
+    threadPoolSize: ${GITOPS_ROLLOUT_ITERATOR_THREAD_POOL_SIZE:-5}
+    targetIntervalInSeconds: ${GITOPS_ROLLOUT_ITERATOR_TARGET_INTERVAL_SECONDS:-5}
+
+enableDelegateResponseCleanupIterator: ${ENABLE_DELEGATE_RESPONSE_CLEANER:-false}
+
+enableWaitNotifyEngineOptimisation: ${ENABLE_WAIT_NOTIFY_OPTIMISATION:-false}
+
+notifyResponseIterator:
+  threadPoolSize: ${NOTIFY_RESPONSES_THREAD_POOL_SIZE:-2}
+  enabled: ${ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG:-false}
+  targetIntervalInSeconds: 300
+  threadPoolIntervalInSeconds: ${NOTIFY_RESPONSES_ITERATOR_THREAD_INTERVAL:-1}
+  redisLockTimeout: 10
+  redisBatchSize: ${NOTIFY_RESPONSES_ITERATOR_REDIS_BATCH_SIZE:-50}
+  threadSleepIntervalMs: ${NOTIFY_RESPONSES_ITERATOR_THREAD_SLEEP_INTERVAL:-50}
+
+#[secondary-db] : Uncomment the following if you want to connect to another database
+#secondary - mongo:
+#uri : mongodb:  // localhost:27017/cd-nextgen-secondary
+#connectTimeout : 30000
+#serverSelectionTimeout : 90000
+#maxConnectionIdleTime : 600000
+#connectionsPerHost : 300
+#indexManagerMode : AUTO
+
+managerClientConfig:
+  baseUrl: http://localhost:3457/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+ngManagerClientConfig:
+  baseUrl: http://localhost:7457/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsEnabled: ${RHS_ENABLED:-false}
+rhsClientConfig:
+  baseUrl: ${RHS_CLIENT_BASE_URL:-http://localhost:9009/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+rhsServiceSecret: ${RESOURCE_HIERARCHY_SERVICE_SECRET:-dummyRhsServiceSecret}
+
+harnessIdClientConfig:
+  grpcClientConfig:
+    target: ${HARNESS_ID_GRPC_TARGET:-localhost:8082}
+    serviceAuthSecret: ${HARNESS_ID_SERVICE_SECRET:-your-256-bit-secret-key-here-min-32-chars}
+    deadlineSeconds: ${HARNESS_ID_GRPC_DEADLINE_SECONDS:-30}
+  restClientConfig:
+    baseUrl: ${HARNESS_ID_REST_BASE_URL:-http://localhost:8081}
+    connectTimeOutSeconds: ${HARNESS_ID_REST_CONNECT_TIMEOUT_SECONDS:-5}
+    readTimeOutSeconds: ${HARNESS_ID_REST_READ_TIMEOUT_SECONDS:-10}
+  callerServiceName: NG_MANAGER
+
+ciManagerClientConfig:
+  baseUrl: http://localhost:4457/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+cvngClientConfig:
+  baseUrl: http://localhost:6457/cv/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+stoCoreClientConfig:
+  baseUrl: ${STO_CORE_SERVICE_BASE_URL:-http://localhost:4000/api/}v2/system/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+pipelineServiceClientConfig:
+  baseUrl: http://localhost:12001/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+dbOpsServiceClientConfig:
+  baseUrl: http://localhost:5001/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+aiMLOpsServiceClientConfig:
+  baseUrl: ${AIMLOPS_SERVICE_CLIENT_BASEURL:-http://localhost:9550/}
+  connectTimeOutSeconds: ${AIMLOPS_SERVICE_CLIENT_CONNECT_TIMEOUT:-15}
+  readTimeOutSeconds: ${AIMLOPS_SERVICE_CLIENT_READ_TIMEOUT:-15}
+
+harnessRegistryServiceClientConfig:
+  baseUrl: ${HARNESS_ARTIFACT_REGISTRY_SERVICE_URL:-http://localhost:3000/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+auditClientConfig:
+  baseUrl: http://localhost:9005/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: ${PLATFORM_READ_TIMEOUT:-10}
+
+ceNextGenClientConfig:
+  baseUrl: http://localhost:7340/ccm/api/
+  connectTimeOutSeconds: 30
+  readTimeOutSeconds: 200
+
+lightwingClientConfig:
+  baseUrl: http://localhost:9595/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+ffServerClientConfig:
+  baseUrl: http://localhost:3000/api/1.0/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+iacmClientConfig:
+  baseUrl: ${IACM_SERVICE_BASE_URL:-http://localhost:8080/api/}
+  globalToken: ${IACM_SERVICE_SECRET:-"551715ea-ca71-11ec-9d64-0242ac120002"}
+
+templateServiceClientConfig:
+  baseUrl: http://localhost:15001/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+chaosServiceClientConfig:
+  baseUrl: ${CHAOS_SERVICE_BASE_URL:-http://localhost:8080}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+loadTestServiceClientConfig:
+  baseUrl: ${LOAD_TEST_MANAGER_SERVICE_BASE_URL:-http://localhost:8090}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+aiTestAutomationClientConfig:
+  baseUrl: ${RELICX_BASE_URL:-http://localhost:13000} # dummy URL
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+aitGcpClientConfig:
+  baseUrl: ${AIT_GCP_BASE_URL:-http://ait-node-api-service:8080}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+monitoringManagerServiceClientConfig:
+  baseUrl: ${MONITORING_MANAGER_SERVICE_BASE_URL:-http://localhost:8092/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+seiServiceClientConfig:
+  baseUrl: ${SEI_SERVICE_BASE_URL:-http://localhost:8991}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+serviceDiscoveryServiceClientConfig:
+  baseUrl: ${SERVICE_DISCOVERY_SERVICE_BASE_URL:-http://localhost:8080/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+idpServiceClientConfig:
+  baseUrl: ${IDP_SERVICE_CLIENT_BASE_URL:-http://localhost:12003/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+iroManagerServiceClientConfig:
+  baseUrl: ${IRO_MANAGER_SERVICE_BASE_URL:-http://localhost:8080/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+gitopsResourceClientConfig:
+  config:
+    baseUrl: http://localhost:7908/api/v1/
+    connectTimeOutSeconds: ${GITOPS_RESOURCE_CLIENT_CONNECT_TIMEOUT_SECONDS:-35}
+    readTimeOutSeconds: ${GITOPS_RESOURCE_CLIENT_READ_TIMEOUT_SECONDS:-35}
+  secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+enableAuth: true
+enableLicenseManager: ${ENABLE_LICENSE_MANAGER:-false}
+sendEventToDS: ${SEND_EVENT_TO_DS:-false}
+
+licenseManagerClientConfig:
+  baseUrl: ${LICENSE_MANAGER_BASE_URL:-http://localhost:7093/}
+  connectTimeOutSeconds: ${LICENSE_MANAGER_CLIENT_CONNECT_TIMEOUT:-15}
+  readTimeOutSeconds: ${LICENSE_MANAGER_CLIENT_READ_TIMEOUT:-15}
+
+grpcClient:
+  target: localhost:9879
+  authority: localhost
+
+grpcServer:
+  connectors:
+    - port: 9979
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+
+gitSyncServerConfig:
+  connectors:
+    - port: 13002
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+
+gitService:
+  harnessCodeJwtSecret: ${NEXT_GEN_MANAGER_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+  caching:
+    validCacheDurationInMillis: ${GIT_SERVICE_CACHING_VALID_CACHE_DURATION:-600000}
+    maxCacheDurationInMillis: ${GIT_SERVICE_CACHING_MAX_CACHE_DURATION:-86400000}
+    backgroundUpdateThreadPool:
+      corePoolSize: ${GIT_SERVICE_CACHING_BACKGROUND_UPDATE_THREAD_POOL_CORE_SIZE:-1}
+      maxPoolSize: ${GIT_SERVICE_CACHING_BACKGROUND_UPDATE_THREAD_POOL_MAX_SIZE:-10}
+      idleTime: ${GIT_SERVICE_CACHING_BACKGROUND_UPDATE_THREAD_POOL_IDLE_TIME:-60}
+      timeUnit: ${GIT_SERVICE_CACHING_BACKGROUND_UPDATE_THREAD_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+      queueSize: 10
+    defaultBranchCacheDurationTimeInMinutes: ${GIT_SERVICE_DEFAULT_BRANCH_CACHE_DURATION:-720}
+
+shouldDeployWithGitSync: true
+
+fileServiceConfiguration:
+  fileStorageMode: MONGO
+  clusterName: ""
+  awsRegion: ""
+  bucketsTtlDays:
+    ALL_WEBHOOK_PAYLOAD_DATA: ${FILE_SERVICE_BUCKETS_TTL_DAYS_ALL_WEBHOOK_PAYLOAD_DATA:-30}
+
+eventsFramework:
+  shouldUseKafka: ${PMS_SDK_EVENTS_USE_KAFKA:-false}
+  redis:
+    sentinel: false
+    masterName: "test"
+    redisUrl: "redis://localhost:6379"
+    sentinelUrls:
+      - "redis://redis1:26379"
+      - "redis://redis2:26379"
+      - "redis://redis3:26379"
+    envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-}
+    readMode: MASTER
+    nettyThreads: 16
+    useScriptCache: true
+    userName: ""
+    password: ""
+    sslConfig:
+      enabled: false
+      CATrustStorePath: "/tmp/ca_trust_store"
+      CATrustStorePassword: ""
+    cleanUpKeysAmount: ${PMS_REDIS_CACHE_CLEANUP_KEYS_AMOUNT:-1000}
+    maxCleanupDelay: ${PMS_REDIS_CACHE_CLEANUP_MAX_DELAY_SECONDS:-60}
+
+distributedLockImplementation: REDIS
+
+redisLockConfig:
+  sentinel: false
+  masterName: "test"
+  redisUrl: "redis://localhost:6379"
+  sentinelUrls:
+    - "redis://redis1:26379"
+    - "redis://redis2:26379"
+    - "redis://redis3:26379"
+  envNamespace: ${LOCK_CONFIG_ENV_NAMESPACE:-}
+  readMode: MASTER
+  nettyThreads: 16
+  useScriptCache: true
+  userName: ""
+  password: ""
+
+pmsSdkGrpcServerConfig:
+  connectors:
+    - port: 12101
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+
+pmsGrpcClientConfig:
+  target: localhost:12011
+  authority: localhost
+
+shouldConfigureWithPMS: ${SHOULD_CONFIGURE_WITH_PMS:-false}
+
+ceAwsSetupConfig:
+  accessKey: ce_aws_accessKey_placeholder
+  secretKey: ce_aws_secretKey_placeholder
+  destinationBucket: ce_aws_destinationBucket_placeholder
+  templateURL: https://continuous-efficiency-templates.s3.amazonaws.com/templateOptimOnly.yaml
+
+ceAzureSetupConfig:
+  azureAppClientId: azureAppClientIdPlaceholder
+  azureAppClientSecret: azureAppClientSecretplaceholder
+  azureStorageSuffix: "blob.core.windows.net"
+  azureAuthorityHost: "https://login.microsoftonline.com"
+
+ceGcpSetupConfig:
+  gcpProjectId: gcpProjectIdPlaceHolder
+
+ciDefaultEntityConfiguration:
+  harnessImageUseName: harnessdev
+  harnessImagePassword: harnessPass
+
+resourceGroupClientConfig:
+  serviceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: ${PLATFORM_READ_TIMEOUT:-10}
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+notificationClient:
+  messageBroker:
+    type: MONGO
+    uri: mongodb://localhost:27017/notification
+    connectTimeout: 30000
+    serverSelectionTimeout: 90000
+    socketTimeout: 360000
+    maxConnectionIdleTime: 600000
+    connectionsPerHost: 300
+  httpClient:
+    baseUrl: http://localhost:9005/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: ${PLATFORM_READ_TIMEOUT:-10}
+  secrets:
+    notificationClientSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+logStreamingServiceConfig:
+  baseUrl: http://localhost:8079
+  serviceToken: token
+  threadPoolConfig:
+    corePoolSize: ${LOG_STREAMING_CLIENT_POOL_CORE_SIZE:-10}
+  delayToClosePrefixLogStreamInSeconds: ${LOG_STREAMING_CLIENT_DELAY_TO_CLOSE_LOG_STREAM_IN_SECONDS:-5}
+
+cannyApiConfig:
+  token: dummyToken
+
+clearbitApiConfig:
+  token: dummyToken
+
+outboxPollConfig:
+  initialDelayInSeconds: 5
+  pollingIntervalInSeconds: 5
+  maximumRetryAttemptsForAnEvent: 7
+  lockId: NextGenManager
+  enableMetrics: ${ENABLE_OUTBOX_EVENT_METRICS:-false}
+
+deploymentCountBQConfig:
+  projectId: "segment-warehouse-dev"
+  dataset: "test_deployment_count_dataset"
+  totalDeploymentsTableName: "rpt_cd_deployment_count_test"
+
+segmentConfiguration:
+  enabled: false
+  loggingEnabled: true
+  url: "segment_url_place_holder"
+  apiKey: "segment_api_key"
+  certValidationRequired: false
+  flushQueueSize: 250
+  flushInterval: 1
+
+subscriptionConfig:
+  stripeApiKey: dummy
+
+accessControlClient:
+  enableAccessControl: ${ENABLE_ACCESS_CONTROL:-false}
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: ${ACCESS_CONTROL_READ_TIMEOUT:-10}
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+
+accessControlAdminClient:
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  mockAccessControlService: ${MOCK_ACCESS_CONTROL_SERVICE:-true}
+
+gitGrpcClientConfigs:
+  cf:
+    target: localhost:11001
+    authority: localhost
+  pms:
+    target: localhost:14002
+    authority: localhost
+  core:
+    target: localhost:13002
+    authority: localhost
+  templateservice:
+    target: localhost:16002
+    authority: localhost
+
+gitSdkConfiguration:
+  gitSdkGrpcServerConfig:
+    # For ng it will be in process server so this isn't required.
+    connectors:
+      - port: 13002
+        maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+  gitManagerGrpcClientConfig:
+    target: localhost:13002
+    authority: localhost
+  scmConnectionConfig:
+    url: localhost:8091
+
+baseUrls:
+  currentGenUiUrl: http://localhost:8181/#/
+  nextGenUiUrl: https://localhost:8181/ng/#/
+  nextGenAuthUiUrl: http://localhost:8181/auth/#/
+  webhookBaseUrl: http://localhost:7457/
+  ngManagerInternalBaseUrl: ${HARNESS_NG_MANAGER_INTERNAL_URL:-http://localhost:7457/}
+  scmServiceBaseUrl: ${HARNESS_SCM_API_INTERNAL_URL:-http://localhost:3000/}
+  harnessCodeGitUrl: ${HARNESS_CODE_GIT_URL:- http://localhost:3000/git}
+  harnessCodeExternalUrl: ${HARNESS_CODE_EXTERNAL_API_URL:- http://localhost:3000/}
+  harnessArtifactRegistryUrl: ${HARNESS_ARTIFACT_REGISTRY_URL:- http://localhost:3000/}
+  directoryServiceUrl: ${DIRECTORY_SERVICE_URL:- http://localhost:8085/}
+  aiVerifyAgentsServiceUrl: ${AI_VERIFY_AGENTS_SERVICE_URL:-http://localhost:6467/}
+
+ngAuthUIEnabled: false
+
+cfClientConfig:
+  apiKey: ""
+  configUrl: "https://config.feature-flags.uat.harness.io/api/1.0"
+  eventUrl: "https://event.feature-flags.uat.harness.io/api/1.0"
+  analyticsEnabled: true
+  connectionTimeout: 10000
+  readTimeout: 45000
+  bufferSize: 10240
+  retries: 6
+  sleepInterval: 5000
+
+fmeClientConfig:
+  serverSdkKey: ${SPLIT_PROXY_APIKEY:-"dummySplitProxyAPIKey"}
+  proxyClientApiKey: ${SPLIT_PROXY_CLIENT_APIKEYS:-"dummySplitProxyClientAPIKey"}
+  proxyOrigin: ${FME_PROXY_URL:-http://proxy-sdk-svc.harness.svc.cluster.local:3000}
+  readyTimeoutSeconds: ${FME_READY_TIMEOUT_SECONDS:-10}
+  failFast: ${FME_FAIL_FAST:-false}
+
+featureFlagConfig:
+  featureFlagSystem: LOCAL
+  syncFeaturesToCF: false
+
+enableDashboardTimescale: false
+enablePaginatedQueryOnTimescale: ${ENABLE_PAGINATED_QUERY_ON_TIMESCALE:-false}
+
+cdLicensingV2CacheExpiryInHours: ${CD_LICENSING_V2_CACHE_EXPIRY_IN_HOURS:-6}
+
+timescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: ""
+  timescaledbPassword: ""
+  connectTimeout: ${TIMESCALEDB_PRIMARY_CONNECT_TIMEOUT:-10}
+  socketTimeout: ${TIMESCALEDB_PRIMARY_SOCKET_TIMEOUT:-30}
+  logUnclosedConnections: false
+  loggerLevel: OFF
+  minIdle: ${TIMESCALE_PRIMARY_MIN_IDLE:-0}
+  maxPoolSize: ${TIMESCALE_PRIMARY_MAX_POOL_SIZE:-30}
+
+secondaryTimescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: ""
+  timescaledbPassword: ""
+  connectTimeout: ${TIMESCALEDB_SECONDARY_CONNECT_TIMEOUT:-10}
+  socketTimeout: ${TIMESCALEDB_SECONDARY_SOCKET_TIMEOUT:-180}
+  logUnclosedConnections: false
+  loggerLevel: OFF
+  secondary: true
+  minIdle: ${TIMESCALE_SECONDARY_MIN_IDLE:-0}
+  maxPoolSize: ${TIMESCALE_SECONDARY_MAX_POOL_SIZE:-30}
+
+alloydb:
+  alloyDbUrl: "jdbc:postgresql://localhost:5432/harness"
+  alloyDbUsername: "admin"
+  alloyDbPassword: "password"
+  connectTimeout: 10
+  socketTimeout: 30
+  logUnclosedConnections: false
+  isConnectionValidationNeeded: true
+
+ngManagerServiceHttpClientConfig:
+  baseUrl: http://localhost:7457/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+  enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+
+signupNotificationConfiguration:
+  projectId: "projectId_place_holder"
+  bucketName: "bucketName_place_holder"
+  templates:
+    verify:
+      gcsFileName: "email_verify.txt"
+      templateId: "email_verify"
+    confirm:
+      gcsFileName: "signup_confirmation.txt"
+      templateId: "signup_confirmation"
+  expireDurationInMinutes: 60
+
+cacheConfig:
+  cacheBackend: REDIS
+  cacheNamespace: ""
+  disabledCaches: [ ]
+  enterpriseCacheEnabled: true
+
+scopeAccessCheckEnabled: true
+
+hostname: ${HOSTNAME:-localhost}
+
+signupTargetEnv: "CI PR Target"
+delegateStatusEndpoint: "35.225.97.192"
+
+cloudCreditsHourlyRollUpJobSchedule: ${CLOUD_CREDITS_HOURLY_ROLL_UP_JOB_SCHEDULE:-2}
+cloudCreditsHourlyRollUpBatchSize: ${CLOUD_CREDITS_HOURLY_ROLL_UP_BATCH_SIZE:-100}
+oauthRefreshFrequency: 30
+oauthRefreshEnabled: true
+
+gitlabConfig:
+  clientId: "1234"
+  clientSecret: "1234"
+  callbackUrl: "https://gitlab.com/oauth/token"
+
+bitbucketConfig:
+  clientId: "1234"
+  clientSecret: "1234"
+  callbackUrl: "https://bitbucket.com/oauth/token"
+
+zoomConfig:
+  clientId: "1234"
+  clientSecret: "1234"
+  callbackUrl: "http://localdev.harness.io/gateway/api/secret/oauth2/zoom"
+
+confluenceConfig:
+  clientId: "124"
+  clientSecret: "1234"
+  callbackUrl: "http://localdev.harness.io/gateway/api/secret/oauth2/confluence"
+  scope: "write:confluence-content offline_access"
+
+msTeamsConfig:
+  clientId: "124"
+  clientSecret: "1234"
+  callbackUrl: "http://localhost:8080/api/secret/oauth2/ms_teams"
+  scope: "offline_access OnlineMeetings.ReadWrite Channel.Create"
+
+slackConfig:
+  clientId: "124"
+  clientSecret: "1234"
+  callbackUrl: "http://localhost:8080/api/secret/oauth2/zoom"
+  scope: "channels:manage,chat:write"
+
+googleChatConfig:
+  clientId: "124"
+  clientSecret: "1234"
+  callbackUrl: "http://localhost:8080/api/secret/oauth2/google_chat"
+
+providerConfig:
+  oauth:
+    bitbucketServerConfig:
+      callbackUrl: ${BITBUCKET_SERVER_OAUTH_CALLBACK_URL:-""}
+    gitlabOnPremConfig:
+      callbackUrl: ${GITLAB_ON_PREM_OAUTH_CALLBACK_URL:-""}
+    githubEnterpriseConfig:
+      callbackUrl: ${GITHUB_ENTERPRISE_OAUTH_CALLBACK_URL:-""}
+
+basePathPrefix: ${BASE_PATH_PREFIX:-""}
+
+enforcementClientConfiguration:
+  enforcementCheckEnabled: false
+
+# remove in a few cycles
+opaServerConfig:
+  baseUrl: http://localhost:3000
+  secret: secret
+
+policyManagerSecret: secret
+
+opaClientConfig:
+  baseUrl: http://localhost:3000
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+opaConnectivityEnabled: false
+
+secretsConfiguration:
+  secretResolutionEnabled: false
+  gcpSecretManagerProject: harness-playground
+
+pmsPlanCreatorServicePoolConfig:
+  corePoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE:-3}
+  idleTime: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+
+dashboardExecutorServiceConfig:
+  corePoolSize: ${DASHBOARD_EXECUTOR_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${DASHBOARD_EXECUTOR_POOL_MAX_SIZE:-15}
+  idleTime: ${DASHBOARD_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${DASHBOARD_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+gitOpsStepExecutorServiceConfig:
+  corePoolSize: ${GITOPS_STEP_EXECUTOR_POOL_CORE_SIZE:-1}
+  maxPoolSize: ${GITOPS_STEP_EXECUTOR_POOL_MAX_SIZE:-50}
+  idleTime: ${GITOPS_STEP_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${GITOPS_STEP_EXECUTOR_POOL_IDLE_TIME_UNIT:-SECONDS}
+
+batchSecretsExecutorServiceConfig:
+  corePoolSize: ${BATCH_SECRETS_EXECUTOR_POOL_CORE_SIZE:-1}
+  maxPoolSize: ${BATCH_SECRETS_EXECUTOR_POOL_MAX_SIZE:-50}
+  idleTime: ${BATCH_SECRETS_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${BATCH_SECRETS_EXECUTOR_POOL_IDLE_TIME_UNIT:-SECONDS}
+
+gitxWebhookEventProcessorExecutorServiceConfig:
+  corePoolSize: ${GITX_WEBHOOK_EVENT_PROCESSOR_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${GITX_WEBHOOK_EVENT_PROCESSOR_EXECUTOR_POOL_MAX_SIZE:-50}
+  idleTime: ${GITX_WEBHOOK_EVENT_PROCESSOR_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${GITX_WEBHOOK_EVENT_PROCESSOR_EXECUTOR_POOL_IDLE_TIME_UNIT:-SECONDS}
+
+entityCleanupConfig:
+  threadPoolConfig:
+    corePoolSize: ${ENTITY_CLEANUP_EXECUTOR_POOL_CORE_SIZE:-1}
+    maxPoolSize: ${ENTITY_CLEANUP_EXECUTOR_POOL_MAX_SIZE:-5}
+    idleTime: ${ENTITY_CLEANUP_EXECUTOR_POOL_IDLE_TIME:-10}
+    timeUnit: ${ENTITY_CLEANUP_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  batchSize: ${ENTITY_CLEANUP_BATCH_SIZE:-500}
+
+debeziumConsumersConfigs:
+  planExecutionsSummaryStreaming:
+    topic: ${DEBEZIUM_CONSUMER_TOPIC_NAME:-DEBEZIUM_pmsMongo.pms-harness.planExecutionsSummary}
+    threads: ${DEBEZIUM_CONSUMER_THREADS:-2}
+    batchSize: ${DEBEZIUM_CONSUMER_BATCH_SIZE:-100}
+  moduleLicensesStreaming:
+    topic: ${DEBEZIUM_CONSUMER_TOPIC_NAME_MODULE_LICENSES:-DEBEZIUM_ngMongo.ng-harness.moduleLicenses}
+    threads: ${DEBEZIUM_CONSUMER_THREADS_MODULE_LICENSES:-2}
+    batchSize: ${DEBEZIUM_CONSUMER_BATCH_SIZE_MODULE_LICENSES:-100}
+  gitOpsUtilizationSnapshotStreaming:
+    topic: ${DEBEZIUM_CONSUMER_TOPIC_NAME_GITOPS_UTILIZATION:-DEBEZIUM_gitOpsMongo.harness-gitops.utilization_snapshot}
+    threads: ${DEBEZIUM_CONSUMER_THREADS_GITOPS_UTILIZATION:-2}
+    batchSize: ${DEBEZIUM_CONSUMER_BATCH_SIZE_GITOPS_UTILIZATION:-100}
+  gitOpsApplicationsStreaming:
+    topic: ${DEBEZIUM_CONSUMER_TOPIC_NAME_GITOPS_APPLICATIONS:-DEBEZIUM_gitOpsMongo.harness-gitops.applications}
+    threads: ${DEBEZIUM_CONSUMER_THREADS_GITOPS_APPLICATIONS:-2}
+    batchSize: ${DEBEZIUM_CONSUMER_BATCH_SIZE_GITOPS_APPLICATIONS:-100}
+
+cdcKafka:
+  enabled: ${CDC_KAFKA_ENABLED:-false}
+  consumers:
+    # GITOPS team — utilizationSnapshot CDC (parallel HKafkaConsumer).
+    # Three-step config-driven cutover (no FF caching issues):
+    #   kafkaConsumerEnabled: flip ON to register the consumer thread at boot (starts draining)
+    #   processingEnabled:    flip ON after connector is verified → Kafka consumer writes to TimescaleDB
+    #   redisShortCircuit:    flip ON after Kafka is verified → Redis consumer stops processing
+    - name: utilizationSnapshot
+      topic: ${CDC_KAFKA_UTILIZATION_SNAPSHOT_TOPIC:-gitops.harness-gitops.utilization_snapshot}
+      maxPollRecords: ${CDC_KAFKA_UTILIZATION_SNAPSHOT_MAX_POLL_RECORDS:-500}
+      kafkaConsumerEnabled: ${CDC_KAFKA_UTILIZATION_SNAPSHOT_ENABLED:-false}
+      processingEnabled: ${CDC_KAFKA_UTILIZATION_SNAPSHOT_PROCESSING_ENABLED:-false}
+      redisShortCircuit: ${CDC_REDIS_UTILIZATION_SNAPSHOT_SHORT_CIRCUIT:-false}
+    # GITOPS team — applications CDC (parallel HKafkaConsumer, JSON serialization).
+    # Same three-step cutover as utilizationSnapshot:
+    #   Step 1 – kafkaConsumerEnabled=true   → consumer thread registers at boot (drain-only)
+    #   Step 2 – processingEnabled=true      → Kafka consumer starts processing events
+    #   Step 3 – redisShortCircuit=true      → Redis consumer acks without processing
+    - name: applications
+      topic: ${CDC_KAFKA_APPLICATIONS_TOPIC:-gitops.harness-gitops.applications}
+      maxPollRecords: ${CDC_KAFKA_APPLICATIONS_MAX_POLL_RECORDS:-500}
+      kafkaConsumerEnabled: ${CDC_KAFKA_APPLICATIONS_ENABLED:-false}
+      processingEnabled: ${CDC_KAFKA_APPLICATIONS_PROCESSING_ENABLED:-false}
+      redisShortCircuit: ${CDC_REDIS_APPLICATIONS_SHORT_CIRCUIT:-false}
+    # GTM team — moduleLicenses CDC (sequential, IDP-style Runnable consumer).
+    # Three-step config-driven cutover (no FF caching issues):
+    #   kafkaConsumerEnabled: flip ON to register the consumer thread at boot (starts draining)
+    #   processingEnabled:    flip ON after connector is verified → Kafka consumer writes to TimescaleDB
+    #   redisShortCircuit:    flip ON after Kafka is verified → Redis consumer stops processing
+    - name: moduleLicenses
+      topic: ${CDC_KAFKA_MODULE_LICENSES_TOPIC:-ngMongo.ng-harness.moduleLicenses}
+      maxPollRecords: ${CDC_KAFKA_MODULE_LICENSES_MAX_POLL_RECORDS:-500}
+      kafkaConsumerEnabled: ${CDC_KAFKA_MODULE_LICENSES_ENABLED:-false}
+      processingEnabled: ${CDC_KAFKA_MODULE_LICENSES_PROCESSING_ENABLED:-false}
+      redisShortCircuit: ${CDC_REDIS_MODULE_LICENSES_SHORT_CIRCUIT:-false}
+    # PIPELINE team — planExecutionsSummary CDC (sequential, single-thread Runnable consumer).
+    # Same three-step cutover as GTM moduleLicenses:
+    #   Step 1 – kafkaConsumerEnabled=true   → consumer thread registers at boot (drain-only)
+    #   Step 2 – processingEnabled=true      → Kafka consumer starts processing events
+    #   Step 3 – redisShortCircuit=true      → Redis consumer acks without processing
+    - name: planExecutionsSummaryCD
+      topic: ${CDC_KAFKA_PLAN_EXEC_SUMMARY_CD_TOPIC:-pmsMongo.pms-harness.planExecutionsSummary}
+      maxPollRecords: ${CDC_KAFKA_PLAN_EXEC_SUMMARY_CD_MAX_POLL_RECORDS:-100}
+      kafkaConsumerEnabled: ${CDC_KAFKA_PLAN_EXEC_SUMMARY_CD_ENABLED:-false}
+      processingEnabled: ${CDC_KAFKA_PLAN_EXEC_SUMMARY_CD_PROCESSING_ENABLED:-false}
+      redisShortCircuit: ${CDC_REDIS_PLAN_EXEC_SUMMARY_CD_SHORT_CIRCUIT:-false}
+
+cdTsDbRetentionPeriodMonths: 7
+
+enableOpentelemetry:  false
+enableLoopDetection: false
+loopDetectionThreshold: 2
+
+disableFreezeNotificationTemplate: ${DISABLE_FREEZE_NOTIFY_TEMPLATE:-false}
+disableChaosNotificationTemplate: ${DISABLE_CHAOS_NOTIFY_TEMPLATE:-false}
+disableIRNotificationTemplate: ${DISABLE_IR_NOTIFICATION_TEMPLATE:-false}
+disableStoNotificationTemplate: ${DISABLE_STO_NOTIFICATION_TEMPLATE:-false}
+disableHarNotificationTemplate: ${DISABLE_HAR_NOTIFICATION_TEMPLATE:-true}
+disableAitNotificationTemplate: ${DISABLE_AIT_NOTIFICATION_TEMPLATE:-false}
+disableServiceAccountNotificationTemplate: ${DISABLE_SERVICE_ACCOUNT_NOTIFICATION_TEMPLATE:-false}
+
+tokenExpiryAlertIterator:
+  enabled: ${ENABLE_TOKEN_EXPIRY_ALERT_ITERATOR:-false}
+  iteratorMode: ${TOKEN_EXPIRY_ALERT_ITERATOR_MODE:-REDIS_BATCH}
+  threadPoolSize: ${TOKEN_EXPIRY_ALERT_ITERATOR_THREAD_POOL_SIZE:-1}
+  threadPoolIntervalInSeconds: ${TOKEN_EXPIRY_ALERT_ITERATOR_THREAD_POOL_INTERVAL_SECONDS:-3600}
+  targetIntervalInSeconds: ${TOKEN_EXPIRY_ALERT_ITERATOR_TARGET_INTERVAL_SECONDS:-86400}
+  batchSize: ${TOKEN_EXPIRY_ALERT_ITERATOR_BATCH_SIZE:-5}
+  redisLockTimeoutSeconds: ${TOKEN_EXPIRY_ALERT_ITERATOR_REDIS_LOCK_TIMEOUT_SECONDS:-5}
+
+pluginExecutionConfig:
+  samBuildStepImageConfig:
+    image: harness/aws-sam-plugin:nodejs20.x-1.162.1-1.4.0-beta-linux-amd64
+    entrypoint:
+      - ""
+  samDeployStepImageConfig:
+    image: harness/aws-sam-plugin:nodejs20.x-1.162.1-1.4.0-beta-linux-amd64
+    entrypoint:
+      - ""
+  gitCloneConfig:
+    image: harness/drone-git:1.4.1-rootless
+    entrypoint:
+      - /usr/local/bin/clone
+  downloadAwsS3Config:
+    image: harness/download-aws-s3:1.3.0-rootless-linux
+    entrypoint:
+      - /usr/local/bin/download
+  downloadHarnessStoreConfig:
+    image: harness/download-harness-store:1.0.0-rootless-linux
+    entrypoint:
+      - /usr/local/bin/download
+  downloadGcsConfig:
+    image: harness/download-google-cloud-storage:0.0.4-linux-amd64
+    entrypoint:
+      - /usr/local/bin/download
+  aiVerifyDynatraceGrailLogsPluginImageConfig:
+    image: harness/dynatrace-log-data-collection-plugin:stable-amd64
+    entrypoint:
+      - /app/dynatrace-log
+  aiVerifyDatadogMetricsPluginImageConfig:
+    image: harness/datadog-metrics-data-collection-plugin:stable-amd64
+    entrypoint:
+      - /app/datadog-metric
+  aiVerifyDynatraceGrailMetricsPluginImageConfig:
+    image: harness/dynatrace-grail-metric-data-collection-plugin:stable-amd64
+    entrypoint:
+      - /app/dynatrace-grail-metric
+  aiVerifyPrometheusMetricsPluginImageConfig:
+    image: harness/prometheus-metric-data-collection-plugin:stable-amd64
+    entrypoint:
+      - /app/prometheus-metric
+  serverlessBaseRepository: "harness/serverless-plugin"
+  apiUrl: https://localhost:8181/#/
+
+signupDomainDenylistConfig:
+  gcsCreds: null
+  projectId: null
+  bucketName: null
+
+queueServiceClientConfig:
+  httpClientConfig:
+    baseUrl: ${HSQS_BASE_URL:-http://localhost:9544/}
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  queueServiceSecret: ${HSQS_AUTH_TOKEN:-ThisIsMyUniqueJwtQueueServiceSecret}
+  envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-localhost}
+  topic: ${HSQS_TOPIC:-ng}
+
+webhookPushEventHsqsDequeueConfig:
+  batchSize: ${WEBHOOK_PUSH_EVENT_DEQUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${WEBHOOK_PUSH_EVENT_DEQUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+webhookBranchHookEventHsqsDequeueConfig:
+  batchSize: ${WEBHOOK_BRANCH_HOOK_EVENT_DEQUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${WEBHOOK_BRANCH_HOOK_EVENT_DEQUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+gitXWebhookEventQueueConfig:
+  batchSize: ${GITX_WEBHOOK_EVENT_QUEUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${GITX_WEBHOOK_EVENT_QUEUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+gitXWebhookEventValidationQueueConfig:
+  batchSize: ${GITX_WEBHOOK_EVENT_VALIDATION_QUEUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${GITX_WEBHOOK_EVENT_VALIDATION_QUEUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+useQueueServiceForWebhookTriggers: ${USE_QUEUE_SERVICE_FOR_WEBHOOK_TRIGGERS:-false}
+
+useQueueServiceForGitXWebhook: ${USE_QUEUE_SERVICE_FOR_GITX_WEBHOOK:-false}
+
+enableDefaultUserGroupsCreationJob: ${ENABLE_DEFAULT_USER_GROUPS_CREATION_JOB:-true}
+
+dailyAccountUsersJobInitialDelayInMinutes: ${DAILY_ACCOUNT_USERS_JOB_INITIAL_DELAY_IN_MINUTES:-1}
+totalAccountUsersJobInitialDelayInMinutes: ${TOTAL_ACCOUNT_USERS_JOB_INITIAL_DELAY_IN_MINUTES:-1}
+
+webhookGitXPushEventQueueConfig:
+  batchSize: ${WEBHOOK_GITX_PUSH_EVENT_QUEUE_BATCH_SIZE:-20}
+  threadSleepTimeInMillis: ${WEBHOOK_GITX_PUSH_EVENT_QUEUE_THREAD_SLEEP_TIME_IN_MILLIS:-30}
+
+serviceStepMaxTimeout: ${SERVICE_STEP_MAX_TIMEOUT:-1h}
+infraStepMaxTimeout: ${INFRA_STEP_MAX_TIMEOUT:-30m}
+
+proxy:
+  enabled: false
+  host: localhost
+  port: 80
+  username: ""
+  password: ""
+  protocol: http
+
+awsServiceEndpointUrls:
+  enabled: false
+  endPointRegion: us-east-1
+  stsEndPointUrl: https://sts.us-east-1.amazonaws.com
+  ecsEndPointUrl: https://ecs.us-east-1.amazonaws.com
+  cloudwatchEndPointUrl: https://monitoring.us-east-1.amazonaws.com
+  bcmDataExportsEndPointUrl: https://bcm-data-exports.us-east-1.api.aws
+
+
+streamPerServiceConfiguration: ${PIE_STREAM_PER_SERVICE:- false}
+
+skipSdkMongoRegistration: ${SKIP_SDK_MONGO_REGISTRATION:-false}
+
+serviceGitXThreadConfig:
+  threadPoolConfig:
+    corePoolSize: ${SERVICE_GITX_POOL_CORE_SIZE:-1}
+    maxPoolSize: ${SERVICE_GITX_POOL_MAX_SIZE:-10}
+    idleTime: ${SERVICE_GITX_POOL_IDLE_TIME:-30}
+    timeUnit: ${SERVICE_GITX_POOL_TIME_UNIT:-SECONDS}
+
+oidcConfigPath: ${OIDC_CONFIG_PATH:-""}
+
+privateConnectivityOrgConfig:
+  orgOAuthClientId: ${PRIVATE_CONNECTIVITY_TAILSCALE_ORG_OAUTH_CLIENT_ID:-}
+  orgOAuthClientSecret: ${PRIVATE_CONNECTIVITY_TAILSCALE_ORG_OAUTH_CLIENT_SECRET:-}
+  organizationIdentity: ${PRIVATE_CONNECTIVITY_TAILSCALE_ORGANIZATION_IDENTITY:-}
+
+devOpsEssentialsConfigPath: ${DEVOPS_ESSENTIAL_CONFIG_PATH:-""}
+stripeConfig:
+  stripeApiKey: ${DEVOPS_STRIPE_API_KEY:-sandboxApiKey}
+  stripeIdempotencyKey: ${STRIPE_IDEMPOTENCY_KEY:-sandboxIdempotencyKey}
+  stripeAccount: ${STRIPE_ACCOUNT:-sandboxAccount}
+  stripeInvoiceEmail: ${STRIPE_INVOICE_EMAIL:-test@harness.io}
+  stripeDisableMeters: ${STRIPE_DISABLE_METERS:-false}
+
+deploymentStagePlanCreationInfoThreadConfig:
+  threadPoolConfig:
+    corePoolSize: ${DEPLOY_STAGE_PLAN_INFO_SAVE_POOL_CORE_SIZE:-1}
+    maxPoolSize: ${DEPLOY_STAGE_PLAN_INFO_SAVE_POOL_MAX_SIZE:-10}
+    idleTime: ${DEPLOY_STAGE_PLAN_INFO_SAVE_POOL_IDLE_TIME:-30}
+    timeUnit: ${DEPLOY_STAGE_PLAN_INFO_SAVE_POOL_TIME_UNIT:-SECONDS}
+
+connectorTestConfig:
+  maxConcurrentTasks: ${CONNECTOR_TEST_MAX_DELEGATE_TASKS_PER_REQUEST:-100}
+  cacheTimeoutMinutes: ${CONNECTOR_TEST_CACHE_TIMEOUT_MINUTES:-360}
+  validationTimeoutSeconds: ${CONNECTOR_TEST_TIMEOUT_SECONDS:-30}
+  threadPoolConfig:
+    corePoolSize: ${CONNECTOR_TEST_POOL_CORE_SIZE:-1}
+    maxPoolSize: ${CONNECTOR_TEST_POOL_MAX_SIZE:-10}
+    idleTime: ${CONNECTOR_TEST_POOL_IDLE_TIME:-30}
+    timeUnit: ${CONNECTOR_TEST_POOL_TIME_UNIT:-SECONDS}
+    queueSize: ${CONNECTOR_TEST_QUEUE_SIZE:-100}
+
+frpsTunnel:
+  host: ${FRPS_TUNNEL_HOST:-http://localhost}
+
+publishAccountActivityMetrics: ${PUBLISH_ACCOUNT_ACTIVITY_METRICS:-false}
+
+awsSdkDefaultBackOffStrategyConfiguration:
+  backoffMaxErrorRetries: ${BACKOFF_MAX_ERROR_RETRIES_FOR_AWS_SDK_CALL:-5}
+  baseDelayInMs: ${BASE_DELAY_IN_MS_FOR_AWS_SDK_CALL:-100}
+  throttledBaseDelayInMs: ${THROTTLED_BASE_DELAY_IN_MS_FOR_AWS_SDK_CALL:-500}
+  maxBackoffInMs: ${MAX_BACKOFF_IN_MS_FOR_AWS_SDK_CALL:-20000}
+
+resilience4j.circuitbreaker:
+  configs:
+    almostClosed:
+      slidingWindowType: TIME_BASED
+      slidingWindowSize: 1
+      failureRateThreshold: 100
+      minimumNumberOfCalls: 100000
+  instances:
+    access-control:
+      baseConfig: almostClosed
+    policy-management-service:
+      baseConfig: almostClosed
+    template-service:
+      baseConfig: almostClosed
+    ng-manager:
+      baseConfig: almostClosed
+    cg-manager:
+      baseConfig: almostClosed
+    pipeline-service:
+      baseConfig: almostClosed
+    delegate-service-grpc:
+      baseConfig: almostClosed
+    platform-service:
+      baseConfig: almostClosed
+    queue-service:
+      baseConfig: almostClosed
+
+resilience4j.bulkhead:
+  configs:
+    sampleConfig:
+      maxConcurrentCalls: 10000
+      maxWaitDuration: 15
+  instances:
+    sample-service:
+      baseConfig: sampleConfig
+
+globalTemplatesConfig:
+  url: ${GLOBAL_TEMPLATE_GIT_URL:-url}
+  username: ${GLOBAL_TEMPLATE_GIT_USERNAME:-username}
+  token: ${GLOBAL_TEMPLATE_GIT_TOKEN:-token}
+  repoName: ${GLOBAL_TEMPLATE_GIT_REPO:-repoName}
+
+irConfig:
+  isDctEnabled: ${IR_DCT_ENABLED:-true}
+  dctInitialDelaySeconds: ${IR_DCT_INITIAL_DELAY_SECONDS:-0}
+  dctSchedulerPeriodSeconds: ${IR_DCT_SCHEDULER_PERIOD_SECONDS:-30}
+  dctLimitPerApiCall: ${IR_DCT_LIMIT_PER_API_CALL:-25}
+  dctMaxCountPerIteration: ${IR_DCT_MAX_COUNT_PER_ITERATION:-100}
+  dctSleepMs: ${IR_DCT_SLEEP_MILLI_SECONDS:-3000}
+
+instanceSyncPerpetualTaskConfig:
+  intervalSeconds: ${INSTANCE_SYNC_PERPETUAL_TASK_INTERVAL_SECONDS:-600}
+  timeoutSeconds: ${INSTANCE_SYNC_PERPETUAL_TASK_TIMEOUT_SECONDS:-600}
+
+cgiTaskConfigPath: ${CGI_TASK_CONFIG_PATH:-""}
+taskBinaryConfigPath: ${TASK_BINARY_CONFIG_PATH:-""}
+
+webhookSecretsConfig:
+  artifactRegistry: ${HARNESS_ARTIFACT_REGISTRY_WEBHOOK_SECRET:-oHTu7tIkKtSGVGfS6pmmyucfkHb7cw2SYgfvvbkhPFc=}
+  code: ${HARNESS_CODE_WEBHOOK_SECRET:-QVuzqTWuy2W+7ETFDSuTrtqNY48MG0tXbRru9GR3ftA=}
+
+projectMovementEntityMigrationMetricsConfig:
+  enabled: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_ENABLED:-false}
+  initialDelayMinutes: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_INIT_DELAY:-60}
+  frequencyMinutes: ${PROJECT_MOVEMENT_ENTITY_MIGRATION_METRICS_FREQUENCY:-1440}
+
+projectMovementTimescaleDbMigrationMetricsConfig:
+  enabled: ${PROJECT_MOVEMENT_TIMESCALE_DB_MIGRATION_METRICS_ENABLED:-false}
+  initialDelayMinutes: ${PROJECT_MOVEMENT_TIMESCALE_DB_MIGRATION_METRICS_INIT_DELAY:-60}
+  frequencyMinutes: ${PROJECT_MOVEMENT_TIMESCALE_DB_MIGRATION_METRICS_FREQUENCY:-120}
+
+tokenExpirationConfig:
+  disableTokenExpirationJob: ${DISABLE_TOKEN_EXPIRATION_JOB:-false}
+  tokenExpirationJobDelayInSeconds: ${TOKEN_EXPIRATION_JOB_DELAY_IN_SECONDS:-300}
+  tokenExpirationJobInitialDelayInSeconds: ${TOKEN_EXPIRATION_JOB_INITIAL_DELAY_IN_SECONDS:-900}
+
+scopedPermissionsBackfillConfig:
+  # Defaults to enabled: the backfill must run on every install (including self-managed) before
+  # the deprecated `permission` field can be dropped, and self-managed installs have no operator
+  # step to turn it on.
+  disableJob: ${DISABLE_SCOPED_PERMISSIONS_BACKFILL_JOB:-false}
+  delayInSeconds: ${SCOPED_PERMISSIONS_BACKFILL_JOB_DELAY_IN_SECONDS:-86400}
+  initialDelayInSeconds: ${SCOPED_PERMISSIONS_BACKFILL_JOB_INITIAL_DELAY_IN_SECONDS:-600}
+  batchSize: ${SCOPED_PERMISSIONS_BACKFILL_BATCH_SIZE:-100}
+
+# Daily Organization Billing Job Configuration
+enableOrganizationBillingJob: ${ENABLE_ORGANIZATION_BILLING_JOB:-false}
+
+enableCDBillingJob: ${ENABLE_CD_BILLING_JOB:-false}
+
+kafkaModuleConfig:
+  enableConfluentKafkaProducer: ${ENABLE_CONFLUENT_KAFKA_PRODUCER:-false}
+  kafkaConfluentBaseConfig:
+    bootstrapServers: ${KAFKA_CONFLUENT_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_CONFLUENT_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_CONFLUENT_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_CONFLUENT_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_CONFLUENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_CONFLUENT_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+  enableGeneralKafkaProducer: ${ENABLE_GENERAL_KAFKA_PRODUCER:-false}
+  kafkaGeneralBaseConfig:
+    bootstrapServers: ${KAFKA_GENERAL_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_GENERAL_SCHEMA_REGISTRY_URL:-""}
+    saslJaasConfig: ${KAFKA_GENERAL_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_GENERAL_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_GENERAL_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_GENERAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_GENERAL_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+    sslTruststoreLocation: ${KAFKA_GENERAL_SSL_TRUSTSTORE_LOCATION:-""}
+    sslTruststorePassword: ${KAFKA_GENERAL_SSL_TRUSTSTORE_PASSWORD:-""}
+    sslTruststoreType: ${KAFKA_GENERAL_SSL_TRUSTSTORE_TYPE:-""}
+    sslKeystoreLocation: ${KAFKA_GENERAL_SSL_KEYSTORE_LOCATION:-""}
+    sslKeystorePassword: ${KAFKA_GENERAL_SSL_KEYSTORE_PASSWORD:-""}
+    sslKeystoreType: ${KAFKA_GENERAL_SSL_KEYSTORE_TYPE:-""}
+    sslKeyPassword: ${KAFKA_GENERAL_SSL_KEY_PASSWORD:-""}
+    sslProtocol: ${KAFKA_GENERAL_SSL_PROTOCOL:-""}
+    sslEnabledProtocols: ${KAFKA_GENERAL_SSL_ENABLED_PROTOCOLS:-""}
+    sslProvider: ${KAFKA_GENERAL_SSL_PROVIDER:-""}
+
+enableCdcMigrationByCreatingChangeEventsInMongo: ${ENABLE_CDC_MIGRATION_BY_CREATING_CHANGE_EVENTS_IN_MONGO:-false}
+enableTsdbMigrationForParentUniqueId: ${ENABLE_TSDB_MIGRATION_FOR_PARENT_UNIQUE_ID:-false}
+
+permissionCheckBatchSizeForConnectorListing: ${PERMISSION_CHECK_BATCH_SIZE_FOR_CONNECTOR_LISTING:-1000}
+
+smpConfig:
+  saasBaseUrl: ${SAAS_BASE_URL:- "https://app.harness.io/"}
+
+backfillOrchestrationEventHandlerPoolConfig:
+  corePoolSize: ${CD_BACKFILL_ORCHESTRATION_EVENT_HANDLER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${CD_BACKFILL_ORCHESTRATION_EVENT_HANDLER_POOL_MAX_SIZE:-50}
+  idleTime: ${CD_BACKFILL_ORCHESTRATION_EVENT_HANDLER_POOL_IDLE_TIME:-60}
+  timeUnit: ${CD_BACKFILL_ORCHESTRATION_EVENT_HANDLER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${CD_BACKFILL_ORCHESTRATION_EVENT_HANDLER_POOL_QUEUE_SIZE:-100}
+
+instanceSyncIterator:
+  enabled: ${ENABLE_INSTANCE_SYNC_ITERATOR:-false}
+  retryIntervalInSeconds: ${INSTANCE_SYNC_ITERATOR_RETRY_INTERVAL_SECONDS:-1800}
+  iterator:
+    threadPoolSize: ${INSTANCE_SYNC_ITERATOR_THREAD_POOL_SIZE:-10}
+    targetIntervalInSeconds: ${INSTANCE_SYNC_ITERATOR_TARGET_INTERVAL_SECONDS:-1800}
+
+deDuplicateUserGroupsJobConfig:
+  disableDeDuplicateUserGroupsJob: ${DISABLE_DE_DUPLICATE_USER_GROUPS_JOB:-true}
+  deDuplicateUserGroupsJobDelayInMinutes: ${DE_DUPLICATE_USER_GROUPS_JOB_DELAY_IN_MINUTES:-1440}
+  deDuplicateUserGroupsJobInitialDelayInMinutes: ${DE_DUPLICATE_USER_GROUPS_JOB_INITIAL_DELAY_IN_MINUTES:-60}
+  deDuplicateUserGroupsJobSleepInMillis: ${DE_DUPLICATE_USER_GROUPS_JOB_SLEEP_IN_MILLIS:-2000}
+
+autoProvisionLicenseConfig:
+  enabled: ${AUTO_PROVISION_LICENSE_FOR_FLEX_PRICING:-false}
+  editionModuleConfig:
+    ENTERPRISE: ${AUTO_PROVISION_ENTERPRISE_MODULES:-CD,CI,CE,STO,CHAOS,IACM,CODE,SSCA,SEI,FME,DBOPS,HAR,AISRE,AARP,AISEC}
+    ESSENTIALS: ${AUTO_PROVISION_ESSENTIALS_MODULES:-CD,CI,CE,STO,CHAOS,IACM,CODE,SSCA,SEI,FME,DBOPS,AISRE,AARP,AISEC}
+    FREE: ${AUTO_PROVISION_FREE_MODULES:-CD,CI,CE,STO,CHAOS,IACM,CODE,SSCA,SEI,FME,DBOPS,AISRE,AARP,AISEC}
+
+orphanUserGroupsCleanupJobConfig:
+  disableOrphanUserGroupsCleanupJob: ${DISABLE_ORPHAN_USER_GROUPS_CLEANUP_JOB:-true}
+  orphanUserGroupsCleanupJobDelayInMinutes: ${ORPHAN_USER_GROUPS_CLEANUP_JOB_DELAY_IN_MINUTES:-1440}
+  orphanUserGroupsCleanupJobInitialDelayInMinutes: ${ORPHAN_USER_GROUPS_CLEANUP_JOB_INITIAL_DELAY_IN_MINUTES:-60}
+  orphanUserGroupsCleanupJobSleepInMillis: ${ORPHAN_USER_GROUPS_CLEANUP_JOB_SLEEP_IN_MILLIS:-200}
+  orphanUserGroupsCleanupJobBatchSize: ${ORPHAN_USER_GROUPS_CLEANUP_JOB_BATCH_SIZE:-50}
+
+serviceUniqueIdBackfillJobConfig:
+  disabled: ${DISABLE_SERVICE_UNIQUE_ID_BACKFILL_JOB:-false}
+  initialDelayInMinutes: ${SERVICE_UNIQUE_ID_BACKFILL_INITIAL_DELAY_MINUTES:-0}
+  intervalInMinutes: ${SERVICE_UNIQUE_ID_BACKFILL_INTERVAL_MINUTES:-1440}
+  batchSize: ${SERVICE_UNIQUE_ID_BACKFILL_BATCH_SIZE:-500}
+  sleepBetweenBatchesInMillis: ${SERVICE_UNIQUE_ID_BACKFILL_SLEEP_MILLIS:-1000}
+  maxRetryCount: ${SERVICE_UNIQUE_ID_BACKFILL_MAX_RETRY:-5}
+# SPIRE-based service-to-service mesh identity. Fully opt-in: with
+# MESH_IDENTITY_INBOUND_ENABLED=false (default), NextGenApplication skips all mesh
+# wiring and the existing HMAC path is unchanged. Enable in POC / staging via env vars.
+meshIdentity:
+  inboundEnabled: ${MESH_IDENTITY_INBOUND_ENABLED:-false}
+  outboundEnabled: ${MESH_IDENTITY_OUTBOUND_ENABLED:-false}
+  outboundOnly: ${MESH_IDENTITY_OUTBOUND_ONLY:-false}
+  # Fallback to HMAC when mesh validation fails. Keep true during rollout.
+  fallbackEnabled: ${MESH_IDENTITY_FALLBACK_ENABLED:-true}
+  rejectAuthorizationWithoutMeshHeader: ${MESH_IDENTITY_REJECT_AUTH_WITHOUT_MESH_HEADER:-false}
+  audience: ${MESH_IDENTITY_AUDIENCE:-NextGenManager}
+  allowedAudiences: ${MESH_IDENTITY_ALLOWED_AUDIENCES:-gateway-internal-service}

@@ -1,0 +1,21 @@
+pipeline:
+  name: Test-Trigger-Child
+  identifier: TestTriggerChild
+  projectIdentifier: projectId
+  orgIdentifier: orgId
+  stages:
+    - stage:
+        name: child
+        identifier: child
+        type: Pipeline
+        spec:
+          org: orgId
+          project: projectId
+          pipeline: test
+          inputs:
+            stages:
+              - stage:
+                  identifier: Test
+                  spec:
+                    service:
+                      serviceRef: serverless

@@ -1,0 +1,14 @@
+name: ID_PLACEHOLDER
+id: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/helm-template:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{runtime.manifestPath}}
+    PLUGIN_VALUES_PATH: ${{serviceOutput.manifests.overrides}}
+    PLUGIN_KUBECONFIG_PATH: ${{runtime.workspace}}/kubeconfig
+    PLUGIN_NAMESPACE: ${{infra.namespace}}
+    PLUGIN_RELEASE_NAME: ${{infra.releaseName}}
+    PLUGIN_COMMAND_FLAGS: ${{json.format(${{serviceOutput.manifests.primary.flags}})}}

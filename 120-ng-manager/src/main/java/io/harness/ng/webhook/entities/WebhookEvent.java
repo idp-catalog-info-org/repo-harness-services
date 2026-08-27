@@ -1,0 +1,94 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.webhook.entities;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+import static io.harness.logging.AutoLogContext.OverrideBehavior.OVERRIDE_NESTS;
+
+import io.harness.annotation.HarnessEntity;
+import io.harness.annotations.StoreIn;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.HeaderConfig;
+import io.harness.beans.Scope;
+import io.harness.iterator.interfaces.PersistentRegularIterable;
+import io.harness.logging.AutoLogContext;
+import io.harness.mongo.index.FdTtlIndex;
+import io.harness.ng.DbAliases;
+import io.harness.persistence.PersistentEntity;
+import io.harness.persistence.UuidAccess;
+import io.harness.security.dto.Principal;
+
+import dev.morphia.annotations.Entity;
+import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Data;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
+import lombok.experimental.NonFinal;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_TRIGGERS})
+@Data
+@Builder
+@FieldNameConstants(innerTypeName = "WebhookEventsKeys")
+@StoreIn(DbAliases.NG_MANAGER)
+@Entity(value = "webhookEvents", noClassnameStored = true)
+@Document("webhookEvents")
+@TypeAlias("webhookEvents")
+@HarnessEntity(exportable = true)
+@OwnedBy(PIPELINE)
+public class WebhookEvent implements PersistentEntity, UuidAccess, PersistentRegularIterable {
+  @Id @dev.morphia.annotations.Id String uuid;
+  String payload;
+  List<HeaderConfig> headers;
+  String accountId;
+  Scope webhookScope;
+  String webhookIdentifier;
+  Principal principal;
+  @Setter @NonFinal @Builder.Default boolean processing = Boolean.FALSE;
+  @Setter @NonFinal @Builder.Default Integer attemptCount = 0;
+  @FdTtlIndex @Default Date validUntil = Date.from(OffsetDateTime.now().plusDays(7).toInstant());
+  @CreatedDate Long createdAt;
+  @NonFinal @Builder.Default Long nextIteration = 0L;
+
+  @Override
+  public Long obtainNextIteration(String fieldName) {
+    return nextIteration;
+  }
+
+  @Override
+  public void updateNextIteration(String fieldName, long nextIteration) {
+    this.nextIteration = nextIteration;
+  }
+
+  public AutoLogContext autoLogContext() {
+    var logContext = new HashMap<String, String>();
+    put(logContext, WebhookEventsKeys.webhookIdentifier, webhookIdentifier);
+    put(logContext, WebhookEventsKeys.uuid, uuid);
+    put(logContext, WebhookEventsKeys.accountId, accountId);
+    return new AutoLogContext(logContext, OVERRIDE_NESTS);
+  }
+
+  void put(Map<String, String> map, String key, String value) {
+    if (StringUtils.isNotBlank(value)) {
+      map.put(key, value);
+    }
+  }
+}

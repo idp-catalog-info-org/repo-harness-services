@@ -1,0 +1,39 @@
+identifier: dynatrace
+name: Dynatrace
+description: View monitoring info from Dynatrace for services in your software catalog.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Dynatrace
+category: Monitoring
+source: https://github.com/backstage/backstage/tree/master/plugins/dynatrace
+iconUrl: https://backstage.io/img/dynatrace.svg
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/dynatrace/
+config: |-
+  proxy:
+    endpoints:
+      '/dynatrace':
+        target: https://example.live.dynatrace.com/api/v2
+        pathRewrite:
+          /api/proxy/dynatrace/?: /
+        headers:
+          Authorization: Api-Token ${DYNATRACE_TOKEN}
+
+  dynatrace:
+    baseUrl: https://example.apps.dynatrace.com
+environmentVariables:
+  - DYNATRACE_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: DynatraceTab
+      addByDefault: true
+      defaultRoute: /dynatrace
+      layoutSchemaSpecs:
+        name: DynatraceTab
+        title: Dynatrace
+        contents:
+          - component: DynatraceTab

@@ -1,0 +1,6 @@
+name: Step Concurrency Rebuild Metrics Group
+identifier: StepConcurrencyRebuildMetricsGroup
+labels:
+  - scope
+  - accountId
+  - outcome

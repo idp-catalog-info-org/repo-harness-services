@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-sample-service
+  description: My Sample service.
+  tags: [my-sample]
+  links:
+    - title: Website
+      url: http://my-sample-website.com
+  annotations:
+    github.com/project-slug: my-sample-org/my-sample-repo
+    backstage.io/techdocs-ref: dir:../../
+spec:
+  type: Service
+  owner: my-sample-team
+  lifecycle: experimental
+  system: my-sample-system

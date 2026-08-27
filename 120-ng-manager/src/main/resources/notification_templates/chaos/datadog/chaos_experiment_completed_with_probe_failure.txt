@@ -1,0 +1,33 @@
+{
+    "title": "Chaos Experiment completed with probe failure: ${CHAOS_EXPERIMENT_NAME}",
+    "text": "Harness Chaos Experiment ${CHAOS_EXPERIMENT_NAME} has been completed with probe failure for the project - ${PROJECT_ID} under the organization - ${ORG_ID} for the account - ${ACCOUNT_ID}.",
+    "tags": [
+        "run_sequence:${RUN_SEQUENCE}",
+        "report_created_on:${REPORT_CREATED_ON}",
+        "resilience_score:${RESILIENCE_SCORE}",
+        "account_id:${ACCOUNT_ID}",
+        "org_id:${ORG_ID}",
+        "project_id:${PROJECT_ID}",
+        "experiment_id:${EXPERIMENT_ID}",
+        "description:${CHAOS_EXPERIMENT_DESCRIPTION}",
+        "tags:${CHAOS_EXPERIMENT_TAGS}",
+        "schedule_details:${SCHEDULE_DETAILS}",
+        "experiment_run_id:${CHAOS_EXPERIMENT_RUN_ID}",
+        "chaos_infrastructure:${CHAOS_INFRASTRUCTURE_ID}",
+        "chaos_infrastructure_type:${CHAOS_INFRASTRUCTURE_TYPE}",
+        "notify_id:${NOTIFY_ID}",
+        "environment:${ENVIRONMENT_ID}",
+        "executed_by:${USER_ID}",
+        "executed_on:${EXECUTED_ON}",
+        "executed_till:${EXECUTED_TILL}",
+        "duration:${DURATION}",
+        "number_of_faults:${TOTAL_NUMBER_OF_FAULTS}",
+        "number_of_probes:${TOTAL_NUMBER_OF_PROBES}",
+        "number_of_actions:${TOTAL_NUMBER_OF_ACTIONS}",
+        "chaos_experiment_url:${CHAOS_EXPERIMENT_URL}"
+    ],
+    "aggregation_key": "${EXPERIMENT_ID}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

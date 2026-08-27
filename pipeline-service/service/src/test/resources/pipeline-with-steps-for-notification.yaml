@@ -1,0 +1,141 @@
+pipeline:
+  name: StepNotificationTest
+  identifier: stepNotificationTest
+  stages:
+    - stage:
+        identifier: deploy
+        name: Deploy Stage
+        type: Deployment
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: http_call
+                  name: HTTP Call
+                  type: Http
+                  spec:
+                    url: https://example.com
+              - stepGroup:
+                  identifier: sg1
+                  name: Step Group 1
+                  steps:
+                    - step:
+                        identifier: inner_step
+                        name: Inner Step
+                        type: ShellScript
+                        spec:
+                          shell: Bash
+                    - step:
+                        identifier: another_inner
+                        name: Another Inner Step
+                        type: ShellScript
+                        spec:
+                          shell: Bash
+              - parallel:
+                  - step:
+                      identifier: parallel_a
+                      name: Parallel A
+                      type: ShellScript
+                      spec:
+                        shell: Bash
+                  - step:
+                      identifier: parallel_b
+                      name: Parallel B
+                      type: ShellScript
+                      spec:
+                        shell: Bash
+    - parallel:
+        - stage:
+            identifier: build
+            name: Build Stage
+            type: CI
+            spec:
+              execution:
+                steps:
+                  - step:
+                      identifier: run_tests
+                      name: Run Tests
+                      type: Run
+                      spec:
+                        command: mvn test
+        - stage:
+            identifier: qa
+            name: QA Stage
+            type: Deployment
+            spec:
+              execution:
+                steps:
+                  - step:
+                      identifier: verify
+                      name: Verify
+                      type: Http
+                      spec:
+                        url: https://qa.example.com
+    - stage:
+        identifier: template_stage
+        name: Template Stage
+        template:
+          templateRef: myTemplate
+          versionLabel: v1
+    - stage:
+        identifier: nested_sg
+        name: Nested StepGroup Stage
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - stepGroup:
+                  identifier: outer_sg
+                  name: Outer SG
+                  steps:
+                    - stepGroup:
+                        identifier: inner_sg
+                        name: Inner SG
+                        steps:
+                          - step:
+                              identifier: deep_step
+                              name: Deep Step
+                              type: ShellScript
+                              spec:
+                                shell: Bash
+              - step:
+                  identifier: template_step
+                  name: Template Step
+                  template:
+                    templateRef: stepTemplate
+                    versionLabel: v1
+    - stage:
+        identifier: insert_stage
+        name: Insert Stage
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: before_insert
+                  name: Before Insert
+                  type: ShellScript
+                  spec:
+                    shell: Bash
+              - insert:
+                  identifier: my_insert
+                  name: My Insert Block
+                  steps:
+                    - step:
+                        identifier: injected_step1
+                        name: Injected Step 1
+                        type: Http
+                        spec:
+                          url: https://example.com
+                    - step:
+                        identifier: injected_step2
+                        name: Injected Step 2
+                        type: ShellScript
+                        spec:
+                          shell: Bash
+              - step:
+                  identifier: after_insert
+                  name: After Insert
+                  type: ShellScript
+                  spec:
+                    shell: Bash

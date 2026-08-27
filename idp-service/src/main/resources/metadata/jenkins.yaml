@@ -1,0 +1,50 @@
+identifier: jenkins
+name: Jenkins
+description: Jenkins offers a simple way to set up a continuous integration and continuous delivery environment.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: '@timja'
+category: CI/CD
+source: https://github.com/backstage/backstage/tree/master/plugins/jenkins
+iconUrl: https://img.icons8.com/color/1600/jenkins.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/jenkins/
+config: |-
+  jenkins:
+    instances:
+      - name: default
+        baseUrl: '<your-jenkins-url>'
+        username: '<your-jenkins-username>'
+        apiKey: ${JENKINS_TOKEN}
+environmentVariables:
+  - JENKINS_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityJenkinsContent
+      addByDefault: true
+      defaultRoute: /ci-cd
+      layoutSchemaSpecs:
+        name: EntityJenkinsContent
+        title: CI/CD
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isJenkinsAvailable
+                  content:
+                    component: EntityJenkinsContent
+    - type: CARD
+      name: EntityLatestJenkinsRunCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityLatestJenkinsRunCard
+        specs:
+          props:
+            branch: "main,master"
+            variant: "gridItem"
+          gridProps:
+            sm: 6

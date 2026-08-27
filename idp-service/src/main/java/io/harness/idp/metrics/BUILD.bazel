@@ -1,0 +1,43 @@
+# Copyright 2023 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_binary")
+
+filegroup(
+    name = "resource",
+    srcs = [],
+    visibility = ["//idp-service:__subpackages__"],
+)
+
+java_binary(
+    name = "module",
+    srcs = glob([
+        "*.java",
+    ]),
+    data = [":resource"],
+    main_class = "io.harness.idp.app.IdpApplication",
+    resources = [
+        "//idp-service/src/main/resources:resource",
+    ],
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//960-persistence/src/main/java/io/harness/mongo/metrics:module",
+        "//970-ng-commons/src/main/java/io/harness/metrics:module",
+        "//970-ng-commons/src/main/java/io/harness/metrics/recorder:module",
+        "//970-ng-commons/src/main/java/io/harness/metrics/service/api:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_google_inject_guice",
+        "@maven//:io_dropwizard_metrics_metrics_core",
+        "@maven//:org_apache_logging_log4j_log4j_api",
+        "@maven//:org_apache_logging_log4j_log4j_to_slf4j",
+        "@maven//:org_mongodb_mongo_java_driver",
+    ],
+)
+
+exports_files([
+    "config.yml",
+])

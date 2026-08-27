@@ -1,0 +1,7 @@
+name: Expression Functor Metrics Group
+identifier: ExpressionFunctorMetricsGroup
+labels:
+  - functor_type
+  - result
+# functor_type values: outcome, sweeping_output, ancestor, child, qualified, strategy, expanded_json
+# result values: hit, miss, error

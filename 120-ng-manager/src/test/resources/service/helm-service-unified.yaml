@@ -1,0 +1,43 @@
+service:
+  uses: helm
+  with:
+    manifests:
+      primary: <+input>
+      sources:
+        - id: m1
+          uses: helm-chart
+          with:
+            store:
+              uses: github
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>
+                paths: <+input>
+            values: null
+            chart-name: null
+            chart-version: null
+            sub-chart-path: <+input>
+            fetch-chart-metadata: false
+            skip-version: false
+            declarative-rollback: false
+        - id: m2
+          uses: helm-chart
+          with:
+            store:
+              uses: github
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>
+                paths: <+input>
+            values: null
+            chart-name: null
+            chart-version: null
+            sub-chart-path: <+input>
+            fetch-chart-metadata: false
+            skip-version: false
+            declarative-rollback: false
+  inputs: {}

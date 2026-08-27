@@ -1,0 +1,20 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/oci-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_CHART_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartName}}
+    PLUGIN_ARTIFACT_CHART_VERSION: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartVersion}}
+    PLUGIN_ARTIFACT_CHART_PATH: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.path}}
+    PLUGIN_OCI_NAME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).name}}
+    PLUGIN_OCI_URL: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).url}}
+    PLUGIN_OCI_USERNAME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).username}}
+    PLUGIN_OCI_PASSWORD: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).password}}

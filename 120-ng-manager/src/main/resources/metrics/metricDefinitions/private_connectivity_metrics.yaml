@@ -1,0 +1,47 @@
+name: Private Connectivity Metrics
+identifier: private_connectivity_metrics
+metrics:
+  - metricName: private_connectivity_provision_success
+    metricDefinition: Count of successfully provisioned private connectivity tailnets.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_provision_failure_definitive
+    metricDefinition: Count of provisioning failures where the provider confirmed no tailnet was created.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_provision_failure_ambiguous
+    metricDefinition: Count of provisioning failures where provider tailnet creation may have succeeded.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_provision_failure_other
+    metricDefinition: Count of provisioning failures outside provider tailnet creation.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_reconcile_failure
+    metricDefinition: Count of failed desired-configuration reconciliation attempts.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_failure_fenced
+    metricDefinition: Count of release failures while fencing new traffic.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_failure_traffic_cut
+    metricDefinition: Count of release failures while applying the deny-all traffic policy.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_failure_credentials_revoked
+    metricDefinition: Count of release failures while revoking provider credentials.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_failure_network_removed
+    metricDefinition: Count of release failures while removing provider network resources.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_failure_unbound
+    metricDefinition: Count of release failures while persisting the final unbound state.
+    type: Count
+    unit: "1"
+  - metricName: private_connectivity_release_retry_threshold
+    metricDefinition: Count of release attempts that reached the operator-intervention threshold.
+    type: Count
+    unit: "1"

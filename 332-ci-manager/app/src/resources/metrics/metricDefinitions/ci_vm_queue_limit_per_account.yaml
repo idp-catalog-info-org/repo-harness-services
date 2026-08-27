@@ -1,0 +1,12 @@
+name: CI Manager VM Queue Limit Per Account
+identifier: CIManagerVMQueueLimitPerAccount
+metricGroup: CIManagerQueueVMLimit
+metrics:
+  - metricName: ci_queue_limits_per_account
+    metricDefinition: Queue limit per account
+    type: LastValue
+    unit: count
+  - metricName: ci_queue_limits_mac_per_account
+    metricDefinition: Queue limit per account for Mac
+    type: LastValue
+    unit: count

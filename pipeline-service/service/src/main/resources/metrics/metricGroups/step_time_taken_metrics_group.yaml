@@ -1,0 +1,7 @@
+name: Step Time Taken Metrics Group
+identifier: StepTimeTakenMetricsGroup
+labels:
+  - accountId
+  - stepType
+  - stepCategory
+  - module

@@ -1,0 +1,91 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+// TODO: Rename io.harness.pms.contracts.sdk.registration and move this out of this directory
+package io.harness.pms.contracts.plan;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/steps/step_type.proto";
+
+// TODO : Rename this PmsSdkRegistrationService
+service PmsService {
+  rpc initializeSdk(InitializeSdkRequest) returns (InitializeSdkResponse);
+}
+
+// Next number is 15
+message InitializeSdkRequest {
+  string name = 1;
+  map<string, Types> supportedTypes = 2;
+  repeated io.harness.pms.contracts.steps.SdkStep supportedSteps = 13;
+  SdkModuleInfo sdkModuleInfo = 5;
+  ConsumerConfig interruptConsumerConfig = 6;
+  ConsumerConfig orchestrationEventConsumerConfig = 7;
+  ConsumerConfig facilitatorEventConsumerConfig = 8;
+  ConsumerConfig nodeStartEventConsumerConfig = 9;
+  ConsumerConfig progressEventConsumerConfig = 10;
+  ConsumerConfig nodeAdviseEventConsumerConfig = 11;
+  ConsumerConfig nodeResumeEventConsumerConfig = 12;
+  ConsumerConfig planCreationEventConsumerConfig = 14;
+  map<string, string> staticAliases = 15;
+  repeated string sdkFunctors = 16;
+  repeated JsonExpansionInfo jsonExpansionInfo = 18;
+  string modulePath = 19;
+  repeated InputsMetadataInfo inputsMetadataInfo = 20;
+  map<string, string> staticAliasesUnified = 21;
+  bool inactive = 23;
+  ConsumerConfig backfillOrchestrationEventConsumerConfig = 24;
+}
+
+message InitializeSdkResponse {}
+
+message Types {
+  repeated string types = 1;
+}
+
+message SdkModuleInfo {
+  string displayName = 1;
+}
+
+message ConsumerConfig {
+  oneof config {
+    Redis redis = 1 [deprecated = true];
+  }
+  ConsumerPreference consumerPreference = 2;
+  Redis redisSettings = 3;
+  KafkaConsumerSettings kafkaSettings = 4;
+  enum ConsumerPreference {
+    REDIS = 0;
+    KAFKA = 1;
+  }
+}
+
+message Redis {
+  string topicName = 1;
+  // We should add more redis config details here but for now assuming the redis config is same for all omitting this
+}
+
+message KafkaConsumerSettings {
+  string topicName = 1;
+}
+
+message JsonExpansionInfo {
+  string key = 1;
+  ExpansionRequestType expansionType = 2;
+  string expansionKey = 3;
+  io.harness.pms.contracts.steps.StepType stageType = 4;
+}
+
+message InputsMetadataInfo {
+  string entityInputsKey = 1;
+  string entityKey = 2;
+}
+
+enum ExpansionRequestType {
+  LOCAL_FQN = 0;
+  KEY = 1;
+}

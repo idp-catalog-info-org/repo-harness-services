@@ -1,0 +1,53 @@
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "content": {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+            "weight": "bolder",
+            "size": "medium"
+          },
+          {
+            "type": "TextBlock",
+            "text": "A lifecycle rule dry run has completed with status: ${EXECUTION_STATUS}.",
+            "wrap": true
+          },
+          {
+            "type": "TextBlock",
+            "text": "No artifacts were modified. The results below show what would have happened if the lifecycle rule had been executed.",
+            "wrap": true
+          },
+          {
+            "type": "FactSet",
+            "facts": [
+              {"title": "Lifecycle Rule:", "value": "${POLICY_NAME}"},
+              {"title": "Execution Type:", "value": "Dry Run"},
+              {"title": "Execution Start Time:", "value": "${EXECUTION_START_TIME}"},
+              {"title": "Execution End Time:", "value": "${EXECUTION_END_TIME}"},
+              {"title": "Execution Status:", "value": "${EXECUTION_STATUS}"},
+              {"title": "Scheduled Execution Time:", "value": "${SCHEDULED_EXECUTION_TIME}"},
+              {"title": "Artifacts Protected (Protection Rule):", "value": "${ARTIFACTS_SKIPPED}"},
+              {"title": "Artifacts That Would Be Deleted:", "value": "${ARTIFACTS_DELETED}"},
+              {"title": "Registries Affected:", "value": "${REGISTRIES_AFFECTED}"},
+              {"title": "Estimated Storage Reclamation:", "value": "${STORAGE_RECLAIMED}"}
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "type": "Action.OpenUrl",
+            "title": "View Execution Details",
+            "url": "${EXECUTION_URL}"
+          }
+        ]
+      }
+    }
+  ]
+}

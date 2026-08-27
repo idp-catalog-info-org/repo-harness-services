@@ -1,0 +1,6 @@
+integrations:
+  bitbucketServer:
+    - host: ${HOST}
+      apiBaseUrl: https://${API_BASE_URL}/rest/api/1.0
+      username: ${BITBUCKET_SERVER_USERNAME}
+      password: ${BITBUCKET_SERVER_PASSWORD}

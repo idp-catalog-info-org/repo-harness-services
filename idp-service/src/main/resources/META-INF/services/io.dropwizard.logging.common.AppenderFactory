@@ -1,0 +1,4 @@
+io.dropwizard.logging.common.ConsoleAppenderFactory
+io.dropwizard.logging.common.FileAppenderFactory
+io.dropwizard.logging.common.SyslogAppenderFactory
+io.harness.logging.GkeConsoleAppenderFactory

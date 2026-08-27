@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/argocd-schema.json",
+  "title": "ArgoCD Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["argocd"],
+  "properties": {
+    "argocd": {
+      "$id": "#root/argocd",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configuration settings for ArgoCD.",
+      "required": ["username", "password", "appLocatorMethods"],
+      "properties": {
+        "username": {
+          "$id": "#root/argocd/username",
+          "type": "string",
+          "default": "${ARGOCD_USERNAME}",
+          "pattern": "^.*$",
+          "description": "The username for ArgoCD authentication."
+        },
+        "password": {
+          "$id": "#root/argocd/password",
+          "type": "string",
+          "default": "${ARGOCD_PASSWORD}",
+          "pattern": "^.*$",
+          "description": "The password for ArgoCD authentication."
+        },
+        "appLocatorMethods": {
+          "$id": "#root/argocd/appLocatorMethods",
+          "type": "array",
+          "description": "Methods to locate applications within ArgoCD.",
+          "items": {
+            "$id": "#root/argocd/appLocatorMethods/items",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "instances"],
+            "properties": {
+              "type": {
+                "$id": "#root/argocd/appLocatorMethods/items/type",
+                "type": "string",
+                "enum": ["config"],
+                "pattern": "^config$",
+                "description": "The type of app locator method, which is 'config' in this case."
+              },
+              "instances": {
+                "$id": "#root/argocd/appLocatorMethods/items/instances",
+                "type": "array",
+                "description": "List of instances where the applications are located.",
+                "items": {
+                  "$id": "#root/argocd/appLocatorMethods/items/instances/items",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "url"],
+                  "properties": {
+                    "name": {
+                      "$id": "#root/argocd/appLocatorMethods/items/instances/items/name",
+                      "type": "string",
+                      "description": "The name of the ArgoCD instance."
+                    },
+                    "url": {
+                      "$id": "#root/argocd/appLocatorMethods/items/instances/items/url",
+                      "type": "string",
+                      "pattern": "((http|https):\\/\\/)?([a-zA-Z0-9.-]+|\\d{1,3}(\\.\\d{1,3}){3})(:\\d{1,5})?(\\/[-a-zA-Z0-9@:%._+~#?&//=]*)?",
+                      "description": "The URL of the ArgoCD instance."
+                    },
+                    "token": {
+                      "$id": "#root/argocd/appLocatorMethods/items/instances/items/token",
+                      "type": "string",
+                      "default": "${ARGOCD_AUTH_TOKEN}",
+                      "pattern": "^.*$",
+                      "description": "The authentication token for ArgoCD. This field is optional."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

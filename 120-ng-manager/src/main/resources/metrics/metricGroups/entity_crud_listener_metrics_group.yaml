@@ -1,0 +1,6 @@
+name: NG Manager Entity CRUD Listener Metrics Group
+identifier: entity_crud_listener_metrics_group
+labels:
+  - entityType
+  - action
+  - status

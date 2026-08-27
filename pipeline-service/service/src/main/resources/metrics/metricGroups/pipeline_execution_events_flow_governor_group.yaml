@@ -1,0 +1,5 @@
+name: Pipeline Execution Events Flow Governor Group
+identifier: PipelineExecutionEventsFlowGovernorGroup
+labels:
+  - mode
+  - topic

@@ -1,0 +1,17 @@
+{
+    "text" : "*Pipeline <${PIPELINE_URL}|${PIPELINE}> from Org ${ORG} failed to start*\n",
+    "attachments" : [
+        {
+          "color" : "${COLOR}",
+          "blocks" : [
+            {
+              "type" : "section",
+              "text" : {
+                "type" : "mrkdwn",
+                "text": "trigger <${TRIGGER_ACTIVITY_URL}|${TRIGGER}> failed\nError details - ${ERROR}\n _Triggered on ${START_DATE}_"
+              }
+            }
+          ]
+        }
+    ]
+}

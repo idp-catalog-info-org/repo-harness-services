@@ -1,0 +1,47 @@
+trigger:
+  name: customArtifactInlineScriptTrigger
+  identifier: customArtifactInlineScriptTrigger
+  enabled: true
+  tags: {}
+  orgIdentifier: org
+  projectIdentifier: proj
+  pipelineIdentifier: pipeline
+  stagesToExecute: []
+  source:
+    type: Artifact
+    spec:
+      type: CustomArtifact
+      spec:
+        artifactsArrayPath: $.results
+        inputs: []
+        script: |-
+          curl -X POST \
+            https://example.test/artifactory/api/search/aql \
+            -H 'Authorization: Basic '<+secrets.getValue("jfrog_Auth")> \
+            -H 'Content-Type: text/plain' \
+            -H 'cache-control: no-cache' \
+            -d 'items.find({ "repo": "test-repo", "name": {"$eq": "artifact.war"}})' > $HARNESS_ARTIFACT_RESULT_PATH
+        version: <+trigger.artifact.build>
+        versionPath: name
+        connectorRef: ""
+        metaDataConditions: []
+        eventConditions: []
+  inputYaml: |
+    pipeline:
+      identifier: pipeline
+      stages:
+        - stage:
+            identifier: SampleStage
+            type: Deployment
+            spec:
+              service:
+                serviceInputs:
+                  serviceDefinition:
+                    type: Ssh
+                    spec:
+                      artifacts:
+                        primary:
+                          identifier: ""
+                          type: CustomArtifact
+                          spec:
+                            version: <+trigger.artifact.build>

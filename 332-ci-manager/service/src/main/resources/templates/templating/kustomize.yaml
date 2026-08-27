@@ -1,0 +1,13 @@
+name: ID_PLACEHOLDER
+id: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/kustomize-template:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{serviceOutput.manifests.primary.paths}}
+    PLUGIN_KUSTOMIZE_YAML_FOLDER_PATH: ${{serviceOutput.manifests.primary.kustomizeYamlFolderPath}}
+    PLUGIN_PATCHES_PATH: ${{serviceOutput.manifests.overrides}}
+    PLUGIN_PLUGIN_PATH: ${{serviceOutput.manifests.primary.plugin}}
+    PLUGIN_FLAGS_JSON: ${{json.format(${{serviceOutput.manifests.primary.flags}})}}

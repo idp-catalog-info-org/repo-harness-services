@@ -1,0 +1,28 @@
+{
+  "type": "record",
+  "name": "ConnectDefault",
+  "namespace": "io.confluent.connect.avro",
+  "doc": "CDC event for node executions matching Kafka Connect MongoDB Source format",
+  "fields": [
+    {
+      "name": "payload",
+      "type": "string",
+      "doc": "JSON string containing the complete MongoDB CDC event (operationType, ns, documentKey, fullDocument, clusterTime, wallTime, _id)"
+    },
+    {
+      "name": "db",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null,
+      "doc": "Database name for routing/filtering (e.g., 'harness-pms')"
+    },
+    {
+      "name": "source_type",
+      "type": "string",
+      "default": "MONGODB",
+      "doc": "Source type for timestamp extraction (always 'MONGODB' for CDC events)"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{{ include "harnesscommon.monitoring.podMonitor" (dict "name" "pipeline-service" "ctx" $ "label" "app.kubernetes.io/name") }}
+---
+# PodMonitor for orchestration-engine worker service
+{{- if .Values.pipelineSplitting.enabled }}
+{{ include "harnesscommon.monitoring.podMonitor" (dict "name" "orchestration-engine" "ctx" $ "label" "app.kubernetes.io/name" "podMonitorName" "orchestration-engine") }}
+{{- end }}
+---
+# PodMonitor for the prometheus-elasticsearch-exporter subchart pods.
+# The exporter listens on port 9108 at /metrics, so we hand the shared helper a
+# copy of the context with monitoring.port/path overridden for this call only.
+{{- if (index .Values "prometheus-elasticsearch-exporter" "enabled") }}
+{{- $exporterCtx := mergeOverwrite (deepCopy $) (dict "Values" (dict "monitoring" (dict "port" 9108 "path" "/metrics"))) }}
+{{ include "harnesscommon.monitoring.podMonitor" (dict "name" "prometheus-elasticsearch-exporter" "ctx" $exporterCtx "label" "app.kubernetes.io/name" "podMonitorName" "elasticsearch-exporter") }}
+{{- end }}

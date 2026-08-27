@@ -1,0 +1,13 @@
+name: Template Resolution Metrics
+identifier: TemplateResolutionMetrics
+metricGroup: pipeline_template_resolution_group
+metrics:
+  - metricName: template_resolution_request_count
+    metricDefinition: Total number of template resolution requests with status (success/failure)
+    type: Count
+    unit: "1"
+  - metricName: template_resolution_duration
+    metricDefinition: Time taken for template resolution in pipeline
+    type: Duration
+    distribution: [ 0ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 5m, 15m ]
+    unit: "ms"

@@ -1,0 +1,34 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store OpenShift template manifest. Template content (files) and params (paramsPaths)
+# are fetched from the Harness File Store and written to the runner workspace by the manifest step.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: OpenShift template file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  paramsPaths:
+    type: list
+    description: OpenShift param file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.paramsPaths}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store OpenShift manifest 'ID_PLACEHOLDER' on the runner"

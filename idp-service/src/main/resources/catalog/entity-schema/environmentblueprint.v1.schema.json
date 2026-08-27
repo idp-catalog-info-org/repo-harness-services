@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "An EnvironmentBlueprint describes the lifecycle of environments. Environments can be created and later updated, using the EnvironmentBlueprint is a declarative configuration of involved entities.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": ["apiVersion", "kind", "identifier", "owner", "spec"],
+      "properties": {
+        "apiVersion": {
+          "enum": ["harness.io/v1"]
+        },
+        "kind": {
+          "enum": [
+            "ENVIRONMENTBLUEPRINT",
+            "EnvironmentBlueprint",
+            "environmentblueprint"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": ["string", "null"]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the component.",
+          "examples": ["artist-relations-team", "user:john.johnson"],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "parameters": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/parameterOptions"
+              }
+            },
+            "entities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/entity"
+              }
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "parameterOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["number", "string", "boolean"]
+        },
+        "description": {
+          "type": "string"
+        },
+        "value": {},
+        "default": {}
+      }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier"],
+      "properties": {
+        "identifier": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/parameterOptions"
+          }
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref"],
+          "properties": {
+            "ref": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "spec": {
+              "type": "object"
+            }
+          }
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "spec": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short (typically relatively few words, on one line) description of the Environment Blueprint."
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of single-valued strings, to for example classify catalog entities in various ways.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

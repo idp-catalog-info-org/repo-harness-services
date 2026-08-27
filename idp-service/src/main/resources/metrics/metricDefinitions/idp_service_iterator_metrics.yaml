@@ -1,0 +1,12 @@
+name: IDP Service Iterator Metrics
+identifier: IdpServiceIteratorMetrics
+metricGroup: IdpServiceIteratorMetricsGroup
+metrics:
+  - metricName: idp_iterator_success_total
+    metricDefinition: IDP Service iterator successful processing count per account
+    type: Count
+    unit: "1"
+  - metricName: idp_iterator_failure_total
+    metricDefinition: IDP Service iterator failure count per account
+    type: Count
+    unit: "1"

@@ -1,0 +1,20 @@
+pipeline:
+  clone:
+    disabled: true
+  stages:
+    - runtime: shell
+      steps:
+        - action:
+            uses: TestStepTemplate
+            with:
+              input1: hello
+              input2: false
+              input3: 44
+              input4: test
+    - runtime: shell
+      template:
+        uses: TestStageTemplate
+        with:
+          input1: world
+          input2: true
+          input3: 78

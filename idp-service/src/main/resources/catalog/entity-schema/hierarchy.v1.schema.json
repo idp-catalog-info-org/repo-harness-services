@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "A Hierarchy describes a harness hierarchy.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "type"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "HIERARCHY",
+            "Hierarchy",
+            "hierarchy"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "account",
+            "organization",
+            "project"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

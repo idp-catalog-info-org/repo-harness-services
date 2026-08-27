@@ -1,0 +1,1648 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.steps.approval.step;
+
+import static io.harness.annotations.dev.HarnessTeam.CDC;
+import static io.harness.rule.OwnerRule.ANKUR_PATEL;
+import static io.harness.rule.OwnerRule.AYUSHMAN;
+import static io.harness.rule.OwnerRule.HARSHIT;
+import static io.harness.rule.OwnerRule.IVAN;
+import static io.harness.rule.OwnerRule.NAMANG;
+import static io.harness.rule.OwnerRule.RAKSHIT_AGARWAL;
+import static io.harness.rule.OwnerRule.SARTHAK_KASAT;
+import static io.harness.rule.OwnerRule.SOURABH;
+import static io.harness.rule.OwnerRule.YUVRAJ;
+import static io.harness.rule.OwnerRule.vivekveman;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import io.harness.CategoryTest;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.EmbeddedUser;
+import io.harness.beans.FeatureName;
+import io.harness.category.element.UnitTests;
+import io.harness.data.structure.UUIDGenerator;
+import io.harness.dataretention.PipelineRetentionService;
+import io.harness.engine.executions.plan.service.PlanExecutionService;
+import io.harness.engine.pms.data.expression.PmsEngineExpressionService;
+import io.harness.entity.accountoverrides.DataRetentionEntity;
+import io.harness.exception.InvalidArgumentsException;
+import io.harness.exception.InvalidRequestException;
+import io.harness.execution.NodeExecution;
+import io.harness.jira.JiraIssueNG;
+import io.harness.logstreaming.ILogStreamingStepClient;
+import io.harness.logstreaming.LogLine;
+import io.harness.logstreaming.LogStreamingStepClientFactory;
+import io.harness.logstreaming.NGLogCallback;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.repositories.ApprovalInstanceRepository;
+import io.harness.rule.Owner;
+import io.harness.servicenow.ServiceNowFieldValueNG;
+import io.harness.servicenow.ServiceNowTicketNG;
+import io.harness.steps.StepSpecTypeConstants;
+import io.harness.steps.approval.step.beans.ApprovalStatus;
+import io.harness.steps.approval.step.beans.ApprovalType;
+import io.harness.steps.approval.step.entities.ApprovalInstance;
+import io.harness.steps.approval.step.entities.ApprovalInstance.ApprovalInstanceKeys;
+import io.harness.steps.approval.step.entities.HarnessApprovalInstance;
+import io.harness.steps.approval.step.entities.HarnessApprovalInstance.HarnessApprovalInstanceKeys;
+import io.harness.steps.approval.step.entities.JiraApprovalInstance;
+import io.harness.steps.approval.step.entities.JiraApprovalInstance.JiraApprovalInstanceKeys;
+import io.harness.steps.approval.step.entities.ServiceNowApprovalInstance;
+import io.harness.steps.approval.step.entities.ServiceNowApprovalInstance.ServiceNowApprovalInstanceKeys;
+import io.harness.steps.approval.step.harness.beans.ApproverInput;
+import io.harness.steps.approval.step.harness.beans.ApproverInputInfoDTO;
+import io.harness.steps.approval.step.harness.beans.ApproversDTO;
+import io.harness.steps.approval.step.harness.beans.HarnessApprovalAction;
+import io.harness.steps.approval.step.harness.beans.HarnessApprovalActivity;
+import io.harness.steps.approval.step.harness.beans.HarnessApprovalActivityRequestDTO;
+import io.harness.utils.AmbianceScopeResolutionHelper;
+import io.harness.utils.PmsFeatureFlagService;
+import io.harness.waiter.WaitNotifyEngine;
+
+import com.google.inject.Inject;
+import com.mongodb.client.result.UpdateResult;
+import dev.morphia.mapping.Mapper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.transaction.support.TransactionTemplate;
+
+@OwnedBy(CDC)
+@RunWith(MockitoJUnitRunner.class)
+public class ApprovalInstanceServiceTest extends CategoryTest {
+  @Mock private ApprovalInstanceRepository approvalInstanceRepository;
+  @Mock private TransactionTemplate transactionTemplate;
+  @Mock private WaitNotifyEngine waitNotifyEngine;
+  @Mock private PlanExecutionService planExecutionService;
+  @Mock private LogStreamingStepClientFactory logStreamingStepClientFactory;
+  @Mock private PmsEngineExpressionService pmsEngineExpressionService;
+  @Mock private AmbianceScopeResolutionHelper scopeResolutionHelper;
+
+  @Mock private PipelineRetentionService pipelineRetentionService;
+  @Mock private PmsFeatureFlagService pmsFeatureFlagService;
+  private static final String planExecutionId = "planExecutionId";
+  private static final ApprovalStatus approvalStatus = ApprovalStatus.WAITING;
+  private static final ApprovalType approvalType = ApprovalType.HARNESS_APPROVAL;
+  private static final String nodeExecutionId = "nodeExecutionId";
+  private static final String callbackId = "callbackId";
+  private static final String ACCOUNT_ID = "account";
+  private static final String ORG_ID = "account";
+  private static final String PROJECT_ID = "PROJECT_ID";
+  private static final String PARENT_UNIQUE_ID = "PARENT_UNIQUE_ID";
+  private static final String PIPELINE_ID = "PIPELINE_ID";
+  private static final String APPROVAL_KEY = "key";
+  private static final String APPROVAL_ID = "approvalId";
+  private static final String TASK_ID = "taskId";
+  private static final String KEYS_IN_CRITERIA = "status,priority,issuetype";
+  private static final Long CREATED_AT = 1000L;
+  private static final String APPROVAL_NAME = "Admin";
+  private static final String APPROVAL_COMMENT = "Approval comment";
+  private static final String APPROVAL_EMAIL = "admin@harness.io";
+  private static final String VARIABLE_NAME = "var";
+  private static final String ANOTHER_VARIABLE_NAME = "anotherVar";
+  private static final String VARIABLE_DEFAULT_VALUE = "default";
+  private static final String EMPTY_VARIABLE_VALUE = "";
+  private static final String VARIABLE_VALUE_1 = "val1";
+  private static final String VARIABLE_VALUE_2 = "val2";
+  private static final String NON_MATCHING_VALUE = "notVal";
+  private static final String MULTI_VARIABLE_VALUE_NON_MATCHING = VARIABLE_VALUE_1 + ", " + NON_MATCHING_VALUE;
+  private static final String MULTI_VARIABLE_VALUE = VARIABLE_VALUE_1 + ", " + VARIABLE_VALUE_2;
+  private static final List<String> ALLOWED_VALUES = Arrays.asList(VARIABLE_VALUE_1, VARIABLE_VALUE_2);
+  private static final List<String> SELECT_ONE_FROM = Arrays.asList(VARIABLE_VALUE_1, VARIABLE_VALUE_2);
+  private static final String REGEX = "val[^.]+";
+  @Spy @Inject @InjectMocks private ApprovalInstanceServiceImpl approvalInstanceServiceImpl;
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testSave() {
+    ApprovalInstance serviceNowApprovalInstance = ServiceNowApprovalInstance.builder().build();
+    serviceNowApprovalInstance.setAmbiance(Ambiance.newBuilder().build());
+    when(approvalInstanceRepository.save(serviceNowApprovalInstance)).thenReturn(serviceNowApprovalInstance);
+    when(pipelineRetentionService.getRetentionPeriodInMonths(any())).thenReturn(6);
+    when(pmsFeatureFlagService.isEnabled(ACCOUNT_ID, FeatureName.CDS_CUSTOMIZE_PIPELINE_TTL)).thenReturn(false);
+    assertThat(approvalInstanceServiceImpl.save(serviceNowApprovalInstance)).isEqualTo(serviceNowApprovalInstance);
+  }
+
+  @Test
+  @Owner(developers = SARTHAK_KASAT)
+  @Category(UnitTests.class)
+  public void testParentUniqueIdFromAmbiance() {
+    ApprovalInstance serviceNowApprovalInstance = ServiceNowApprovalInstance.builder().build();
+    serviceNowApprovalInstance.setAccountId(ACCOUNT_ID);
+    serviceNowApprovalInstance.setParentUniqueId(PARENT_UNIQUE_ID);
+    serviceNowApprovalInstance.setAmbiance(
+        Ambiance.newBuilder().putSetupAbstractions("parentUniqueId", PARENT_UNIQUE_ID).build());
+    when(approvalInstanceRepository.save(serviceNowApprovalInstance)).thenReturn(serviceNowApprovalInstance);
+    assertThat(serviceNowApprovalInstance.getParentUniqueId()).isEqualTo(PARENT_UNIQUE_ID);
+    when(pipelineRetentionService.getRetentionPeriodInMonths(any())).thenReturn(6);
+    when(pmsFeatureFlagService.isEnabled(ACCOUNT_ID, FeatureName.CDS_CUSTOMIZE_PIPELINE_TTL)).thenReturn(false);
+    ApprovalInstance instance = approvalInstanceServiceImpl.save(serviceNowApprovalInstance);
+    assertThat(instance).isNotNull();
+    assertThat(instance.getParentUniqueId()).isEqualTo(PARENT_UNIQUE_ID);
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testget() {
+    ServiceNowApprovalInstance serviceNowApprovalInstance = ServiceNowApprovalInstance.builder().build();
+    ApprovalInstance entity = (ApprovalInstance) serviceNowApprovalInstance;
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+
+    assertThat(approvalInstanceServiceImpl.get("hello")).isEqualTo(entity);
+  }
+  @Test
+  @Owner(developers = RAKSHIT_AGARWAL)
+  @Category(UnitTests.class)
+  public void testGetException() {
+    String instance = "Invalid";
+    when(approvalInstanceRepository.findById(instance)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> { approvalInstanceServiceImpl.get(""); })
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageStartingWith("Invalid approval instance id");
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testgetHarnessApprovalInstance() {
+    HarnessApprovalInstance harnessApprovalInstance = HarnessApprovalInstance.builder().build();
+    ApprovalInstance entity = (ApprovalInstance) harnessApprovalInstance;
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+
+    assertThat(approvalInstanceServiceImpl.getHarnessApprovalInstance("hello")).isEqualTo(entity);
+  }
+
+  @Test
+  @Owner(developers = RAKSHIT_AGARWAL)
+  @Category(UnitTests.class)
+  public void testGetHarnessApprovalInstanceException() {
+    String approvalInstanceId = "Invalid";
+    when(approvalInstanceRepository.findById(approvalInstanceId)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> { approvalInstanceServiceImpl.get("Invalid"); })
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageStartingWith("Invalid approval instance id");
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testdelete() {
+    HarnessApprovalInstance harnessApprovalInstance = HarnessApprovalInstance.builder().build();
+
+    ApprovalInstance entity = (ApprovalInstance) harnessApprovalInstance;
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+
+    approvalInstanceServiceImpl.delete("hello");
+    verify(approvalInstanceRepository, times(1)).deleteById(anyString());
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testabortByNodeExecutionId() {
+    approvalInstanceServiceImpl.abortByNodeExecutionId("hello");
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(eq(new Query(Criteria.where(ApprovalInstanceKeys.nodeExecutionId).is("hello"))
+                             .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING))),
+            eq(new Update().set(ApprovalInstanceKeys.status, ApprovalStatus.ABORTED)));
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testexpireByNodeExecutionId() {
+    approvalInstanceServiceImpl.expireByNodeExecutionId("hello");
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(eq(new Query(Criteria.where(ApprovalInstanceKeys.nodeExecutionId).is("hello"))
+                             .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING))),
+            eq(new Update().set(ApprovalInstanceKeys.status, ApprovalStatus.EXPIRED)));
+  }
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testmarkExpiredInstances() {
+    UpdateResult updateResult = mock(UpdateResult.class);
+
+    when(approvalInstanceRepository.updateMulti(any(), any())).thenReturn(updateResult);
+    when(updateResult.getModifiedCount()).thenReturn(0L);
+    approvalInstanceServiceImpl.markExpiredInstances();
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    ArgumentCaptor<Update> updateArgumentCaptor = ArgumentCaptor.forClass(Update.class);
+    verify(approvalInstanceRepository, times(1))
+        .updateMulti(queryArgumentCaptor.capture(), updateArgumentCaptor.capture());
+    Query query = queryArgumentCaptor.getValue();
+    Update update = updateArgumentCaptor.getValue();
+    assertThat(query.getQueryObject()).hasSize(2);
+    assertThat(update.getUpdateObject().size()).isEqualTo(1);
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testfinalizeStatusServicenow() {
+    ServiceNowApprovalInstance serviceNowApprovalInstance = ServiceNowApprovalInstance.builder().build();
+    ApprovalInstance entity = (ApprovalInstance) serviceNowApprovalInstance;
+    entity.setType(ApprovalType.SERVICENOW_APPROVAL);
+
+    when(approvalInstanceRepository.updateFirst(any(), any())).thenReturn(entity);
+
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    entity.setAmbiance(ambiance);
+    approvalInstanceServiceImpl.finalizeStatus("hello", ApprovalStatus.APPROVED, "errormessage", null);
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    ArgumentCaptor<Update> updateArgumentCaptor = ArgumentCaptor.forClass(Update.class);
+    verify(approvalInstanceRepository).updateFirst(queryArgumentCaptor.capture(), updateArgumentCaptor.capture());
+    Query query = queryArgumentCaptor.getValue();
+    Update update = updateArgumentCaptor.getValue();
+    assertThat(query.getQueryObject()).hasSize(2);
+    assertThat(update.getUpdateObject().size()).isEqualTo(1);
+  }
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testfinalizeStatusJira() {
+    JiraApprovalInstance jiraApprovalInstance = JiraApprovalInstance.builder().build();
+    ApprovalInstance entity = (ApprovalInstance) jiraApprovalInstance;
+    entity.setType(ApprovalType.JIRA_APPROVAL);
+    when(approvalInstanceRepository.updateFirst(any(), any())).thenReturn(entity);
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    entity.setAmbiance(ambiance);
+    approvalInstanceServiceImpl.finalizeStatus("hello", ApprovalStatus.APPROVED, "errormessage", null);
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    ArgumentCaptor<Update> updateArgumentCaptor = ArgumentCaptor.forClass(Update.class);
+    verify(approvalInstanceRepository).updateFirst(queryArgumentCaptor.capture(), updateArgumentCaptor.capture());
+    Query query = queryArgumentCaptor.getValue();
+    Update update = updateArgumentCaptor.getValue();
+    assertThat(query.getQueryObject()).hasSize(2);
+    assertThat(update.getUpdateObject().size()).isEqualTo(1);
+  }
+  // eq captor
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testaddHarnessApprovalActivity() throws Exception {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(
+                ApproverInputInfoDTO.builder().name("NAME").defaultValue("DEFAULT_VAL").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = (ApprovalInstance) harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        HarnessApprovalActivityRequestDTO.builder().build();
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO1 =
+        HarnessApprovalActivityRequestDTO.builder()
+            .action(HarnessApprovalAction.APPROVE)
+            .comments("comment")
+            .approverInputs(Collections.singletonList(ApproverInput.builder().name("NAME").value("CUSTOM_VAL").build()))
+            .build();
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+
+    instance.setStatus(ApprovalStatus.APPROVED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      // default value taken for approver input variable
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+          "hello", embeddedUser, harnessApprovalActivityRequestDTO);
+      verify(approvalInstanceRepository, times(1)).save(entity);
+      verify(ngLogCallback.constructed().get(0)).saveExecutionLog(anyString());
+      when(transactionTemplate.execute(any())).thenReturn(harnessApprovalInstance);
+      // set instance to waiting to avoid already complete failure
+      harnessApprovalInstance.setStatus(ApprovalStatus.WAITING);
+      // custom value set for approver input variable
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+          "hello", embeddedUser, harnessApprovalActivityRequestDTO1);
+      verify(approvalInstanceRepository, times(2)).save(entity);
+      verify(ngLogCallback.constructed().get(1), times(1)).saveExecutionLog(anyString());
+      assertThat(approvalInstanceServiceImpl.addHarnessApprovalActivity(
+                     "hello", embeddedUser, harnessApprovalActivityRequestDTO))
+          .isEqualTo(harnessApprovalInstance);
+    }
+  }
+
+  @Test
+  @Owner(developers = vivekveman)
+  @Category(UnitTests.class)
+  public void testaddHarnessApprovalActivityTestEmptyValue() throws Exception {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(
+                ApproverInputInfoDTO.builder().name("NAME").defaultValue("DEFAULT_VAL").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = (ApprovalInstance) harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        HarnessApprovalActivityRequestDTO.builder().build();
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO1 =
+        HarnessApprovalActivityRequestDTO.builder()
+            .action(HarnessApprovalAction.APPROVE)
+            .comments("comment")
+            .approverInputs(Collections.singletonList(ApproverInput.builder().name("NAME").build()))
+            .build();
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      // default value taken for approver input variable
+
+      harnessApprovalInstance.addApprovalActivity(embeddedUser, harnessApprovalActivityRequestDTO1);
+      assertThat(harnessApprovalInstance.getApprovalActivities().get(0).getApproverInputs().get(0).getValue())
+          .isEqualTo("");
+    }
+  }
+
+  @Test
+  @Owner(developers = YUVRAJ)
+  @Category(UnitTests.class)
+  public void testFindAllPreviousWaitingApprovals() {
+    Ambiance ambiance1 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId1").build();
+    Ambiance ambiance2 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId2").build();
+    List<ApprovalInstance> approvalInstances = new ArrayList<>();
+    ApprovalInstance approvalInstance = HarnessApprovalInstance.builder()
+                                            .approvalKey("key")
+                                            .approvalActivities(Collections.EMPTY_LIST)
+                                            .approvalMessage("message1")
+                                            .approvers(ApproversDTO.builder().build())
+                                            .isAutoRejectEnabled(true)
+                                            .includePipelineExecutionHistory(false)
+                                            .build();
+    approvalInstance.setAmbiance(ambiance2);
+    approvalInstance.setId("_id");
+    approvalInstances.add(approvalInstance);
+    approvalInstance.setDeadline(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
+    when(scopeResolutionHelper.getParentUniqueId(ambiance1)).thenReturn(PARENT_UNIQUE_ID);
+    when(approvalInstanceRepository.findAll(Criteria.where("accountId")
+                                                .is(ACCOUNT_ID)
+                                                .and("parentUniqueId")
+                                                .is(PARENT_UNIQUE_ID)
+                                                .and("pipelineIdentifier")
+                                                .is(PIPELINE_ID)
+                                                .and("approvalKey")
+                                                .is(APPROVAL_KEY)
+                                                .and(ApprovalInstanceKeys.status)
+                                                .is(ApprovalStatus.WAITING)
+                                                .and("isAutoRejectEnabled")
+                                                .is(true)
+                                                .and(ApprovalInstanceKeys.createdAt)
+                                                .lt(CREATED_AT)))
+        .thenReturn(approvalInstances);
+    when(pmsEngineExpressionService.renderExpression(ambiance1, "<+service.identifier>", true)).thenReturn("ser1");
+    when(pmsEngineExpressionService.renderExpression(ambiance2, "<+service.identifier>", true)).thenReturn("ser1");
+    List<String> approvalIds = approvalInstanceServiceImpl.findAllPreviousWaitingApprovals(
+        ACCOUNT_ID, ORG_ID, PROJECT_ID, PIPELINE_ID, APPROVAL_KEY, ambiance1, CREATED_AT);
+    assertThat(approvalIds).isNotNull();
+    assertThat(approvalIds.size()).isEqualTo(1);
+    assertThat(approvalIds.get(0)).isEqualTo("_id");
+  }
+
+  @Test
+  @Owner(developers = SARTHAK_KASAT)
+  @Category(UnitTests.class)
+  public void testFindAllPreviousWaitingApprovalsWithParentUniqueId() {
+    Ambiance ambiance1 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId1").build();
+    Ambiance ambiance2 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId2").build();
+    List<ApprovalInstance> approvalInstances = new ArrayList<>();
+    ApprovalInstance approvalInstance = HarnessApprovalInstance.builder()
+                                            .approvalKey("key")
+                                            .approvalActivities(Collections.EMPTY_LIST)
+                                            .approvalMessage("message1")
+                                            .approvers(ApproversDTO.builder().build())
+                                            .isAutoRejectEnabled(true)
+                                            .includePipelineExecutionHistory(false)
+                                            .build();
+    approvalInstance.setAmbiance(ambiance2);
+    approvalInstance.setId("_id");
+    approvalInstances.add(approvalInstance);
+    approvalInstance.setDeadline(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1));
+    approvalInstance.setParentUniqueId("parentUniqueId");
+    when(scopeResolutionHelper.getParentUniqueId(ambiance1)).thenReturn(PARENT_UNIQUE_ID);
+    when(approvalInstanceRepository.findAll(Criteria.where("accountId")
+                                                .is(ACCOUNT_ID)
+                                                .and("parentUniqueId")
+                                                .is(PARENT_UNIQUE_ID)
+                                                .and("pipelineIdentifier")
+                                                .is(PIPELINE_ID)
+                                                .and("approvalKey")
+                                                .is(APPROVAL_KEY)
+                                                .and(ApprovalInstanceKeys.status)
+                                                .is(ApprovalStatus.WAITING)
+                                                .and("isAutoRejectEnabled")
+                                                .is(true)
+                                                .and(ApprovalInstanceKeys.createdAt)
+                                                .lt(CREATED_AT)))
+        .thenReturn(approvalInstances);
+    when(pmsEngineExpressionService.renderExpression(ambiance1, "<+service.identifier>", true)).thenReturn("ser1");
+    when(pmsEngineExpressionService.renderExpression(ambiance2, "<+service.identifier>", true)).thenReturn("ser1");
+    List<String> approvalIds = approvalInstanceServiceImpl.findAllPreviousWaitingApprovals(
+        ACCOUNT_ID, ORG_ID, PROJECT_ID, PIPELINE_ID, APPROVAL_KEY, ambiance1, CREATED_AT);
+    assertThat(approvalIds).isNotNull();
+    assertThat(approvalIds.size()).isEqualTo(1);
+    assertThat(approvalIds.get(0)).isEqualTo("_id");
+  }
+
+  @Test
+  @Owner(developers = YUVRAJ)
+  @Category(UnitTests.class)
+  public void testFindAllPreviousWaitingApprovalsNegative() {
+    Ambiance ambiance1 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId1").build();
+    Ambiance ambiance2 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId2").build();
+    List<ApprovalInstance> approvalInstances = new ArrayList<>();
+    ApprovalInstance approvalInstance = HarnessApprovalInstance.builder()
+                                            .approvalKey("key")
+                                            .approvalActivities(Collections.EMPTY_LIST)
+                                            .approvalMessage("message1")
+                                            .approvers(ApproversDTO.builder().build())
+                                            .isAutoRejectEnabled(true)
+                                            .includePipelineExecutionHistory(false)
+                                            .build();
+    approvalInstance.setAmbiance(ambiance2);
+    approvalInstance.setId("_id");
+    approvalInstances.add(approvalInstance);
+    when(scopeResolutionHelper.getParentUniqueId(ambiance1)).thenReturn(PARENT_UNIQUE_ID);
+    when(approvalInstanceRepository.findAll(Criteria.where("accountId")
+                                                .is(ACCOUNT_ID)
+                                                .and("parentUniqueId")
+                                                .is(PARENT_UNIQUE_ID)
+                                                .and("pipelineIdentifier")
+                                                .is(PIPELINE_ID)
+                                                .and("approvalKey")
+                                                .is(APPROVAL_KEY)
+                                                .and(ApprovalInstanceKeys.status)
+                                                .is(ApprovalStatus.WAITING)
+                                                .and("isAutoRejectEnabled")
+                                                .is(true)
+                                                .and(ApprovalInstanceKeys.createdAt)
+                                                .lt(CREATED_AT)))
+        .thenReturn(approvalInstances);
+    when(pmsEngineExpressionService.renderExpression(ambiance1, "<+service.identifier>", true)).thenReturn("ser1");
+    when(pmsEngineExpressionService.renderExpression(ambiance2, "<+service.identifier>", true)).thenReturn("ser2");
+    List<String> approvalIds = approvalInstanceServiceImpl.findAllPreviousWaitingApprovals(
+        ACCOUNT_ID, ORG_ID, PROJECT_ID, PIPELINE_ID, APPROVAL_KEY, ambiance1, CREATED_AT);
+    assertThat(approvalIds).isNotNull();
+    assertThat(approvalIds).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = YUVRAJ)
+  @Category(UnitTests.class)
+  public void testFindAllPreviousWaitingApprovalsWithoutApprovalKey() {
+    Ambiance ambiance1 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId1").build();
+    when(pmsEngineExpressionService.renderExpression(ambiance1, "<+service.identifier>", true)).thenReturn("ser1");
+    List<String> approvalIds = approvalInstanceServiceImpl.findAllPreviousWaitingApprovals(
+        ACCOUNT_ID, ORG_ID, PROJECT_ID, PIPELINE_ID, null, ambiance1, CREATED_AT);
+    assertThat(approvalIds).isNotNull();
+    assertThat(approvalIds).isEmpty();
+    verifyNoMoreInteractions(approvalInstanceRepository);
+  }
+
+  @Test
+  @Owner(developers = YUVRAJ)
+  @Category(UnitTests.class)
+  public void testRejectPreviousExecutionsForUnauthorized() {
+    Ambiance ambiance = Ambiance.newBuilder().build();
+    ILogStreamingStepClient stepClient = Mockito.mock(ILogStreamingStepClient.class);
+    when(logStreamingStepClientFactory.getLogStreamingStepClient(ambiance)).thenReturn(stepClient);
+    when(pmsEngineExpressionService.renderExpression(ambiance, "<+pipeline.executionUrl>", true))
+        .thenReturn("pipelineUrl");
+    approvalInstanceServiceImpl.rejectPreviousExecutions("instanceId", new EmbeddedUser(), true, ambiance);
+    ArgumentCaptor<LogLine> logLineArgumentCaptor = ArgumentCaptor.forClass(LogLine.class);
+    verify(stepClient, times(1)).writeLogLine(logLineArgumentCaptor.capture(), anyString());
+    assertThat(logLineArgumentCaptor.getValue().getMessage())
+        .isEqualTo("Unable to auto reject previous execution with approval id instanceId as the user does not have the "
+            + "access to reject this execution");
+  }
+
+  @Test
+  @Owner(developers = YUVRAJ)
+  @Category(UnitTests.class)
+  public void testRejectPreviousExecutionsForAuthorized() {
+    Ambiance ambiance = Ambiance.newBuilder().build();
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(
+                ApproverInputInfoDTO.builder().name("NAME").defaultValue("DEFAULT_VAL").build()))
+            .build();
+    harnessApprovalInstance.setStatus(ApprovalStatus.REJECTED);
+    when(pmsEngineExpressionService.renderExpression(ambiance, "<+pipeline.executionUrl>", true))
+        .thenReturn("pipelineUrl");
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequest =
+        HarnessApprovalActivityRequestDTO.builder()
+            .comments("Rejected due to approval of pipelineUrl")
+            .action(HarnessApprovalAction.REJECT)
+            .build();
+    ArgumentCaptor<HarnessApprovalActivityRequestDTO> argumentCaptor =
+        ArgumentCaptor.forClass(HarnessApprovalActivityRequestDTO.class);
+    when(transactionTemplate.execute(any())).thenReturn(harnessApprovalInstance);
+    approvalInstanceServiceImpl.rejectPreviousExecutions("instanceId", new EmbeddedUser(), false, ambiance);
+    verify(approvalInstanceServiceImpl, times(1))
+        .addHarnessApprovalActivity(anyString(), any(), argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue()).isEqualTo(harnessApprovalActivityRequest);
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testdeleteByNodeExecutionIdsWhenLessThanBatchSize() {
+    Set<String> nodeExecutionIds = new HashSet<>();
+    nodeExecutionIds.add(UUIDGenerator.generateUuid());
+    nodeExecutionIds.add(UUIDGenerator.generateUuid());
+    when(approvalInstanceRepository.deleteAllByNodeExecutionIdIn(any())).thenReturn(2L);
+
+    approvalInstanceServiceImpl.deleteByNodeExecutionIds(nodeExecutionIds);
+    ArgumentCaptor<Set<String>> setArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+    verify(approvalInstanceRepository, times(1)).deleteAllByNodeExecutionIdIn(setArgumentCaptor.capture());
+    Set<String> setArgs = setArgumentCaptor.getValue();
+    assertThat(setArgs).isEqualTo(nodeExecutionIds);
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testdeleteByNodeExecutionIdsWhenEqualToBatchSize() {
+    Set<String> nodeExecutionIds = new HashSet<>();
+    for (int i = 0; i < 500; i++) {
+      nodeExecutionIds.add(UUIDGenerator.generateUuid());
+    }
+    // only return value if called with valid query else throw exception
+    when(approvalInstanceRepository.deleteAllByNodeExecutionIdIn(any())).thenAnswer((Answer<Long>) invocation -> {
+      Object[] args = invocation.getArguments();
+      Set<String> setNodeExecutionId = (Set<String>) args[0];
+      if (setNodeExecutionId.equals(nodeExecutionIds)) {
+        return 500L;
+      }
+      throw new Exception();
+    });
+
+    approvalInstanceServiceImpl.deleteByNodeExecutionIds(nodeExecutionIds);
+    verify(approvalInstanceRepository, times(1)).deleteAllByNodeExecutionIdIn(any());
+    verifyNoMoreInteractions(approvalInstanceRepository);
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testdeleteByNodeExecutionIdsWhenMoreThanBatchSize() {
+    Set<String> nodeExecutionIds = new HashSet<>();
+    for (int i = 0; i < 600; i++) {
+      nodeExecutionIds.add(UUIDGenerator.generateUuid());
+    }
+    // only return value if called with valid query else throw exception
+    when(approvalInstanceRepository.deleteAllByNodeExecutionIdIn(any())).thenAnswer((Answer<Long>) invocation -> {
+      Object[] args = invocation.getArguments();
+      Set<String> setNodeExecutionId = (Set<String>) args[0];
+      if (setNodeExecutionId.size() == 500) {
+        return 500L;
+      } else if (setNodeExecutionId.size() == 100) {
+        return 100L;
+      }
+      throw new Exception();
+    });
+
+    approvalInstanceServiceImpl.deleteByNodeExecutionIds(nodeExecutionIds);
+    verify(approvalInstanceRepository, times(2)).deleteAllByNodeExecutionIdIn(any());
+    verifyNoMoreInteractions(approvalInstanceRepository);
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testIsNodeExecutionOfApprovalStepType() {
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(null)).isFalse();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(NodeExecution.builder().build()))
+        .isFalse();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder().stepType(StepType.newBuilder().build()).build()))
+        .isFalse();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder()
+                       .stepType(StepType.newBuilder().setStepCategory(StepCategory.STEP_GROUP).build())
+                       .build()))
+        .isFalse();
+    assertThat(
+        approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+            NodeExecution.builder().stepType(StepType.newBuilder().setStepCategory(StepCategory.STEP).build()).build()))
+        .isFalse();
+    assertThat(
+        approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+            NodeExecution.builder()
+                .stepType(StepType.newBuilder().setStepCategory(StepCategory.STEP).setType("notApproval").build())
+                .build()))
+        .isFalse();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder()
+                       .stepType(StepType.newBuilder()
+                                     .setStepCategory(StepCategory.STEP)
+                                     .setType(StepSpecTypeConstants.CUSTOM_APPROVAL)
+                                     .build())
+                       .build()))
+        .isTrue();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder()
+                       .stepType(StepType.newBuilder()
+                                     .setStepCategory(StepCategory.STEP)
+                                     .setType(StepSpecTypeConstants.JIRA_APPROVAL)
+                                     .build())
+                       .build()))
+        .isTrue();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder()
+                       .stepType(StepType.newBuilder()
+                                     .setStepCategory(StepCategory.STEP)
+                                     .setType(StepSpecTypeConstants.SERVICENOW_APPROVAL)
+                                     .build())
+                       .build()))
+        .isTrue();
+    assertThat(approvalInstanceServiceImpl.isNodeExecutionOfApprovalStepType(
+                   NodeExecution.builder()
+                       .stepType(StepType.newBuilder()
+                                     .setStepCategory(StepCategory.STEP)
+                                     .setType(StepSpecTypeConstants.HARNESS_APPROVAL)
+                                     .build())
+                       .build()))
+        .isTrue();
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testUpdateTicketFieldsInServiceNowApprovalInstance() {
+    ServiceNowApprovalInstance serviceNowApprovalInstance = ServiceNowApprovalInstance.builder().build();
+    serviceNowApprovalInstance.setId("id");
+
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(serviceNowApprovalInstance, null);
+    }).doesNotThrowAnyException();
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+          serviceNowApprovalInstance, ServiceNowTicketNG.builder().build());
+    }).doesNotThrowAnyException();
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+          serviceNowApprovalInstance, ServiceNowTicketNG.builder().fields(new HashMap<>()).build());
+    }).doesNotThrowAnyException();
+    Map<String, ServiceNowFieldValueNG> serviceNowTicketFields = new HashMap<>();
+    serviceNowTicketFields.put(
+        "dummyField", ServiceNowFieldValueNG.builder().displayValue("displayValue").value("value").build());
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+          serviceNowApprovalInstance, ServiceNowTicketNG.builder().fields(serviceNowTicketFields).build());
+    }).doesNotThrowAnyException();
+    verify(approvalInstanceRepository, times(0)).updateFirst(any(), any());
+
+    serviceNowTicketFields.put("state", ServiceNowFieldValueNG.builder().displayValue("Open").value("open").build());
+
+    Map<String, ServiceNowFieldValueNG> updatedApprovalInstanceTicketFields = new HashMap<>();
+    updatedApprovalInstanceTicketFields.put(
+        "state", ServiceNowFieldValueNG.builder().displayValue("Open").value("open").build());
+
+    approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+        serviceNowApprovalInstance, ServiceNowTicketNG.builder().fields(serviceNowTicketFields).build());
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(new Query(Criteria.where(Mapper.ID_KEY).is(serviceNowApprovalInstance.getId()))
+                         .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING)),
+            new Update().set(ServiceNowApprovalInstanceKeys.ticketFields, updatedApprovalInstanceTicketFields));
+
+    // settings service now instance fields to the same value
+    serviceNowApprovalInstance.setTicketFields(updatedApprovalInstanceTicketFields);
+    approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+        serviceNowApprovalInstance, ServiceNowTicketNG.builder().fields(serviceNowTicketFields).build());
+    verify(approvalInstanceRepository, times(1)).updateFirst(any(), any());
+
+    // settings service now instance fields to different value
+    updatedApprovalInstanceTicketFields.put(
+        "state", ServiceNowFieldValueNG.builder().displayValue("Closed").value("closed").build());
+
+    serviceNowApprovalInstance.setTicketFields(updatedApprovalInstanceTicketFields);
+    approvalInstanceServiceImpl.updateTicketFieldsInServiceNowApprovalInstance(
+        serviceNowApprovalInstance, ServiceNowTicketNG.builder().fields(serviceNowTicketFields).build());
+    verify(approvalInstanceRepository, times(2)).updateFirst(any(), any());
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testUpdateTicketFieldsInJiraApprovalInstance() {
+    JiraApprovalInstance jiraApprovalInstance = JiraApprovalInstance.builder().build();
+    jiraApprovalInstance.setId("id");
+    JiraIssueNG jiraIssueNG = new JiraIssueNG();
+
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, null);
+    }).doesNotThrowAnyException();
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    }).doesNotThrowAnyException();
+
+    jiraIssueNG.setFields(new HashMap<>());
+
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    }).doesNotThrowAnyException();
+    Map<String, Object> jiraTicketFields = new HashMap<>();
+    jiraTicketFields.put("dummyField", "dummyValue");
+    jiraIssueNG.setFields(jiraTicketFields);
+
+    assertThatCode(() -> {
+      approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    }).doesNotThrowAnyException();
+    verify(approvalInstanceRepository, times(0)).updateFirst(any(), any());
+
+    jiraTicketFields.put("Status", "To Do");
+    jiraIssueNG.setFields(jiraTicketFields);
+
+    Map<String, Object> updatedApprovalInstanceTicketFields = new HashMap<>();
+    updatedApprovalInstanceTicketFields.put("Status", "To Do");
+
+    approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(new Query(Criteria.where(Mapper.ID_KEY).is(jiraApprovalInstance.getId()))
+                         .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING)),
+            new Update().set(JiraApprovalInstanceKeys.ticketFields, updatedApprovalInstanceTicketFields));
+
+    // settings service now instance fields to the same value
+    jiraApprovalInstance.setTicketFields(updatedApprovalInstanceTicketFields);
+    approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    verify(approvalInstanceRepository, times(1)).updateFirst(any(), any());
+
+    // settings service now instance fields to different value
+    updatedApprovalInstanceTicketFields.put("Status", "In Progress");
+
+    jiraApprovalInstance.setTicketFields(updatedApprovalInstanceTicketFields);
+    approvalInstanceServiceImpl.updateTicketFieldsInJiraApprovalInstance(jiraApprovalInstance, jiraIssueNG);
+    verify(approvalInstanceRepository, times(2)).updateFirst(any(), any());
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testGetApprovalInstancesByExecutionId() {
+    assertThatThrownBy(() -> {
+      approvalInstanceServiceImpl.getApprovalInstancesByExecutionId("", null, null, null, null);
+    }).isInstanceOf(InvalidRequestException.class);
+
+    approvalInstanceServiceImpl.getApprovalInstancesByExecutionId(
+        planExecutionId, approvalStatus, approvalType, nodeExecutionId, null);
+    verify(approvalInstanceRepository, times(1))
+        .findAll(Criteria.where(ApprovalInstanceKeys.planExecutionId)
+                     .is(planExecutionId)
+                     .and(ApprovalInstanceKeys.status)
+                     .is(approvalStatus)
+                     .and(ApprovalInstanceKeys.type)
+                     .is(approvalType)
+                     .and(ApprovalInstanceKeys.nodeExecutionId)
+                     .is(nodeExecutionId));
+
+    approvalInstanceServiceImpl.getApprovalInstancesByExecutionId(
+        planExecutionId, approvalStatus, approvalType, null, null);
+    verify(approvalInstanceRepository, times(1))
+        .findAll(Criteria.where(ApprovalInstanceKeys.planExecutionId)
+                     .is(planExecutionId)
+                     .and(ApprovalInstanceKeys.status)
+                     .is(approvalStatus)
+                     .and(ApprovalInstanceKeys.type)
+                     .is(approvalType));
+
+    approvalInstanceServiceImpl.getApprovalInstancesByExecutionId(
+        planExecutionId, null, approvalType, nodeExecutionId, null);
+    verify(approvalInstanceRepository, times(1))
+        .findAll(Criteria.where(ApprovalInstanceKeys.planExecutionId)
+                     .is(planExecutionId)
+                     .and(ApprovalInstanceKeys.status)
+                     .in(Arrays.asList(ApprovalStatus.values()))
+                     .and(ApprovalInstanceKeys.type)
+                     .is(approvalType)
+                     .and(ApprovalInstanceKeys.nodeExecutionId)
+                     .is(nodeExecutionId));
+
+    approvalInstanceServiceImpl.getApprovalInstancesByExecutionId(
+        planExecutionId, approvalStatus, null, nodeExecutionId, null);
+    verify(approvalInstanceRepository, times(1))
+        .findAll(Criteria.where(ApprovalInstanceKeys.planExecutionId)
+                     .is(planExecutionId)
+                     .and(ApprovalInstanceKeys.status)
+                     .is(approvalStatus)
+                     .and(ApprovalInstanceKeys.type)
+                     .in(Arrays.asList(ApprovalType.values()))
+                     .and(ApprovalInstanceKeys.nodeExecutionId)
+                     .is(nodeExecutionId));
+
+    approvalInstanceServiceImpl.getApprovalInstancesByExecutionId(
+        planExecutionId, approvalStatus, null, nodeExecutionId, callbackId);
+    verify(approvalInstanceRepository, times(1))
+        .findAll(Criteria.where(ApprovalInstanceKeys.planExecutionId)
+                     .is(planExecutionId)
+                     .and(ApprovalInstanceKeys.status)
+                     .is(approvalStatus)
+                     .and(ApprovalInstanceKeys.type)
+                     .in(Arrays.asList(ApprovalType.values()))
+                     .and(ApprovalInstanceKeys.nodeExecutionId)
+                     .is(nodeExecutionId)
+                     .and(HarnessApprovalInstanceKeys.callbackId)
+                     .is(callbackId));
+  }
+
+  @Test
+  @Owner(developers = SOURABH)
+  @Category(UnitTests.class)
+  public void testAddHarnessApprovalActivityV2() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(
+                ApproverInputInfoDTO.builder().name("NAME").defaultValue("DEFAULT_VAL").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        HarnessApprovalActivityRequestDTO.builder().autoApprove(true).build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.APPROVED);
+
+    instance.setStatus(ApprovalStatus.APPROVED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+    when(transactionTemplate.execute(any())).thenReturn(instance);
+    when(waitNotifyEngine.doneWith(any(), any())).thenReturn("");
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityV2(
+        "hello", embeddedUser, harnessApprovalActivityRequestDTO, false);
+    verify(waitNotifyEngine, times(0)).doneWith(any(), any());
+  }
+
+  @Test
+  @Owner(developers = SOURABH)
+  @Category(UnitTests.class)
+  public void testRejectPreviousExecutionV2() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(
+                ApproverInputInfoDTO.builder().name("NAME").defaultValue("DEFAULT_VAL").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    when(scopeResolutionHelper.getParentUniqueId(any())).thenReturn(PARENT_UNIQUE_ID);
+    when(approvalInstanceRepository.findAll(Criteria.where("accountId")
+                                                .is(ACCOUNT_ID)
+                                                .and("parentUniqueId")
+                                                .is(PARENT_UNIQUE_ID)
+                                                .and("pipelineIdentifier")
+                                                .is(PIPELINE_ID)
+                                                .and("approvalKey")
+                                                .is(APPROVAL_KEY)
+                                                .and(ApprovalInstanceKeys.status)
+                                                .is(ApprovalStatus.WAITING)
+                                                .and("isAutoRejectEnabled")
+                                                .is(true)
+                                                .and(ApprovalInstanceKeys.createdAt)
+                                                .lt(CREATED_AT)))
+        .thenReturn(Collections.emptyList());
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        HarnessApprovalActivityRequestDTO.builder().action(HarnessApprovalAction.APPROVE).autoApprove(true).build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.APPROVED);
+    instance.setAccountId(ACCOUNT_ID);
+    instance.setOrgIdentifier(ORG_ID);
+    instance.setProjectIdentifier(PROJECT_ID);
+    instance.setPipelineIdentifier(PIPELINE_ID);
+    instance.setApprovalKey(APPROVAL_KEY);
+    instance.setCreatedAt(CREATED_AT);
+
+    instance.setStatus(ApprovalStatus.APPROVED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+    when(transactionTemplate.execute(any())).thenReturn(instance);
+    when(waitNotifyEngine.doneWith(any(), any())).thenReturn("");
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityV2(
+        "hello", embeddedUser, harnessApprovalActivityRequestDTO, false);
+    verify(waitNotifyEngine, times(0)).doneWith(any(), any());
+  }
+
+  @Test
+  @Owner(developers = SOURABH)
+  @Category(UnitTests.class)
+  public void addHarnessApprovalActivityInTransactionWithAutoApprove() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance = HarnessApprovalInstance.builder().approvers(approversDTO).build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    when(approvalInstanceRepository.findAll(any())).thenReturn(Collections.emptyList());
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        HarnessApprovalActivityRequestDTO.builder().action(HarnessApprovalAction.APPROVE).autoApprove(true).build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.APPROVED);
+    instance.setAccountId(ACCOUNT_ID);
+    instance.setOrgIdentifier(ORG_ID);
+
+    instance.setStatus(ApprovalStatus.APPROVED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+          "hello", embeddedUser, harnessApprovalActivityRequestDTO);
+      verify(approvalInstanceRepository, times(1)).save(any());
+    }
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testUpdateLatestDelegateTaskId() {
+    approvalInstanceServiceImpl.updateLatestDelegateTaskId(APPROVAL_ID, "   ");
+    approvalInstanceServiceImpl.updateLatestDelegateTaskId("   ", TASK_ID);
+
+    approvalInstanceServiceImpl.updateLatestDelegateTaskId(APPROVAL_ID, TASK_ID);
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    ArgumentCaptor<Update> updateArgumentCaptor = ArgumentCaptor.forClass(Update.class);
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(queryArgumentCaptor.capture(), updateArgumentCaptor.capture());
+    assertThat(queryArgumentCaptor.getValue())
+        .isEqualTo(new Query(Criteria.where(Mapper.ID_KEY).is(APPROVAL_ID))
+                       .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING))
+                       .addCriteria(Criteria.where(ApprovalInstanceKeys.type)
+                                        .in(Arrays.asList(ApprovalType.SERVICENOW_APPROVAL,
+                                            ApprovalType.CUSTOM_APPROVAL, ApprovalType.JIRA_APPROVAL))));
+    assertThat(updateArgumentCaptor.getValue())
+        .isEqualTo(new Update().set(ServiceNowApprovalInstanceKeys.latestDelegateTaskId, TASK_ID));
+  }
+
+  @Test
+  @Owner(developers = NAMANG)
+  @Category(UnitTests.class)
+  public void testUpdateKeyListInKeyValueCriteria() {
+    approvalInstanceServiceImpl.updateKeyListInKeyValueCriteria(APPROVAL_ID, null);
+    approvalInstanceServiceImpl.updateKeyListInKeyValueCriteria("   ", "");
+
+    approvalInstanceServiceImpl.updateKeyListInKeyValueCriteria(APPROVAL_ID, KEYS_IN_CRITERIA);
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    ArgumentCaptor<Update> updateArgumentCaptor = ArgumentCaptor.forClass(Update.class);
+    verify(approvalInstanceRepository, times(1))
+        .updateFirst(queryArgumentCaptor.capture(), updateArgumentCaptor.capture());
+    assertThat(queryArgumentCaptor.getValue())
+        .isEqualTo(new Query(Criteria.where(Mapper.ID_KEY).is(APPROVAL_ID))
+                       .addCriteria(Criteria.where(ApprovalInstanceKeys.status).is(ApprovalStatus.WAITING))
+                       .addCriteria(Criteria.where(ApprovalInstanceKeys.type).is(ApprovalType.JIRA_APPROVAL)));
+    assertThat(updateArgumentCaptor.getValue())
+        .isEqualTo(new Update().set(JiraApprovalInstanceKeys.keyListInKeyValueCriteria, KEYS_IN_CRITERIA));
+  }
+
+  @Test
+  @Owner(developers = IVAN)
+  @Category(UnitTests.class)
+  public void testFindLatestApprovalInstanceByPlanExecutionIdAndType() {
+    when(approvalInstanceRepository.find(any()))
+        .thenReturn(List.of(HarnessApprovalInstance.builder()
+                                .approvalMessage(APPROVAL_COMMENT)
+                                .approvalActivities(List.of(
+                                    HarnessApprovalActivity.builder()
+                                        .comments(APPROVAL_COMMENT)
+                                        .user(EmbeddedUser.builder().email(APPROVAL_EMAIL).name(APPROVAL_NAME).build())
+                                        .build()))
+                                .approvers(ApproversDTO.builder().userGroups(List.of(APPROVAL_NAME)).build())
+                                .build()));
+
+    Optional<ApprovalInstance> latestApprovalInstance =
+        approvalInstanceServiceImpl.findLatestApprovalInstanceByPlanExecutionIdAndType(
+            planExecutionId, ApprovalType.HARNESS_APPROVAL);
+
+    assertThat(latestApprovalInstance.isPresent()).isEqualTo(true);
+    ApprovalInstance approvalInstance = latestApprovalInstance.get();
+    assertThat(approvalInstance).isInstanceOf(HarnessApprovalInstance.class);
+
+    List<HarnessApprovalActivity> approvalActivities =
+        ((HarnessApprovalInstance) approvalInstance).getApprovalActivities();
+    assertThat(approvalActivities.size()).isEqualTo(1);
+    HarnessApprovalActivity harnessApprovalActivity = approvalActivities.get(0);
+    assertThat(harnessApprovalActivity.getComments()).isEqualTo(APPROVAL_COMMENT);
+    assertThat(harnessApprovalActivity.getUser().getEmail()).isEqualTo(APPROVAL_EMAIL);
+    assertThat(harnessApprovalActivity.getUser().getName()).isEqualTo(APPROVAL_NAME);
+  }
+
+  @Test
+  @Owner(developers = IVAN)
+  @Category(UnitTests.class)
+  public void testFindLatestApprovalInstanceByPlanExecutionIdAndTypeWithEmptyResponse() {
+    when(approvalInstanceRepository.find(any())).thenReturn(null);
+
+    Optional<ApprovalInstance> latestApprovalInstance =
+        approvalInstanceServiceImpl.findLatestApprovalInstanceByPlanExecutionIdAndType(
+            planExecutionId, ApprovalType.HARNESS_APPROVAL);
+
+    assertThat(latestApprovalInstance.isPresent()).isEqualTo(false);
+  }
+
+  @Test
+  @Owner(developers = IVAN)
+  @Category(UnitTests.class)
+  public void testFindLatestApprovalInstanceByPlanExecutionIdAndTypeWithPlanExecutionIdEmpty() {
+    assertThatThrownBy(()
+                           -> approvalInstanceServiceImpl.findLatestApprovalInstanceByPlanExecutionIdAndType(
+                               "", ApprovalType.HARNESS_APPROVAL))
+        .isInstanceOf(InvalidArgumentsException.class)
+        .hasMessage("PlanExecutionId cannot be null or empty");
+  }
+
+  @Test
+  @Owner(developers = IVAN)
+  @Category(UnitTests.class)
+  public void testFindLatestApprovalInstanceByPlanExecutionIdAndTypeWithApprovalTypeNull() {
+    assertThatThrownBy(
+        () -> approvalInstanceServiceImpl.findLatestApprovalInstanceByPlanExecutionIdAndType(planExecutionId, null))
+        .isInstanceOf(InvalidArgumentsException.class)
+        .hasMessage("ApprovalType cannot be null");
+  }
+
+  @Test
+  @Owner(developers = ANKUR_PATEL)
+  @Category(UnitTests.class)
+  public void testFindAllHarnessApprovalInstancesByPlanExecutionId() {
+    HarnessApprovalInstance firstInstance =
+        HarnessApprovalInstance.builder()
+            .approvalMessage(APPROVAL_COMMENT)
+            .approvalActivities(
+                List.of(HarnessApprovalActivity.builder()
+                            .comments(APPROVAL_COMMENT)
+                            .user(EmbeddedUser.builder().email(APPROVAL_EMAIL).name(APPROVAL_NAME).build())
+                            .build()))
+            .approvers(ApproversDTO.builder().userGroups(List.of(APPROVAL_NAME)).build())
+            .build();
+    HarnessApprovalInstance secondInstance =
+        HarnessApprovalInstance.builder()
+            .approvalMessage(APPROVAL_COMMENT)
+            .approvalActivities(
+                List.of(HarnessApprovalActivity.builder()
+                            .comments(APPROVAL_COMMENT)
+                            .user(EmbeddedUser.builder().email(APPROVAL_EMAIL).name(APPROVAL_NAME).build())
+                            .build()))
+            .approvers(ApproversDTO.builder().userGroups(List.of(APPROVAL_NAME)).build())
+            .build();
+    when(approvalInstanceRepository.find(any())).thenReturn(List.of(firstInstance, secondInstance));
+
+    List<HarnessApprovalInstance> approvalInstances =
+        approvalInstanceServiceImpl.findAllHarnessApprovalInstancesByPlanExecutionId(planExecutionId);
+
+    assertThat(approvalInstances).hasSize(2);
+    assertThat(approvalInstances).containsExactly(firstInstance, secondInstance);
+
+    ArgumentCaptor<Query> queryArgumentCaptor = ArgumentCaptor.forClass(Query.class);
+    verify(approvalInstanceRepository, times(1)).find(queryArgumentCaptor.capture());
+    assertThat(queryArgumentCaptor.getValue())
+        .isEqualTo(query(where(ApprovalInstanceKeys.planExecutionId).is(planExecutionId))
+                       .addCriteria(where(ApprovalInstanceKeys.type).in(ApprovalType.HARNESS_APPROVAL))
+                       .with(Sort.by(Sort.Direction.ASC, ApprovalInstanceKeys.createdAt)));
+  }
+
+  @Test
+  @Owner(developers = ANKUR_PATEL)
+  @Category(UnitTests.class)
+  public void testFindAllHarnessApprovalInstancesByPlanExecutionIdWithPlanExecutionIdEmpty() {
+    assertThatThrownBy(() -> approvalInstanceServiceImpl.findAllHarnessApprovalInstancesByPlanExecutionId(""))
+        .isInstanceOf(InvalidArgumentsException.class)
+        .hasMessage("PlanExecutionId cannot be null or empty");
+  }
+
+  @Test
+  @Owner(developers = SOURABH)
+  @Category(UnitTests.class)
+  public void testFindAllPreviousWaitingApprovalsWithExpiredInstances() {
+    Ambiance ambiance1 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId1").build();
+    Ambiance ambiance2 = Ambiance.newBuilder().setPlanExecutionId("planExecutionId2").build();
+    List<ApprovalInstance> approvalInstances = new ArrayList<>();
+    ApprovalInstance approvalInstance = HarnessApprovalInstance.builder()
+                                            .approvalKey("key")
+                                            .approvalActivities(Collections.EMPTY_LIST)
+                                            .approvalMessage("message1")
+                                            .approvers(ApproversDTO.builder().build())
+                                            .isAutoRejectEnabled(true)
+                                            .includePipelineExecutionHistory(false)
+                                            .build();
+    approvalInstance.setAmbiance(ambiance2);
+    approvalInstance.setId("_id");
+    approvalInstances.add(approvalInstance);
+    approvalInstance.setDeadline(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(1));
+    when(scopeResolutionHelper.getParentUniqueId(ambiance1)).thenReturn(PARENT_UNIQUE_ID);
+    when(approvalInstanceRepository.findAll(Criteria.where("accountId")
+                                                .is(ACCOUNT_ID)
+                                                .and("parentUniqueId")
+                                                .is(PARENT_UNIQUE_ID)
+                                                .and("pipelineIdentifier")
+                                                .is(PIPELINE_ID)
+                                                .and("approvalKey")
+                                                .is(APPROVAL_KEY)
+                                                .and(ApprovalInstanceKeys.status)
+                                                .is(ApprovalStatus.WAITING)
+                                                .and("isAutoRejectEnabled")
+                                                .is(true)
+                                                .and(ApprovalInstanceKeys.createdAt)
+                                                .lt(CREATED_AT)))
+        .thenReturn(approvalInstances);
+    when(pmsEngineExpressionService.renderExpression(ambiance1, "<+service.identifier>", true)).thenReturn("ser1");
+    when(pmsEngineExpressionService.renderExpression(ambiance2, "<+service.identifier>", true)).thenReturn("ser1");
+    List<String> approvalIds = approvalInstanceServiceImpl.findAllPreviousWaitingApprovals(
+        ACCOUNT_ID, ORG_ID, PROJECT_ID, PIPELINE_ID, APPROVAL_KEY, ambiance1, CREATED_AT);
+    assertThat(approvalIds).isNotNull();
+    assertThat(approvalIds.size()).isEqualTo(0);
+  }
+
+  Optional<DataRetentionEntity> getDataRetentionEntity() {
+    return Optional.of(DataRetentionEntity.builder().retentionPeriodInMonths(6).build());
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testSkipValidationWhenAutoApprovalRequest() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(ANOTHER_VARIABLE_NAME, "value");
+
+    harnessApprovalActivityRequestDTO.setAutoApprove(true);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testSkipValidationWhenRejectRequest() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(ANOTHER_VARIABLE_NAME, "value");
+
+    harnessApprovalActivityRequestDTO.setAction(HarnessApprovalAction.REJECT);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenRequiredApproverInputsAreNotProvided() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(ANOTHER_VARIABLE_NAME, "value");
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenRequiredApproverInputIsProvidedAsEmptyString() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, EMPTY_VARIABLE_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testDoesNotThrowErrorWhenRequiredParamterIsNullInApprovalInputDTO() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, null, null, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, EMPTY_VARIABLE_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testValidationSkippedWhenNonRequiredApproverInputIsProvidedAsEmptyString() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, false, ALLOWED_VALUES, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, EMPTY_VARIABLE_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenApproverInputValueNotInAllowedValues() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, ALLOWED_VALUES, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, NON_MATCHING_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testValidationPassedWhenApproverInputValueInAllowedValues() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, ALLOWED_VALUES, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, VARIABLE_VALUE_1);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenOneOfApproverInputValueNotInAllowedValues() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, ALLOWED_VALUES, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, MULTI_VARIABLE_VALUE_NON_MATCHING);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testValidationPassedWhenAllOfApproverInputValueInAllowedValues() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, ALLOWED_VALUES, null, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, MULTI_VARIABLE_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenApproverInputValueNotInSelectOneFrom() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, false, null, SELECT_ONE_FROM, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, NON_MATCHING_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testValidationPassedWhenApproverInputValueInSelectOneFrom() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, SELECT_ONE_FROM, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, VARIABLE_VALUE_1);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testValidationPassedWhenApproverInputValueMatchesRegex() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, null, REGEX);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, VARIABLE_VALUE_1);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(1);
+  }
+
+  @Test(expected = InvalidRequestException.class)
+  @Owner(developers = HARSHIT)
+  @Category(UnitTests.class)
+  public void testErrorThrownWhenApproverInputValueNotMatchesRegex() {
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("embeddedUser").build();
+    mockHarnessApprovalInstanceWithApproverInputs(
+        VARIABLE_NAME, VARIABLE_DEFAULT_VALUE, true, null, SELECT_ONE_FROM, null);
+    mockConstruction(NGLogCallback.class);
+
+    HarnessApprovalActivityRequestDTO harnessApprovalActivityRequestDTO =
+        createHarnessApprovalActivityRequestDTO(VARIABLE_NAME, NON_MATCHING_VALUE);
+
+    approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction(
+        "approvalInstanceId", embeddedUser, harnessApprovalActivityRequestDTO);
+    verifySuccessfulConstraintsValidationForApproverInputs(0);
+  }
+
+  private void verifySuccessfulConstraintsValidationForApproverInputs(int invocations) {
+    verify(approvalInstanceRepository, times(invocations)).save(any());
+  }
+
+  private HarnessApprovalActivityRequestDTO createHarnessApprovalActivityRequestDTO(String variableName, String value) {
+    return HarnessApprovalActivityRequestDTO.builder()
+        .action(HarnessApprovalAction.APPROVE)
+        .comments("comment")
+        .approverInputs(Collections.singletonList(ApproverInput.builder().name(variableName).value(value).build()))
+        .build();
+  }
+
+  private void mockHarnessApprovalInstanceWithApproverInputs(String variableName, String defaultValue, Boolean required,
+      List<String> allowedValues, List<String> selectOneFrom, String regex) {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(0).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(ApproverInputInfoDTO.builder()
+                                                          .name(variableName)
+                                                          .defaultValue(defaultValue)
+                                                          .required(required)
+                                                          .allowedValues(allowedValues)
+                                                          .selectOneFrom(selectOneFrom)
+                                                          .regex(regex)
+                                                          .build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    ApprovalInstance entity = (ApprovalInstance) harnessApprovalInstance;
+    entity.setDeadline(Long.MAX_VALUE);
+    entity.setType(ApprovalType.HARNESS_APPROVAL);
+    entity.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(entity);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+    when(transactionTemplate.execute(any())).thenReturn(harnessApprovalInstance);
+    harnessApprovalInstance.setStatus(ApprovalStatus.WAITING);
+  }
+
+  @Test
+  @Owner(developers = AYUSHMAN)
+  @Category(UnitTests.class)
+  public void testApprovalLogMessagesForRejectAction() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(1).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(ApproverInputInfoDTO.builder().name("input1").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    harnessApprovalInstance.setDeadline(Long.MAX_VALUE);
+    harnessApprovalInstance.setType(ApprovalType.HARNESS_APPROVAL);
+    harnessApprovalInstance.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(harnessApprovalInstance);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("TestUser").email("test@harness.io").build();
+    HarnessApprovalActivityRequestDTO rejectRequest =
+        HarnessApprovalActivityRequestDTO.builder()
+            .action(HarnessApprovalAction.REJECT)
+            .comments("Test rejection comment")
+            .approverInputs(Collections.singletonList(ApproverInput.builder().name("input1").value("value1").build()))
+            .build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.REJECTED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction("approvalId", embeddedUser, rejectRequest);
+
+      ArgumentCaptor<String> logMessageCaptor = ArgumentCaptor.forClass(String.class);
+      verify(ngLogCallback.constructed().get(0)).saveExecutionLog(logMessageCaptor.capture());
+
+      String logMessage = logMessageCaptor.getValue();
+      assertThat(logMessage).contains("Approval request rejected by TestUser");
+      assertThat(logMessage).contains("comments:{Test rejection comment}");
+      assertThat(logMessage).contains("inputs:[( input1 : value1 )]");
+      assertThat(logMessage).doesNotContain("Request to REJECT this approval received");
+    }
+  }
+
+  @Test
+  @Owner(developers = AYUSHMAN)
+  @Category(UnitTests.class)
+  public void testApprovalLogMessagesForApproveAction() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(1).build();
+    HarnessApprovalInstance harnessApprovalInstance =
+        HarnessApprovalInstance.builder()
+            .approvers(approversDTO)
+            .approverInputs(Collections.singletonList(ApproverInputInfoDTO.builder().name("input1").build()))
+            .build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    harnessApprovalInstance.setDeadline(Long.MAX_VALUE);
+    harnessApprovalInstance.setType(ApprovalType.HARNESS_APPROVAL);
+    harnessApprovalInstance.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(harnessApprovalInstance);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("TestUser").email("test@harness.io").build();
+    HarnessApprovalActivityRequestDTO approveRequest =
+        HarnessApprovalActivityRequestDTO.builder()
+            .action(HarnessApprovalAction.APPROVE)
+            .comments("Test approval comment")
+            .approverInputs(Collections.singletonList(ApproverInput.builder().name("input1").value("value1").build()))
+            .build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.APPROVED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction("approvalId", embeddedUser, approveRequest);
+
+      ArgumentCaptor<String> logMessageCaptor = ArgumentCaptor.forClass(String.class);
+      verify(ngLogCallback.constructed().get(0)).saveExecutionLog(logMessageCaptor.capture());
+
+      String logMessage = logMessageCaptor.getValue();
+      assertThat(logMessage).contains("Approval request accepted by TestUser");
+      assertThat(logMessage).contains("comments:{Test approval comment}");
+      assertThat(logMessage).contains("inputs:[( input1 : value1 )]");
+      assertThat(logMessage).doesNotContain("Request to APPROVE this approval received");
+    }
+  }
+
+  @Test
+  @Owner(developers = AYUSHMAN)
+  @Category(UnitTests.class)
+  public void testApprovalLogMessagesWithEmailWhenNameIsBlank() {
+    ApproversDTO approversDTO = ApproversDTO.builder().minimumCount(1).build();
+    HarnessApprovalInstance harnessApprovalInstance = HarnessApprovalInstance.builder().approvers(approversDTO).build();
+    Ambiance ambiance = Ambiance.newBuilder().setPlanExecutionId("PlanExecutionId").build();
+    harnessApprovalInstance.setAmbiance(ambiance);
+    harnessApprovalInstance.setDeadline(Long.MAX_VALUE);
+    harnessApprovalInstance.setType(ApprovalType.HARNESS_APPROVAL);
+    harnessApprovalInstance.setStatus(ApprovalStatus.WAITING);
+    Optional<ApprovalInstance> optional = Optional.of(harnessApprovalInstance);
+    when(approvalInstanceRepository.findById(any())).thenReturn(optional);
+
+    EmbeddedUser embeddedUser = EmbeddedUser.builder().name("").email("test@harness.io").build();
+    HarnessApprovalActivityRequestDTO rejectRequest = HarnessApprovalActivityRequestDTO.builder()
+                                                          .action(HarnessApprovalAction.REJECT)
+                                                          .comments("Test comment")
+                                                          .build();
+
+    HarnessApprovalInstance instance = HarnessApprovalInstance.builder().build();
+    instance.setStatus(ApprovalStatus.REJECTED);
+    when(approvalInstanceRepository.save(any())).thenReturn(instance);
+
+    try (MockedConstruction<NGLogCallback> ngLogCallback = mockConstruction(NGLogCallback.class)) {
+      approvalInstanceServiceImpl.addHarnessApprovalActivityInTransaction("approvalId", embeddedUser, rejectRequest);
+
+      ArgumentCaptor<String> logMessageCaptor = ArgumentCaptor.forClass(String.class);
+      verify(ngLogCallback.constructed().get(0)).saveExecutionLog(logMessageCaptor.capture());
+
+      String logMessage = logMessageCaptor.getValue();
+      assertThat(logMessage).contains("Approval request rejected by test@harness.io");
+      assertThat(logMessage).contains("inputs:[]");
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "content": {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "Harness Artifact Registry Firewall Exemption Status Changed",
+            "weight": "bolder",
+            "size": "medium"
+          },
+          {
+            "type": "TextBlock",
+            "text": "A firewall exemption status has been updated:",
+            "wrap": true
+          },
+          {
+            "type": "FactSet",
+            "facts": [
+              {"title": "Package Name:", "value": "${PACKAGE_NAME}"},
+              {"title": "Version List:", "value": "${VERSION_LIST}"},
+              {"title": "Registry:", "value": "${REGISTRY_NAME} - ${REGISTRY_URL}"},
+              {"title": "Status:", "value": "${STATUS}"},
+              {"title": "Changed By:", "value": "${CHANGED_BY}"}
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "type": "Action.OpenUrl",
+            "title": "View Exemption in Harness",
+            "url": "${EXCEPTION_URL}"
+          }
+        ]
+      }
+    }
+  ]
+}

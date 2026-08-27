@@ -1,0 +1,9 @@
+name: GitX Operations Process Time Metrics
+identifier: GitXOperationsProcessTime
+metricGroup: gitx_operations_times_group
+metrics:
+  - metricName: gitx_operation_process_time
+    metricDefinition: Time taken to process gitx file operations (create, update, delete).
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"

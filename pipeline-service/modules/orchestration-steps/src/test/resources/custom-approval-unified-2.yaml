@@ -1,0 +1,31 @@
+approval:
+  uses: custom
+  with:
+    script-timeout: 4m 30s
+    retry: 1m 30s
+    run:
+      container:
+        image: alpine
+      script: |-
+        test="approved"
+        export var="singh"
+        echo "hello world"
+      output:
+        - name: var1
+          value: value1
+        - name: var2
+          mask: true
+          value: value2
+    approve:
+        match-any-condition: false
+        conditions:
+          - input1:
+              in:
+                - test1
+          - input2:
+              not:
+                in:
+                  - test2
+          - input3:
+              not:
+                eq: test3

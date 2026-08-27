@@ -1,0 +1,28 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: alpine
+    connector: account.harnessImage
+  script: |
+    #!/bin/sh
+
+    set -f  # Disable globbing
+
+    # Split PLUGIN_FILES_LIST by comma
+    OLD_IFS="$IFS"
+    IFS=","
+    for filePath in $PLUGIN_FILES_LIST; do
+      echo "$filePath"
+      echo "================"
+      if [ -f "$filePath" ]; then
+        cat "$filePath"
+      else
+        echo "File not found: $filePath"
+      fi
+      echo
+    done
+    IFS="$OLD_IFS"
+  env:
+    PLUGIN_FILES_LIST: PLUGIN_FILES_LIST_PLACEHOLDER

@@ -1,0 +1,8 @@
+name: CI Manager Stage Execution Metrics
+identifier: CIStageExecutionMetrics
+metricGroup: CIStageExecutionMetricsGroup
+metrics:
+  - metricName: ci_stage_execution_count
+    metricDefinition: CI stages executed, by infra type, terminal status and phase (incl. pre-init/plan-creation failures)
+    type: Count
+    unit: "1"

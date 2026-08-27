@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pipeline-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.commonLabels }}
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.config "context" $) | nindent 2}}
+  {{ include "harnesscommon.harnessfunctions.java17flags" (dict "context" $) | nindent 2 }}
+  {{- if .Values.additionalConfigs }}
+  {{- toYaml .Values.additionalConfigs | nindent 2 }}
+  {{- end }}
+  {{- include "harnesscommon.monitoring.config" . | nindent 2 }}
+  {{- include "harnesscommon.logging.setFileLogging" . | nindent 2 }}
+  {{- include "harnesscommon.secretsLoader.configContent" (dict "ctx" $ "databaseSecrets" (list 
+    (dict "dbtype" "mongo" "usernamesecrets" (list "PMSHARNESS_MONGO_USER" "NOTIFICATIONS_MONGO_USER") "passwordsecrets" (list "PMSHARNESS_MONGO_PASSWORD" "NOTIFICATIONS_MONGO_PASSWORD"))
+    (dict "dbtype" "redis" "usernamesecrets" (list "LOCK_CONFIG_REDIS_USERNAME" "EVENTS_FRAMEWORK_REDIS_USERNAME" "CACHE_CONFIG_REDIS_USERNAME") "passwordsecrets" (list "LOCK_CONFIG_REDIS_PASSWORD" "EVENTS_FRAMEWORK_REDIS_PASSWORD" "CACHE_CONFIG_REDIS_PASSWORD"))
+    (dict "dbtype" "postgres" "usernamesecrets" (list "POSTGRES_PRIMARY_USERNAME") "passwordsecrets" (list "POSTGRES_PRIMARY_PASSWORD"))
+    (dict "dbtype" "timescaledb" "usernamesecrets" (list "TIMESCALEDB_USERNAME" "SECONDARY_TIMESCALEDB_USERNAME") "passwordsecrets" (list "TIMESCALE_PASSWORD" "SECONDARY_TIMESCALE_PASSWORD"))
+  )) | nindent 2}}

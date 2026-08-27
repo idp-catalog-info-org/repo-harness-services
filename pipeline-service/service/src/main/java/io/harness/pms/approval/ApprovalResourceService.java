@@ -1,0 +1,52 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.approval;
+
+import io.harness.accesscontrol.AccountIdentifier;
+import io.harness.accesscontrol.OrgIdentifier;
+import io.harness.accesscontrol.ProjectIdentifier;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.ng.beans.PageResponse;
+import io.harness.steps.approval.step.beans.ApprovalInstanceResponseDTO;
+import io.harness.steps.approval.step.beans.ApprovalStatus;
+import io.harness.steps.approval.step.beans.ApprovalType;
+import io.harness.steps.approval.step.beans.PendingApprovalSummaryDTO;
+import io.harness.steps.approval.step.harness.beans.HarnessApprovalActivityRequestDTO;
+import io.harness.steps.approval.step.harness.beans.HarnessApprovalInstanceAuthorizationDTO;
+
+import java.io.IOException;
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
+
+@CodePulse(
+    module = ProductModule.CDS, unitCoverageRequired = false, components = {HarnessModuleComponent.CDS_APPROVALS})
+public interface ApprovalResourceService {
+  ApprovalInstanceResponseDTO get(@NotNull String approvalInstanceId, @AccountIdentifier String accountId);
+
+  ApprovalInstanceResponseDTO get(
+      @NotNull String approvalInstanceId, @AccountIdentifier String accountId, boolean refresh);
+
+  ApprovalInstanceResponseDTO addHarnessApprovalActivity(
+      @NotNull String approvalInstanceId, @NotNull @Valid HarnessApprovalActivityRequestDTO request);
+  ApprovalInstanceResponseDTO addHarnessApprovalActivityByPlanExecutionId(@NotNull @AccountIdentifier String accountId,
+      @NotNull @OrgIdentifier String orgIdentifier, @NotNull @ProjectIdentifier String projectIdentifier,
+      @NotNull String planExecutionId, @NotNull @Valid HarnessApprovalActivityRequestDTO request, String callbackId);
+  List<ApprovalInstanceResponseDTO> getApprovalInstancesByExecutionId(@NotEmpty String planExecutionId,
+      @Valid ApprovalStatus approvalStatus, @Valid ApprovalType approvalType, String nodeExecutionId, String callbackId,
+      boolean isRetry);
+
+  HarnessApprovalInstanceAuthorizationDTO getHarnessApprovalInstanceAuthorization(
+      @NotNull String approvalInstanceId, boolean skipHasAlreadyApprovedValidation);
+  String getYamlSnippet(ApprovalType approvalType, String accountId) throws IOException;
+
+  PageResponse<PendingApprovalSummaryDTO> listPendingApprovals(@NotNull String accountId, int size);
+}

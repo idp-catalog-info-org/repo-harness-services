@@ -1,0 +1,29 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Inputs-only template: generic Git remote store (storeType comes from NG mapper in {@code ConfigFile#getInputs()}).
+inputs:
+  connectorRef:
+    type: connector
+    description: Git connector ref (alias)
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.connectorRef}}
+  gitFetchType:
+    type: string
+    description: Branch or Commit (matches NG gitFetchType when present)
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.gitFetchType}}
+  branch:
+    type: string
+    description: branch name (optional, mutually exclusive with commit)
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.branch}}
+  commit:
+    type: string
+    description: commit SHA (optional, mutually exclusive with branch)
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.commitId}}
+  paths:
+    type: list
+    description: file paths to fetch from the repository
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.paths}}
+  repoName:
+    type: string
+    description: repository name (optional)
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.repoName}}

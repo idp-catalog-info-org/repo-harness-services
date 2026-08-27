@@ -1,0 +1,6 @@
+name: GitX API Metrics Group
+identifier: gitx_api_metrics_group
+labels:
+  - accountId
+  - operationType
+  - statusClass

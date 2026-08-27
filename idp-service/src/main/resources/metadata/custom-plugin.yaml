@@ -1,0 +1,12 @@
+identifier: my_custom_plugin
+name: My Custom Plugin
+config: |-
+  proxy:
+    endpoints:
+      '/my-custom-plugin':
+        headers:
+          Authorization: Bearer ${MY_CUSTOM_PLUGIN_TOKEN}
+
+environmentVariables:
+  - MY_CUSTOM_PLUGIN_TOKEN
+type: CUSTOM

@@ -1,0 +1,83 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1705105026.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "anyOf": [
+    "proxy",
+    "customPlugins"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^\/.*": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints/*/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "",
+                  "pattern": "((http|https):\\/\\/)(www\\.)?[a-zA-Z0-9-@:%._\\+~#=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)"
+                },
+                "headers": {
+                  "$id": "#root/proxy/endpoints/*/headers",
+                  "title": "Headers",
+                  "type": "object"
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints/*/pathRewrite",
+                  "title": "PathRewrite",
+                  "type": "object"
+                },
+                "allowedHeaders": {
+                  "$id": "#root/proxy/endpoints/*/allowedHeaders",
+                  "title": "AllowedHeaders",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "credentials": {
+                  "$id": "#root/proxy/endpoints/*/credentials",
+                  "title": "Credentials",
+                  "type": "string",
+                  "default": "",
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "customPlugins": {
+      "$id": "#root/customPlugins",
+      "title": "CustomPlugins",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  }
+}

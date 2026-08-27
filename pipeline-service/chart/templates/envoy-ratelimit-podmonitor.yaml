@@ -1,0 +1,45 @@
+{{- if and .Values.rateLimiting.enabled .Values.rateLimiting.metrics.enabled .Values.global.monitoring.enabled }}
+# Scrapes the Envoy sidecar's Prometheus metrics (/stats/prometheus on the admin
+# port) — proxy-side metrics: per-route ratelimit.ok/over_limit/error, upstream
+# latency/health, downstream rq counts. (RLS-only metrics are scraped separately
+# from the statsd-exporter on the shared ratelimit Deployment.)
+#
+# Mirrors harnesscommon.monitoring.podMonitor's dual-CRD behaviour so it respects
+# the cluster's monitoring platform:
+#   global.monitoring.managedPlatform=google (default on GKE) -> GMP PodMonitoring
+#   global.monitoring.managedPlatform=oss                     -> prom-operator PodMonitor
+{{- $ossEnabled := eq (default "google" .Values.global.monitoring.managedPlatform) "oss" -}}
+{{- if not $ossEnabled }}
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: {{ include "pipeline-service.name" . }}-envoy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pipeline-service.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pipeline-service.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: {{ .Values.rateLimiting.adminPort }}
+      path: /stats/prometheus
+      interval: {{ .Values.rateLimiting.metrics.scrapeInterval }}
+{{- else }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "pipeline-service.name" . }}-envoy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "pipeline-service.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pipeline-service.selectorLabels" . | nindent 6 }}
+  podMetricsEndpoints:
+    - targetPort: {{ .Values.rateLimiting.adminPort }}
+      path: /stats/prometheus
+      interval: {{ .Values.rateLimiting.metrics.scrapeInterval }}
+{{- end }}
+{{- end }}

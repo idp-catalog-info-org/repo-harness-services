@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ci-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.commonLabels }}
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  {{- include "harnesscommon.monitoring.config" . | nindent 2 }}
+  {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.config "context" $) | nindent 2}}
+  {{- if .Values.global.airgap }}
+  DEFAULT_INTERNAL_IMAGE_CONNECTOR: "account.harnessImage"
+  {{- end }}
+  {{- if .Values.global.ssca.enabled }}
+  HARNESS_FULCIO_SERVICE_ENDPOINT: "{{ .Values.global.loadbalancerURL }}{{ .Values.global.loadbalancerContext }}/harness-fulcio/"
+  SSCA_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}{{ .Values.global.loadbalancerContext }}/ssca-manager/'
+  SSCA_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_plugin.image.repository }}:{{ .Values.ci_images.ssca_plugin.image.tag }}'
+  SSCA_CDXGEN_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_cdxgen_plugin.image.repository }}:{{ .Values.ci_images.ssca_cdxgen_plugin.image.tag }}'
+  SSCA_ENFORCEMENT_IMAGE: '{{ .Values.ci_images.ssca_plugin.image.repository }}:{{ .Values.ci_images.ssca_plugin.image.tag }}'
+  VM_SSCA_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_plugin.image.repository }}:{{ .Values.ci_images.ssca_plugin.image.tag }}'
+  VM_SSCA_CDXGEN_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_cdxgen_plugin.image.repository }}:{{ .Values.ci_images.ssca_cdxgen_plugin.image.tag }}'
+  SSCA_ARTIFACT_SIGNING_IMAGE: '{{ .Values.ci_images.ssca_artifact_signing_plugin.image.repository }}:{{ .Values.ci_images.ssca_artifact_signing_plugin.image.tag }}'
+  SSCA_ARTIFACT_VERIFICATION_IMAGE: '{{ .Values.ci_images.ssca_artifact_signing_plugin.image.repository }}:{{ .Values.ci_images.ssca_artifact_signing_plugin.image.tag }}'
+  VM_SSCA_ARTIFACT_SIGNING_IMAGE: '{{ .Values.ci_images.ssca_artifact_signing_plugin.image.repository }}:{{ .Values.ci_images.ssca_artifact_signing_plugin.image.tag }}'
+  VM_SSCA_ARTIFACT_VERIFICATION_IMAGE: '{{ .Values.ci_images.ssca_artifact_signing_plugin.image.repository }}:{{ .Values.ci_images.ssca_artifact_signing_plugin.image.tag }}'
+  VM_SSCA_ENFORCEMENT_IMAGE: '{{ .Values.ci_images.ssca_plugin.image.repository }}:{{ .Values.ci_images.ssca_plugin.image.tag }}'
+  VM_DOCKER_PROVENANCE_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  VM_SLSA_VERIFICATION_DOCKER_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  SLSA_VERIFICATION_DOCKER_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  SLSA_VERIFICATION_GCR_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  DOCKER_PROVENANCE_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  GCR_PROVENANCE_IMAGE: '{{ .Values.ci_images.slsa_plugin.image.repository }}:{{ .Values.ci_images.slsa_plugin.image.tag }}'
+  SSCA_COMPLIANCE_IMAGE: '{{ .Values.ci_images.ssca_compliance_plugin.image.repository }}:{{ .Values.ci_images.ssca_compliance_plugin.image.tag }}'
+  VM_SSCA_COMPLIANCE_IMAGE: '{{ .Values.ci_images.ssca_compliance_plugin.image.repository }}:{{ .Values.ci_images.ssca_compliance_plugin.image.tag }}'
+  SSCA_PR_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  VM_SSCA_PR_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  SSCA_JUNIT_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  VM_SSCA_JUNIT_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  DEPLOY_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  VM_DEPLOY_ATTESTATION_IMAGE: '{{ .Values.ci_images.ssca_attestation_plugin.image.repository }}:{{ .Values.ci_images.ssca_attestation_plugin.image.tag }}'
+  SSCA_AIBOM_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_aibom_plugin.image.repository }}:{{ .Values.ci_images.ssca_aibom_plugin.image.tag }}'
+  VM_SSCA_AIBOM_ORCHESTRATION_IMAGE: '{{ .Values.ci_images.ssca_aibom_plugin.image.repository }}:{{ .Values.ci_images.ssca_aibom_plugin.image.tag }}'
+  ENFORCE_ATTESTATION_IMAGE: '{{ .Values.ci_images.enforce_attestation_plugin.image.repository }}:{{ .Values.ci_images.enforce_attestation_plugin.image.tag }}'
+  VM_ENFORCE_ATTESTATION_IMAGE: '{{ .Values.ci_images.enforce_attestation_plugin.image.repository }}:{{ .Values.ci_images.enforce_attestation_plugin.image.tag }}'
+  {{- end }}
+  {{ include "harnesscommon.harnessfunctions.java17flags" (dict "context" $) | nindent 2 }}
+  {{- include "harnesscommon.logging.setFileLogging" . | nindent 2 }}
+{{- if .Values.additionalConfigs }}
+  {{- toYaml .Values.additionalConfigs | nindent 2 }}
+{{- end }}
+  {{- include "harnesscommon.secretsLoader.configContent" (dict "ctx" $ "databaseSecrets" (list 
+    (dict "dbtype" "mongo" "usernamesecrets" (list "HARNESS_MONGO_USER" "HARNESSCI_MONGO_USER" "PMSHARNESS_MONGO_USER") "passwordsecrets" (list "HARNESS_MONGO_PASSWORD" "HARNESSCI_MONGO_PASSWORD" "PMSHARNESS_MONGO_PASSWORD"))
+    (dict "dbtype" "redis" "usernamesecrets" (list "LOCK_CONFIG_REDIS_USERNAME" "EVENTS_FRAMEWORK_REDIS_USERNAME" "CACHE_CONFIG_REDIS_USERNAME") "passwordsecrets" (list "LOCK_CONFIG_REDIS_PASSWORD" "EVENTS_FRAMEWORK_REDIS_PASSWORD" "CACHE_CONFIG_REDIS_PASSWORD"))
+    (dict "dbtype" "timescaledb" "usernamesecrets" (list "TIMESCALEDB_USERNAME") "passwordsecrets" (list "TIMESCALE_PASSWORD"))
+  )) | nindent 2}}

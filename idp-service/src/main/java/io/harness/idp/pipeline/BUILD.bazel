@@ -1,0 +1,44 @@
+# Copyright 2023 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["**/*.java"]),
+    resources = [],
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//332-ci-manager/contracts/src/main/java/io/harness/cimanager/executionconfig/api:module",
+        "//332-ci-manager/service:module",
+        "//332-idp/src/main/java/io/harness/steps/executions/executable:module",
+        "//332-idp/src/main/java/io/harness/steps/executions/plan:module",
+        "//879-pipeline-ci-commons:module",
+        "//930-ng-core-clients/src/main/java/io/harness/connector:module",
+        "//932-connector-task/src/main/java/io/harness/connector/helper:module",
+        "//940-secret-manager-client/src/main/java/io/harness/secretmanagerclient/services/api:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/customhttp:module",
+        "//970-api-services-beans/src/main/java/io/harness/security/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//970-ng-commons/src/main/java/io/harness/utils/identifierref:module",
+        "//970-ng-commons/src/main/java/io/serializer/mapper:module",
+        "//980-commons/src/main/java/io/harness/beans:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//999-annotations:module",
+        "//clients/pipeline-service/pms-sdk:module",
+        "//clients/pipeline-service/pms-sdk-core:module",
+        "//clients/scope/src/main/java/io/harness/scopeinfoclient/remote:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/entities:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/service:module",
+        "//idp-service/src/main/java/io/harness/idp/onboarding:module",
+        "//idp-service/src/main/java/io/harness/idp/steps/execution/plan/action:module",
+        "@maven//:com_google_code_gson_gson",
+    ],
+)

@@ -1,0 +1,4 @@
+summary: "${EVENT_TYPE}: ${PIPELINE}, from org ${ORG} failed to start. Trigger ${TRIGGER} failed. Trigger on ${START_DATE}"
+link:
+    href: harness.io
+    text: Harness

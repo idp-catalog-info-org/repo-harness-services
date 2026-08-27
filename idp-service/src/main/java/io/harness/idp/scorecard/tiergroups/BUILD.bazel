@@ -1,0 +1,47 @@
+# Copyright 2026 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = [
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/config:sources",
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/entity:sources",
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/mappers:sources",
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/repositories:sources",
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/resources:sources",
+        "//idp-service/src/main/java/io/harness/idp/scorecard/tiergroups/service:sources",
+    ],
+    resources = [],
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//960-persistence/src/main/java/io/harness/annotation:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "//idp-service/contracts/openapi/v1:idp-service-server-spec-module",
+        "//idp-service/contracts/src/main/java/io/harness/idp/annotations:module",
+        "//idp-service/src/main/java/io/harness/idp/common:module",
+        "//idp-service/src/main/java/io/harness/idp/events/utils:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_google_inject_guice",
+        "@maven//:commons_io_commons_io",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_glassfish_jersey_media_jersey_media_multipart",
+        "@maven//:org_springframework_data_spring_data_commons",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["BUILD.bazel"]),
+    pmd_srcs = glob(["BUILD.bazel"]),
+    sonarqube_srcs = glob(["BUILD.bazel"]),
+)

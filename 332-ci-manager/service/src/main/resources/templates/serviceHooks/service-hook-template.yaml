@@ -1,0 +1,23 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  manifestPath:
+    type: string
+    description: Manifest files directory path
+    default: ${{runtime.manifestPath}}
+  workspace:
+    type: string
+    description: Working directory path
+    default: ${{runtime.workspace}}
+
+run:
+  type: run
+  container:
+    image: alpine
+    connector: account.harnessImage
+  script: SCRIPT_PLACEHOLDER
+  env:
+    MANIFEST_FILES_DIRECTORY: ${{inputs.manifestPath}}
+    WORKING_DIRECTORY: ${{inputs.workspace}}
+    VALUES_OVERRIDE_DIRECTORY: ${{inputs.workspace}}/values-overrides

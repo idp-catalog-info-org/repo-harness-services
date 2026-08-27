@@ -1,0 +1,980 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.app;
+
+import static io.harness.annotations.dev.HarnessTeam.CI;
+import static io.harness.app.CIManagerConfiguration.HARNESS_RESOURCE_CLASSES;
+import static io.harness.authorization.AuthorizationServiceHeader.CI_MANAGER;
+import static io.harness.configuration.DeployVariant.DEPLOY_VERSION;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+import static io.harness.eventsframework.EventsFrameworkConstants.ENTITY_CRUD;
+import static io.harness.eventsframework.EventsFrameworkConstants.OBSERVER_EVENT_CHANNEL;
+import static io.harness.logging.LoggingInitializer.initializeLogging;
+import static io.harness.pms.contracts.plan.ExpansionRequestType.KEY;
+import static io.harness.pms.contracts.plan.ExpansionRequestType.LOCAL_FQN;
+import static io.harness.pms.listener.NgOrchestrationNotifyEventListener.NG_ORCHESTRATION;
+
+import static java.util.Collections.singletonList;
+
+import io.harness.Microservice;
+import io.harness.ModuleType;
+import io.harness.PipelineServiceUtilityModule;
+import io.harness.SCMGrpcClientModule;
+import io.harness.accesscontrol.NGAccessDeniedExceptionMapper;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.app.migration.AddUniqueIdParentIdToEntitiesJob;
+import io.harness.app.migration.CIManagerMigrationProvider;
+import io.harness.authorization.AuthorizationServiceHeader;
+import io.harness.beans.ScopeInfo;
+import io.harness.beans.ScopeInfoFactory;
+import io.harness.cache.CacheModule;
+import io.harness.cf.AbstractCfModule;
+import io.harness.cf.CfClientConfig;
+import io.harness.cf.CfMigrationConfig;
+import io.harness.ci.app.InspectCommand;
+import io.harness.ci.cd.governance.UnifiedEnvironmentExpansionHandler;
+import io.harness.ci.cd.governance.UnifiedServiceExpansionHandler;
+import io.harness.ci.enforcement.BuildRestrictionUsageImpl;
+import io.harness.ci.enforcement.BuildsPerDayRestrictionUsageImpl;
+import io.harness.ci.enforcement.BuildsPerMonthRestrictionUsageImpl;
+import io.harness.ci.enforcement.TotalBuildsRestrictionUsageImpl;
+import io.harness.ci.event.CIDataDeleteJob;
+import io.harness.ci.event.CIInfraCleanupService;
+import io.harness.ci.execution.AccountEventConsumer;
+import io.harness.ci.execution.execution.CINotifyEventConsumerRedis;
+import io.harness.ci.execution.execution.CINotifyEventPublisher;
+import io.harness.ci.execution.execution.ObserverEventConsumer;
+import io.harness.ci.execution.execution.OrchestrationExecutionEventHandlerRegistrar;
+import io.harness.ci.execution.plan.creator.CIModuleInfoProvider;
+import io.harness.ci.execution.plan.creator.CIPipelineServiceInfoProvider;
+import io.harness.ci.execution.plan.creator.filter.CIFilterCreationResponseMerger;
+import io.harness.ci.execution.queue.CICapacityPoller;
+import io.harness.ci.execution.queue.CIExecutionPoller;
+import io.harness.ci.execution.serializer.CiExecutionRegistrars;
+import io.harness.ci.plugin.PluginMetadataRecordsJob;
+import io.harness.ci.registrars.CIFacilitatorRegistrar;
+import io.harness.ci.registrars.ExecutionAdvisers;
+import io.harness.ci.registrars.ExecutionRegistrar;
+import io.harness.ci.telemetry.CiTelemetryRecordsJob;
+import io.harness.ci.telemetry.StoTelemetryRecordsJob;
+import io.harness.controller.PrimaryVersionChangeScheduler;
+import io.harness.core.ci.dashboard.CIActiveCommitterUsageImpl;
+import io.harness.core.ci.dashboard.CICacheAllowanceImpl;
+import io.harness.delegate.beans.DelegateAsyncTaskResponse;
+import io.harness.delegate.beans.DelegateSyncTaskResponse;
+import io.harness.delegate.beans.DelegateTaskProgressResponse;
+import io.harness.dropwizard.bundles.swagger.SwaggerBundleConfiguration;
+import io.harness.dropwizard.bundles.swagger.SwaggerV2Bundle;
+import io.harness.enforcement.client.servicedependencies.CustomRestrictionRegisterConfiguration;
+import io.harness.enforcement.client.servicedependencies.RestrictionUsageRegisterConfiguration;
+import io.harness.enforcement.client.services.EnforcementSdkRegisterService;
+import io.harness.enforcement.client.usage.RestrictionUsageInterface;
+import io.harness.enforcement.constants.FeatureRestrictionName;
+import io.harness.exception.GeneralException;
+import io.harness.ff.FeatureFlagConfig;
+import io.harness.filter.HttpServiceLoopDetectionFilter;
+import io.harness.filter.LoopDetectionAndPrevention;
+import io.harness.gitsync.GitSdkConfiguration;
+import io.harness.gitsync.events.AbstractGitSyncSdkModule;
+import io.harness.gitsync.persistance.EntityKeySource;
+import io.harness.gitsync.persistance.EntityLookupHelper;
+import io.harness.gitsync.persistance.GitAwarePersistence;
+import io.harness.gitsync.persistance.GitSyncSdkServiceImpl;
+import io.harness.gitsync.persistance.NoOpGitSyncSdkServiceImpl;
+import io.harness.gitsync.persistance.testing.NoOpGitAwarePersistenceImpl;
+import io.harness.gitsync.scm.GitSyncSdkService;
+import io.harness.gitsync.sdk.GitSyncEntitiesConfiguration;
+import io.harness.gitsync.sdk.GitSyncGrpcClientModule;
+import io.harness.gitsync.sdk.GitSyncSdkConfiguration;
+import io.harness.govern.ProviderModule;
+import io.harness.governance.DefaultConnectorRefExpansionHandler;
+import io.harness.grpc.interceptor.GrpcServiceLoopDetectionModule;
+import io.harness.health.HealthService;
+import io.harness.iterator.PersistenceIteratorFactory;
+import io.harness.kafka.KafkaModule;
+import io.harness.maintenance.MaintenanceController;
+import io.harness.metrics.MetricRegistryModule;
+import io.harness.metrics.jobs.RecordMetricsJob;
+import io.harness.metrics.modules.PrometheusMetricsModule;
+import io.harness.metrics.service.api.MetricService;
+import io.harness.migration.ng.MigrationProvider;
+import io.harness.migration.ng.NGMigrationConfiguration;
+import io.harness.migration.ng.NGMigrationSdkInitHelper;
+import io.harness.migration.ng.NGMigrationSdkModule;
+import io.harness.mongo.AbstractMongoModule;
+import io.harness.mongo.MongoConfig;
+import io.harness.morphia.MorphiaRegistrar;
+import io.harness.ng.DbAliases;
+import io.harness.ng.core.CorrelationFilter;
+import io.harness.ng.core.TraceFilter;
+import io.harness.ng.core.exceptionmappers.GenericExceptionMapperV2;
+import io.harness.ng.core.exceptionmappers.JerseyViolationExceptionMapperV2;
+import io.harness.ng.core.exceptionmappers.NotAllowedExceptionMapper;
+import io.harness.ng.core.exceptionmappers.NotFoundExceptionMapper;
+import io.harness.ng.core.exceptionmappers.WingsExceptionMapperV2;
+import io.harness.ng.core.utils.InfrastructureExecutionConstants;
+import io.harness.persistence.HPersistence;
+import io.harness.persistence.NoopUserProvider;
+import io.harness.persistence.UserProvider;
+import io.harness.persistence.store.Store;
+import io.harness.pms.contracts.plan.JsonExpansionInfo;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.events.base.PipelineEventConsumerController;
+import io.harness.pms.listener.NgOrchestrationNotifyEventListenerNonVersioned;
+import io.harness.pms.sdk.PmsSdkInitHelper;
+import io.harness.pms.sdk.PmsSdkModule;
+import io.harness.pms.sdk.configuration.PmsSdkConfiguration;
+import io.harness.pms.sdk.core.SdkDeployMode;
+import io.harness.pms.sdk.core.governance.JsonExpansionHandlerInfo;
+import io.harness.pms.sdk.core.plan.creation.creators.pipeline.PipelineServiceInfoProvider;
+import io.harness.pms.sdk.core.steps.Step;
+import io.harness.pms.sdk.execution.events.facilitators.FacilitatorEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.facilitators.FacilitatorEventRedisConsumerV2;
+import io.harness.pms.sdk.execution.events.interrupts.InterruptEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.interrupts.InterruptEventRedisConsumerV2;
+import io.harness.pms.sdk.execution.events.node.advise.NodeAdviseEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.node.advise.NodeAdviseRedisConsumerV2;
+import io.harness.pms.sdk.execution.events.node.resume.NodeResumeEventConsumerV2;
+import io.harness.pms.sdk.execution.events.node.resume.NodeResumeEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.node.start.NodeStartEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.node.start.NodeStartEventRedisConsumerV2;
+import io.harness.pms.sdk.execution.events.orchestrationevent.OrchestrationEventRedisConsumer;
+import io.harness.pms.sdk.execution.events.plan.CreatePartialPlanRedisConsumer;
+import io.harness.pms.sdk.execution.events.progress.NodeProgressEventRedisConsumerV2;
+import io.harness.pms.sdk.execution.events.progress.ProgressEventRedisConsumer;
+import io.harness.pms.serializer.json.PmsBeansJacksonModule;
+import io.harness.pms.yaml.YAMLFieldNameConstants;
+import io.harness.queue.QueueListenerController;
+import io.harness.queue.QueuePublisher;
+import io.harness.resource.VersionInfoResource;
+import io.harness.scopeinfoclient.remote.ScopeInfoClient;
+import io.harness.security.MeshIdentityBootstrap;
+import io.harness.security.NextGenAuthenticationFilter;
+import io.harness.security.ScopeInfoFilter;
+import io.harness.security.annotations.NextGenManagerAuth;
+import io.harness.security.mesh.MeshIdentityConfig;
+import io.harness.serializer.CiBeansRegistrars;
+import io.harness.serializer.ConnectorNextGenRegistrars;
+import io.harness.serializer.DelegateServiceRegistrars;
+import io.harness.serializer.KryoModule;
+import io.harness.serializer.KryoRegistrar;
+import io.harness.serializer.PersistenceRegistrars;
+import io.harness.serializer.PrimaryVersionManagerRegistrars;
+import io.harness.serializer.YamlBeansModuleRegistrars;
+import io.harness.service.impl.DelegateAsyncServiceImpl;
+import io.harness.service.impl.DelegateProgressServiceImpl;
+import io.harness.service.impl.DelegateSyncServiceImpl;
+import io.harness.sto.plan.creator.STOPipelineServiceInfoProvider;
+import io.harness.sto.registrars.STOExecutionRegistrar;
+import io.harness.threading.ThreadPool;
+import io.harness.token.remote.TokenClient;
+import io.harness.waiter.NotifierScheduledExecutorService;
+import io.harness.waiter.NotifyEvent;
+import io.harness.waiter.NotifyQueuePublisherRegister;
+import io.harness.waiter.NotifyResponseCleaner;
+import io.harness.waiter.ProgressUpdateService;
+import io.harness.waiter.nrcsp.NotifyResponseCleanerFactory;
+import io.harness.waiter.nrcsp.NotifyResponseCleanerSpringPersistence;
+import io.harness.waiter.nrcsp.NotifyResponseIterator;
+import io.harness.yaml.YamlSdkConfiguration;
+import io.harness.yaml.YamlSdkInitHelper;
+import io.harness.yaml.YamlSdkModule;
+import io.harness.yaml.schema.beans.YamlSchemaRootClass;
+
+import software.wings.security.annotations.AdminPortalAuth;
+
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+import dev.morphia.converters.TypeConverter;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.core.Application;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
+import io.dropwizard.jersey.errors.EarlyEofExceptionMapper;
+import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
+import io.serializer.HObjectMapper;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import java.lang.annotation.Annotation;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import javax.servlet.DispatcherType;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ResourceInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.LogManager;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.model.Resource;
+import org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider;
+import org.springframework.core.convert.converter.Converter;
+import ru.vyarus.guice.validator.ValidationModule;
+
+@Slf4j
+@OwnedBy(CI)
+public class CIManagerApplication extends Application<CIManagerConfiguration> {
+  private static final SecureRandom random = new SecureRandom();
+  public static final Store HARNESSCI_STORE = Store.builder().name(DbAliases.CIMANAGER).build();
+  private static final String APP_NAME = "CI Manager Service Application";
+  private final MetricRegistry metricRegistry = new MetricRegistry();
+  private final MetricRegistry threadPoolMetricRegistry = new MetricRegistry();
+
+  public static void main(String[] args) throws Exception {
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      log.info("Shutdown hook, entering maintenance...");
+      MaintenanceController.forceMaintenance(true);
+    }));
+    new CIManagerApplication().run(args);
+  }
+
+  @Override
+  public String getName() {
+    return APP_NAME;
+  }
+
+  public static void configureObjectMapper(final ObjectMapper mapper) {
+    HObjectMapper.configureObjectMapperForNG(mapper);
+    mapper.registerModule(new PmsBeansJacksonModule());
+  }
+
+  @Override
+  public void run(CIManagerConfiguration configuration, Environment environment) {
+    log.info("Starting ci manager app ...");
+
+    log.info("Entering startup maintenance mode");
+    MaintenanceController.forceMaintenance(true);
+
+    log.info("Leaving startup maintenance mode");
+    List<Module> modules = new ArrayList<>();
+    modules.add(KryoModule.getInstance());
+    modules.add(NGMigrationSdkModule.getInstance());
+    modules.add(new SCMGrpcClientModule(configuration.getScmConnectionConfig()));
+    modules.add(new ProviderModule() {
+      @Provides
+      @Singleton
+      Set<Class<? extends KryoRegistrar>> registrars() {
+        return ImmutableSet.<Class<? extends KryoRegistrar>>builder()
+            .addAll(YamlBeansModuleRegistrars.kryoRegistrars)
+            .addAll(CiBeansRegistrars.kryoRegistrars)
+            .addAll(CiExecutionRegistrars.kryoRegistrars)
+            .addAll(ConnectorNextGenRegistrars.kryoRegistrars)
+            .addAll(DelegateServiceRegistrars.kryoRegistrars)
+            .build();
+      }
+
+      @Provides
+      @Singleton
+      Set<Class<? extends MorphiaRegistrar>> morphiaRegistrars() {
+        return ImmutableSet.<Class<? extends MorphiaRegistrar>>builder()
+            .addAll(CiExecutionRegistrars.morphiaRegistrars)
+            .addAll(PrimaryVersionManagerRegistrars.morphiaRegistrars)
+            .build();
+      }
+
+      @Provides
+      @Singleton
+      @Named("morphiaClasses")
+      Map<Class, String> morphiaCustomCollectionNames() {
+        return ImmutableMap.<Class, String>builder()
+            .put(DelegateSyncTaskResponse.class, "ciManager_delegateSyncTaskResponses")
+            .put(DelegateAsyncTaskResponse.class, "ciManager_delegateAsyncTaskResponses")
+            .put(DelegateTaskProgressResponse.class, "ciManager_delegateTaskProgressResponses")
+            .build();
+      }
+
+      @Provides
+      @Singleton
+      Set<Class<? extends TypeConverter>> morphiaConverters() {
+        return ImmutableSet.<Class<? extends TypeConverter>>builder()
+            .addAll(PersistenceRegistrars.morphiaConverters)
+            .build();
+      }
+
+      @Provides
+      @Singleton
+      List<Class<? extends Converter<?, ?>>> springConverters() {
+        return ImmutableList.<Class<? extends Converter<?, ?>>>builder().build();
+      }
+      @Provides
+      @Singleton
+      List<YamlSchemaRootClass> yamlSchemaRootClasses() {
+        return ImmutableList.<YamlSchemaRootClass>builder().addAll(CiBeansRegistrars.yamlSchemaRegistrars).build();
+      }
+    });
+
+    modules.add(new ProviderModule() {
+      @Provides
+      @Singleton
+      MongoConfig mongoConfig() {
+        return configuration.getHarnessCIMongo();
+      }
+
+      @Provides
+      @Singleton
+      @Named("base")
+      public String base() {
+        return configuration.getBase();
+      }
+
+      @Provides
+      @Singleton
+      @Named("dbAliases")
+      public List<String> getDbAliases() {
+        return configuration.getDbAliases();
+      }
+
+      @Provides
+      @Singleton
+      @Named("DELEGATE_EXECUTOR_NAME")
+      public ExecutorService coreExecutorService() {
+        return ThreadPool.getInstrumentedExecutorService(configuration.getDelegateResponseTaskExecutionPoolConfig(),
+            "CIDelegateTaskResponseEventListener", threadPoolMetricRegistry);
+      }
+    });
+
+    modules.add(new AbstractMongoModule() {
+      @Override
+      public UserProvider userProvider() {
+        return new NoopUserProvider();
+      }
+    });
+
+    modules.add(new AbstractCfModule() {
+      @Override
+      public CfClientConfig cfClientConfig() {
+        return configuration.getCfClientConfig();
+      }
+
+      @Override
+      public CfMigrationConfig cfMigrationConfig() {
+        return CfMigrationConfig.builder().build();
+      }
+
+      @Override
+      public FeatureFlagConfig featureFlagConfig() {
+        return configuration.getFeatureFlagConfig();
+      }
+    });
+
+    modules.add(new CIPersistenceModule());
+    addGuiceValidationModule(modules);
+    modules.add(new CIManagerServiceModule(configuration, new CIManagerConfigurationOverride()));
+    modules.add(new CacheModule(configuration.getCacheConfig()));
+
+    modules.add(YamlSdkModule.getInstance());
+
+    PrometheusMetricsModule prometheusMetricsModule = new PrometheusMetricsModule();
+    LoopDetectionAndPrevention loopDetectionAndPrevention =
+        new LoopDetectionAndPrevention(prometheusMetricsModule.metricService);
+    modules.add(prometheusMetricsModule);
+    modules.add(new GrpcServiceLoopDetectionModule(loopDetectionAndPrevention));
+
+    PmsSdkConfiguration ciPmsSdkConfiguration = getPmsSdkConfiguration(
+        configuration, ModuleType.CI, ExecutionRegistrar.getEngineSteps(), CIPipelineServiceInfoProvider.class);
+    modules.add(KafkaModule.getInstance(configuration.getKafkaModuleConfig()));
+    modules.add(PmsSdkModule.getInstance(ciPmsSdkConfiguration, threadPoolMetricRegistry, false));
+
+    modules.add(PipelineServiceUtilityModule.getInstance());
+    modules.add(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(MetricRegistry.class).toInstance(metricRegistry);
+      }
+    });
+    modules.add(new MetricRegistryModule(metricRegistry, threadPoolMetricRegistry));
+
+    if (configuration.isShouldDeployWithGitSync()) {
+      GitSyncSdkConfiguration gitSyncSdkConfiguration = getGitSyncConfiguration(configuration);
+      modules.add(new AbstractGitSyncSdkModule() {
+        @Override
+        public GitSyncSdkConfiguration getGitSyncSdkConfiguration() {
+          return gitSyncSdkConfiguration;
+        }
+
+        @Override
+        protected void configure() {
+          install(GitSyncGrpcClientModule.getInstance());
+          bind(EntityKeySource.class).to(EntityLookupHelper.class);
+          bind(GitSyncSdkService.class).to(GitSyncSdkServiceImpl.class);
+        }
+      });
+    } else {
+      modules.add(new AbstractGitSyncSdkModule() {
+        @Override
+        protected void configure() {
+          bind(GitAwarePersistence.class).to(NoOpGitAwarePersistenceImpl.class);
+          bind(GitSyncSdkService.class).to(NoOpGitSyncSdkServiceImpl.class);
+        }
+
+        @Override
+        public GitSyncSdkConfiguration getGitSyncSdkConfiguration() {
+          return null;
+        }
+      });
+    }
+
+    Injector injector = Guice.createInjector(modules);
+
+    registerPMSSDK(configuration, injector, ModuleType.CI, CIPipelineServiceInfoProvider.class, environment);
+    registerPMSSDK(configuration, injector, ModuleType.STO, STOPipelineServiceInfoProvider.class, environment);
+    registerMigrations(injector);
+    registerResources(environment, injector);
+    registerWaitEnginePublishers(injector);
+    registerManagedBeans(environment, injector, configuration);
+    registerScopeInfoFilter(environment, injector);
+    registerHealthCheck(environment, injector);
+    registerAuthFilters(configuration, environment, injector);
+    registerExceptionMappers(environment);
+    registerCorrelationFilter(environment, injector);
+    registerStores(configuration, injector);
+    scheduleJobs(injector, configuration);
+    registerQueueListener(injector);
+    registerPmsSdkEvents(injector);
+    initializeEnforcementFramework(injector);
+    registerEventConsumers(injector);
+    registerYamlSdk(injector);
+
+    if (BooleanUtils.isTrue(configuration.getEnableOpentelemetry())) {
+      registerTraceFilter(environment, injector);
+    }
+
+    if (loopDetectionAndPrevention.shouldLoopBeDetected()) {
+      registerHttpServiceLoopDetectionFilter(configuration, environment, loopDetectionAndPrevention);
+    }
+
+    log.info("CIManagerApplication DEPLOY_VERSION = " + System.getenv().get(DEPLOY_VERSION));
+    initializeCiManagerMonitoring(configuration, injector);
+    if (!configuration.getCiExecutionServiceConfig().isLocal()) {
+      initializeCiManagerDataDeletion(injector);
+    }
+
+    initializePluginPublisher(injector);
+    initializeMonitoring(configuration, injector);
+    registerOasResource(configuration, environment, injector);
+    log.info("Starting app done");
+    MaintenanceController.forceMaintenance(false);
+    LogManager.shutdown();
+  }
+
+  private void registerEventConsumers(final Injector injector) {
+    final ExecutorService observerEventConsumerExecutor =
+        Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(OBSERVER_EVENT_CHANNEL).build());
+    observerEventConsumerExecutor.execute(injector.getInstance(ObserverEventConsumer.class));
+    final ExecutorService accountEventConsumerExecutor =
+        Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(ENTITY_CRUD).build());
+    accountEventConsumerExecutor.execute(injector.getInstance(AccountEventConsumer.class));
+  }
+
+  private void registerOasResource(CIManagerConfiguration appConfig, Environment environment, Injector injector) {
+    OpenApiResource openApiResource = injector.getInstance(OpenApiResource.class);
+    openApiResource.setOpenApiConfiguration(appConfig.getOasConfig());
+    environment.jersey().register(openApiResource);
+  }
+
+  private void registerQueueListener(Injector injector) {
+    log.info("Initializing queue listeners...");
+    QueueListenerController queueListenerController = injector.getInstance(QueueListenerController.class);
+    queueListenerController.register(injector.getInstance(NgOrchestrationNotifyEventListenerNonVersioned.class), 1);
+  }
+
+  private void initializeMonitoring(CIManagerConfiguration config, Injector injector) {
+    PmsSdkConfiguration ciSDKConfig = getPmsSdkConfiguration(
+        config, ModuleType.CI, ExecutionRegistrar.getEngineSteps(), CIPipelineServiceInfoProvider.class);
+    // If Deployment mode is REMOTE then monitoring is
+    // initialized as part of the PMS SDK registration step.
+    if (!ciSDKConfig.getDeploymentMode().equals(SdkDeployMode.REMOTE)) {
+      injector.getInstance(MetricService.class).initializeMetrics();
+      injector.getInstance(RecordMetricsJob.class).scheduleMetricsTasks();
+    }
+  }
+
+  @Override
+  public void initialize(Bootstrap<CIManagerConfiguration> bootstrap) {
+    initializeLogging();
+    log.info("bootstrapping ...");
+    bootstrap.addCommand(new InspectCommand<>(this));
+    bootstrap.addCommand(new ScanClasspathMetadataCommand());
+    bootstrap.addCommand(new GenerateOpenApiSpecCommand());
+
+    bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
+        bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
+
+    configureObjectMapper(bootstrap.getObjectMapper());
+    bootstrap.addBundle(new SwaggerV2Bundle<>() {
+      @Override
+      protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(CIManagerConfiguration appConfig) {
+        return appConfig.getSwaggerBundleConfiguration();
+      }
+
+      @Override
+      protected Collection<Class<?>> getResourceClasses() {
+        return HARNESS_RESOURCE_CLASSES;
+      }
+    });
+    bootstrap.setMetricRegistry(metricRegistry);
+    log.info("bootstrapping done.");
+  }
+
+  private void registerResources(Environment environment, Injector injector) {
+    for (Class<?> resource : HARNESS_RESOURCE_CLASSES) {
+      if (Resource.isAcceptable(resource)) {
+        environment.jersey().register(injector.getInstance(resource));
+      }
+    }
+    environment.jersey().register(injector.getInstance(VersionInfoResource.class));
+  }
+
+  private void registerPMSSDK(CIManagerConfiguration config, Injector injector, ModuleType moduleType,
+      Class<? extends PipelineServiceInfoProvider> pipelineServiceInfoProviderClass, Environment environment) {
+    Map<StepType, Class<? extends Step>> engineSteps = new HashMap<>();
+    PmsSdkConfiguration pmsSdkConfiguration = null;
+    if (moduleType == ModuleType.CI) {
+      engineSteps = ExecutionRegistrar.getEngineSteps();
+      pmsSdkConfiguration = getPmsSdkConfiguration(config, moduleType, engineSteps, pipelineServiceInfoProviderClass);
+      if (pmsSdkConfiguration.getDeploymentMode().equals(SdkDeployMode.REMOTE)) {
+        try {
+          PmsSdkInitHelper.initializeSDKInstance(injector, pmsSdkConfiguration, environment);
+        } catch (Exception e) {
+          throw new GeneralException("Fail to start " + moduleType + " manager because pms sdk registration failed", e);
+        }
+      }
+    } else if (moduleType == ModuleType.STO) {
+      engineSteps = STOExecutionRegistrar.getEngineSteps();
+      pmsSdkConfiguration =
+          getStoPmsSdkConfiguration(config, moduleType, engineSteps, pipelineServiceInfoProviderClass);
+      if (pmsSdkConfiguration.getDeploymentMode().equals(SdkDeployMode.REMOTE)) {
+        try {
+          PmsSdkInitHelper.initializeSDKNoInstance(injector, pmsSdkConfiguration);
+        } catch (Exception e) {
+          throw new GeneralException("Fail to start " + moduleType + " manager because pms sdk registration failed", e);
+        }
+      }
+    }
+  }
+
+  private void registerYamlSdk(Injector injector) {
+    YamlSdkConfiguration yamlSdkConfiguration = YamlSdkConfiguration.builder()
+                                                    .requireSchemaInit(true)
+                                                    .requireSnippetInit(true)
+                                                    .requireValidatorInit(false)
+                                                    .build();
+    YamlSdkInitHelper.initialize(injector, yamlSdkConfiguration);
+  }
+
+  private PmsSdkConfiguration getPmsSdkConfiguration(CIManagerConfiguration config, ModuleType moduleType,
+      Map<StepType, Class<? extends Step>> engineSteps,
+      Class<? extends PipelineServiceInfoProvider> pipelineServiceInfoProviderClass) {
+    boolean remote = false;
+    if (config.getShouldConfigureWithPMS() != null && config.getShouldConfigureWithPMS()) {
+      remote = true;
+    }
+
+    return PmsSdkConfiguration.builder()
+        .deploymentMode(remote ? SdkDeployMode.REMOTE : SdkDeployMode.LOCAL)
+        .streamPerServiceConfiguration(config.isStreamPerServiceConfiguration())
+        .moduleType(moduleType)
+        .pipelineServiceInfoProviderClass(pipelineServiceInfoProviderClass)
+        .grpcServerConfig(config.getPmsSdkGrpcServerConfig())
+        .pmsGrpcClientConfig(config.getPmsGrpcClientConfig())
+        .filterCreationResponseMerger(new CIFilterCreationResponseMerger())
+        .engineSteps(engineSteps)
+        .engineFacilitators(CIFacilitatorRegistrar.getEngineFacilitators())
+        .executionSummaryModuleInfoProviderClass(CIModuleInfoProvider.class)
+        .engineAdvisers(ExecutionAdvisers.getEngineAdvisers())
+        .engineEventHandlersMap(OrchestrationExecutionEventHandlerRegistrar.getEngineEventHandlers())
+        .eventsFrameworkConfiguration(config.getEventsFrameworkConfiguration())
+        .executionPoolConfig(config.getPmsSdkExecutionPoolConfig())
+        .orchestrationEventPoolConfig(config.getPmsSdkOrchestrationEventPoolConfig())
+        .orchestrationHandlerPoolConfig(config.getPmsSdkOrchestrationHandlerPoolConfig())
+        .planCreatorServiceInternalConfig(config.getPmsPlanCreatorServicePoolConfig())
+        .jsonExpansionHandlers(getJsonExpansionHandlers())
+        .staticAliasesUnified(getStaticAliasesUnified())
+        .pipelineSdkRedisEventsConfig(config.getPipelineSdkRedisEventsConfig())
+        .build();
+  }
+
+  private PmsSdkConfiguration getStoPmsSdkConfiguration(CIManagerConfiguration config, ModuleType moduleType,
+      Map<StepType, Class<? extends Step>> engineSteps,
+      Class<? extends PipelineServiceInfoProvider> pipelineServiceInfoProviderClass) {
+    boolean remote = false;
+    if (config.getShouldConfigureWithPMS() != null && config.getShouldConfigureWithPMS()) {
+      remote = true;
+    }
+
+    return PmsSdkConfiguration.builder()
+        .streamPerServiceConfiguration(config.isStreamPerServiceConfiguration())
+        .deploymentMode(remote ? SdkDeployMode.REMOTE : SdkDeployMode.LOCAL)
+        .moduleType(moduleType)
+        .pipelineServiceInfoProviderClass(pipelineServiceInfoProviderClass)
+        .grpcServerConfig(config.getPmsSdkGrpcServerConfig())
+        .pmsGrpcClientConfig(config.getPmsGrpcClientConfig())
+        .filterCreationResponseMerger(new CIFilterCreationResponseMerger())
+        .engineSteps(engineSteps)
+        .executionSummaryModuleInfoProviderClass(CIModuleInfoProvider.class)
+        .engineAdvisers(ExecutionAdvisers.getEngineAdvisers())
+        .engineEventHandlersMap(OrchestrationExecutionEventHandlerRegistrar.getEngineEventHandlers())
+        .eventsFrameworkConfiguration(config.getEventsFrameworkConfiguration())
+        .executionPoolConfig(config.getPmsSdkExecutionPoolConfig())
+        .orchestrationEventPoolConfig(config.getPmsSdkOrchestrationEventPoolConfig())
+        .planCreatorServiceInternalConfig(config.getPmsPlanCreatorServicePoolConfig())
+        .jsonExpansionHandlers(new ArrayList<>())
+        .pipelineSdkRedisEventsConfig(config.getPipelineSdkRedisEventsConfig())
+        .build();
+  }
+
+  private List<JsonExpansionHandlerInfo> getJsonExpansionHandlers() {
+    List<JsonExpansionHandlerInfo> jsonExpansionHandlers = new ArrayList<>();
+    JsonExpansionInfo connectorRefExpansionInfo =
+        JsonExpansionInfo.newBuilder().setKey(YAMLFieldNameConstants.CONNECTOR_REF).setExpansionType(KEY).build();
+    JsonExpansionHandlerInfo connectorRefExpansionHandlerInfo =
+        JsonExpansionHandlerInfo.builder()
+            .jsonExpansionInfo(connectorRefExpansionInfo)
+            .expansionHandler(DefaultConnectorRefExpansionHandler.class)
+            .build();
+
+    JsonExpansionInfo unifiedConnectorExpansionInfo =
+        JsonExpansionInfo.newBuilder().setKey(YAMLFieldNameConstants.CONNECTOR).setExpansionType(KEY).build();
+    JsonExpansionHandlerInfo unifiedConnectorExpansionHandlerInfo =
+        JsonExpansionHandlerInfo.builder()
+            .jsonExpansionInfo(unifiedConnectorExpansionInfo)
+            .expansionHandler(DefaultConnectorRefExpansionHandler.class)
+            .build();
+
+    StepType stageType = StepType.newBuilder().setStepCategory(StepCategory.STAGE).setType("CI").build();
+    JsonExpansionInfo unifiedServiceExpansionInfo = JsonExpansionInfo.newBuilder()
+                                                        .setKey(YAMLFieldNameConstants.SERVICE)
+                                                        .setExpansionType(LOCAL_FQN)
+                                                        .setStageType(stageType)
+                                                        .build();
+    JsonExpansionHandlerInfo unifiedServiceExpansionHandlerInfo =
+        JsonExpansionHandlerInfo.builder()
+            .jsonExpansionInfo(unifiedServiceExpansionInfo)
+            .expansionHandler(UnifiedServiceExpansionHandler.class)
+            .build();
+
+    JsonExpansionInfo unifiedEnvironmentExpansionInfo = JsonExpansionInfo.newBuilder()
+                                                            .setKey(YAMLFieldNameConstants.ENVIRONMENT)
+                                                            .setExpansionType(LOCAL_FQN)
+                                                            .setStageType(stageType)
+                                                            .build();
+    JsonExpansionHandlerInfo unifiedEnvironmentExpansionHandlerInfo =
+        JsonExpansionHandlerInfo.builder()
+            .jsonExpansionInfo(unifiedEnvironmentExpansionInfo)
+            .expansionHandler(UnifiedEnvironmentExpansionHandler.class)
+            .build();
+
+    jsonExpansionHandlers.add(connectorRefExpansionHandlerInfo);
+    jsonExpansionHandlers.add(unifiedConnectorExpansionHandlerInfo);
+    jsonExpansionHandlers.add(unifiedServiceExpansionHandlerInfo);
+    jsonExpansionHandlers.add(unifiedEnvironmentExpansionHandlerInfo);
+    return jsonExpansionHandlers;
+  }
+
+  private void scheduleJobs(Injector injector, CIManagerConfiguration config) {
+    injector.getInstance(PrimaryVersionChangeScheduler.class).registerExecutors();
+    if (config.isEnableWaitNotifyEngineOptimisation()) {
+      injector.getInstance(NotifyResponseIterator.class)
+          .createAndStartRedisBatchIterator(
+              PersistenceIteratorFactory.RedisBatchExecutorOptions.builder()
+                  .name("CI-NotifyResponseIterator")
+                  .poolSize(config.getNotifyResponseRedisConfig().getThreadPoolSize())
+                  .batchSize(config.getNotifyResponseRedisConfig().getRedisBatchSize())
+                  .lockTimeout(config.getNotifyResponseRedisConfig().getRedisLockTimeout())
+                  .interval(Duration.ofSeconds(config.getNotifyResponseRedisConfig().getThreadPoolIntervalInSeconds()))
+                  .threadSleepInterval(config.getNotifyResponseRedisConfig().getThreadSleepIntervalMs())
+                  .lockAcquireWarnThresholdMs(config.getNotifyResponseRedisConfig().getLockAcquireWarnThresholdMs())
+                  .build(),
+              Duration.ofSeconds(config.getNotifyResponseRedisConfig().getTargetIntervalInSeconds()));
+      NotifyResponseCleanerSpringPersistence cleaner =
+          injector.getInstance(NotifyResponseCleanerFactory.class).create("CI");
+      injector.getInstance(NotifierScheduledExecutorService.class)
+          .scheduleWithFixedDelay(cleaner, random.nextInt(300), 300L, TimeUnit.SECONDS);
+    } else {
+      injector.getInstance(NotifierScheduledExecutorService.class)
+          .scheduleWithFixedDelay(
+              injector.getInstance(NotifyResponseCleaner.class), random.nextInt(300), 300L, TimeUnit.SECONDS);
+    }
+
+    injector.getInstance(Key.get(ScheduledExecutorService.class, Names.named("taskPollExecutor")))
+        .scheduleWithFixedDelay(injector.getInstance(DelegateSyncServiceImpl.class), 0L, 2L, TimeUnit.SECONDS);
+
+    for (int i = 0; i < config.getAsyncDelegateResponseConsumption().getCorePoolSize(); i++) {
+      injector.getInstance(Key.get(ScheduledExecutorService.class, Names.named("async-taskPollExecutor")))
+          .scheduleWithFixedDelay(injector.getInstance(DelegateAsyncServiceImpl.class), 0L, 5L, TimeUnit.SECONDS);
+    }
+    injector.getInstance(Key.get(ScheduledExecutorService.class, Names.named("taskPollExecutor")))
+        .scheduleWithFixedDelay(injector.getInstance(DelegateProgressServiceImpl.class), 0L, 5L, TimeUnit.SECONDS);
+    injector.getInstance(Key.get(ScheduledExecutorService.class, Names.named("taskPollExecutor")))
+        .scheduleWithFixedDelay(injector.getInstance(ProgressUpdateService.class), 0L, 5L, TimeUnit.SECONDS);
+
+    if (config.isEnableAsyncResourceCleanup()) {
+      // every 10 sec
+      injector.getInstance(Key.get(ScheduledExecutorService.class, Names.named("resourceCleanupExecutor")))
+          .scheduleWithFixedDelay(injector.getInstance(CIInfraCleanupService.class), 0L, 10L, TimeUnit.SECONDS);
+    }
+  }
+
+  private void registerManagedBeans(Environment environment, Injector injector, CIManagerConfiguration config) {
+    environment.lifecycle().manage(injector.getInstance(QueueListenerController.class));
+    environment.lifecycle().manage(injector.getInstance(NotifierScheduledExecutorService.class));
+    environment.lifecycle().manage(injector.getInstance(PipelineEventConsumerController.class));
+    environment.lifecycle().manage(injector.getInstance(AddUniqueIdParentIdToEntitiesJob.class));
+    if (config.getEnableQueue()) {
+      environment.lifecycle().manage(injector.getInstance(CIExecutionPoller.class));
+      if (config.getCiExecutionServiceConfig().getGlobalQueueingConfig().getEnableGlobalQueue()) {
+        environment.lifecycle().manage(injector.getInstance(CICapacityPoller.class));
+      }
+    }
+    // Do not remove as it's used for MaintenanceController for shutdown mode
+    environment.lifecycle().manage(injector.getInstance(MaintenanceController.class));
+  }
+
+  private void registerPmsSdkEvents(Injector injector) {
+    log.info("Initializing redis abstract consumers...");
+    PipelineEventConsumerController pipelineEventConsumerController =
+        injector.getInstance(PipelineEventConsumerController.class);
+    pipelineEventConsumerController.register(injector.getInstance(OrchestrationEventRedisConsumer.class), 1);
+
+    pipelineEventConsumerController.register(injector.getInstance(InterruptEventRedisConsumer.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(FacilitatorEventRedisConsumer.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(NodeStartEventRedisConsumer.class), 2);
+    pipelineEventConsumerController.register(injector.getInstance(ProgressEventRedisConsumer.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(NodeAdviseEventRedisConsumer.class), 2);
+    pipelineEventConsumerController.register(injector.getInstance(NodeResumeEventRedisConsumer.class), 2);
+
+    pipelineEventConsumerController.register(injector.getInstance(InterruptEventRedisConsumerV2.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(FacilitatorEventRedisConsumerV2.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(NodeStartEventRedisConsumerV2.class), 2);
+    pipelineEventConsumerController.register(injector.getInstance(NodeProgressEventRedisConsumerV2.class), 1);
+    pipelineEventConsumerController.register(injector.getInstance(NodeAdviseRedisConsumerV2.class), 2);
+    pipelineEventConsumerController.register(injector.getInstance(NodeResumeEventConsumerV2.class), 2);
+
+    pipelineEventConsumerController.register(injector.getInstance(CreatePartialPlanRedisConsumer.class), 2);
+    pipelineEventConsumerController.register(injector.getInstance(CINotifyEventConsumerRedis.class), 15);
+  }
+
+  private void registerHealthCheck(Environment environment, Injector injector) {
+    final HealthService healthService = injector.getInstance(HealthService.class);
+    environment.healthChecks().register("CI Service", healthService);
+    healthService.registerMonitor(injector.getInstance(HPersistence.class));
+  }
+
+  private static void addGuiceValidationModule(List<Module> modules) {
+    ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+                                            .configure()
+                                            .parameterNameProvider(new ReflectionParameterNameProvider())
+                                            .buildValidatorFactory();
+    modules.add(new ValidationModule(validatorFactory));
+  }
+
+  private static void registerStores(CIManagerConfiguration config, Injector injector) {
+    final HPersistence hPersistence = injector.getInstance(HPersistence.class);
+    if (isNotEmpty(config.getHarnessCIMongo().getUri())) {
+      hPersistence.register(HARNESSCI_STORE, config.getHarnessCIMongo().getUri());
+    }
+  }
+
+  private void registerWaitEnginePublishers(Injector injector) {
+    final QueuePublisher<NotifyEvent> publisher =
+        injector.getInstance(Key.get(new TypeLiteral<QueuePublisher<NotifyEvent>>() {}));
+    final NotifyQueuePublisherRegister notifyQueuePublisherRegister =
+        injector.getInstance(NotifyQueuePublisherRegister.class);
+    notifyQueuePublisherRegister.register(
+        NG_ORCHESTRATION, payload -> publisher.send(singletonList(NG_ORCHESTRATION), payload));
+    notifyQueuePublisherRegister.register("ci_orchestration", injector.getInstance(CINotifyEventPublisher.class));
+  }
+
+  private void registerAuthFilters(CIManagerConfiguration configuration, Environment environment, Injector injector) {
+    if (configuration.isEnableAuth()) {
+      Predicate<Pair<ResourceInfo, ContainerRequestContext>> predicate =
+          getAuthFilterPredicate(NextGenManagerAuth.class).or(getAuthFilterPredicate(AdminPortalAuth.class));
+      Map<String, String> serviceToSecretMapping = new HashMap<>();
+      serviceToSecretMapping.put(AuthorizationServiceHeader.BEARER.getServiceId(), configuration.getJwtAuthSecret());
+      serviceToSecretMapping.put(
+          AuthorizationServiceHeader.IDENTITY_SERVICE.getServiceId(), configuration.getJwtIdentityServiceSecret());
+      serviceToSecretMapping.put(
+          AuthorizationServiceHeader.DEFAULT.getServiceId(), configuration.getNgManagerServiceSecret());
+      serviceToSecretMapping.put(
+          AuthorizationServiceHeader.RELICX.getServiceId(), configuration.getAiTestAutomationServiceSecret());
+      serviceToSecretMapping.put(
+          AuthorizationServiceHeader.ADMIN_PORTAL.getServiceId(), configuration.getJwtDataHandlerSecret());
+      // Mesh identity dispatch: opt-in per config. See MeshIdentityConfig for the rollout matrix.
+      MeshIdentityConfig mesh = configuration.getMeshIdentity();
+      NextGenAuthenticationFilter authFilter = MeshIdentityBootstrap.buildFilter(predicate, serviceToSecretMapping,
+          injector.getInstance(Key.get(TokenClient.class, Names.named("PRIVILEGED"))), mesh);
+      environment.jersey().register(authFilter);
+    }
+  }
+
+  private Predicate<Pair<ResourceInfo, ContainerRequestContext>> getAuthFilterPredicate(
+      Class<? extends Annotation> annotation) {
+    return resourceInfoAndRequest
+        -> (resourceInfoAndRequest.getKey().getResourceMethod() != null
+               && resourceInfoAndRequest.getKey().getResourceMethod().getAnnotation(annotation) != null)
+        || (resourceInfoAndRequest.getKey().getResourceClass() != null
+            && resourceInfoAndRequest.getKey().getResourceClass().getAnnotation(annotation) != null);
+  }
+  private void registerExceptionMappers(Environment environment) {
+    environment.jersey().register(JerseyViolationExceptionMapperV2.class);
+    environment.jersey().register(GenericExceptionMapperV2.class);
+    environment.jersey().register(new JsonProcessingExceptionMapper(true));
+    environment.jersey().register(EarlyEofExceptionMapper.class);
+    environment.jersey().register(NGAccessDeniedExceptionMapper.class);
+    environment.jersey().register(WingsExceptionMapperV2.class);
+    environment.jersey().register(NotFoundExceptionMapper.class);
+    environment.jersey().register(NotAllowedExceptionMapper.class);
+  }
+
+  private void registerCorrelationFilter(Environment environment, Injector injector) {
+    environment.jersey().register(injector.getInstance(CorrelationFilter.class));
+  }
+
+  private void registerTraceFilter(Environment environment, Injector injector) {
+    environment.jersey().register(injector.getInstance(TraceFilter.class));
+  }
+
+  private void registerHttpServiceLoopDetectionFilter(CIManagerConfiguration appConfig, Environment environment,
+      LoopDetectionAndPrevention loopDetectionAndPrevention) {
+    log.info("Initializing HttpServiceLoopDetectionFilter with threshold {} and loop prevention {}",
+        loopDetectionAndPrevention.getLoopDetectionThreshold(), loopDetectionAndPrevention.isEnableLoopPrevention());
+    HttpServiceLoopDetectionFilter filterInstance = new HttpServiceLoopDetectionFilter(loopDetectionAndPrevention);
+    environment.servlets()
+        .addFilter("HttpServiceLoopDetectionFilter", filterInstance)
+        .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    environment.jersey().register(filterInstance);
+  }
+
+  private void registerMigrations(Injector injector) {
+    NGMigrationConfiguration config = getMigrationSdkConfiguration();
+    NGMigrationSdkInitHelper.initialize(injector, config);
+  }
+
+  private NGMigrationConfiguration getMigrationSdkConfiguration() {
+    return NGMigrationConfiguration.builder()
+        .microservice(Microservice.CI)
+        .migrationProviderList(new ArrayList<Class<? extends MigrationProvider>>() {
+          { add(CIManagerMigrationProvider.class); }
+        })
+        .build();
+  }
+
+  private void initializeEnforcementFramework(Injector injector) {
+    CustomRestrictionRegisterConfiguration customConfig =
+        CustomRestrictionRegisterConfiguration.builder()
+            .customRestrictionMap(
+                ImmutableMap
+                    .<FeatureRestrictionName,
+                        Class<? extends io.harness.enforcement.client.custom.CustomRestrictionInterface>>builder()
+                    .put(FeatureRestrictionName.BUILDS, BuildRestrictionUsageImpl.class)
+                    .build())
+            .build();
+    RestrictionUsageRegisterConfiguration restrictionUsageRegisterConfiguration =
+        RestrictionUsageRegisterConfiguration.builder()
+            .restrictionNameClassMap(
+                ImmutableMap.<FeatureRestrictionName, Class<? extends RestrictionUsageInterface>>builder()
+                    .put(FeatureRestrictionName.ACTIVE_COMMITTERS, CIActiveCommitterUsageImpl.class)
+                    .put(FeatureRestrictionName.MAX_TOTAL_BUILDS, TotalBuildsRestrictionUsageImpl.class)
+                    .put(FeatureRestrictionName.MAX_BUILDS_PER_MONTH, BuildsPerMonthRestrictionUsageImpl.class)
+                    .put(FeatureRestrictionName.MAX_BUILDS_PER_DAY, BuildsPerDayRestrictionUsageImpl.class)
+                    .put(FeatureRestrictionName.CACHE_SIZE_ALLOWANCE, CICacheAllowanceImpl.class)
+                    .build())
+            .build();
+    injector.getInstance(EnforcementSdkRegisterService.class)
+        .initialize(restrictionUsageRegisterConfiguration, customConfig);
+  }
+
+  private void initializeCiManagerMonitoring(CIManagerConfiguration config, Injector injector) {
+    if (BooleanUtils.isTrue(config.getEnableTelemetry())) {
+      log.info("Initializing CI Manager Monitoring");
+      injector.getInstance(CiTelemetryRecordsJob.class).scheduleTasks();
+      injector.getInstance(StoTelemetryRecordsJob.class).scheduleTasks();
+    }
+  }
+  private void initializeCiManagerDataDeletion(Injector injector) {
+    injector.getInstance(CIDataDeleteJob.class).scheduleTasks();
+  }
+
+  private void registerScopeInfoFilter(Environment environment, Injector injector) {
+    environment.jersey().getResourceConfig().register(new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bindFactory(ScopeInfoFactory.class).to(ScopeInfo.class);
+      }
+    });
+    environment.jersey().register(
+        new ScopeInfoFilter(injector.getInstance(Key.get(ScopeInfoClient.class, Names.named("PRIVILEGED")))));
+  }
+
+  private void initializePluginPublisher(Injector injector) {
+    log.info("Initializing plugin metadata publishing job");
+    injector.getInstance(PluginMetadataRecordsJob.class).scheduleTasks();
+  }
+
+  private Map<String, String> getStaticAliasesUnified() {
+    Map<String, String> aliases = new HashMap<>();
+    aliases.put("artifact", "artifacts.primary");
+    aliases.put("manifest", "manifests.primary");
+    aliases.put("infra", "stage.steps.infrastructure.output");
+    aliases.put("unified", "stage.steps.liteEngineTask.unified");
+    aliases.put(InfrastructureExecutionConstants.INFRA_KEY, "stage.steps.infrastructure.output.infrastructureKey");
+    aliases.put(InfrastructureExecutionConstants.INFRA_KEY_SHORT_ID,
+        "stage.steps.infrastructure.output.infrastructureKeyShort");
+    return aliases;
+  }
+
+  private GitSyncSdkConfiguration getGitSyncConfiguration(CIManagerConfiguration config) {
+    ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+    configureObjectMapper(objectMapper);
+    Set<GitSyncEntitiesConfiguration> gitSyncEntitiesConfigurations = new HashSet<>();
+    final GitSdkConfiguration gitSdkConfiguration = config.getGitSdkConfiguration();
+    return GitSyncSdkConfiguration.builder()
+        .grpcClientConfig(gitSdkConfiguration.getGitManagerGrpcClientConfig())
+        .grpcServerConfig(gitSdkConfiguration.getGitSdkGrpcServerConfig())
+        .deployMode(GitSyncSdkConfiguration.DeployMode.REMOTE)
+        .microservice(Microservice.CI)
+        .scmConnectionConfig(gitSdkConfiguration.getScmConnectionConfig())
+        .eventsFrameworkConfiguration(config.getEventsFrameworkConfiguration())
+        .serviceHeader(CI_MANAGER)
+        .gitSyncEntitiesConfiguration(gitSyncEntitiesConfigurations)
+        .objectMapper(objectMapper)
+        .throw424ForGITServerErrors(gitSdkConfiguration.getThrow424ForGITServerErrors())
+        .build();
+  }
+}

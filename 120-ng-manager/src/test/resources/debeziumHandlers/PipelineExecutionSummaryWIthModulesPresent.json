@@ -1,0 +1,97 @@
+{
+  "_id": "66b24bf367e460494c9061db",
+  "runSequence": 1,
+  "accountId": "OgiB4-xETamKNVAz-wQRjw",
+  "orgIdentifier": "Ng_Pipelines_K8s_Organisations",
+  "projectIdentifier": "PipelinesApiAutomationProjectAzure6XnkE68S8G",
+  "pipelineIdentifier": "NGPipeAutoNGPipeAutoyZrySFuURQId4ejHtYwSLx1Mp",
+  "planExecutionId": "bYyS1nb1TUKfDrentubOCg",
+  "name": "azurepipelinerollingrollbacktest",
+  "pipelineDeleted": false,
+  "internalStatus": "RUNNING",
+  "status": "RUNNING",
+  "executionInputConfigured": false,
+  "tags": {},
+  "labels": {},
+  "moduleInfo": {
+    "cd": {
+      "__recast": "io.harness.cdng.pipeline.executions.beans.CDPipelineModuleInfo",
+      "artifactDisplayNames": {
+        "_0": "cdpqaautomationcr.azurecr.io/server/nginx:1.0",
+        "_1": "server/nginx:1.0",
+        "_2": "1.0",
+        "_3": "20d6a917-99fa-4b1b-9b2e-a3d624e9dcf0",
+        "_4": "sha256:bb129a712c2431ecce4af8dde831e980373b26368233ef0f3b2bae9e9ec515ee",
+        "_5": "server/nginx",
+        "_6": "cdpqaautomationcr.azurecr.io",
+        "_7": "primary"
+      },
+      "envGroupIdentifiers": {},
+      "envIdentifiers": {
+        "_0": "TestEnv"
+      },
+      "environmentTypes": {
+        "_0": "PreProduction"
+      },
+      "freezeIdentifiers": {},
+      "gitOpsAppIdentifiers": {},
+      "infrastructureIdentifiers": {
+        "_0": null
+      },
+      "infrastructureNames": {
+        "_0": null
+      },
+      "infrastructureTypes": {
+        "_0": "KubernetesAzure"
+      },
+      "serviceDefinitionTypes": {
+        "_0": "Kubernetes"
+      },
+      "serviceIdentifiers": {
+        "_0": "service1"
+      }
+    }
+  },
+  "modules": {
+    "_0": "pms",
+    "_1": "cd"
+  },
+  "startingNodeId": "erkOmGj4Tv--QHDzj40o2g",
+  "executionTriggerInfo": {
+    "_serialised": "CAESVAoWZ2xZcjBHbXNSTTZsdlhYcDVhV3lVdxIJYXV0b2NkcG5nGiEKBWVtYWlsEhhhdXRvY2RwbmdAbWFpbGluYXRvci5jb20aDAoIdW5pcXVlSWQSAA==",
+    "triggerType": "MANUAL",
+    "triggeredBy": {
+      "identifier": "autocdpng",
+      "triggerIdentifier": "",
+      "uuid": "glYr0GmsRM6lvXXp5aWyUw",
+      "extraInfo": {
+        "gitUser": null,
+        "email": "autocdpng@mailinator.com"
+      }
+    }
+  },
+  "governanceMetadata": {
+    "_serialised": ""
+  },
+  "stagesExecutionMetadata": {
+    "isStagesExecution": false
+  },
+  "allowStagesExecution": false,
+  "storeType": "INLINE",
+  "startTs": 1722960883149,
+  "pipelineVersion": "0",
+  "executionMode": "NORMAL",
+  "notesExistForPlanExecutionId": false,
+  "shouldUseSimplifiedLogBaseKey": true,
+  "uniqueId": "XnjvVpFZRLmjci-uT0z-mw",
+  "validUntil": 1738858483469,
+  "parentStageInfo": {
+    "_serialised": "",
+    "hasParentPipeline": false
+  },
+  "isLatestExecution": true,
+  "createdAt": 1722960883469,
+  "lastUpdatedAt": 1722960948725,
+  "version": 11,
+  "_class": "planExecutionsSummary"
+}

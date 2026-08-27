@@ -1,0 +1,528 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.engine.executions.node.service;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.engine.executions.retry.RetryStageInfo;
+import io.harness.execution.NodeExecution;
+import io.harness.logging.UnitProgress;
+import io.harness.monitoring.ExecutionStatistics;
+import io.harness.plan.Node;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.execution.events.OrchestrationEventType;
+import io.harness.pms.data.stepparameters.PmsStepParameters;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
+@OwnedBy(PIPELINE)
+public interface NodeExecutionService {
+  /**
+   * Fetches nodeExecution and uses id Index
+   * Use this method only when all or most fields are required, like clone, graph etc
+   * @param nodeExecutionId
+   * @return
+   */
+  NodeExecution get(String nodeExecutionId);
+
+  Stream<NodeExecution> get(List<String> nodeExecutionIds);
+
+  /**
+   * Fetches nodeExecution and uses id Index
+   * @param nodeExecutionId
+   * @param fieldsToInclude
+   * @return NodeExecution with fields included as projection
+   */
+  NodeExecution getWithFieldsIncluded(String nodeExecutionId, Set<String> fieldsToInclude);
+
+  NodeExecution getWithFieldsIncludedFromSecondary(String nodeExecutionId, Set<String> fieldsToInclude);
+
+  /**
+   * Fetches nodeExecution optional and uses id Index
+   * @param nodeExecutionId
+   * @param fieldsToInclude
+   * @return Optional of NodeExecution with fields included as projection
+   */
+  Optional<NodeExecution> getOptional(String nodeExecutionId, Set<String> fieldsToInclude);
+
+  /**
+   * Get pipeline node from a given planExecutionId with projection
+   * Uses - planExecutionId_stepCategory_identifier_idx
+   * @param planExecutionId
+   * @param fields
+   * @return
+   */
+  Optional<NodeExecution> getPipelineNodeExecutionWithProjections(@NonNull String planExecutionId, Set<String> fields);
+
+  /**
+   * Fetches nodeExecution for given planExecutionId and planNodeId
+   * Uses - planExecutionId_nodeId_idx index
+   * @param planNodeUuid
+   * @param planExecutionId
+   * @return
+   */
+  NodeExecution getByPlanNodeUuid(String planNodeUuid, String planExecutionId);
+
+  /**
+   * Only allows getting nodeExecutions within max batch size, only if no projection is required
+   * Get approval before using this method, Example for all retriedNodeIds
+   * Uses id index
+   * @param nodeExecutionIds
+   * @return NodeExecutions with all properties
+   */
+  List<NodeExecution> getAll(Set<String> nodeExecutionIds);
+  List<NodeExecution> getAllWithFieldIncluded(Set<String> nodeExecutionIds, Set<String> fieldsToInclude);
+
+  Stream<NodeExecution> fetchAllNodeExecutions(String planExecutionId, Set<String> fieldsToInclude);
+
+  /**
+   * Fetches all step nodeExecutions with given projected fields, checks stepCategory should be step
+   * Check before using this method if you need all nodes or subset of nodes
+   * Uses - planExecutionId_stepCategory_identifier_idx
+   * @param planExecutionId
+   * @param fieldsToInclude
+   * @return
+   */
+  Stream<NodeExecution> fetchAllStepNodeExecutions(String planExecutionId, Set<String> fieldsToInclude);
+
+  /**
+   * Fetches all statuses for nodeExecutions for give planExecutionId and oldRetry false
+   * Uses - planExecutionId_mode_status_oldRetry_idx index
+   *
+   * @param planExecutionId
+   * @param ignoreIdentityNodes
+   * @return
+   */
+  List<Status> fetchNodeExecutionsStatusesWithoutOldRetries(String planExecutionId, boolean ignoreIdentityNodes);
+
+  /**
+   * Fetches all non-final-statuses for nodeExecutions for given planExecutionId and oldRetry false
+   * Uses - planExecutionId_mode_status_oldRetry_idx index, uses PROJECTION_COVERED
+   * @param planExecutionId
+   * @return
+   */
+  List<Status> fetchNonFlowingAndNonFinalStatuses(String planExecutionId);
+
+  /**
+   * Fetches all non-final-status NodeExecutions for given planExecutionId and oldRetry false
+   * Uses - planExecutionId_mode_status_oldRetry_idx index, uses PROJECTION_COVERED
+   * @param planExecutionId
+   * @param fieldsToInclude
+   * @return
+   */
+  List<NodeExecution> fetchWaitingStatusNodeExecutions(String planExecutionId, Set<String> fieldsToInclude);
+
+  /**
+   * Returns distinct waiting statuses for nodes within a stage, excluding specified nodes.
+   * Uses covered index — no document deserialization.
+   */
+  List<Status> fetchDistinctWaitingStatusesForStage(
+      String planExecutionId, String stageExecutionId, String excludeNodeExecutionId);
+
+  /**
+   * Returns distinct waiting statuses across the entire plan, excluding specified nodes.
+   * Uses covered index — no document deserialization.
+   */
+  List<Status> fetchDistinctWaitingStatusesForPlan(
+      String planExecutionId, String excludeNodeExecutionId, String excludeStageNodeExecutionId);
+
+  /**
+   * Returns iterator for nodeExecution without old retries without projection
+   * Uses - planExecutionId_oldRetry_idx
+   * Check before using this, as it gets all nodes without projections for a planExecutionId (Get approval)
+   * Example -> Complete Graph generation
+   * @param planExecutionId
+   * @return
+   */
+  Stream<NodeExecution> fetchNodeExecutionsWithoutOldRetriesIterator(String planExecutionId);
+
+  /**
+   * Returns iterator for nodeExecution without old retries and statusIn defined in param
+   * Uses - planExecutionId_status_idx
+   * @param planExecutionId
+   * @return
+   */
+  Stream<NodeExecution> fetchNodeExecutionsWithoutOldRetriesAndStatusInIterator(
+      String planExecutionId, EnumSet<Status> statuses, @NotNull Set<String> fieldsToInclude);
+
+  /**
+   * Returns iterator for nodeExecution without old retries for given planExecutionId
+   * Uses - planExecutionId_status_idx
+   * @param planExecutionId
+   * @return
+   */
+  Stream<NodeExecution> fetchNodeExecutionsWithoutOldRetriesIterator(
+      String planExecutionId, @NotNull Set<String> fieldsToInclude);
+
+  /**
+   * Returns iterator for children nodeExecution for given parentId(direct children only) with projection sort by
+   * CreatedAt (Desc) Uses - planExecutionId_parentId_createdAt_idx
+   * TODO(archit): Check if planExecutionId and sort is required or not
+   * @param planExecutionId
+   * @param parentId
+   * @param fieldsToBeIncluded
+   * @return
+   */
+  Stream<NodeExecution> fetchChildrenNodeExecutionsIterator(
+      String planExecutionId, String parentId, Set<String> fieldsToBeIncluded);
+
+  /**
+   * Returns iterator for children nodeExecution for given parentId(direct children only) with projection sort by
+   * CreatedAt (Desc) Uses - planExecutionId_parentId_createdAt_idx
+   * TODO(archit): Check if planExecutionId and sort is required or not
+   * @param planExecutionId
+   * @param parentId
+   * @param fieldsToBeIncluded
+   * @return
+   */
+  Stream<NodeExecution> fetchChildrenNodeExecutionsIterator(
+      String planExecutionId, String parentId, Direction sortOrderOfCreatedAt, Set<String> fieldsToBeIncluded);
+
+  /**
+   * Returns List for all children nodeExecution for given parentId recursively with oldRetry as false
+   * without projection from secondary, sort by CreatedAt (Asc) Uses - planExecutionId_parentId_createdAt_idx
+   * @param planExecutionId
+   * @param parentIds
+   * @return
+   */
+  List<NodeExecution> fetchChildrenNodeExecutionsRecursivelyFromGivenParentIdWithoutOldRetries(
+      String planExecutionId, List<String> parentIds);
+
+  /**
+   * Returns iterator for children nodeExecution for given parentId(direct children only) with projection (No Sort, thus
+   * default db sort) Uses - parentId_status_idx
+   * @param parentId
+   * @param fieldsToBeIncluded
+   * @return
+   */
+  Stream<NodeExecution> fetchChildrenNodeExecutionsIterator(String parentId, Set<String> fieldsToBeIncluded);
+
+  /**
+   * Fetches all nodes with given status with fieldsToBeIncluded as projections from analytics node
+   * Uses - status_idx index
+   * @param statuses
+   * @param fieldsToBeIncluded
+   * @return
+   */
+  Stream<NodeExecution> fetchAllNodeExecutionsByStatusIteratorFromAnalytics(
+      EnumSet<Status> statuses, Set<String> fieldsToBeIncluded);
+
+  /**
+   * Count number of nodeExecutions for given parentId(direct children only) and statuses for those nodeExecutions
+   * Uses - parentId_status_idx
+   * @param parentId
+   * @param flowingStatuses
+   * @return
+   */
+  long findCountByParentIdAndStatusIn(String parentId, Set<Status> flowingStatuses);
+
+  /**
+   * Returns children executions (including grandchildren) for given parentId
+   * Note: nodeExecution should atleast have parentId projected fields
+   * Doesn't make any DB calls
+   *
+   * @param parentId
+   * @param includeParent
+   * @param finalList                 -> it contains the result from allExecutions
+   * @param allExecutions
+   * @param includeChildrenOfStrategy
+   * @return
+   */
+  List<NodeExecution> extractChildExecutions(String parentId, boolean includeParent, List<NodeExecution> finalList,
+      List<NodeExecution> allExecutions, boolean includeChildrenOfStrategy);
+
+  // stepType, parentId and Status are already included into projections
+
+  /**
+   * Internally uses pagination to get all children of given planExecutionId
+   * Apart from fieldsTobeIncluded, NodeProjectionUtils.fieldsForAllChildrenExtractor fields are already in projection
+   * Uses - planExecutionId_status_idx index
+   *
+   * @param planExecutionId
+   * @param parentId
+   * @param statuses
+   * @param includeParent
+   * @param fieldsToBeIncluded
+   * @param includeChildrenOfStrategy
+   * @return all children(including grandchildren) in given planExecutionId and of parentId having one of the statuses
+   */
+  List<NodeExecution> findAllChildrenWithStatusInAndWithoutOldRetries(String planExecutionId, String parentId,
+      EnumSet<Status> statuses, boolean includeParent, Set<String> fieldsToBeIncluded,
+      boolean includeChildrenOfStrategy);
+
+  List<NodeExecution> findAllChildrenWithStatusInAndWithoutOldRetriesV2(
+      String planExecutionId, String parentId, EnumSet<Status> statuses, boolean includeChildrenOfStrategy);
+
+  /**
+   * Note: It depends upon findAllChildrenWithStatusInAndWithoutOldRetries
+   * Thus only NodeProjectionUtils.fieldsForAllChildrenExtractor fields are in projection
+   * @param planExecutionId
+   * @param parentId
+   * @param includeParent
+   * @return all children(including grandchildren) in given planExecutionId and of parentId for all statuses
+   */
+  default List<NodeExecution> findAllChildrenOnlyIds(String planExecutionId, String parentId, boolean includeParent) {
+    return findAllChildrenWithStatusInAndWithoutOldRetries(
+        planExecutionId, parentId, EnumSet.noneOf(Status.class), includeParent, new HashSet<>(), false);
+  }
+
+  /**
+   * Creates NodeExecution for given value, and sends orchestrationLog event of type NodeExecutionStart and
+   * OrchestrationEvent of type NodeExecutionStart
+   * @param nodeExecution
+   * @return
+   */
+  NodeExecution save(NodeExecution nodeExecution);
+
+  /**
+   * Save a collection nodeExecutions.
+   * This does not send any orchestration event nor orchestration log event . So if you want to do graph update
+   * operations on NodeExecution save, then use the above save() method.
+   * @param nodeExecutions
+   * @return
+   */
+  List<NodeExecution> saveAll(Collection<NodeExecution> nodeExecutions);
+
+  /**
+   * Use this method to update nodeExecution, it will return new NodeExecution after update
+   * Get approval before this, as it will return all fields in return value
+   * It will also send OrchestrationLogEvent if any set field contains GRAPH_FIELDS in NodeExecutionServiceImpl
+   * Example -> retry node or clone nodes or processAdviserResponse where different impl may require different fields
+   * @param nodeExecutionId
+   * @param ops
+   * @return
+   */
+  NodeExecution update(@NonNull String nodeExecutionId, @NonNull Consumer<Update> ops);
+
+  /**
+   * Use this method to update nodeExecution, it will return new NodeExecution after update
+   * Projection fields cannot be empty, else it throws exception
+   * It will also send OrchestrationLogEvent if any set field contains GRAPH_FIELDS in NodeExecutionServiceImpl
+   * @param nodeExecutionId
+   * @param ops
+   * @param fieldsToBeIncluded
+   * @return
+   */
+  NodeExecution update(
+      @NonNull String nodeExecutionId, @NonNull Consumer<Update> ops, @NonNull Set<String> fieldsToBeIncluded);
+
+  /**
+   * NodeExecution update with ops, use this if returned value is not required
+   * It will also send OrchestrationLogEvent if any set field contains GRAPH_FIELDS in NodeExecutionServiceImpl
+   * Get approval before using this method.
+   * Use {@link #updateV2ForNonFinalStatusNodeExecution} if node should only be updated if in non-final status
+   * @param nodeExecutionId
+   * @param ops
+   */
+  void updateV2(@NonNull String nodeExecutionId, @NonNull Consumer<Update> ops);
+
+  /**
+   * NodeExecution update with ops, use this if returned value is not required
+   * This will only update the node execution if it is in non-final state
+   * It will also send OrchestrationLogEvent if any set field contains GRAPH_FIELDS in NodeExecutionServiceImpl
+   * Get approval before using this method
+   * @param nodeExecutionId
+   * @param ops
+   */
+  void updateV2ForNonFinalStatusNodeExecution(@NonNull String nodeExecutionId, @NonNull Consumer<Update> ops);
+
+  /**
+   * Sets unitProgresses only when the given timestamp is at least as new as what's persisted, dropping
+   * stale/out-of-order snapshots. Sends OrchestrationLogEvent like updateV2, since unitProgresses is a GRAPH_FIELD.
+   */
+  void updateUnitProgressesIfNewer(
+      @NonNull String nodeExecutionId, @NonNull List<UnitProgress> unitProgresses, long timestamp);
+
+  /**
+   * Shared timestamp fence for every unit-progress writing path: applies {@code payloadOps} and stamps
+   * {@code unitProgressesTimestamp} only when the timestamp is at least as new as what's persisted and the node is
+   * not yet in a final status; otherwise a silent no-op. Inclusive ({@code >=}) so the two paths sharing one
+   * snapshot's token both land.
+   */
+  void updateWithUnitProgressTimestampFence(
+      @NonNull String nodeExecutionId, long timestamp, @NonNull Consumer<Update> payloadOps);
+
+  /**
+   * Use this method while updating statuses. This guarantees we are hopping from correct statuses.
+   * As we don't have transactions it is possible that your node execution state is manipulated by some other thread and
+   * your transition is no longer valid.
+   * Like your workflow is aborted but some other thread try to set it to running. Same logic applied to plan execution
+   * status as well
+   */
+  NodeExecution updateStatusWithOps(@NonNull String nodeExecutionId, @NonNull Status targetStatus, Consumer<Update> ops,
+      EnumSet<Status> overrideStatusSet);
+
+  void updateCalculatedStatusForParentStageNode(Ambiance ambiance, List<NodeExecution> allNonFlowingNodeExecutions);
+  /**
+   * Mark the given nodeExecutionIds to status as discontinuing
+   * @param leafInstanceIds
+   * @return
+   */
+  long markLeavesDiscontinuing(List<String> leafInstanceIds);
+
+  /**
+   * Mark all leaf nodes in given status and oldRetry false or all nodes in status [INPUT_WAITING , QUEUED]
+   * as Discontinuing
+   * Uses - planExecutionId_status_idx
+   * @param planExecutionId
+   * @param statuses
+   * @return
+   */
+  long markAllLeavesAndQueuedNodesDiscontinuing(String planExecutionId, EnumSet<Status> statuses);
+
+  /**
+   * Mark all finalizable nodes in StatusUtils.finalizableStatues and oldRetry false as Discontinuing
+   * Uses - planExecutionId_status_idx
+   * @param planExecutionId
+   * @return
+   */
+  long markAllFinalizableNodesDiscontinuing(String planExecutionId);
+
+  /**
+   * Update the old execution -> set oldRetry flag set to true
+   * It also sends OrchestrationLogEvent for NodeUpdate
+   * @param nodeExecutionId Id of Failed Node Execution
+   */
+  boolean markRetried(String nodeExecutionId);
+
+  /**
+   * Update the old step group node execution and its children -> set oldRetry flag set to true
+   * It also sends OrchestrationLogEvent for NodeUpdate
+   * @param nodeExecutionId Id of Failed StepGroup Node Execution
+   */
+  boolean markCurrentNodeExecutionAndChildrenRetried(String nodeExecutionId, String planExecutionId);
+
+  /**
+   * Deletes the nodeExecutions and its related metadata
+   * @param planExecutionIds Ids of to be deleted planExecution
+   */
+  void deleteAllNodeExecutionAndMetadata(Set<String> planExecutionIds);
+
+  /**
+   * Updates TTL the nodeExecutions and its related metadata
+   * @param planExecutionId Id of to be deleted planExecution
+   */
+  void updateTTLForNodeExecution(String planExecutionId, Date ttlExpiryDate);
+
+  /**
+   * Update Nodes for which the previousId was failed node execution and replace it with the
+   * note execution which is being retried
+   * Uses - previous_id_idx
+   * @param nodeExecutionId Old nodeExecutionId
+   * @param newNodeExecutionId Id of new retry node execution
+   */
+  boolean updateRelationShipsForRetryNode(String nodeExecutionId, String newNodeExecutionId);
+
+  /**
+   * Mark all the activeStatuses nodes in given planExecutionId as ERRORED
+   * Uses - planExecutionId_status_idx
+   * @param planExecutionId
+   * @return
+   */
+  boolean errorOutActiveNodes(String planExecutionId);
+
+  /**
+   * Emit orchestration event to for the node and event type
+   * @param nodeExecution - event related node execution
+   * @param orchestrationEventType - event type
+   * @param bakfill - is backfill event
+   */
+  void emitEvent(NodeExecution nodeExecution, OrchestrationEventType orchestrationEventType, boolean bakfill);
+
+  // TODO(Projection): Make it paginated, and projection, in retry flow
+  // Todo(Sahil): Remove usages of this function and useV2 instead
+  List<RetryStageInfo> getStageDetailFromPlanExecutionId(String planExecutionId, String pipelineVersion);
+
+  // TODO(Projection): Make it paginated, and projection, in retry flow
+  List<RetryStageInfo> getStageDetailFromPlanExecutionIdV2(String planExecutionId);
+
+  List<NodeExecution> fetchStageExecutions(String planExecutionId);
+
+  List<NodeExecution> fetchStageExecutionsV2(String planExecutionId);
+
+  List<NodeExecution> fetchStageExecutionsWithProjection(String planExecutionId, Set<String> fieldsToBeIncluded);
+
+  /**
+   * Bulk read STAGE NodeExecutions across multiple plan executions with
+   * {@code (planExecutionId IN, stepCategory == STAGE, identifier IN, oldRetry == false)}.
+   * Hits planExecutionId_stepCategory_identifier_idx. Sort by createdAt DESC is the M6 tiebreak —
+   * PMS retry insert + oldRetry flip are non-atomic, so the new attempt has the larger createdAt.
+   * Used by the Stage Queue priority-update path to resolve (planExecutionId, stageIdentifier)
+   * selectors back to a current NodeExecution.uuid.
+   */
+  List<NodeExecution> findCurrentStageAttempts(Set<String> planExecutionIds, Set<String> stageIdentifiers);
+
+  // TODO(Projection): Make it paginated, and projection, in retry flow
+  List<NodeExecution> fetchStrategyNodeExecutions(String planExecutionId, List<String> stageFQNs);
+
+  // TODO(Projection): Make it paginated, and projection, in retry flow
+  List<String> fetchStageFqnFromStageIdentifiers(String planExecutionId, List<String> stageIdentifiers);
+
+  // TODO(Projection): Make it paginated, and projection, in retry flow
+  Map<String, Node> mapNodeExecutionIdWithPlanNodeForGivenStageFQN(String planExecutionId, List<String> stageFQNs);
+
+  // TODO(Projection): Make it paginated, has projection
+  List<NodeExecution> fetchStageExecutionsWithEndTsAndStatusProjection(String planExecutionId);
+
+  Stream<NodeExecution> fetchNodeExecutionsForGivenStageFQNs(
+      String planExecutionId, List<String> stageFQNs, Collection<String> requiredFields);
+
+  NodeExecution fetchNodeExecutionForPlanNodeAndRetriedId(
+      String planExecutionId, String planNode, boolean oldRetry, List<String> retriedId);
+
+  Stream<NodeExecution> fetchAllLeavesUsingPlanExecutionId(String planExecutionId, Set<String> fieldsToBeIncluded);
+
+  Stream<NodeExecution> fetchAllNodeExecutionsByPlanExecutionIdLastUpdatedAtGT(
+      String planExecutionId, Long lastUpdatedAt);
+
+  Stream<NodeExecution> fetchAllNodeExecutionsByPlanExecutionIdLastUpdatedAtGTFromSecondary(
+      String planExecutionId, Long lastUpdatedAt);
+
+  boolean checkIfUnprocessedNodeExecutionsForPlanExecutionId(String planExecutionId, Long lastUpdatedAt);
+
+  ExecutionStatistics aggregateRunningNodeExecutionsCount();
+
+  Ambiance getAmbiance(NodeExecution nodeExecution);
+
+  /**
+   *
+   * @param nodeExecutions List of nodeExecutions for which we want to fetch the ambiances list
+   * @return Returns the ambiance list corresponding to the given nodeExecutions. All the nodeExecutions must belong to
+   *     the same planExecution.
+   */
+  List<Ambiance> getAmbiances(List<NodeExecution> nodeExecutions);
+  void markNodesProcessing(List<String> nodeExecutionIds, boolean processing);
+
+  List<String> fetchListOfApprovalInstanceIdsForPlanExecutionId(String planExecutionId);
+
+  PmsStepParameters getResolvedStepInputs(List<String> stepInputsKeyExclude, PmsStepParameters resolvedParameters);
+
+  long getCountOfLeafStepsWithGivenStatuses(String planExecutionId, Set<Status> statuses);
+
+  NodeExecution updateUsingQuery(Query query, Update update);
+}

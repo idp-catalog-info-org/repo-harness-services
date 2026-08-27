@@ -1,0 +1,36 @@
+identifier: harness-iacm
+name: Harness Infrastructure as Code Management
+description: This plugin provides an overview of all the resources provisioned through information on active workspaces in your account.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: harness.io
+category: Infrastructure
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-iacm#harness-iacm-plugin
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-iacm
+config: |-
+  proxy:
+    endpoints:
+      '/harness/prod':
+        target: 'https://app.harness.io/'
+        pathRewrite:
+          '/api/proxy/harness/prod/?': '/'
+        allowedHeaders:
+          - authorization
+          - Harness-Account
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityIacmContent
+      addByDefault: true
+      defaultRoute: /harness-iacm
+      layoutSchemaSpecs:
+        name: EntityIacmContent
+        title: Harness IACM
+        contents:
+          - component: EntityIacmContent

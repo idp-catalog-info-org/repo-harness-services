@@ -1,0 +1,27 @@
+{
+  "phases": {
+    "hot": {
+      "actions": {
+        "rollover": {
+          "max_age": "31d",
+          "max_primary_shard_size": "30gb"
+        }
+      }
+    },
+    "warm": {
+      "min_age": "217d",
+      "actions": {}
+    },
+    "cold": {
+      "min_age": "403d",
+      "actions": {}
+    },
+    "delete": {
+      "min_age": "775d",
+      "actions": {
+        "delete": {
+        }
+      }
+    }
+  }
+}

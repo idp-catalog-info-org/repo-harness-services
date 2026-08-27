@@ -1,0 +1,6 @@
+name: IDP Service Dropwizard Metrics Group per resource method
+identifier: IdpServiceDwResourcesMetricsGroup
+labels:
+  - method
+  - resource
+  - container

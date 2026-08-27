@@ -1,0 +1,74 @@
+# Copyright 2025 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/utils/ci:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/steps:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/steps/executable:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/steps/matrix:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/execution:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/plancreator:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/plancreator/steps:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/plancreator/steps/pluginstep:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/runner/request/builder:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/steps/container:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/steps/container/execution:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/steps/plugin:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/steps/plugin/infrastructure:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/sdk/core/adviser:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/timeout:module",
+        "//910-delegate-service-driver/src/main/java/io/harness/beans:module",
+        "//920-delegate-service-beans/src/main/proto:920_delegate_service_beans_java_proto",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/ci:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/ci/k8s:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/ci/pod:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/helper:module",
+        "//951-delegate-task-commons/src/main/java/io/harness/delegate/beans:module",
+        "//951-delegate-task-commons/src/main/java/software/wings/beans:module",
+        "//953-yaml-commons/src/main/java/io/harness/plancreator/execution:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/sdk/core/steps/io:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/core/failurestrategy/action:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//959-common-entities/src/main/java/io/harness/beans:module",
+        "//959-timeout-engine/src/main/java/io/harness/timeout/trackers/absolute:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//970-ng-commons/src/main/java/io/harness/utils:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/encryption:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/serializer:module",
+        "//980-commons/src/main/java/io/harness/supplier:module",
+        "//980-commons/src/main/java/io/harness/tasks:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/pipeline/variables:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/plancreator/steps/internal:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/steps/plugin:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/container:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/container/utils:module",
+        "//pipeline-service/modules/orchestration/contracts/src/main/java/io/harness/steps:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_google_protobuf_protobuf_java",
+        "@maven//:com_intellij_annotations",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

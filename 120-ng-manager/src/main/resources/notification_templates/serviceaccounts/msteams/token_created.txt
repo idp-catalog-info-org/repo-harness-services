@@ -1,0 +1,44 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#00FF00",
+  "summary": "Token created — ${TOKEN_IDENTIFIER}",
+  "sections": [
+    {
+      "activityTitle": "A new token ${TOKEN_IDENTIFIER} was created for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME}",
+      "facts": [
+        {
+          "name": "Expires",
+          "value": "${EXPIRY_DATE}"
+        },
+        {
+          "name": "Token Identifier",
+          "value": "${TOKEN_IDENTIFIER}"
+        },
+        {
+          "name": "API Key Identifier",
+          "value": "${API_KEY_IDENTIFIER}"
+        },
+        {
+          "name": "Service Account",
+          "value": "${SERVICE_ACCOUNT_NAME}"
+        },
+        {
+          "name": "Account Name",
+          "value": "${ACCOUNT_NAME}"
+        },
+        {
+          "name": "Account ID",
+          "value": "${ACCOUNT_IDENTIFIER}"
+        },
+        {
+          "name": "Organization",
+          "value": "${ORG_IDENTIFIER}"
+        },
+        {
+          "name": "Project",
+          "value": "${PROJECT_IDENTIFIER}"
+        }
+      ]
+    }
+  ]
+}

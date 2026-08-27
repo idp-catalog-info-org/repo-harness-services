@@ -1,0 +1,19 @@
+pipeline:
+  stages:
+    - name: stage_1
+      steps:
+        - name: run_1
+          run:
+            script: |-
+              echo "ok"
+              echo $var1
+              exit 1
+            shell: sh
+            env:
+              var1: abc
+            user: 0
+            container:
+              image: nginx
+              connector: account.harnessImage
+  repo:
+    connector: account.GitHub

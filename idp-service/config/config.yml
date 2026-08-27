@@ -1,0 +1,1367 @@
+mongo:
+  uri: mongodb://localhost:27017/idp-harness
+  connectTimeout: 30000
+  serverSelectionTimeout: 90000
+  socketTimeout: 360000
+  maxConnectionIdleTime: 600000
+  connectionsPerHost: 300
+  indexManagerMode: AUTO
+  transactionsEnabled: false
+  aliasDBName: idp-harness
+  traceMode: DISABLED
+  maxOperationTimeInMillis: 300000
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 12003
+      maxRequestHeaderSize: 100KiB
+  adminConnectors:
+    - type: http
+      port: 12004
+  requestLog:
+    appenders: []
+  maxThreads: 1024
+
+eventsFramework:
+  shouldUseKafka: ${PMS_SDK_EVENTS_USE_KAFKA:-false}
+  redis:
+    sentinel: false
+    masterName: "test"
+    redisUrl: "redis://localhost:6379"
+    sentinelUrls:
+      - "redis://redis1:26379"
+      - "redis://redis2:26379"
+      - "redis://redis3:26379"
+    envNamespace: ""
+    readMode: MASTER
+    nettyThreads: 16
+    useScriptCache: true
+    userName: ""
+    password: ""
+    sslConfig:
+      enabled: false
+      CATrustStorePath: "/tmp/ca_trust_store"
+      CATrustStorePassword: ""
+    cleanUpKeysAmount: ${PMS_REDIS_CACHE_CLEANUP_KEYS_AMOUNT:-1000}
+    maxCleanupDelay: ${PMS_REDIS_CACHE_CLEANUP_MAX_DELAY_SECONDS:-60}
+
+redisLockConfig:
+  sentinel: false
+  masterName: "test"
+  redisUrl: "redis://localhost:6379"
+  sentinelUrls:
+    - "redis://redis1:26379"
+    - "redis://redis2:26379"
+    - "redis://redis3:26379"
+  envNamespace: ""
+  readMode: MASTER
+  nettyThreads: 16
+  useScriptCache: true
+  userName: ""
+  password: ""
+
+pmsSdkGrpcServerConfig:
+  connectors:
+    - port: 12501
+      maxConnectionAgeSeconds: ${GRPC_MAX_CONNECTION_AGE:-0}
+
+pmsGrpcClientConfig:
+  target: localhost:12011
+  authority: localhost
+
+shouldConfigureWithPMS: ${SHOULD_CONFIGURE_WITH_PMS:-false}
+
+gitSdkConfiguration:
+  gitSdkGrpcServerConfig:
+    connectors:
+      - port: 16002
+  gitManagerGrpcClientConfig:
+    target: localhost:13002
+    authority: localhost
+  scmConnectionConfig:
+    url: localhost:8091
+  throw424ForGITServerErrors: ${THROW_424_FOR_GIT_SERVER_ERRORS:-false}
+
+gitAwareEntityHelperPoolConfig:
+  corePoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_CORE_SIZE:-3}
+  maxPoolSize: ${GIT_AWARE_ENTITY_HELPER_POOL_MAX_SIZE:-10}
+  idleTime: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME:-10}
+  timeUnit: ${GIT_AWARE_ENTITY_HELPER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+cacheConfig:
+  cacheBackend: REDIS
+  cacheNamespace: ""
+  disabledCaches: [ ]
+  enterpriseCacheEnabled: true
+
+logging:
+  level: INFO
+  loggers:
+    org.glassfish.jersey: WARN
+    allbegray.slack: WARN
+    org.glassfish.jersey.server.ServerRuntime.Responder: "OFF"
+  appenders:
+    - type: console
+      threshold: TRACE
+      target: STDOUT
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+    - type: gke-console
+      threshold: TRACE
+      target: STDOUT
+      stackdriverLogEnabled: false
+    - type: file
+      threshold: TRACE
+      currentLogFilename: ${LOG_FILENAME:-/opt/harness/logs/pod.log}
+      archive: true
+      archivedLogFilenamePattern: /opt/harness/logs/pod.%d{yyyy-MM-dd}.%i.log
+      archivedFileCount: ${LOG_MAX_FILE_COUNT:-10}
+      maxFileSize: ${LOG_MAX_FILE_SIZE:-50MB}
+      totalSizeCap: ${LOG_TOTAL_FILE_SIZE_CAP:-1GB}
+      logFormat: "%date{ISO8601} %green([%thread]) %highlight(%-5level) %cyan(%logger) - %msg %yellow(%replace(%mdc){'(.+)', '[$1]'}) %n"
+
+
+distributedLockImplementation: REDIS
+
+logStreamingServiceConfig:
+  baseUrl: http://localhost:8079
+  serviceToken: token
+
+ngManagerServiceHttpClientConfig:
+  baseUrl: http://localhost:7457/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsClientConfig:
+  baseUrl: ${RHS_CLIENT_BASE_URL:-http://localhost:9009/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+rhsEnabled: ${RHS_ENABLED:-false}
+
+scsClientConfig:
+  baseUrl: ${SCS_CLIENT_BASE_URL:-http://localhost:7457/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+scsCutoverEnabled: ${SCS_CUTOVER_ENABLED:-false}
+
+platformConfigServiceEnabled: ${PLATFORM_CONFIG_SERVICE_ENABLED:-false}
+platformConfigServiceClientConfig:
+  baseUrl: ${PLATFORM_CONFIG_SERVICE_CLIENT_BASE_URL:-http://localhost:9010/}
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+platformConfigServiceSecret: ${PLATFORM_CONFIG_SERVICE_SECRET:-dummyPlatformConfigServiceSecret}
+
+managerClientConfig:
+  baseUrl: http://localhost:3457/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+backstageHttpClientConfig:
+  baseUrl: http://localhost:7007/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+idpAgentHttpClientConfig:
+  baseUrl: http://localhost:8000/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+ngManagerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+scsServiceSecret: ${SCS_SERVICE_SECRET:-dummyScsServiceSecret}
+rhsServiceSecret: ${RESOURCE_HIERARCHY_SERVICE_SECRET:-"dummyRhsServiceSecret"}
+managerServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+backstageServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+idpServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+jwtAuthSecret: dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq
+jwtIdentityServiceSecret: HVSKUYqD4e5Rxu12hFDdCJKGM64sxgEynvdDhaOHaTHhwwn0K4Ttr0uoOxSsEVYNrUU=
+idpEncryptionSecret: q7YdsdUoXTit5nqdBR1LdKQXE3beIGE6yiseIPM1WKg_iFE5C4oRxi1_Ao6XcKZvhCbtgZQliOkUO1cu
+pipelineServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+jwtExternalServiceSecret: nhUmut2NMcUnsR01OgOz0e51MZ51AqUwrOATJ3fJ
+idpAutomationGitHubToken: IDP_AUTOMATION_GITHUB_TOKEN
+idpAutomationXApiKey: IDP_AUTOMATION_X_API_KEY
+
+workflowLibraryConfig:
+  accountIdentifier: ${WORKFLOW_LIBRARY_ACCOUNT_ID:-l7B_kbSEQD2wjrM7PShm5w}
+  orgIdentifier: ${WORKFLOW_LIBRARY_ORG_ID:-PROD}
+  projectIdentifier: ${WORKFLOW_LIBRARY_PROJECT_ID:-Harness_Commons}
+  repoIdentifier: ${WORKFLOW_LIBRARY_REPO_ID:-ootbWorkflowLibrary}
+  branch: ${WORKFLOW_LIBRARY_BRANCH:-main}
+  apiUrl: ${WORKFLOW_LIBRARY_API_URL:-https://harness0.harness.io/gateway/code}
+  gitBaseUrl: ${WORKFLOW_LIBRARY_GIT_BASE_URL:-https://git0.harness.io}
+  serviceAccountToken: ${WORKFLOW_LIBRARY_SERVICE_ACCOUNT_TOKEN:-}
+
+managerTarget: localhost:9879
+managerAuthority: localhost
+
+onboardingModuleConfig:
+  descriptionForEntitySelected: A YAML file will be created for each service inside your Git repository. An example of what the files will look like is shown below
+  descriptionForSampleEntity: Because you didn't choose any Harness services to import in the previous step, an example Harness service catalog-info.yaml will be created inside your Git repository as shown below
+  useGitServiceGrpcForSingleEntityPush: true
+  tmpPathForCatalogInfoYamlStore: /tmp/idp-catalog-onboarding
+  catalogInfoLocationDefaultPath: /.harness-idp-entities
+  harnessCiCdAnnotations:
+    projectUrl: https://localhost:8181/ng/account/accountIdentifier/home/orgs/orgIdentifier/projects/projectIdentifier/details
+    serviceUrl: https://localhost:8181/ng/account/accountIdentifier/cd/orgs/orgIdentifier/projects/projectIdentifier/services/serviceIdentifier
+
+onboardingModuleV2Config:
+  descriptionForSampleCatalogInfoDef: Because you didn't choose any Harness services to import in the previous step, an example service sample-catalog-info.yaml will be created inside your Git repository as shown below
+  descriptionForActualCatalogInfoDef: A YAML file will be created for each service inside your Git repository. An example of what the files will look like is shown below
+
+accessControlClient:
+  enableAccessControl: false
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+idpAppConfig:
+  failoverSync:
+    enabled: false
+    threadCount: 1
+  podLabel: ""
+  apiBasedRestart: ${IDP_UI_API_BASED_RESTART:-false}
+  primary:
+    eksAuth:
+      enabled: false
+      clusterName: "dummy"
+      region: ""
+    workloadIdentity:
+      enabled: false
+      project: "dummy"
+      location: "dummy"
+      cluster: "dummy"
+    masterUrl: "dummy"
+    token: "dummy"
+    caCrt: "dummy"
+  failover:
+    eksAuth:
+      enabled: false
+      clusterName: "dummy"
+      region: ""
+    workloadIdentity:
+      enabled: false
+      project: "dummy"
+      location: "dummy"
+      cluster: "dummy"
+    masterUrl: "dummy"
+    token: "dummy"
+    caCrt: "dummy"
+
+backstageEntitiesFetchLimit: 1000
+
+provisionModuleConfig:
+  triggerPipelineUrl: ""
+
+env: "local"
+base: "http://localhost:12003"
+proxyEndPointEnv: "local"
+devSpaceDefaultBackstageNamespace: "envSpecific"
+devSpaceDefaultAccountId: "envSpecific"
+
+backstageAppBaseUrl: https://localhost:3000
+backstagePostgresHost: ""
+
+delegateSelectorsCacheMode: redis # in-memory or redis
+
+proxyAllowList:
+  services:
+    manager:
+      proxyPath: v1/idp-proxy-service/manager
+      clientConfig:
+        baseUrl: http://localhost:3457/api/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+      allowList:
+        - /users/validate-support-user
+        - /ng/accounts/feature-flag-enabled
+    ng-manager:
+      proxyPath: v1/idp-proxy-service/ng-manager
+      clientConfig:
+        baseUrl: http://localhost:7457/
+        connectTimeOutSeconds: 15
+        readTimeOutSeconds: 15
+      secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+      allowList:
+        - /user/aggregate
+        - /aggregate/acl/usergroups
+        - /token/validate
+        - /v2/secrets/[^/]+/decrypt
+      shouldEncryptResponseList:
+        - /v2/secrets/[^/]+/decrypt
+
+shouldConfigureWithNotification: ${SHOULD_CONFIGURE_WITH_NOTIFICATION:-false}
+
+notificationClient:
+  messageBroker:
+    type: MONGO
+    uri: mongodb://localhost:27017/notification
+    connectTimeout: 30000
+    serverSelectionTimeout: 90000
+    socketTimeout: 360000
+    maxConnectionIdleTime: 600000
+    connectionsPerHost: 300
+  httpClient:
+    baseUrl: http://localhost:9005/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+  secrets:
+    notificationClientSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+notificationConfigs:
+  pluginRequestsNotificationSlack: https://hooks.slack.com/services/dummy/dummy/dummy
+  catalogEntitiesVerificationNotificationSlack: https://hooks.slack.com/services/dummy/dummy/dummy
+
+pipelineServiceClientConfig:
+  baseUrl: http://localhost:12001/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+iteratorsConfig:
+  scorecardScoreComputation:
+    threadPoolCount: 5
+    enabled: false
+    targetIntervalInSeconds: 43200 #12 hours in seconds
+  backstageEnvVariablesSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  backstagePermissionsSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  configPurge:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 604800 #7 days in seconds
+  licenseUsageCount:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  scaffolderTasksSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 30 #30 seconds
+  userSync:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 60
+  telemetryRecords:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  onboardingFlow:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 60
+  marketPlacePluginsSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 2592000 #1 month in seconds
+  statsComputationSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  activeDevelopersSync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  scorecardStatsComputation:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  idpToHarnessEntities:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 300 #5 minutes in seconds
+  harnessToIDPUserGroupSync:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 1800 #30 minutes in seconds
+  catalogEntitiesVerification:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 86400 #24 hours in seconds
+  apiEndpointRefresh:
+    enabled: ${API_ENDPOINT_REFRESH_ITERATOR_ENABLED:-true}
+    targetIntervalInSeconds: ${API_ENDPOINT_REFRESH_ITERATOR_TARGET_INTERVAL_IN_SECONDS:-1800} #30 minutes in seconds
+    # Must stay > targetIntervalInSeconds (else the same entities are re-processed back-to-back).
+    recencyWindowInSeconds: ${API_ENDPOINT_REFRESH_RECENCY_WINDOW_IN_SECONDS:-21600} #6 hours in seconds
+    maxEntitiesPerFire: ${API_ENDPOINT_REFRESH_MAX_ENTITIES_PER_FIRE:-1000}
+    pageSize: ${API_ENDPOINT_REFRESH_PAGE_SIZE:-1000}
+    parallelism: ${API_ENDPOINT_REFRESH_PARALLELISM:-5}
+  scopeTopologyCacheRebuild:
+    threadPoolCount: ${SCOPE_TOPOLOGY_CACHE_REBUILD_ITERATOR_THREAD_POOL_COUNT:-1}
+    enabled: ${SCOPE_TOPOLOGY_CACHE_REBUILD_ITERATOR_ENABLED:-true}
+    targetIntervalInSeconds: ${SCOPE_TOPOLOGY_CACHE_REBUILD_ITERATOR_TARGET_INTERVAL_IN_SECONDS:-14400} #4 hours in seconds
+  modifyEntityIdentifierInDependentsForIdpV2:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 30 #30 seconds
+  modifyDefaultToAccountNamespaceInBackstageForIdpV2:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 30 #30 seconds
+  modifyWorkflowFormContextDataForIdpV2:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 30 #30 seconds
+  migrateEntityScopeForIdpV2:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 30 #30 seconds
+  aggregationRulesComputation:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 43200 #12 hours in seconds
+  populateQueryableEntityRefInCatalogForIdpV2:
+    threadPoolCount: 1
+    enabled: false
+    targetIntervalInSeconds: 30 #30 seconds
+  relationshipRetry:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 180 #3 minutes
+  workflowLibrarySync:
+    threadPoolCount: 1
+    enabled: true
+    targetIntervalInSeconds: 1800 #30 minutes
+  notifyResponse:
+    threadPoolSize: ${NOTIFY_RESPONSES_THREAD_POOL_SIZE:-2}
+    enabled: ${ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG:-false}
+    targetIntervalInSeconds: 300
+    threadPoolIntervalInSeconds: ${NOTIFY_RESPONSES_ITERATOR_THREAD_INTERVAL:-1}
+    redisLockTimeout: 10
+    redisBatchSize: ${NOTIFY_RESPONSES_ITERATOR_REDIS_BATCH_SIZE:-50}
+    threadSleepIntervalMs: ${NOTIFY_RESPONSES_ITERATOR_THREAD_SLEEP_INTERVAL:-500}
+
+enableDelegateResponseCleanupIterator: ${ENABLE_DELEGATE_RESPONSE_CLEANER:-false}
+
+enableWaitNotifyEngineOptimisation: ${ENABLE_WAIT_NOTIFY_OPTIMISATION:-false}
+
+dslClientConfig:
+  connectTimeOutSeconds: 10
+  readTimeOutSeconds: 20
+  writeTimeOutSeconds: 10
+
+tiServiceConfig:
+  internalUrl: ""
+  baseUrl: http://localhost:8078
+  globalToken: "78d16b66-4b4c-11eb-8377-acde48001122"
+
+coverageServiceConfig:
+  baseUrl: ${COVERAGE_SERVICE_ENDPOINT:-"http://localhost:7050"}
+  token: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+cpu: 2
+scoreComputerThreadsPerCoreForIterator: 4
+scoreComputerThreadsPerCoreForUser: 2
+
+aggregationRuleComputeThreadsPerCore: 2
+
+allowedOrigins:
+  - "*"
+
+hostname: ${HOSTNAME:-localhost}
+
+basePathPrefix: ${BASE_PATH_PREFIX:-""}
+
+streamPerServiceConfiguration: ${PIE_STREAM_PER_SERVICE:- false}
+
+auditClientConfig:
+  baseUrl: http://localhost:9005/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+enableAudit: false
+
+internalAccounts:
+  - kmpySmUISimoRrJL6NL73w
+
+segmentConfiguration:
+  enabled: false
+  url: "segment_url_place_holder"
+  apiKey: "segment_api_key"
+  certValidationRequired: false
+
+logServiceConfig:
+  baseUrl: http://localhost:8079
+  globalToken: "c76e567a-b341-404d-a8dd-d9738714eb82"
+
+
+sscaServiceConfig:
+  httpClientConfig:
+    baseUrl: http://localhost:8186
+    connectTimeOutSeconds: 40
+    readTimeOutSeconds: 40
+  serviceSecret: secret
+
+stoServiceConfig:
+  baseUrl: ${STO_SERVICE_ENDPOINT:-http://localhost:4000}
+  internalUrl: ${STO_SERVICE_INTERNAL_ENDPOINT:-""}
+  globalToken: ${STO_SERVICE_GLOBAL_TOKEN:-"token"}
+
+qwietServiceConfig:
+  baseUrl: ${QWIET_SERVICE_ENDPOINT:-https://app.stg.shiftleft.io}
+  globalToken: ${QWIET_STG_SHARED_SECRET:-"token"}
+
+stoServiceRestClientConfig:
+  baseUrl: http://localhost:4000/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+apiUrl: https://localhost:8181/#/
+
+pmsSdkExecutionPoolConfig:
+  corePoolSize: ${PMS_SDK_EXECUTION_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${PMS_SDK_EXECUTION_POOL_MAX_SIZE:-300}
+  idleTime: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME:-120}
+  timeUnit: ${PMS_SDK_EXECUTION_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_EXECUTION_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationEventPoolConfig:
+  corePoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_CORE_SIZE:-5}
+  maxPoolSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_MAX_SIZE:-300}
+  idleTime: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME:-120}
+  timeUnit: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PMS_SDK_ORCHESTRATION_EVENT_POOL_QUEUE_SIZE:-500}
+
+pmsSdkOrchestrationHandlerPoolConfig:
+  corePoolSize: ${ORCHESTRATION_HANDLER_POOL_CORE_SIZE:-10}
+  maxPoolSize: ${ORCHESTRATION_HANDLER_POOL_MAX_SIZE:-30}
+  idleTime: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME:-60}
+  timeUnit: ${ORCHESTRATION_HANDLER_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+
+pipelineSdkRedisEventsConfig:
+  pipelineSdkResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkResponseSpawnEvent:
+    maxTopicSize: ${PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE:-5000}
+  pipelineSdkStepResponseEvent:
+    maxTopicSize: ${PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE:-5000}
+
+pmsPlanCreatorServicePoolConfig:
+  corePoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE:-2}
+  maxPoolSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE:-3}
+  idleTime: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME:-30}
+  timeUnit: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_IDLE_TIME_TIME_UNIT:-SECONDS}
+  queueSize: ${PLAN_CREATOR_SERVICE_EXECUTOR_POOL_QUEUE_SIZE:-500}
+
+opaClientConfig:
+  baseUrl: http://localhost:3000
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+policyManagerSecret: secret
+
+opaConnectivityEnabled: ${OPA_CONNECTIVITY_ENABLED:-false}
+
+ciExecutionServiceConfig:
+  applyCIPluginDefaults: ${APPLY_CI_PLUGIN_DEFAULTS:-false}
+  miningPatternConfig:
+    gcsCreds: null
+    projectId: null
+    bucketName: null
+  queueServiceClientConfig:
+    httpClientConfig:
+      baseUrl: ${HSQS_BASE_URL:-http://localhost:9544/}
+      connectTimeOutSeconds: 15
+      readTimeOutSeconds: 15
+    queueServiceSecret: ${HSQS_AUTH_TOKEN:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+    envNamespace: ${EVENTS_FRAMEWORK_ENV_NAMESPACE:-localhost}
+    topic: ${HSQS_TOPIC:-idp}
+    batchSize: 100
+  globalQueueingConfig:
+    enableGlobalQueue: ${ENABLE_GLOBAL_QUEUE:-false}
+    capacityTaskRetryIntervalMs: ${CAPACITY_TASK_RETRY_INTERVAL_MS:-30000}
+  addonImageTag: releaseBuild-30
+  liteEngineImageTag: v1.4-alpha
+  defaultMemoryLimit: 500
+  defaultCPULimit: 400
+  defaultInternalImageConnector: "account.harnessimage"
+  executionLimits:
+    freeNewUser:
+      dailyMaxBuildsCount: 0
+      monthlyMaxCreditsCount: 0
+    freeBasicUser:
+      dailyMaxBuildsCount: 25
+      monthlyMaxCreditsCount: 2000
+    free:
+      defaultTotalExecutionCount: 20
+      defaultMacExecutionCount: 5
+    team:
+      defaultTotalExecutionCount: 50
+      defaultMacExecutionCount: 10
+    enterprise:
+      defaultTotalExecutionCount: 100
+      defaultMacExecutionCount: 10
+    devopsEssentials:
+      defaultTotalExecutionCount: 65
+      defaultMacExecutionCount: 5
+    overrideConfig:
+      - "kmpySmUISimoRrJL6NL73w:1:1"
+  pvcDefaultStorageSize: 25600
+  delegateServiceEndpointVariableValue: "delegate-service:8080"
+  addonImage: harness/ci-addon:1.18.2
+  liteEngineImage: harness/ci-lite-engine:1.18.2
+  addonImageRootless: harness/ci-addon:rootless-1.18.2
+  liteEngineImageRootless: harness/ci-lite-engine:rootless-1.18.2
+  isLocal: false
+  hostedVmConfig:
+    splitLinuxAmd64Pool: false
+    splitLinuxArm64Pool: false
+    splitWindowsAmd64Pool: false
+  stepConfig:
+    # The below config is for K8 steps
+    gitCloneConfig:
+      # Use rootless image only for K8 git clone
+      image: harness/drone-git:1.7.25-rootless
+      entrypoint:
+        - /usr/local/bin/clone
+      windowsEntrypoint:
+        - "pwsh"
+        - "C:\\bin\\clone.ps1"
+    buildAndPushDockerRegistryConfig:
+      image: plugins/kaniko:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-docker
+    buildAndPushECRConfig:
+      image: plugins/kaniko-ecr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-ecr
+    buildAndPushGCRConfig:
+      image: plugins/kaniko-gcr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-gcr
+    buildAndPushGARConfig:
+      image: plugins/kaniko-gar:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-gar
+    buildAndPushACRConfig:
+      image: plugins/kaniko-acr:1.13.10
+      entrypoint:
+        - /kaniko/kaniko-acr
+    buildAndPushBuildxDockerRegistryConfig:
+      image: plugins/docker:21.3.3
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-docker
+      windowsEntrypoint:
+        - "C:\\bin\\drone-docker.exe"
+    buildAndPushBuildxECRConfig:
+      image: plugins/ecr:21.3.3
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-ecr
+      windowsEntrypoint:
+        - "C:\\bin\\drone-ecr.exe"
+    buildAndPushBuildxGCRConfig:
+      image: plugins/gcr:21.3.3
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-gcr
+      windowsEntrypoint:
+        - "C:\\bin\\drone-gcr.exe"
+    buildAndPushBuildxGARConfig:
+      image: plugins/gar:21.3.3
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-gar
+      windowsEntrypoint:
+        - "C:\\bin\\drone-gar.exe"
+    buildAndPushBuildxACRConfig:
+      image: plugins/acr:21.3.3
+      entrypoint:
+        - /usr/local/bin/dockerd-entrypoint.sh
+        - /bin/drone-acr
+      windowsEntrypoint:
+        - "C:\\bin\\drone-acr.exe"
+    gcsUploadConfig:
+      image: plugins/gcs:1.6.12
+      entrypoint:
+        - /bin/drone-gcs
+      windowsEntrypoint:
+        - "C:\\drone-gcs.exe"
+    s3UploadConfig:
+      image: plugins/s3:1.8.2
+      entrypoint:
+        - /bin/drone-s3
+      windowsEntrypoint:
+        - "C:\\drone-s3.exe"
+    securityConfig:
+      image: harness/sto-plugin:${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+      entrypoint:
+        - /bin/sh
+        - -c
+        - python3 ${DOCKER_ENTRYPOINT}
+    artifactoryUploadConfig:
+      image: plugins/artifactory:1.9.0
+      entrypoint:
+        - /bin/plugin
+      windowsEntrypoint:
+        - "C:\\bin\\drone-artifactory.exe"
+    harUploadConfig:
+      image: harness/har-plugin:1.0.0
+      entrypoint:
+        - /bin/har
+      windowsEntrypoint:
+        - "C:\\bin\\har.exe"
+    cacheGCSConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheS3Config:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheAzureConfig:
+      image: plugins/cache:1.10.10
+      entrypoint:
+        - /bin/drone-cache
+      windowsEntrypoint:
+        - "C:\\drone-cache.exe"
+    cacheProxyConfig:
+      image: harness/harness-cache-server:1.7.23
+      entrypoint:
+        - /app/cache-proxy
+        - server
+    sscaOrchestrationConfig:
+      image: harness/ssca-plugin:0.17.3
+      entrypoint:
+        - /bin/ssca-plugin
+        - orchestrate
+    sscaEnforcementConfig:
+      image: harness/ssca-plugin:0.17.3
+      entrypoint:
+        - /bin/ssca-plugin
+        - enforce
+    sscaArtifactSigningConfig:
+      image: harness/ssca-artifact-signing-plugin:0.31.0
+      entrypoint:
+        - /bin/ssca-artifact-signing-plugin
+        - sign
+    sscaArtifactVerificationConfig:
+      image: harness/ssca-artifact-signing-plugin:0.31.0
+      entrypoint:
+        - /bin/ssca-artifact-signing-plugin
+        - verify
+    sscaCdxgenOrchestrationConfig:
+      image: harness/ssca-cdxgen-plugin:0.18.0
+      entrypoint:
+        - /bin/ssca-plugin
+        - orchestrate
+    provenanceConfig:
+      image: harness/slsa-plugin:0.17.0
+      entrypoint:
+        - /bin/slsa-plugin
+        - attest
+    slsaVerificationConfig:
+      image: harness/slsa-plugin:0.17.0
+      entrypoint:
+        - /bin/slsa-plugin
+        - verify
+    sscaComplianceConfig:
+      image: harness/ssca-compliance-plugin:latest
+      entrypoint:
+        - /bin/ssca-compliance-plugin
+        - scan
+    sscaPrAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - pr-attest
+    sscaJunitAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - junit-attest
+    deployAttestationConfig:
+      image: harness/ssca-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/ssca-attestation-plugin
+        - deploy-attest
+    sscaAibomOrchestrationConfig:
+      image: harness/ssca-ai-bom-plugin:latest
+      entrypoint:
+        - /bin/ai-bom
+        - scan
+    enforceAttestationConfig:
+      image: harness/enforce-attestation-plugin:0.1.0
+      entrypoint:
+        - /bin/enforce-attestation-plugin
+        - enforce-attestation
+    iacmTerraformConfig:
+      image: plugins/harness_terraform:dev
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmAwsCdkConfig:
+      image: ${IACM_AWS_CDK_IMAGE:- plugins/harness_aws_cdk:dev}
+      entrypoint:
+        - /bin/harness-aws-cdk
+      windowsEntrypoint:
+        - "C:\\harness-aws-cdk.exe"
+    iacmOpenTofuConfig:
+      image: plugins/harness_terraform:dev
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmTFComplianceConfig:
+      image: plugins/harness_tf_compliance:dev
+      entrypoint:
+        - /bin/harness-tf-compliance
+      windowsEntrypoint:
+        - "C:\\harness-tf-compliance.exe"
+    iacmTFLintConfig:
+      image: plugins/harness_tf_lint:dev
+      entrypoint:
+        - /bin/harness-tf-lint
+      windowsEntrypoint:
+        - "C:\\harness-tf-lint.exe"
+    iacmTFSecConfig:
+      image: plugins/harness_tf_sec:dev
+      entrypoint:
+        - /bin/harness-tf-sec
+      windowsEntrypoint:
+        - "C:\\harness-tf-sec.exe"
+    iacmCheckovConfig:
+      image: plugins/harness_checkov:dev
+      entrypoint:
+        - /bin/harness-checkov
+      windowsEntrypoint:
+        - "C:\\harness-checkov.exe"
+    iacmModuleTestConfig:
+      image: ${IACM_MODULE_TEST_IMAGE:- plugins/harness_terraform:dev}
+      entrypoint:
+        - /bin/harness-terraform
+      windowsEntrypoint:
+        - "C:\\harness-terraform.exe"
+    iacmBlastRadiusAgentConfig:
+      image: ${IACM_BLAST_RADIUS_AGENT_IMAGE:- plugins/harness_blast_radius_agent:dev}
+      entrypoint:
+        - /bin/blast-radius-agent
+      windowsEntrypoint:
+        - "C:\\blast-radius-agent.exe"
+    iacmAnsible:
+      image: ${IACM_ANSIBLE_IMAGE:- plugins/harness_ansible:dev}
+      entrypoint:
+        - /bin/harness-ansible
+      windowsEntrypoint:
+        - "C:\\harness-ansible.exe"
+    cookieCutter:
+      image: harness/cookiecutter:latest
+      entrypoint:
+        - /usr/local/bin/cookiecutter-plugin.py
+    createRepo:
+      image: harness/createrepo:latest
+      entrypoint:
+        - /usr/local/bin/createrepo-plugin.sh
+    directPush:
+      image: harness/directpush:latest
+      entrypoint:
+        - /usr/local/bin/directpush-plugin.sh
+    registerCatalog:
+      image: harness/registercatalog:latest
+      entrypoint:
+        - /usr/local/bin/registercatalog-plugin.sh
+    createCatalog:
+      image: harness/createcatalog:latest
+      entrypoint:
+        - /usr/local/bin/createcatalog-plugin.sh
+    slackNotify:
+      image: harness/slacknotify:latest
+      entrypoint:
+        - /usr/local/bin/slacknotify-plugin.sh
+    createOrganisation:
+      image: harness/createorganisation:latest
+      entrypoint:
+        - /usr/local/bin/createorganisation-plugin.sh
+    createProject:
+      image: harness/createproject:latest
+      entrypoint:
+        - /usr/local/bin/createproject-plugin.sh
+    createResource:
+      image: harness/createresource:latest
+      entrypoint:
+        - /usr/local/bin/createresource-plugin.sh
+    updateCatalogProperty:
+      image: harness/updatecatalogproperty:latest
+      entrypoint:
+        - /usr/local/bin/updatecatalogproperty-plugin.sh
+    vmImageConfig:
+      gitClone: harness/drone-git:1.7.25
+      buildAndPushDockerRegistry: plugins/docker:21.3.3
+      buildAndPushACR: plugins/acr:21.3.3
+      buildAndPushECR: plugins/ecr:21.3.3
+      buildAndPushGCR: plugins/gcr:21.3.3
+      buildAndPushGAR: plugins/gar:21.3.3
+      gcsUpload: plugins/gcs:1.6.12
+      s3Upload: plugins/s3:1.8.2
+      security: harness/sto-plugin:${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
+      artifactoryUpload: plugins/artifactory:1.9.0
+      harUpload: harness/har-plugin:1.0.0
+      cacheGCS: plugins/cache:1.10.10
+      cacheS3: plugins/cache:1.10.10
+      cacheAzure: plugins/cache:1.10.10
+      cacheProxy: harness/harness-cache-server:1.7.23
+      sscaOrchestration: harness/ssca-plugin:0.17.3
+      sscaEnforcement: harness/ssca-plugin:0.17.3
+      sscaArtifactSigning: harness/ssca-artifact-signing-plugin:latest
+      sscaArtifactVerification: harness/ssca-artifact-signing-plugin:latest
+      sscaCdxgenOrchestration: harness/ssca-cdxgen-plugin:0.18.0
+      provenance: harness/slsa-plugin:0.17.0
+      slsaVerification: harness/slsa-plugin:0.17.0
+      sscaCompliance: harness/ssca-compliance-plugin:latest
+      sscaPrAttestation: harness/ssca-attestation-plugin:0.1.0
+      sscaJunitAttestation: harness/ssca-attestation-plugin:0.1.0
+      deployAttestation: harness/ssca-attestation-plugin:0.1.0
+      sscaAibomOrchestration: harness/ssca-ai-bom-plugin:latest
+      enforceAttestation: harness/enforce-attestation-plugin:0.1.0
+      iacmTerraform: plugins/harness_terraform_vm:dev
+      iacmOpenTofu: plugins/harness_terraform_vm:dev
+      iacmAwsCdk: plugins/harness_aws_cdk_vm:dev
+      iacmTFCompliance: plugins/harness_tf_compliance:dev
+      iacmTFLint: plugins/harness_tf_lint:dev
+      iacmTFSec: plugins/harness_tf_sec:dev
+      iacmCheckov: plugins/harness_checkov:dev
+      iacmModuleTest: ${IACM_MODULE_TEST_VM_IMAGE:- plugins/harness_terraform_vm:dev}
+      iacmBlastRadiusAgent: ${IACM_BLAST_RADIUS_AGENT_VM_IMAGE:- plugins/harness_blast_radius_agent:dev}
+      iacmAnsible: ${IACM_ANSIBLE_VM_IMAGE:- plugins/harness_ansible_vm:dev}
+      cookieCutter: harness/cookiecutter:latest
+      createRepo: harness/createrepo:latest
+      directPush: harness/directpush:latest
+      registerCatalog: harness/registercatalog:latest
+      createCatalog: harness/createcatalog:latest
+      slackNotify: harness/slacknotify:latest
+      createOrganisation: harness/createorganisation:latest
+      createProject: harness/createproject:latest
+      createResource: harness/createresource:latest
+      updateCatalogProperty: harness/updatecatalogproperty:latest
+    vmContainerlessStepConfig:
+      gitCloneConfig:
+        name: github.com/wings-software/drone-git@refs/tags/v1.7.25
+        disableClone: true
+        binarySuffix: plugin-{{ os }}-{{ arch }}.zst
+  gitnessConfig:
+    jwtSecret: ${GITNESS_JWT_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+    httpClientConfig:
+      baseUrl: ${GITNESS_INTERNAL_URL:- http://localhost:3000}
+  harnessRegistryConfig:
+    jwtSecret: ${HARNESS_REGISTRY_JWT_SECRET:-"IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"}
+    httpClientConfig:
+      baseUrl: ${HARNESS_REGISTRY_URL:- http://localhost:3000}
+
+
+iacmServiceConfig:
+  baseUrl: http://localhost:8080
+  externalUrl: http://localhost:8080
+  globalToken: "551715ea-ca71-11ec-9d64-0242ac120002"
+
+
+poServerConfig:
+  baseUrl: http://localhost:8080
+  externalUrl: ""
+  globalToken: "551715ea-ca71-11ec-9d64-0242ac120002"
+
+enforcementClientConfiguration:
+  enforcementCheckEnabled: false
+
+harnessCodeGitUrl: ${HARNESS_CODE_GIT_URL:- http://localhost:3000/git}
+llmGatewayBaseUrl: ${LLM_GATEWAY_BASE_URL:-}
+enableMetrics: true
+enableAPIMetrics: true
+
+allowedKindsForCatalogSync:
+  - API
+  - Component
+  - Domain
+  - Group
+  - Resource
+  - System
+  - Template
+  - User
+
+allowedKindsForAudit:
+  - API
+  - Component
+  - Domain
+  - Resource
+  - System
+  - Template
+
+customPlugins:
+  triggerPipelineUrl: ""
+  pipelineExecutionUrl: ""
+  pipelineExecutionLogUrl: ""
+  bucketName: idp-custom-plugins
+  imageBucketName: idp-layouts-qa
+
+catalogContent:
+  bucketName: ${CATALOG_CONTENT_BUCKET_NAME:-idp-catalog-content}
+
+contentEncryption:
+  enabled: ${IDP_CONTENT_ENCRYPTION_ENABLED:-false}
+  kmsKeyUri: ${IDP_CONTENT_ENCRYPTION_KMS_KEY_URI:-}
+
+debeziumConsumersConfigs:
+  backstageCatalog:
+    topic: ${DEBEZIUM_BACKSTAGE_CATALOG_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.backstageCatalog}
+    batchSize: ${DEBEZIUM_BACKSTAGE_CATALOG_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_BACKSTAGE_CATALOG_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  backstageScaffolderTasks:
+    topic: ${DEBEZIUM_BACKSTAGE_SCAFFOLDER_TASKS_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.backstageScaffolderTasks}
+    batchSize: ${DEBEZIUM_BACKSTAGE_SCAFFOLDER_TASKS_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_BACKSTAGE_SCAFFOLDER_TASKS_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  scorecards:
+    topic: ${DEBEZIUM_SCORECARDS_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.scorecards}
+    batchSize: ${DEBEZIUM_SCORECARDS_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_SCORECARDS_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  appConfigs:
+    topic: ${DEBEZIUM_APP_CONFIGS_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.appConfigs}
+    batchSize: ${DEBEZIUM_APP_CONFIGS_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_APP_CONFIGS_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  moduleLicenses:
+    topic: ${DEBEZIUM_MODULE_LICENSES_CONSUMER_TOPIC_NAME:-DEBEZIUM_ngMongo.ng-harness.moduleLicenses}
+    batchSize: ${DEBEZIUM_MODULE_LICENSES_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_MODULE_LICENSES_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  checks:
+    topic: ${DEBEZIUM_CHECKS_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.checks}
+    batchSize: ${DEBEZIUM_CHECKS_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_CHECKS_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+  catalog:
+    topic: ${DEBEZIUM_CATALOG_CONSUMER_TOPIC_NAME:-DEBEZIUM_idpMongo.idp-harness.catalog}
+    batchSize: ${DEBEZIUM_CATALOG_CONSUMER_BATCH_SIZE:-100}
+    maxProcessingTimeSeconds: ${DEBEZIUM_CATALOG_CONSUMER_MAX_PROCESSING_TIME_SECONDS:-10}
+
+cdcKafkaConfig:
+  enabled: ${CDC_KAFKA_ENABLED:-false}
+  maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+  consumers:
+    - name: catalog
+      enabled: ${CDC_KAFKA_CATALOG_ENABLED:-true}
+      topic: ${CDC_KAFKA_CATALOG_TOPIC:-idpMongo.idp-harness.catalog}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_CATALOG_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_CATALOG_REDIS_SHORT_CIRCUIT:-false}
+    - name: scaffolderTasks
+      enabled: ${CDC_KAFKA_SCAFFOLDER_TASKS_ENABLED:-true}
+      topic: ${CDC_KAFKA_SCAFFOLDER_TASKS_TOPIC:-idpMongo.idp-harness.backstageScaffolderTasks}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_SCAFFOLDER_TASKS_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_SCAFFOLDER_TASKS_REDIS_SHORT_CIRCUIT:-false}
+    - name: checks
+      enabled: ${CDC_KAFKA_CHECKS_ENABLED:-true}
+      topic: ${CDC_KAFKA_CHECKS_TOPIC:-idpMongo.idp-harness.checks}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_CHECKS_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_CHECKS_REDIS_SHORT_CIRCUIT:-false}
+    - name: scorecards
+      enabled: ${CDC_KAFKA_SCORECARDS_ENABLED:-true}
+      topic: ${CDC_KAFKA_SCORECARDS_TOPIC:-idpMongo.idp-harness.scorecards}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_SCORECARDS_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_SCORECARDS_REDIS_SHORT_CIRCUIT:-false}
+    - name: moduleLicenses
+      enabled: ${CDC_KAFKA_MODULE_LICENSES_ENABLED:-true}
+      topic: ${CDC_KAFKA_MODULE_LICENSES_TOPIC:-ngMongo.idp-harness.moduleLicenses}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_MODULE_LICENSES_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_MODULE_LICENSES_REDIS_SHORT_CIRCUIT:-false}
+    - name: appConfigs
+      enabled: ${CDC_KAFKA_APP_CONFIGS_ENABLED:-true}
+      topic: ${CDC_KAFKA_APP_CONFIGS_TOPIC:-idpMongo.idp-harness.appConfigs}
+      maxPollRecords: ${CDC_KAFKA_MAX_POLL_RECORDS:-100}
+      useJsonValueFormat: ${CDC_KAFKA_APP_CONFIGS_USE_JSON:-false}
+      redisShortCircuit: ${CDC_KAFKA_APP_CONFIGS_REDIS_SHORT_CIRCUIT:-false}
+
+enableDashboardTimescale: false
+enableOpenTelemetry: false
+
+timescaledb:
+  timescaledbUrl: "jdbc:postgresql://localhost:5432/harness"
+  timescaledbUsername: "postgres"
+  timescaledbPassword: ""
+  connectTimeout: 10
+  socketTimeout: 30
+  logUnclosedConnections: false
+  loggerLevel: OFF
+
+numberOfThreadsToUseForConsumers:
+  entity_crud: 1
+  usermembership: 1
+  idp_module_license_usage_capture: 2
+  idp_catalog_entities_sync_capture: 1
+  idp_catalog_entities_v3_referenced_entities_sync: 1
+  idp_catalog_entities_v3_sto_enrichment: 1
+  idp_catalog_entities_v3_api_endpoint: 1
+  project_movement: 1
+  project_topology_rebuild: 1
+  idp_catalog_custom_property_entity_sync_capture: 1
+  BACKSTAGE_CATALOG_REDIS_EVENT_CONSUMER: 1
+  BACKSTAGE_SCAFFOLDER_TASKS_REDIS_EVENT_CONSUMER: 1
+  IDP_SCORECARDS_REDIS_EVENT_CONSUMER: 1
+  IDP_APP_CONFIGS_REDIS_EVENT_CONSUMER: 1
+  MODULE_LICENSES_REDIS_EVENT_CONSUMER: 1
+  IDP_CHECKS_REDIS_EVENT_CONSUMER: 1
+  IDP_CATALOG_REDIS_EVENT_CONSUMER: 1
+  STO_SCAN_COMPLETION_EVENT: 1
+  integration_idp_crud: 1
+  idp_integration_catalog_processor: 1
+  idp_relationship_processing: 1
+  idp_kind_processor: 1
+  idp_bulk_field_update: 1
+
+okHttpClientConnectionPoolConfigs:
+  backstageHttpClient:
+    maxIdleConnections: 5
+    keepAliveDuration: 5
+    timeUnit: MINUTES
+  directDslClientHttpClient:
+    maxIdleConnections: 5
+    keepAliveDuration: 5
+    timeUnit: MINUTES
+  proxyApiManagerHttpClient:
+    maxIdleConnections: 5
+    keepAliveDuration: 5
+    timeUnit: MINUTES
+  proxyApiNgManagerHttpClient:
+    maxIdleConnections: 5
+    keepAliveDuration: 5
+    timeUnit: MINUTES
+  idpAgentHttpClient:
+    maxIdleConnections: 5
+    keepAliveDuration: 5
+    timeUnit: MINUTES
+
+accessControlAdminClient:
+  accessControlServiceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  accessControlServiceSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+  mockAccessControlService: true
+
+resourceGroupClientConfig:
+  serviceConfig:
+    baseUrl: http://localhost:9006/api/
+    connectTimeOutSeconds: 15
+    readTimeOutSeconds: 15
+    enableHttpLogging: ${ENABLE_HTTP_LOGGING:-false}
+  secret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+deploymentType: SAAS
+deploymentNamespace: dummy
+
+
+cacheServiceConfig:
+  internalUrl: ${CACHE_SERVICE_INTERNAL_ENDPOINT:-""}
+  baseUrl: ${CACHE_SERVICE_ENDPOINT:-http://localhost:8082}
+  globalToken: ${CACHE_SERVICE_GLOBAL_TOKEN:-"f47c6470-2483-4e06-8f44-3c35d6b55b26"}
+
+dynamicConfigResolution: false
+
+harnessCodeRepoConfig:
+  baseUrl: ${HARNESS_CODE_REPO_CONFIG_BASE_URL:-http://localhost:3000}
+  gitBaseUrl: ${HARNESS_CODE_REPO_CONFIG_GIT_BASE_URL:-http://localhost:3000/git}
+  apiUrl: ${HARNESS_CODE_REPO_CONFIG_API_URL:-http://localhost:3000}
+  internalApiUrl: ${HARNESS_CODE_REPO_CONFIG_INTERNAL_API_URL:-http://localhost:3000}
+  serviceClientSharedSecret: ${HARNESS_CODE_REPO_CONFIG_SERVICE_CLIENT_SHARED_SECRET:-IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM}
+
+fileServiceConfiguration:
+  fileStorageMode: MONGO
+  clusterName: ""
+
+gcsForTechDocsDelegate: false
+
+homePageCardIconConfig:
+  bucketName: ${HOME_PAGE_CARD_ICON_BUCKET_NAME:-idp-layouts-qa}
+  cdnDNS: ${HOME_PAGE_CARD_ICON_CDN_DNS:-idp-layouts-qa.qa.harness.io}
+  cdnEnabled: ${HOME_PAGE_CARD_ICON_CDN_ENABLED:-false}
+  storageType: ${HOME_PAGE_CARD_ICON_STORAGE_TYPE:-GCS}
+  s3Region: ${HOME_PAGE_CARD_ICON_S3_REGION:-us-west-2}
+
+defaultTierGroupConfig:
+  identifier: ${DEFAULT_TIER_GROUP_IDENTIFIER:-default_tiers}
+  name: ${DEFAULT_TIER_GROUP_NAME:-Default Tier Group}
+  description: ${DEFAULT_TIER_GROUP_DESCRIPTION:-Default score tiers for measuring software delivery performance.}
+  tiers:
+    - name: ${DEFAULT_TIER_GROUP_BRONZE_NAME:-Critical}
+      description: ${DEFAULT_TIER_GROUP_BRONZE_DESCRIPTION:-Score is below recommended standards and needs immediate attention.}
+      icon: ${DEFAULT_TIER_GROUP_BRONZE_ICON:-BRONZE}
+      colour: "${DEFAULT_TIER_GROUP_BRONZE_COLOUR:-#e43326}"
+      minScore: ${DEFAULT_TIER_GROUP_BRONZE_MIN_SCORE:-0}
+      maxScore: ${DEFAULT_TIER_GROUP_BRONZE_MAX_SCORE:-49}
+    - name: ${DEFAULT_TIER_GROUP_SILVER_NAME:-Warning}
+      description: ${DEFAULT_TIER_GROUP_SILVER_DESCRIPTION:-Score partially meets recommended standards and needs improvement.}
+      icon: ${DEFAULT_TIER_GROUP_SILVER_ICON:-SILVER}
+      colour: "${DEFAULT_TIER_GROUP_SILVER_COLOUR:-#ffaf00}"
+      minScore: ${DEFAULT_TIER_GROUP_SILVER_MIN_SCORE:-50}
+      maxScore: ${DEFAULT_TIER_GROUP_SILVER_MAX_SCORE:-74}
+    - name: ${DEFAULT_TIER_GROUP_GOLD_NAME:-Healthy}
+      description: ${DEFAULT_TIER_GROUP_GOLD_DESCRIPTION:-Score meets or exceeds recommended standards.}
+      icon: ${DEFAULT_TIER_GROUP_GOLD_ICON:-GOLD}
+      colour: "${DEFAULT_TIER_GROUP_GOLD_COLOUR:-#1b841d}"
+      minScore: ${DEFAULT_TIER_GROUP_GOLD_MIN_SCORE:-75}
+      maxScore: ${DEFAULT_TIER_GROUP_GOLD_MAX_SCORE:-100}
+
+tierIconConfig:
+  bucketName: ${TIER_ICON_BUCKET_NAME:-idp-layouts-qa}
+  cdnDNS: ${TIER_ICON_CDN_DNS:-idp-layouts-qa.qa.harness.io}
+  cdnEnabled: ${TIER_ICON_CDN_ENABLED:-false}
+  storageType: ${TIER_ICON_STORAGE_TYPE:-GCS}
+  s3Region: ${TIER_ICON_S3_REGION:-us-west-2}
+
+cfClientConfig:
+  apiKey: ""
+  configUrl: "https://config.feature-flags.uat.harness.io/api/1.0"
+  eventUrl: "https://event.feature-flags.uat.harness.io/api/1.0"
+  analyticsEnabled: true
+  connectionTimeout: 10000
+  readTimeout: 45000
+  retries: 6
+  sleepInterval: 5000
+
+featureFlagConfig:
+  featureFlagSystem: LOCAL
+  syncFeaturesToCF: false
+
+enableQueue: ${ENABLE_QUEUE:-true}
+userBillingMetricJobEnabled: ${USER_BILLING_METRIC_JOB_ENABLED:-false}
+
+kafkaModuleConfig:
+  enableConfluentKafkaProducer: ${ENABLE_CONFLUENT_KAFKA_PRODUCER:-false}
+  kafkaConfluentBaseConfig:
+    bootstrapServers: ${KAFKA_CONFLUENT_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL:-"http://localhost:7081"}
+    saslJaasConfig: ${KAFKA_CONFLUENT_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_CONFLUENT_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_CONFLUENT_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_CONFLUENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_CONFLUENT_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_CONFLUENT_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+  enableGeneralKafkaProducer: ${ENABLE_GENERAL_KAFKA_PRODUCER:-false}
+  kafkaGeneralBaseConfig:
+    bootstrapServers: ${KAFKA_GENERAL_BOOTSTRAP_SERVER_URLS:-"http://localhost:39092"}
+    schemaRegistryUrl: ${KAFKA_GENERAL_SCHEMA_REGISTRY_URL:-""}
+    saslJaasConfig: ${KAFKA_GENERAL_SASL_JAAS_CONFIG:-"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"test\" password=\"password\";"}
+    saslMechanism: ${KAFKA_GENERAL_SASL_MECHANISM:-PLAIN}
+    saslLoginCallbackHandlerClass: ${KAFKA_GENERAL_SASL_LOGIN_CALLBACK_HANDLER_CLASS:-""}
+    sslEndpointIdentificationAlgorithm: ${KAFKA_GENERAL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM:-http}
+    securityProtocol: ${KAFKA_GENERAL_SECURITY_PROTOCOL:-SASL_PLAINTEXT}
+    schemaRegistryBasicAuthUserInfo: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO:-""}
+    schemaRegistryBasicAuthCredentialsSource: ${KAFKA_GENERAL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE:-""}
+    sslTruststoreLocation: ${KAFKA_GENERAL_SSL_TRUSTSTORE_LOCATION:-""}
+    sslTruststorePassword: ${KAFKA_GENERAL_SSL_TRUSTSTORE_PASSWORD:-""}
+    sslTruststoreType: ${KAFKA_GENERAL_SSL_TRUSTSTORE_TYPE:-""}
+    sslKeystoreLocation: ${KAFKA_GENERAL_SSL_KEYSTORE_LOCATION:-""}
+    sslKeystorePassword: ${KAFKA_GENERAL_SSL_KEYSTORE_PASSWORD:-""}
+    sslKeystoreType: ${KAFKA_GENERAL_SSL_KEYSTORE_TYPE:-""}
+    sslKeyPassword: ${KAFKA_GENERAL_SSL_KEY_PASSWORD:-""}
+    sslProtocol: ${KAFKA_GENERAL_SSL_PROTOCOL:-""}
+    sslEnabledProtocols: ${KAFKA_GENERAL_SSL_ENABLED_PROTOCOLS:-""}
+    sslProvider: ${KAFKA_GENERAL_SSL_PROVIDER:-""}
+
+udpTypeIngestion:
+  enabled: ${UDP_TYPE_INGESTION_ENABLED:-true}
+  typeIngestionRequestTopic: ${UDP_TYPE_INGESTION_REQUEST_TOPIC:-data-platform-type-ingestion-request}
+  typeProvider: ${UDP_TYPE_INGESTION_TYPE_PROVIDER:-idp}
+  publisherThreadPoolSize: ${UDP_PUBLISHER_THREAD_POOL_SIZE:-2}
+  schemaServiceGrpcClientConfig:
+    target: ${UDP_SCHEMA_SERVICE_GRPC_TARGET:-schema-service:9090}
+    authority: ${UDP_SCHEMA_SERVICE_GRPC_AUTHORITY:-schema-service}
+  configServiceGrpcClientConfig:
+    target: ${UDP_CONFIG_SERVICE_GRPC_TARGET:-config-service:9094}
+    authority: ${UDP_CONFIG_SERVICE_GRPC_AUTHORITY:-config-service}
+
+mongoReplacementConfig:
+  backstage.io : "backstage__dot__io"
+  github.com : "github__dot__com"
+  gitlab.com : "gitlab__dot__com"
+  gocd.org : "gocd__dot__org"
+  periskop.io : "periskop__dot__io"
+  sentry.io : "sentry__dot__io"
+  rollbar.com : "rollbar__dot__com"
+  circleci.com : "circleci__dot__com"
+  graph.microsoft.com : "graph__dot__microsoft__dot__com"
+  sonarqube.org : "sonarqube__dot__org"
+  vault.io : "vault__dot__io"
+  jenkins.io : "jenkins__dot__io"
+  dev.azure.com : "dev__dot__azure__dot__com"
+  bugsnag.com : "bugsnag__dot__com"
+  buildkite.com : "buildkite__dot__com"
+  datadoghq.com : "datadoghq__dot__com"
+  dynatrace.com : "dynatrace__dot__com"
+  firehydrant.com : "firehydrant__dot__com"
+  jfrog.com : "jfrog__dot__com"
+  opsgenie.com : "opsgenie__dot__com"
+  pagerduty.com : "pagerduty__dot__com"
+  rootly.com : "rootly__dot__com"
+  snyk.io : "snyk__dot__io"
+  splunk.com : "splunk__dot__com"
+  sysdigcloud.com : "sysdigcloud__dot__com"
+  wiz.io : "wiz__dot__io"
+
+harnessCiCdAnnotationsServiceUrl: /ng/account/accountIdentifier/cd/orgs/orgIdentifier/projects/projectIdentifier/services/serviceIdentifier
+
+integrationManagerClientConfig:
+  baseUrl: http://localhost:8074/api/
+  connectTimeOutSeconds: 15
+  readTimeOutSeconds: 15
+
+integrationManagerSecret: IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM
+
+integrationManagerIdpMappingId: idp_catalog
+integrationsHarnessCiCdAnnotationsServiceUrl: https://localhost:8181/ng/account/${accountIdentifier}/cd/${orgDetails:-}${projectDetails:-}services/${identifier}
+
+harnessIdClientConfig:
+  grpcClientConfig:
+    target: ${HARNESS_ID_GRPC_TARGET:-localhost:8082}
+    authority: ${HARNESS_ID_GRPC_AUTHORITY:-harnessid}
+    serviceAuthSecret: ${HARNESS_ID_SERVICE_SECRET:-your-256-bit-secret-key-here-min-32-chars}
+    deadlineSeconds: ${HARNESS_ID_GRPC_DEADLINE_SECONDS:-30}
+  restClientConfig:
+    baseUrl: ${HARNESS_ID_REST_BASE_URL:-http://localhost:8081}
+    connectTimeOutSeconds: ${HARNESS_ID_REST_CONNECT_TIMEOUT_SECONDS:-5}
+    readTimeOutSeconds: ${HARNESS_ID_REST_READ_TIMEOUT_SECONDS:-10}
+
+queryServiceConfig:
+  grpcClientConfig:
+    target: ${QUERY_SERVICE_GRPC_TARGET:-localhost:9092}
+    authority: ${QUERY_SERVICE_GRPC_AUTHORITY:-query-service}
+  udpInternalSecret: "${UDP_INTERNAL_SECRET:-}"
+  deadlineSeconds: ${QUERY_SERVICE_DEADLINE_SECONDS:-30}
+  enableCircuitBreaker: ${QUERY_SERVICE_ENABLE_CIRCUIT_BREAKER:-false}
+  tokenConfig:
+    enableCache: ${QUERY_SERVICE_TOKEN_CACHE_ENABLED:-true}
+    validityMinutes: ${QUERY_SERVICE_TOKEN_VALIDITY_MINUTES:-60}
+    cacheTtlMinutes: ${QUERY_SERVICE_TOKEN_CACHE_TTL_MINUTES:-55}
+
+# SPIRE-based service-to-service mesh identity. Fully opt-in: with
+# MESH_IDENTITY_INBOUND_ENABLED=false (default), the service skips mesh wiring
+# and the existing HMAC path is unchanged. Enable via env vars after code ships.
+meshIdentity:
+  inboundEnabled: ${MESH_IDENTITY_INBOUND_ENABLED:-false}
+  outboundEnabled: ${MESH_IDENTITY_OUTBOUND_ENABLED:-false}
+  outboundOnly: ${MESH_IDENTITY_OUTBOUND_ONLY:-false}
+  # Fallback to HMAC when mesh validation fails. Keep true during rollout.
+  fallbackEnabled: ${MESH_IDENTITY_FALLBACK_ENABLED:-true}
+  rejectAuthorizationWithoutMeshHeader: ${MESH_IDENTITY_REJECT_AUTH_WITHOUT_MESH_HEADER:-false}
+  audience: ${MESH_IDENTITY_AUDIENCE:-IDPService}
+  allowedAudiences: ${MESH_IDENTITY_ALLOWED_AUDIENCES:-gateway-internal-service}

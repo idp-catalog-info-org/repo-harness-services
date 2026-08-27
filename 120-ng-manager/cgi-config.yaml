@@ -1,0 +1,168 @@
+- type: "AwsSecretManager"
+  version: 0.0.2
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-linux-arm64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-windows-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsSecretManager/0.0.2/AwsSecretManager-windows-amd64
+- type: "GcpSecretManager"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-linux-arm64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-windows-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/gcpSm/1.0.0/gcpSm-windows-amd64
+- type: "AzureKeyVault"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-linux-arm64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-windows-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/azureVault/1.0.0/azureVault-windows-amd64
+- type: "Vault"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-linux-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-windows-amd64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/vault/1.0.0/vault-windows-arm64
+- type: "DockerRegistry"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-linux-arm64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-windows-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/DockerRegistry/0.0.1/DockerRegistry-windows-amd64
+- type: "SCM"
+  version: 0.0.4
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/darwin/amd64/scm
+    - os: darwin
+      arch: arm64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/darwin/arm64/scm
+    - os: linux
+      arch: amd64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/linux/amd64/scm
+    - os: linux
+      arch: arm64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/linux/arm64/scm
+    - os: windows
+      arch: arm64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/windows/amd64/scm
+    - os: windows
+      arch: amd64
+      url: https://app.harness.io/public/shared/tools/scm/release/6f1deaddb/bin/windows/amd64/scm
+- type: "AwsKms"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-linux-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-windows-amd64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/AwsKms/0.0.1/AwsKms-windows-arm64
+- type: "GcpKms"
+  version: 0.0.1
+  cgiTaskExecutables:
+    - os: darwin
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-darwin-amd64
+    - os: darwin
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-darwin-arm64
+    - os: linux
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-linux-amd64
+    - os: linux
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-linux-arm64
+    - os: windows
+      arch: amd64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-windows-amd64
+    - os: windows
+      arch: arm64
+      url: https://storage.googleapis.com/harness-qa-public/public/shared/cgi/GcpKms/0.0.1/GcpKms-windows-arm64

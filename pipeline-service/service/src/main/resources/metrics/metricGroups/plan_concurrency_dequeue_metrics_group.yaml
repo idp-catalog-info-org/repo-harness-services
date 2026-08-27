@@ -1,0 +1,5 @@
+name: Plan Concurrency Dequeue Metrics Group
+identifier: PlanConcurrencyDequeueMetricsGroup
+labels:
+  - outcome
+  - skip_reason

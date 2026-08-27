@@ -1,0 +1,19 @@
+{
+    "title": "Token rotated — ${TOKEN_IDENTIFIER}",
+    "text": "The token ${TOKEN_IDENTIFIER} for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME} was rotated.\n\nThe old token will remain valid until ${EXPIRY_DATE}. Update any pipelines or integrations to use the new token.\n\nAccount: ${ACCOUNT_NAME} | Account ID: ${ACCOUNT_IDENTIFIER} | Org: ${ORG_IDENTIFIER} | Project: ${PROJECT_IDENTIFIER}",
+    "tags": [
+        "event_type:token_rotated",
+        "token_identifier:${TOKEN_IDENTIFIER}",
+        "api_key_identifier:${API_KEY_IDENTIFIER}",
+        "service_account_name:${SERVICE_ACCOUNT_NAME}",
+        "expiry_date:${EXPIRY_DATE}",
+        "account_name:${ACCOUNT_NAME}",
+        "account_identifier:${ACCOUNT_IDENTIFIER}",
+        "org_identifier:${ORG_IDENTIFIER}",
+        "project_identifier:${PROJECT_IDENTIFIER}"
+    ],
+    "aggregation_key": "${TOKEN_IDENTIFIER}",
+    "priority": "normal",
+    "alert_type": "warning",
+    "source_type_name": "harness_notifications"
+}

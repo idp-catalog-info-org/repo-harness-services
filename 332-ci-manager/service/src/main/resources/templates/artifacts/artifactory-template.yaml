@@ -1,0 +1,87 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Artifactory connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  repository:
+    type: string
+    description: Artifactory repository name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repository}}
+  repositoryFormat:
+    type: string
+    description: Repository format (docker, generic)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repositoryFormat}}
+  artifactPath:
+    type: string
+    description: Artifact path (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactPath}}
+  artifactPathFilter:
+    type: string
+    description: Artifact path filter (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactPathFilter}}
+  artifactDirectory:
+    type: string
+    description: Artifact directory (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactDirectory}}
+  artifactFilter:
+    type: string
+    description: Artifact filter (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactFilter}}
+  repositoryUrl:
+    type: string
+    description: Repository URL (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repositoryUrl}}
+  imageTag:
+    type: string
+    description: Image tag (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  imageTagRegex:
+    type: string
+    description: Image tag regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  imageDigest:
+    type: string
+    description: Image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/artifactory-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_REPOSITORY_NAME: ${{inputs.repository}}
+    PLUGIN_ARTIFACT_REPOSITORY_FORMAT: ${{inputs.repositoryFormat}}
+    PLUGIN_ARTIFACT_DIRECTORY: ${{inputs.artifactDirectory}}
+    PLUGIN_ARTIFACT_FILTER: ${{inputs.artifactFilter}}
+    PLUGIN_ARTIFACT_PATH: ${{inputs.artifactPath}}
+    PLUGIN_ARTIFACT_PATH_FILTER: ${{inputs.artifactPathFilter}}
+    PLUGIN_ARTIFACT_REPOSITORY_URL: ${{inputs.repositoryUrl}}
+    PLUGIN_ARTIFACT_IMAGE_PATH: ${{inputs.artifactPath}}
+    PLUGIN_ARTIFACT_IMAGE_TAG: ${{inputs.imageTag}}
+    PLUGIN_ARTIFACT_IMAGE_TAG_REGEX: ${{inputs.imageTagRegex}}
+    PLUGIN_ARTIFACT_IMAGE_DIGEST: ${{inputs.imageDigest}}
+    PLUGIN_ARTIFACTORY_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_ARTIFACTORY_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_ARTIFACTORY_USERNAME: ${{inputs.artifactConnector.username}}
+    PLUGIN_ARTIFACTORY_PASSWORD: ${{inputs.artifactConnector.password}}

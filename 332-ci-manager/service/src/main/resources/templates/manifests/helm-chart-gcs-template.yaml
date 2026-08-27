@@ -1,0 +1,115 @@
+---
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  connector:
+    type: connector
+    description: GCS connector (resolved from connectorRef)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.connectorRef}}
+  bucketName:
+    type: string
+    description: GCS bucket name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.bucketName}}
+  folderPath:
+    type: string
+    description: Folder path in the bucket
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.folderPath}}
+  manifestPath:
+    type: string
+    description: Manifest path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.manifestPath}}
+  chartName:
+    type: string
+    description: Helm chart name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartName}}
+  chartVersion:
+    type: string
+    description: Helm chart version
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartVersion}}
+  valuesPaths:
+    type: list
+    description: Paths to values YAML files
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  subChartPath:
+    type: string
+    description: Sub-chart path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.subChartPath}}
+  fetchHelmChartMetadata:
+    type: boolean
+    description: Whether to fetch Helm chart metadata
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.fetchHelmChartMetadata}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+  cacheConnector:
+    type: connector
+    description: Cache connector (resolved from connectorRef)
+    default: ${{runtime.settings.ci_cache_connector}}
+  flags:
+    type: string
+    description: Command flags
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.commandFlags}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/gcs-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID:  ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME:  ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_PROJECT: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.project}}
+    PLUGIN_ARTIFACT_BUCKET_NAME: ${{inputs.bucketName}}
+    PLUGIN_ARTIFACT_CHART_NAME: ${{inputs.chartName}}
+    PLUGIN_ARTIFACT_CHART_PATH: ${{inputs.folderPath}}
+    PLUGIN_ARTIFACT_CHART_VERSION:  ${{inputs.chartVersion}}
+    PLUGIN_GCP_NAME: ${{inputs.connector.name}}
+    PLUGIN_GCP_SERVICE_ACCOUNT_KEY: ${{inputs.connector.jsonKey}}
+    PLUGIN_POOL_ID: ${{inputs.connector.workloadPoolId}}
+    PLUGIN_PROVIDER_ID: ${{inputs.connector.providerId}}
+    PLUGIN_PROJECT_NUMBER: ${{inputs.connector.gcpProjectId}}
+    PLUGIN_SERVICE_ACCOUNT_EMAIL: ${{inputs.connector.serviceAccountEmail}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.connector.oidcToken}}
+
+    PLUGIN_CACHE_DIR: ""
+    PLUGIN_CACHE_STORE_ENDPOINT_URL: ${{runtime.settings.ci_cache_s3_endpoint_url}}
+    PLUGIN_CACHE_STORE_REGION: ${{runtime.settings.ci_cache_s3_region}}
+    PLUGIN_CACHE_STORE_BUCKET: ${{runtime.settings.ci_cache_s3_bucket_name}}
+    PLUGIN_CACHE_STORE_USERNAME: ""
+    PLUGIN_CACHE_STORE_PASSWORD: ""
+
+    PLUGIN_CACHE_STORE_AWS_NAME: ${{inputs.cacheConnector.name}}
+    PLUGIN_CACHE_STORE_AWS_ACCESS_KEY: ${{inputs.cacheConnector.accessKey}}
+    PLUGIN_CACHE_STORE_AWS_SECRET_KEY: ${{inputs.cacheConnector.secretKey}}
+    PLUGIN_CACHE_STORE_AWS_SESSION_TOKEN: ${{inputs.cacheConnector.sessionToken}}
+    PLUGIN_CACHE_STORE_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.cacheConnector.crossAccountRoleArn}}
+    PLUGIN_CACHE_STORE_AWS_EXTERNAL_ID: ${{inputs.cacheConnector.externalId}}
+    PLUGIN_CACHE_STORE_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.cacheConnector.assumeRoleSessionDuration}}
+    PLUGIN_CACHE_STORE_AWS_IAM_ROLE_ARN: ${{inputs.cacheConnector.iamRoleArn}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY: ${{inputs.cacheConnector.sdkClientBackoffStrategyType}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.cacheConnector.baseDelay}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.cacheConnector.maxBackoffTime}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.cacheConnector.retryCount}}
+    PLUGIN_CACHE_STORE_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.cacheConnector.fixedBackoff}}
+
+    PLUGIN_CACHE_STORE_OIDC_TOKEN_ID: ${{inputs.cacheConnector.oidcToken}}
+
+    PLUGIN_CACHE_STORE_GCP_NAME: ${{inputs.cacheConnector.name}}
+    PLUGIN_CACHE_STORE_GCP_SERVICE_ACCOUNT_KEY: ${{inputs.cacheConnector.jsonKey}}
+    PLUGIN_CACHE_STORE_POOL_ID: ${{inputs.cacheConnector.workloadPoolId}}
+    PLUGIN_CACHE_STORE_PROVIDER_ID: ${{inputs.cacheConnector.providerId}}
+    PLUGIN_CACHE_STORE_PROJECT_NUMBER: ${{inputs.cacheConnector.gcpProjectId}}
+    PLUGIN_CACHE_STORE_SERVICE_ACCOUNT_EMAIL: ${{inputs.cacheConnector.serviceAccountEmail}}

@@ -1,0 +1,47 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: pipeline-service
+  description: Pipeline orchestration engine (static snapshot)
+  annotations:
+    github.com/project-slug: idp-catalog-info-org/repo-harness-services
+spec:
+  type: service
+  lifecycle: production
+  owner: group:pipeline
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ng-manager
+  description: Next-gen manager (static snapshot from 120-ng-manager)
+  annotations:
+    github.com/project-slug: idp-catalog-info-org/repo-harness-services
+spec:
+  type: service
+  lifecycle: production
+  owner: group:platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ci-manager
+  description: CI manager (static snapshot from 332-ci-manager)
+  annotations:
+    github.com/project-slug: idp-catalog-info-org/repo-harness-services
+spec:
+  type: service
+  lifecycle: production
+  owner: group:ci
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: idp-service
+  description: Internal Developer Portal service (static snapshot)
+  annotations:
+    github.com/project-slug: idp-catalog-info-org/repo-harness-services
+spec:
+  type: service
+  lifecycle: production
+  owner: group:idp

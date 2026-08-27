@@ -1,0 +1,1011 @@
+# Default values for pipeline-service
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  autoscaling:
+    enabled: false
+  pdb:
+    create: false
+  jfr:
+    enabled: false
+  monitoring:
+    enabled: false
+    managedPlatform: ""
+  fips: false
+  kubeVersion: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  loadbalancerURL: "https://test.com"
+  stackDriverLoggingEnabled: false
+  ssca:
+    enabled: false
+  externalSecretsLoader:
+    enabled: false
+    provider: "vault"
+    image:
+      repository: "repo/image"
+      tag: "tag"
+      pullPolicy: "IfNotPresent"
+    vault:
+      address: ""
+      engine: ""
+      basePath: ""
+      auth:
+        method: "token"
+        # For Token auth:
+        token: "vault-token"
+        # For AppRole:
+        roleId: ""
+        secretId: ""
+        # For Kubernetes auth:
+        role: ""
+    databases:
+      mongo:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      redis:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      postgres:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+      timescaledb:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+  database:
+    postgres:
+      ## - installed = true if installed within cluster
+      installed: true
+      ## - protocol to use for connection
+      protocol: postgres
+      ## - host array for external
+      hosts:
+        - postgres:5432
+      ## - secret name containing external values
+      secretName: ""
+      ## - key within secret containing username
+      userKey: ""
+      ## - key within secret containing password
+      passwordKey: ""
+      ## - extra arguments set to connection string
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              POSTGRES_USER: ""
+              POSTGRES_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                POSTGRES_USER:
+                  name: ""
+                  property: ""
+                POSTGRES_PASSWORD:
+                  name: ""
+                  property: ""
+    mongo:
+      installed: true
+      protocol: mongodb
+      # --  provide default values if mongo.installed is set to false
+      hosts: 
+        - dummy.net
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    timescaledb:
+      installed: true
+      protocol: "jdbc:postgresql"
+      sslEnabled: false
+      # --  provide default values if mongo.installed is set to false
+      hosts:
+        - timescaledb-single-chart:5432
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      certName: ""
+      certKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              TIMESCALEDB_USERNAME: ""
+              TIMESCALEDB_PASSWORD: ""
+              TIMESCALEDB_SSL_ROOT_CERT: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                TIMESCALEDB_USERNAME:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_PASSWORD:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_SSL_ROOT_CERT:
+                  name: ""
+                  property: ""
+    redis:
+      installed: true
+      protocol: "redis"
+      # --  provide default values if redis.installed is set to false
+      hosts: []
+      secretName: "redis-secret"
+      userKey: "redis-user"
+      passwordKey: "redis-password"
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+    elasticsearch:
+      installed: true
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              ELASTIC_SEARCH_API_KEY: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                ELASTIC_SEARCH_API_KEY:
+                  name: ""
+                  property: ""
+  imagePullSecrets: []
+  ingress:
+    # -- create ingress objects
+    enabled: false
+    # -- set ingress object classname
+    className: harness
+    # -- set host of ingressObjects
+    hosts:
+      - my-host.example.org
+    # -- set tls for ingress objects
+    tls:
+      enabled: false
+      secretName: ''
+    # -- add annotations to ingress objects
+    objects:
+      annotations: {}
+    disableHostInIngress: false
+    pathPrefix: ""
+    pathType: ""
+  istio:
+    # -- create virtualServices objects
+    enabled: false
+    enableRegexRoutes: false
+    # -- create gateway and use in virtualservice
+    gateway:
+      create: false
+    # -- if gateway not created, use specified gateway and host
+    virtualService:
+      pathPrefix: ""
+      gateways:
+      hosts:
+  opa:
+    enabled: false
+  waitForInitContainer:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: harness/helm-init-container
+      pullPolicy: Always
+      tag: "latest"
+      digest: ""
+      imagePullSecrets: []
+  fileLogging:
+    enabled: false
+    logFilename: /opt/harness/logs/pod.log
+    maxFileSize: 50MB
+    maxBackupFileCount: 10
+    totalFileSizeCap: 1GB
+
+monitoring:
+  port: 8889
+  path: /metrics
+
+terminationMessage: {}
+
+secondaryTimescaledb:
+  # -- TimescaleDB host names
+  hosts: []
+  protocol: "jdbc:postgresql2312321"
+  # -- Enable TimescaleDB SSL
+  # sslEnabled: false
+  # -- TimescaleDB secrets
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          TIMESCALEDB_USERNAME: ""
+          TIMESCALEDB_PASSWORD: ""
+          TIMESCALEDB_SSL_ROOT_CERT: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            TIMESCALEDB_USERNAME:
+              name: ""
+              property: ""
+            TIMESCALEDB_PASSWORD:
+              name: ""
+              property: ""
+            TIMESCALEDB_SSL_ROOT_CERT:
+              name: ""
+              property: ""
+postgres:
+  initializeDb: false
+  ## - protocol to use for connection
+  protocol: ""
+  ## - host array for external
+  hosts: []
+  extraArgs: ""
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          POSTGRES_USER: ""
+          POSTGRES_PASSWORD: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            POSTGRES_USER:
+              name: ""
+              property: ""
+            POSTGRES_PASSWORD:
+              name: ""
+              property: ""
+timescaledb:
+  # -- TimescaleDB host names
+  hosts: []
+  # -- Enable TimescaleDB SSL
+  # sslEnabled: false
+  # -- TimescaleDB secrets
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          TIMESCALEDB_USERNAME: ""
+          TIMESCALEDB_PASSWORD: ""
+          TIMESCALEDB_SSL_ROOT_CERT: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            TIMESCALEDB_USERNAME:
+              name: ""
+              property: ""
+            TIMESCALEDB_PASSWORD:
+              name: ""
+              property: ""
+            TIMESCALEDB_SSL_ROOT_CERT:
+              name: ""
+              property: ""
+database:
+  mongo:
+    pmsharness:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    notifications:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+  redis:
+    events:
+      enabled: false
+      protocol: ""
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""    
+    cache:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+    lock:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+
+replicaCount: 1
+updateStrategy:
+  rollingUpdate:
+    maxSurge: 100%
+    maxUnavailable: 0
+  type: RollingUpdate
+progressDeadlineSeconds: 600
+allowedOrigins: ""
+image:
+  registry: docker.io
+  digest: ""
+  repository: harness/pipeline-service-signed
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.41.3"
+  imagePullSecrets: []
+mongoSecrets:
+  userName:
+    name: harness-secrets
+    key: mongodbUsername
+  password:
+    name: mongodb-replicaset-chart
+    key: mongodb-root-password
+timescaleSecret:
+  password:
+    name: harness-secrets
+    key: timescaledbPostgresPassword
+java:
+  memory: "4096m"
+
+# Pipeline splitting configuration
+# When enabled, creates separate orchestration-engine deployment for worker processing
+pipelineSplitting:
+  enabled: true
+  pipelineService:
+    workloadType: "GRAPH"
+  orchestrationEngine:
+    workloadType: "ORCHESTRATION_ENGINE"
+
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "harness-default"
+podAnnotations: {}
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext:
+  runAsUser: 65534
+  runAsNonRoot: true
+probes:
+  livenessProbe:
+    httpGet:
+      path: /api/health/liveness
+      port: http-pms
+      scheme: HTTP
+    timeoutSeconds: 10
+    periodSeconds: 60
+    successThreshold: 1
+    failureThreshold: 5
+  readinessProbe:
+    httpGet:
+      path: /api/health
+      port: http-pms
+      scheme: HTTP
+    timeoutSeconds: 1
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 10
+  startupProbe:
+    httpGet:
+      path: /api/health
+      port: http-pms
+      scheme: HTTP
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 5
+    successThreshold: 1
+    failureThreshold: 42
+service:
+  annotations: {}
+  type: ClusterIP
+  protocol: TCP
+  port: 12001
+  grpcport: 12011
+  gitsyncgrpcport: 14002
+  pmssdkgrpcport: 15302
+resources:
+  limits:
+    memory: 6144Mi
+  requests:
+    cpu: 1
+    memory: 6144Mi
+autoscaling:
+  enabled: false
+  targetMemory: ""
+  targetCPU: 70
+nodeSelector: {}
+tolerations: []
+affinity: {}
+imagePullSecrets: {}
+additionalConfigs: {}
+java17flags: ""
+# extraVolumes:
+# - name: volume-test
+#   configMap:
+#     name: test-config
+#     readOnly: true
+extraVolumes: []
+# extraVolumeMounts:
+#   - name: test-volume-mount
+#     mountPath: /opt/harness/config
+extraVolumeMounts: []
+# extraContainers: generic escape hatch for arbitrary sidecar containers.
+# Rendered via tplvalues (Helm templating allowed). For the Envoy rate-limit
+# sidecar specifically, use the `rateLimiting` block below instead.
+extraContainers: []
+
+# ---------------------------------------------------------------------------
+# Envoy per-account API rate limiting (see the "Rate Limiting using Envoy" doc).
+# When enabled, an Envoy sidecar is injected that owns the Service port and
+# forwards to the app on `appPort`. The chart automatically sets the app's
+# PMS_APPLICATION_PORT=<appPort> env ONLY when enabled=true (see deployment.yaml),
+# so the app moves off the Service port for Envoy to take over. When disabled, the
+# app stays on service.port (12001) — default-off deploys and probes are unchanged.
+# Rules live in the RLS + its `envoy-config` ConfigMap, deployed separately.
+#
+# To DISABLE limiting WITHOUT redeploying pipeline-service: scale the rate-limit
+# service to 0 — Envoy is fail-open, so it just proxies. Set enabled:false only
+# when you want to remove the sidecar entirely.
+rateLimiting:
+  enabled: false
+  envoyImage: envoyproxy/envoy:v1.31.10
+  # appPort = where the APP listens WHEN the sidecar is enabled; Envoy forwards to
+  # 127.0.0.1:appPort and owns service.port. The Envoy ConfigMap is chart-templated
+  # (templates/envoy-ratelimit-configmap.yaml), so this is the single source of truth:
+  # the listener uses service.port, the forward cluster uses appPort, and the chart
+  # injects PMS_APPLICATION_PORT=appPort into the app container automatically.
+  appPort: 12009
+  adminPort: 9901         # Envoy admin/readiness port
+  rlsHost: rate-limit-service      # shared RLS Service name (namespace + svc suffix added by the template)
+  rlsPort: 8081
+  # Per-route upstream timeout applied to every route in the sidecar. Envoy's built-in
+  # default is 15s, which is too tight for slow-but-valid endpoints (remote-git pipeline
+  # ops can legitimately run into minutes) and produced "504 upstream request timeout".
+  # "0s" disables the route timeout (unbounded active requests); Envoy's stream_idle_timeout
+  # (5m default) and the gateway's own upstream timeout remain as backstops. Lower this
+  # per-env once each route's real p99 is known, for a tighter/safer bound.
+  routeTimeout: "0s"
+  # scrape the Envoy sidecar's /stats/prometheus (proxy-side metrics). Renders a
+  # GMP PodMonitoring on GKE, or a prom-operator PodMonitor when
+  # global.monitoring.managedPlatform=oss.
+  metrics:
+    enabled: true
+    scrapeInterval: 30s
+  resources:
+    # Sized generously: sidecar fronts ALL app traffic (not just rate-limited routes)
+    # and isn't in prod yet. Scale test hit 177m/pod on rate-limited APIs alone (PIPE-36385).
+    # No CPU limit: data-path proxy, avoids CFS-throttling latency; still gets its 500m
+    # request. Memory limit kept (incompressible).
+    requests:
+      cpu: 500m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+shutdownHooksEnabled: false
+# lifecycleHooks:
+#   postStart:
+#     exec:
+#       command:
+#   preStop:
+#     exec:
+#       command:
+
+# extraEnvVars:
+# - name: POD_NAME
+#   valueFrom:
+#     fieldRef:
+#       fieldPath: metadata.name
+extraEnvVars: []
+
+virtualService:
+  annotations: {}
+  objects:
+    - name: pipeline-service
+      pathMatchType: prefix
+      pathRewrite: "/"
+      paths:
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/pipeline/'
+    - name: pipeline-service-v1-apis
+      pathMatchType: regex
+      pathRewrite: "/api/\\1"
+      paths:
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/rerun/[^\/]+/stages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/[^\/]+/retry-stages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/rerun/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/retry/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/execution/[^\/]+/dynamic/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/notification-rules/unresolved-inputs)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/notification-rules/validate)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/triggers/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/dynamic/internal)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/dynamic)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/direct)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/stages)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/stages-execution-list)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/approvals/execution/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/execution/[^\/]+/inputset)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/[^\/]+/git-metadata)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/[^\/]+/import)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/[^\/]+/move-config)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/overlay/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/overlay)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/get-runtime-inputs-schema)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/git-metadata)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/import)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/inputs)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/inputs-schema)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/move-config)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/triggers)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/validate)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/validate/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/execution/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets/merge)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/step-fqn-list)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/input-sets)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/dry-run)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/pipeline-schema/individual-schema)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/pipeline-schema/inputs-schema)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/triggers/catalog)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/step-pallete)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/execution/can-retry/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/[^\/]+/retry-history)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/orgs/[^\/]+/projects/[^\/]+/pipelines/[^\/]+/execute/latest-execution-id/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/conversion/checksums)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/conversion/[^\/]+/retry)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/conversion/[^\/]+)\/?$'
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/(v1/conversion)\/?$'
+ingress:
+  objects:
+    - name: pipeline-service
+      annotations: 
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+      paths:
+      - path: '{{ .Values.global.ingress.pathPrefix }}/pipeline(/|$)(.*)'
+    - name: pipeline-service-v1-apis
+      annotations: 
+        nginx.ingress.kubernetes.io/rewrite-target: /api/$1
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+      paths:
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines.*)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/input-sets.*)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/pipeline-schema.*)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute/stages-execution-list)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute/stages)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute/dynamic)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute/notification-rules/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/step-pallete)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/triggers/catalog)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/approvals/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/triggers)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/triggers/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/execution/.+)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/orgs/.+/projects/.+/pipelines/.+/execute/.+/retry-stages)'
+      - path: '{{ .Values.global.ingress.pathPrefix }}/(v1/conversion.*)'
+
+secrets:
+  fileSecret: []
+  default:
+    OPA_SERVER_SECRET: "dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq"
+    CF_CLIENT_API_KEY: ""
+    LOG_STREAMING_SERVICE_TOKEN: "c76e567a-b341-404d-a8dd-d9738714eb82"
+    ANNOTATIONS_SERVICE_SECRET: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+    IDP_SERVICE_SECRET: "dummyIdpServiceSecret"
+    STO_SERVICE_GLOBAL_TOKEN: ""
+    SECRET_CONNECTOR_SERVICE_SECRET: "dummySecretConnectorServiceSecret"
+    PLATFORM_CONFIG_SERVICE_SECRET: "dummyPlatformConfigServiceSecret"
+    FLEX_ENFORCEMENT_SERVICE_SECRET: "dummyEnforcementServiceSecret"
+  kubernetesSecrets:
+    - secretName: ""
+      keys:
+        OPA_SERVER_SECRET: ""
+        CF_CLIENT_API_KEY: ""
+        ANNOTATIONS_SERVICE_SECRET: ""
+        IDP_SERVICE_SECRET: ""
+        SECRET_CONNECTOR_SERVICE_SECRET: ""
+        PLATFORM_CONFIG_SERVICE_SECRET: ""
+        FLEX_ENFORCEMENT_SERVICE_SECRET: ""
+    - secretName: "harness-secrets"
+      keys:
+        STO_SERVICE_GLOBAL_TOKEN: "stoAppHarnessToken"
+  secretManagement:
+    externalSecretsOperator:
+      - secretStore:
+          name: ""
+          kind: ""
+        remoteKeys:
+          OPA_SERVER_SECRET:
+            name: ""
+            property: ""
+          CF_CLIENT_API_KEY:
+            name: ""
+            property: ""
+          ANNOTATIONS_SERVICE_SECRET:
+            name: ""
+            property: ""
+          IDP_SERVICE_SECRET:
+            name: ""
+            property: ""
+          STO_SERVICE_GLOBAL_TOKEN:
+            name: ""
+            property: ""
+          SECRET_CONNECTOR_SERVICE_SECRET:
+            name: ""
+            property: ""
+          PLATFORM_CONFIG_SERVICE_SECRET:
+            name: ""
+            property: ""
+          FLEX_ENFORCEMENT_SERVICE_SECRET:
+            name: ""
+            property: ""
+
+config:
+  EVENTS_FRAMEWORK_NETTY_THREADS: "64"
+  EVENTS_FRAMEWORK_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  EVENTS_FRAMEWORK_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  EVENTS_FRAMEWORK_SENTINEL_MASTER_NAME: harness-redis
+  EVENTS_FRAMEWORK_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  CACHE_BACKEND: REDIS
+  CACHE_CONFIG_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "cache") }}'
+  CACHE_CONFIG_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "cache") }}'
+  CACHE_CONFIG_SENTINEL_MASTER_NAME: harness-redis
+  CACHE_CONFIG_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  CACHE_NAMESPACE: ""
+  LOCK_CONFIG_ENV_NAMESPACE: ""
+  LOCK_CONFIG_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "lock") }}'
+  LOCK_CONFIG_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "lock") }}'
+  LOCK_CONFIG_SENTINEL_MASTER_NAME: harness-redis
+  LOCK_CONFIG_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  REDIS_RETRY_ATTEMPTS: "5"
+  REDIS_RETRY_INTERVAL: "2500"
+  REDIS_SUBSCRIPTIONS_PER_CONNECTION: "10"
+  REDISSON_PING_CONNECTION_INTERVAL_IN_MILLIS: "0"
+  ACCESS_CONTROL_BASE_URL: http://access-control:9006/api/
+  ACCESS_CONTROL_ENABLED: "true"
+  AISRE_SERVICE_CLIENT_BASE_URL: http://iro-tp-web:80
+  FLEX_ENFORCEMENT_BASE_URL: http://license-manager:7093/
+  FLEX_ENFORCEMENT_OBSERVE_ONLY: "true"
+  AUDIT_SERVICE_BASE_URL: http://platform-service:9005/api/
+  AUTH_ENABLED: "true"
+  BASE_PATH_PREFIX: "/gateway/pipeline/api"
+  CI_MANAGER_BASE_URL: http://ci-manager:7090/
+  CUSTOM_TRIGGER_BASEURL: "{{ .Values.global.loadbalancerURL }}/gateway/pipeline/api/"
+  CV_MANAGER_BASE_URL: http://cv-nextgen:6060/cv/api/
+  DEBEZIUM_CONSUMER_BATCH_SIZE: "100"
+  DEBEZIUM_CONSUMER_THREADS: "2"
+  DEBEZIUM_CONSUMER_TOPIC_NAME: "DEBEZIUM_pms-harness.pms-harness.planExecutionsSummary"
+  DEPLOY_MODE: KUBERNETES_ONPREM
+  DISABLE_CUSTOM_STAGE_IN_PIPELINE_SERVICE: "true"
+  DISABLE_FREEZE_NOTIFY_TEMPLATE: "false"
+  DISTRIBUTED_LOCK_IMPLEMENTATION: "REDIS"
+  ENABLE_APPDYNAMICS: "false"
+  ENABLE_AUDIT: "true"
+  ENABLE_COVERAGE: "false"
+  ENABLE_DASHBOARD_TIMESCALE: "true"
+  ENABLE_ERROR_TRACKING: "false"
+  ENABLE_GIT_SYNC: "true"
+  ENABLE_OPENTELEMETRY: "false"
+  ENFORCEMENT_CHECK_ENABLED: "true"
+  ENV: "SMP"
+  FEATURE_FLAG_SYSTEM: LOCAL
+  FF_SERVER_BASE_URL: 'http://ff-admin-server.{{ .Release.Namespace }}.svc.cluster.local/api/1.0'
+  FF_SERVER_CONNECTION_TIMEOUT: "30000"
+  FF_SERVER_READ_TIMEOUT: "30000"
+  FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE: "5"
+  FILTER_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE: "5"
+  GO_CONVERT_SERVICE_GRPC_URL: '{{ ternary "yaml-converter:8090" "dns:///yaml-converter-headless:8090" .Values.global.istio.enabled }}'
+  GRPC_SERVER_PORT: "12011"
+  HARNESS_CODE_GIT_BASE_URL: '{{ .Values.global.loadbalancerURL }}/code/git'
+  HARNESS_CODE_INTERNAL_API_URL: http://code-api:80/
+  HSQS_BASE_URL: 'http://queue-service:9091/'
+  IACM_MANAGER_BASE_URL: http://iacm-manager:7090/
+  INTERNAL_CI_MANAGER_AUTHORITY: '{{ ternary "ci-manager:9979" "dns:///ci-manager-headless:9979" .Values.global.istio.enabled }}'
+  INTERNAL_CI_MANAGER_TARGET: '{{ ternary "ci-manager:9979" "dns:///ci-manager-headless:9979" .Values.global.istio.enabled }}'
+  INTERNAL_PIPELINE_SERVICE_AUTHORITY: '{{ ternary "pipeline-service:15302" "dns:///pipeline-service-headless:15302" .Values.global.istio.enabled }}'
+  INTERNAL_PIPELINE_SERVICE_TARGET: '{{ ternary "pipeline-service:15302" "dns:///pipeline-service-headless:15302" .Values.global.istio.enabled }}'
+  INTERNAL_MANAGER_AUTHORITY: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  INTERNAL_MANAGER_TARGET: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_AUTHORITY: '{{ ternary "ng-manager:9979" "dns:///ng-manager-headless:9979" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_GITSYNC_AUTHORITY: '{{ ternary "ng-manager:13002" "dns:///ng-manager-headless:13002" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_GITSYNC_TARGET: '{{ ternary "ng-manager:13002" "dns:///ng-manager-headless:13002" .Values.global.istio.enabled }}'
+  INTERNAL_NG_MANAGER_TARGET: '{{ ternary "ng-manager:9979" "dns:///ng-manager-headless:9979" .Values.global.istio.enabled }}'
+  INTERNAL_CVNG_MANAGER_AUTHORITY: cv-nextgen:9979
+  INTERNAL_CVNG_MANAGER_TARGET: cv-nextgen:9979
+  INTERNAL_IACM_MANAGER_AUTHORITY: iacm-manager:9979
+  INTERNAL_IACM_MANAGER_TARGET: iacm-manager:9979
+  INTERNAL_IDP_SERVICE_AUTHORITY: idp-service:9979
+  INTERNAL_IDP_SERVICE_TARGET: idp-service:9979
+  INTERNAL_STO_MANAGER_AUTHORITY: sto-manager:9979
+  INTERNAL_STO_MANAGER_TARGET: sto-manager:9979
+  INTERRUPT_MONITOR_ITERATOR_THREAD_POOL_SIZE: "2"
+  JAVA_ADVANCED_FLAGS: '{{- include "harnesscommon.jfr.v1.printJavaAdvancedFlags" (dict "ctx" $) }}'
+  LOGGING_LEVEL: INFO
+  LOG_STREAMING_CONTAINER_STEP_BASE_URL: '{{ .Values.global.loadbalancerURL }}/log-service/'
+  LOG_STREAMING_SERVICE_BASEURL: 'http://log-service.{{ .Release.Namespace }}.svc.cluster.local:8079/'
+  MANAGER_BASE_URL: http://harness-manager:9090/api/
+  MANAGER_CLIENT_BASEURL: http://harness-manager:9090/api/
+  MEMORY: '{{ .Values.java.memory }}'
+  MONGO_INDEX_MANAGER_MODE: AUTO
+  MONGO_MESSAGE_BROKER_URI: ""
+  MONGO_QUERY_BUDGET_MODE: DISABLED
+  MONGO_TRANSACTIONS_ALLOWED: "false"
+  NG_MANAGER_BASE_URL: http://ng-manager:7090/
+  RHS_CLIENT_BASE_URL: http://resource-hierarchy-service:9009/
+  SECRET_CONNECTOR_SERVICE_CLIENT_BASE_URL: 'http://secrets-connectors-service:9008/'
+  SECRET_CONNECTOR_SERVICE_ENABLED: "false"
+  PLATFORM_CONFIG_SERVICE_CLIENT_BASE_URL: 'http://platform-config-service:9010/'
+  PLATFORM_CONFIG_SERVICE_ENABLED: "false"
+  NOTIFICATION_BASE_URL: http://platform-service:9005/api/
+  OPA_CONNECT_TIMEOUT: "40"
+  OPA_READ_TIMEOUT: "40"
+  OPA_SERVER_BASEURL: 'http://policy-mgmt:3000/'
+  CHANGE_ADVISOR_SERVICE_BASE_URL: 'http://change-advisor-service:6477/'
+  ORCHESTRATION_LOG_SHOULD_USE_BATCHING: "true"
+  ORCHESTRATION_VISUALIZATION_POOL_CORE_SIZE: "10"
+  ORCHESTRATION_VISUALIZATION_POOL_MAX_SIZE: "50"
+  OTEL_EXPORTER_OTLP_ENDPOINT: ""
+  OTEL_SERVICE_NAME: pipeline-service
+  IDP_BASE_URL: '{{ .Values.global.loadbalancerURL }}'
+  PIPELINE_SERVICE_BASE_URL: '{{ .Values.global.loadbalancerURL }}/ng/#'
+  PIPELINE_SERVICE_ENDPOINT: http://pipeline-service:12001/api/
+  PLAN_CREATOR_DEPENDENCY_BATCH: "10"
+  PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE: "20"
+  PLAN_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE: "100"
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE: "20"
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE: "100"
+  PMS_API_BASE_URL: '{{ .Values.global.loadbalancerURL }}/gateway/pipeline/api/'
+  PMS_WEBHOOK_EVENT_CONSUMER_THREAD_COUNT: "15"
+  PUBLISH_ADVISER_EVENT_FOR_CUSTOM_ADVISERS: "true"
+  REDUCE_ORCHESTRATION_EVENT_LOG: "true"
+  RELEASE_MANAGEMENT_SERVICE_BASE_URL: "http://release-management:5001/"
+  RESOURCE_GROUP_BASE_URL: 'http://access-control:9006/api/'
+  SCM_SERVICE_URI: '{{ ternary "scm-service:8091" "dns:///scm-service-headless:8091" .Values.global.istio.enabled }}'
+  SEGMENT_ENABLED: "false"
+  SHOULD_CONFIGURE_WITH_CI: "true"
+  STACK_DRIVER_LOGGING_ENABLED: '{{ .Values.global.stackDriverLoggingEnabled }}'
+  STO_MANAGER_BASE_URL: http://sto-manager:7090/
+  TEMPLATE_SERVICE_ENDPOINT: http://template-service:15002/api/
+  VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_CORE_SIZE: "5"
+  VARIABLE_CREATOR_MERGE_SERVICE_EXECUTOR_POOL_MAX_SIZE: "5"
+  VERSION: '{{ .Values.image.tag }}'
+  WEBHOOK_TRIGGER_BASEURL: '{{ .Values.global.loadbalancerURL }}/ng/api/'
+  SDK_RESPONSE_EVENT_CONSUMER_THREAD_COUNT: "2"
+  NODE_START_EVENT_CONSUMER_THREAD_COUNT: "2"
+  RESUME_EVENT_CONSUMER_THREAD_COUNT: "2"
+  INITIATE_NODE_EVENT_CONSUMER_THREAD_COUNT: "2"
+  SYSTEM_EVENT_TRIGGER_CONSUMER_THREAD_COUNT: "1"
+  ORCHESTRATION_POOL_MAX_SIZE: "300"
+  SDK_RESPONSE_EVENT_POOL_MAX_SIZE: "300"
+  GRPC_MAX_CONNECTION_AGE: "30"
+  # will be change with harness common
+  ELASTIC_SEARCH_URL: elastic-search:9200
+  PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  ENABLE_MIGRATION_JOB_FOR_GCS: "false"
+  MIGRATION_JOB_BATCH_SIZE_FOR_GCS: "1000"
+  GCS_MIGRATION_JOB_FREQUENCY_MINUTES: "60"
+  RESOURCE_RESTRAINT_ITERATOR_THREAD_POOL_SIZE: "10"
+  ENABLE_CONFLUENT_KAFKA_PRODUCER: "false"
+  KAFKA_CONFLUENT_BOOTSTRAP_SERVER_URLS: "pkc-z1o60.europe-west1.gcp.confluent.cloud:9092"
+  KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: "https://psrc-yow81o.europe-west1.gcp.confluent.cloud"
+  KAFKA_CONFLUENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "https"
+  KAFKA_CONFLUENT_SECURITY_PROTOCOL: "SASL_SSL"
+  FIPS_ENABLED: '{{ .Values.global.fips }}'
+  STO_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}{{ .Values.global.loadbalancerContext }}/sto/'
+  STO_SERVICE_INTERNAL_ENDPOINT: 'http://sto-core.{{ .Release.Namespace }}.svc.cluster.local:4000/'
+  ENABLE_WAIT_NOTIFY_OPTIMISATION: "true"
+  ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG: "true"
+  NOTIFY_RESPONSES_THREAD_POOL_SIZE: "100"
+  MONGO_CONNECTIONS_PER_HOST: "100"
+  PMS_STUCK_EXECUTIONS_MAX_PROCESSING_DURATION_MINUTES: "10"
+
+rbac:
+  rules: []
+
+jfr:
+  image:
+    registry: registry.access.redhat.com
+    repository: ubi8/ubi-minimal
+    pullPolicy: Always
+    tag: "8.9-1029"
+    digest: ""
+    imagePullSecrets: []
+
+pdb:
+  create: false
+
+prometheus-elasticsearch-exporter:
+  enabled: false
+  # es:
+  #   uri: http://elastic-search:9200
+  # serviceMonitor:
+  #   enabled: false

@@ -1,0 +1,82 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//332-ssca/cd/src/main/java/io/harness/ssca/cd/execution/filtercreator:module",
+        "//332-ssca/cd/src/main/java/io/harness/ssca/cd/execution/variablecreator:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/utils:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core:module",
+        "//clients/pipeline-service/pms-sdk/src/main/java/io/harness/pms/sdk:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/plan:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/plan:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/cf/pipeline:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/filters:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/approval:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/approval/v1:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/pipeline:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/stages:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/steps/barrier:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/steps/http:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/steps/internal:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/steps/pluginstep:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/plancreator/steps/resourceconstraint:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/pms/sdk/core/pipeline/variables:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/ssca/plancreator:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/custom:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/harness:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/jira:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/servicenow:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/barriers:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/eventlistener:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/jira:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/jira/create:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/jira/update:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/pipelinestage:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/policy/step:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/policy/variables:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/resourcerestraint:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/resourcerestraint/unified:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/servicenow:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/servicenow/create:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/servicenow/importset:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/servicenow/update:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/shellscript:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/upload:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/wait:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipelinerollback:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipelinestage/creator:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipelinestage/plancreator:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipelinestage/v1/plancreator:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/creation:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/creation/lookup:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/sdk:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/sdk/helper:module",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_jooq_joor",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

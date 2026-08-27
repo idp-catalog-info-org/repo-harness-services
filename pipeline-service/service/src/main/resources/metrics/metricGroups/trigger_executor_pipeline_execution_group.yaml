@@ -1,0 +1,7 @@
+name: Trigger Executor Pipeline Execution Metrics Group
+identifier: trigger_executor_pipeline_execution_group
+labels:
+  - accountId
+  - executorType
+  - status
+  - failureReason

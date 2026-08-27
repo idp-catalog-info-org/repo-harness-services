@@ -1,0 +1,10 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "summary": "Harness Incident Response: Low Remaining Percentage for SLO ${SLO_NAME} Error Budget",
+  "sections": [
+    {
+      "activityTitle": "Harness Incident Response: The remaining percentage for the error budget of SLO ${SLO_NAME} is critically low under project ${SLO_PROJECT_NAME}, in organization ${SLO_ORG_NAME}."
+    }
+  ]
+}

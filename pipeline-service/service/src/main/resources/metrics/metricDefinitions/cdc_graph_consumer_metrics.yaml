@@ -1,0 +1,17 @@
+name: CDC Graph Consumer Batch Metrics
+identifier: CdcGraphConsumerBatchMetrics
+metricGroup: CdcGraphConsumerMetricGroup
+metrics:
+  - metricName: cdc_pg_batch_processing_duration_ms
+    metricDefinition: End-to-end time per Kafka poll batch (parse + DB flush), in milliseconds
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s, 30s ]
+    unit: "ms"
+  - metricName: cdc_pg_batch_size
+    metricDefinition: Number of Kafka records received per poll batch
+    type: LastValue
+    unit: "1"
+  - metricName: cdc_pg_vertices_per_batch
+    metricDefinition: Unique vertices accumulated per batch (measures accumulation effectiveness)
+    type: LastValue
+    unit: "1"

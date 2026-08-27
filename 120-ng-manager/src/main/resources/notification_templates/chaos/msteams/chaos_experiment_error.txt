@@ -1,0 +1,86 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FF0000",
+  "summary": "Chaos Experiment error: ${CHAOS_EXPERIMENT_NAME}",
+  "sections": [
+    {
+      "activityTitle": "Chaos Experiment [${CHAOS_EXPERIMENT_NAME}](${CHAOS_EXPERIMENT_URL}) has an error",
+      "activitySubtitle": "In Project ${PROJECT_ID}",
+      "activityImage": "https://s3.amazonaws.com/wings-assets/slackicons/rejected.png",
+      "facts": [
+        {
+          "name": "Status",
+          "value": "Error"
+        },
+        {
+          "name": "Experiment ID",
+          "value": "${EXPERIMENT_ID}"
+        },
+        {
+          "name": "Run Sequence",
+          "value": "${RUN_SEQUENCE}"
+        },
+        {
+          "name": "Resilience Score",
+          "value": "${RESILIENCE_SCORE}"
+        },
+        {
+          "name": "Organization",
+          "value": "${ORG_ID}"
+        },
+        {
+          "name": "Account",
+          "value": "${ACCOUNT_ID}"
+        },
+        {
+          "name": "Description",
+          "value": "${CHAOS_EXPERIMENT_DESCRIPTION}"
+        },
+        {
+          "name": "Tags",
+          "value": "${CHAOS_EXPERIMENT_TAGS}"
+        },
+        {
+          "name": "Schedule",
+          "value": "${SCHEDULE_DETAILS}"
+        },
+        {
+          "name": "Experiment Run ID",
+          "value": "${CHAOS_EXPERIMENT_RUN_ID}"
+        },
+        {
+          "name": "Infrastructure",
+          "value": "${CHAOS_INFRASTRUCTURE_ID} (${CHAOS_INFRASTRUCTURE_TYPE})"
+        },
+        {
+          "name": "Environment",
+          "value": "${ENVIRONMENT_ID}"
+        },
+        {
+          "name": "Executed By",
+          "value": "${USER_ID}"
+        },
+        {
+          "name": "Timeline",
+          "value": "Executed from ${EXECUTED_ON} to ${EXECUTED_TILL} (Duration: ${DURATION})"
+        },
+        {
+          "name": "Faults",
+          "value": "${TOTAL_NUMBER_OF_FAULTS}"
+        },
+        {
+          "name": "Probes",
+          "value": "${TOTAL_NUMBER_OF_PROBES}"
+        },
+        {
+          "name": "Actions",
+          "value": "${TOTAL_NUMBER_OF_ACTIONS}"
+        },
+        {
+          "name": "View Experiment",
+          "value": "[${CHAOS_EXPERIMENT_URL}](${CHAOS_EXPERIMENT_URL})"
+        }
+      ]
+    }
+  ]
+}

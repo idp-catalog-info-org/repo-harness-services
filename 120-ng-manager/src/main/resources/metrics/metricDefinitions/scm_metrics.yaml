@@ -1,0 +1,36 @@
+name: SCM Metrics
+identifier: ScmMetrics
+metricGroup: scm_metrics_group
+metrics:
+  - metricName: scm_service_client_impl_count
+    metricDefinition: Count of SCM service client implementation calls by action type.
+    type: Count
+    unit: "1"
+  
+  - metricName: scm_service_client_impl_latency
+    metricDefinition: Latency of SCM service client implementation calls by action type.
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m ]
+    unit: "ms"
+  
+  - metricName: scm_service_calls_count
+    metricDefinition: Count of SCM service calls by action type.
+    type: Count
+    unit: "1"
+  
+  - metricName: scm_service_calls_latency
+    metricDefinition: Latency of SCM service calls by action type.
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m ]
+    unit: "ms"
+  
+  - metricName: go_scm_calls_count
+    metricDefinition: Count of Go SCM calls by action type.
+    type: Count
+    unit: "1"
+  
+  - metricName: go_scm_call_latency
+    metricDefinition: Latency of individual Go SCM calls by action type.
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m ]
+    unit: "ms"

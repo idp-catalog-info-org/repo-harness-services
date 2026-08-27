@@ -1,0 +1,33 @@
+identifier: vee-code-kong
+name: VeeCode Kong Service Manager
+description: View Kong Service Manager info for services in your software catalog.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: VeeCode
+category: Infrastructure
+source: https://github.com/veecode-platform/platform-backstage-plugins/tree/master/plugins/kong-service-manager
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/vee-code-kong-service-manager/
+config: |-
+  kong:
+    instances:
+      - id: kong-instance01
+        apiBaseUrl: https://api.kong-gateway.example.com
+        auth:
+          kongAdmin: ${KONG_ADMIN_TOKEN}
+environmentVariables:
+  - KONG_ADMIN_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: KongServiceManagerContent
+      addByDefault: true
+      defaultRoute: /kong-service-manager
+      layoutSchemaSpecs:
+        name: KongServiceManagerContent
+        title: Kong
+        contents:
+          - component: KongServiceManagerContent

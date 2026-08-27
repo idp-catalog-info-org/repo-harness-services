@@ -1,0 +1,121 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1685037935.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "auth"
+  ],
+  "properties": {
+    "auth": {
+      "$id": "#root/auth",
+      "title": "Auth",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "environment",
+        "providers"
+      ],
+      "properties": {
+        "environment": {
+          "$id": "#root/auth/environment",
+          "title": "Environment",
+          "type": "string",
+          "default": "",
+          "pattern": "^.*$"
+        },
+        "providers": {
+          "$id": "#root/auth/providers",
+          "title": "Providers",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "atlassian"
+          ],
+          "properties": {
+            "atlassian": {
+              "$id": "#root/auth/providers/atlassian",
+              "title": "Atlassian",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "development"
+              ],
+              "properties": {
+                "development": {
+                  "$id": "#root/auth/providers/atlassian/development",
+                  "title": "Development",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "clientId",
+                    "clientSecret",
+                    "additionalScopes",
+                    "signIn"
+                  ],
+                  "properties": {
+                    "clientId": {
+                      "$id": "#root/auth/providers/atlassian/development/clientId",
+                      "title": "Clientid",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    },
+                    "clientSecret": {
+                      "$id": "#root/auth/providers/atlassian/development/clientSecret",
+                      "title": "Clientsecret",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    },
+                    "additionalScopes": {
+                      "$id": "#root/auth/providers/atlassian/development/additionalScopes",
+                      "title": "AdditionalScopes",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "signIn": {
+                      "$id": "#root/auth/providers/atlassian/development/signIn",
+                      "title": "SignIn",
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "resolvers"
+                      ],
+                      "properties": {
+                        "resolvers": {
+                          "$id": "#root/auth/providers/atlassian/development/signIn/resolvers",
+                          "title": "Resolvers",
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "resolver": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "resolver"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+              }
+            }
+
+          }
+        }
+
+      }
+    }
+
+  }
+}

@@ -1,0 +1,9 @@
+dependencies:
+- name: harness-common
+  repository: https://harness.github.io/helm-common
+  version: 1.7.2
+- name: prometheus-elasticsearch-exporter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 6.5.0
+digest: sha256:9edbff9850994c02db876777078d115a1023b91ea2c1663d333cd28975ca384b
+generated: "2026-06-09T10:00:54.997451+05:30"

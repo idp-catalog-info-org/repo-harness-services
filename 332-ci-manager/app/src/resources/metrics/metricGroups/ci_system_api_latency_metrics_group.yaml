@@ -1,0 +1,8 @@
+name: CI Manager System API Latency Metrics Group
+identifier: CISystemApiLatencyMetricsGroup
+labels:
+  - accountId
+  - infraType
+  - operation
+  - outcome
+  - phase

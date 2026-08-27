@@ -1,0 +1,22 @@
+pipeline:
+  inputs:
+    image:
+      type: string
+      description: image name
+      default: golang
+    repo:
+      type: string
+      description: repository name
+      required: true
+    count:
+      type: number
+    password:
+      type: secret
+      description: docker password
+      enum: [secret1, secret2]
+      required: true
+  stages:
+    - clone:
+        disabled: true
+      steps:
+        - run: export foo=bar

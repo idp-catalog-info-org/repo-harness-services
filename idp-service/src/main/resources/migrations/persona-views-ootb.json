@@ -1,0 +1,27 @@
+[
+  {
+    "identifier": "platform",
+    "name": "Platform",
+    "description": "A day-to-day operating view for platform and DevEx teams who own the catalog itself. Surfaces what is registered, how healthy it is against scorecards, which checks regress the most, where workflows run, and which integrations are wired in — so the team can spot ownership gaps, drive scorecard adoption, and keep the catalog honest.",
+    "cards": [
+      "ootb:entity-distribution-ownership",
+      "ootb:scorecard-compliance",
+      "ootb:top-failing-checks",
+      "ootb:workflows-environments",
+      "ootb:integrations"
+    ]
+  },
+  {
+    "identifier": "leadership",
+    "name": "Leadership",
+    "description": "An executive rollup for engineering leaders. Trades day-to-day operational detail for trend and posture: catalog coverage and ownership, scorecard compliance, incident trajectory, security findings and STO posture, and a cross-team comparison along org/project hierarchy — so leaders can see where reliability and security are improving or slipping without drilling into the catalog.",
+    "cards": [
+      "ootb:entity-distribution-ownership",
+      "ootb:scorecard-compliance",
+      "ootb:incident-trend",
+      "ootb:security-findings",
+      "ootb:sto",
+      "ootb:comparison-by-hierarchy"
+    ]
+  }
+]

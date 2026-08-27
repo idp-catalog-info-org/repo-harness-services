@@ -1,0 +1,76 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.core.event.manager;
+
+import static io.harness.NGCommonEntityConstants.GAR_REGISTRY_URL;
+import static io.harness.connector.utils.ModuleConstants.CONNECTOR_DECORATOR_SERVICE;
+
+import io.harness.NGCommonEntityConstants;
+import io.harness.beans.ScopeInfo;
+import io.harness.connector.ConnectorDTO;
+import io.harness.connector.ConnectorInfoDTO;
+import io.harness.connector.ConnectorResponseDTO;
+import io.harness.connector.services.ConnectorService;
+import io.harness.delegate.beans.connector.DockerConnectorDTO;
+import io.harness.delegate.beans.connector.docker.DockerAuthType;
+import io.harness.delegate.beans.connector.docker.DockerAuthenticationDTO;
+import io.harness.delegate.beans.connector.docker.DockerRegistryProviderType;
+import io.harness.delegate.beans.connector.utils.ConnectorType;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Singleton
+public class CIDefaultEntityManager {
+  @Inject @Named(CONNECTOR_DECORATOR_SERVICE) ConnectorService connectorService;
+
+  public void createCIDefaultEntities(String accountIdentifier, ScopeInfo scopeInfo) {
+    createDockerConnector(accountIdentifier, scopeInfo);
+  }
+
+  private void createDockerConnector(String accountId, ScopeInfo scopeInfo) {
+    Optional<ConnectorResponseDTO> harnessImage =
+        connectorService.get(scopeInfo, NGCommonEntityConstants.HARNESS_IMAGE);
+    if (harnessImage.isPresent()) {
+      log.info(String.format(
+          "skipping creating docker connector as its already present in account id: %s, org: %s, project: %s",
+          scopeInfo.getAccountIdentifier(), scopeInfo.getOrgIdentifier(), scopeInfo.getProjectIdentifier()));
+      return;
+    }
+
+    try {
+      DockerAuthenticationDTO authenticationDTO =
+          DockerAuthenticationDTO.builder().authType(DockerAuthType.ANONYMOUS).build();
+      DockerConnectorDTO dockerConnectorDTO = DockerConnectorDTO.builder()
+                                                  .dockerRegistryUrl(GAR_REGISTRY_URL)
+                                                  .auth(authenticationDTO)
+                                                  .executeOnDelegate(false)
+                                                  .providerType(DockerRegistryProviderType.OTHER)
+                                                  .build();
+      ConnectorInfoDTO connectorInfoDTO = ConnectorInfoDTO.builder()
+                                              .connectorConfig(dockerConnectorDTO)
+                                              .identifier(NGCommonEntityConstants.HARNESS_IMAGE)
+                                              .connectorType(ConnectorType.DOCKER)
+                                              .name("Harness GAR Connector")
+                                              .description("Harness internal connector")
+                                              .orgIdentifier(scopeInfo.getOrgIdentifier())
+                                              .projectIdentifier(scopeInfo.getProjectIdentifier())
+                                              .build();
+      ConnectorDTO connectorDTO = ConnectorDTO.builder().connectorInfo(connectorInfoDTO).build();
+      connectorService.create(scopeInfo, connectorDTO);
+    } catch (Exception ex) {
+      log.error(String.format("Failed to create docker connector in account: %s for org: %s for project: %s",
+                    scopeInfo.getAccountIdentifier(), scopeInfo.getOrgIdentifier(), scopeInfo.getProjectIdentifier()),
+          ex);
+    }
+  }
+}

@@ -1,0 +1,27 @@
+pipeline:
+  stages:
+    - name: ${stageName}
+      id: ${stageId}
+      service:
+        type: kubernetes
+        items:
+          - ${serviceIdentifier}
+      environment:
+        id: ${environmentIdentifier}
+        deploy-to: ${infrastructureIdentifier}
+      steps:
+        - name: Kubernetes Rolling Deploy
+          id: k8sRollingDeployStep
+          template:
+            uses: k8sRollingDeployStep
+      runtime: cloud
+      rollback:
+        - group:
+            steps:
+              - name: Kubernetes Rolling Rollback
+                id: k8sRollingRollbackStep
+                template:
+                  uses: k8sRollingRollbackStep
+      on-failure:
+        errors: all
+        action: stage-rollback

@@ -1,0 +1,5 @@
+name: Elasticsearch Client Metrics Group
+identifier: ElasticsearchClientMetricsGroup
+labels:
+  - operation
+  - status

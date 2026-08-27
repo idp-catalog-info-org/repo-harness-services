@@ -1,0 +1,57 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1706856206.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "azureDevOps"
+  ],
+  "properties": {
+    "azureDevOps": {
+      "$id": "#root/azureDevOps",
+      "title": "Azuredevops",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "token",
+        "organization"
+      ],
+      "properties": {
+        "host": {
+          "$id": "#root/azureDevOps/host",
+          "title": "Host",
+          "type": "string",
+          "default": "",
+          "examples": [
+            "<host-name>"
+          ],
+          "pattern": "(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        },
+        "token": {
+          "$id": "#root/azureDevOps/token",
+          "title": "Token",
+          "type": "string",
+          "default": "",
+          "examples": [
+            "${AZURE_DEVOPS_PERSONAL_ACCESS_TOKEN}"
+          ],
+          "pattern": "^.*$"
+        },
+        "organization": {
+          "$id": "#root/azureDevOps/organization",
+          "title": "Organization",
+          "type": "string",
+          "default": "",
+          "examples": [
+            "<organization-name>"
+          ],
+          "pattern": "^.*$"
+        }
+      }
+    }
+
+  }
+}

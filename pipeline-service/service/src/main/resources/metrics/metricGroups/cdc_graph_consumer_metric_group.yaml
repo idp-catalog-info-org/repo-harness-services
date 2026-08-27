@@ -1,0 +1,5 @@
+name: CDC Graph Consumer Metric Group
+identifier: CdcGraphConsumerMetricGroup
+labels:
+  - collection
+  - operation

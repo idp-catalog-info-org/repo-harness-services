@@ -1,0 +1,21 @@
+inputSet:
+  identifier: thisInputSetIsWrong
+  orgIdentifier: orgId
+  projectIdentifier: projectId
+  pipeline:
+    identifier: "Test_Pipline11"
+    variables:
+      - name: whatever
+        type: String
+        value: 8080
+    stages:
+      - stage:
+          identifier: "qaStage"
+          spec:
+            execution:
+              steps:
+                - step:
+                    identifier: "httpStep1"
+                    type: Http
+                    spec:
+                      method: POST

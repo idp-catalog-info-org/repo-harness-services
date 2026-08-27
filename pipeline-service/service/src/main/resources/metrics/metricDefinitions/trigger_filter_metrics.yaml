@@ -1,0 +1,9 @@
+name: Trigger Filter Process Time Metrics
+identifier: TriggerFilterProcessTime
+metricGroup: trigger_filter_times_group
+metrics:
+  - metricName: trigger_filter_process_time
+    metricDefinition: Time taken to process trigger filter.
+    type: Duration
+    distribution: [ 0ms, 200ms , 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 5m, 15m ]
+    unit: "ms"

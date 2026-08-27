@@ -1,0 +1,37 @@
+/*
+ * Copyright 2024 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.dataretention.config;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Value;
+import lombok.experimental.FieldDefaults;
+
+@Value
+@Builder(toBuilder = true)
+@FieldDefaults(makeFinal = false)
+@OwnedBy(HarnessTeam.PIPELINE)
+@CodePulse(
+    module = ProductModule.CDS, unitCoverageRequired = false, components = {HarnessModuleComponent.CDS_DATA_RETENTION})
+public class DataRetentionConfig {
+  @JsonProperty(defaultValue = "false") boolean enabled;
+  @Builder.Default MongoTTLConfig mongoTTLDays = MongoTTLConfig.builder().build();
+  @JsonProperty(defaultValue = "360") @Builder.Default int cleanUpIntervalMinutes = 360;
+  @JsonProperty(defaultValue = "false") boolean cleanUpEnabled;
+  @JsonProperty(defaultValue = "10") @Builder.Default int reconciliationBatchProcessingSize = 10;
+  @JsonProperty(defaultValue = "15") @Builder.Default int syncRecordsTimeoutMinutes = 15;
+  // Configuration for cleanup event publishing to downstream services (e.g., ng-manager for TimescaleDB cleanup)
+  @JsonProperty(defaultValue = "true") @Builder.Default boolean cleanupEventEnabled = true;
+  @JsonProperty(defaultValue = "500") @Builder.Default int cleanupEventBatchSize = 500;
+}

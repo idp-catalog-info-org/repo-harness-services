@@ -1,0 +1,19 @@
+{
+    "title": "Pipeline ${PIPELINE} from Org ${ORG} failed to start",
+    "text": "Trigger ${TRIGGER} failed",
+    "tags": [
+        "pipeline:${PIPELINE}",
+        "project:${PROJECT}",
+        "org:${ORG}",
+        "trigger:${TRIGGER}",
+        "triggerUrl:${TRIGGER_URL}",
+        "error:${ERROR}",
+        "event_type:${EVENT_TYPE}",
+        "start_date:${START_DATE}",
+        "color:${COLOR}"
+    ],
+    "aggregation_key": "${PIPELINE}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

@@ -1,0 +1,4 @@
+pipeline:
+  identifier: p1
+  name: pipeline1
+  stages: []

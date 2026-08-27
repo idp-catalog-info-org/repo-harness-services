@@ -1,0 +1,608 @@
+!!!custom_delegateAsyncTaskResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateAsyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateSyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateTaskProgressResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateTaskProgressResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+accountSettings {"name": "accountId_orgId_projectId_type_unique_Index", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "type": 1}
+artifactSourceNG {"name": "createdAt_1", "background": true} {"createdAt": 1}
+artifactSourceNG {"name": "uniqueHash", "unique": true} {"uniqueHash": 1}
+awsCdkConfig {"name": "parentUniqueId_provisionerIdentifier_stageExecutionId_createdAt", "background": true} {"parentUniqueId": 1, "provisionerIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+awsCdkConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+azureARMConfig {"name": "accountId_orgId_projectId_provisionerIdentifier_stageExecutionId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "provisionerIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+azureARMConfig {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+azureARMConfig {"name": "parentUniqueId_provisionerIdentifier_stageExecutionId_createdAt", "background": true} {"parentUniqueId": 1, "provisionerIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+azureARMConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+branding {"name": "account_unique_index", "unique": true} {"accountIdentifier": 1}
+branding {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+brandingAssets {"name": "account_assetType_unique_index", "unique": true} {"accountIdentifier": 1, "assetType": 1}
+brandingAssets {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+cache {"name": "accountId_1", "background": true} {"accountId": 1}
+cache {"name": "unique_commutative", "unique": true} {"_id": 1, "contextValue": 1}
+cache {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+cdLicenseReportAccounts {"name": "cdLicenseDailyReportIteration_1", "background": true} {"cdLicenseDailyReportIteration": 1}
+cdLicenseReportAccounts {"name": "unique_account_id", "unique": true} {"accountIdentifier": 1}
+cdTelemetrySentStatus {"name": "no_dup_cd", "unique": true} {"accountId": 1}
+cdcEntitiesMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+cloudformationConfig {"name": "accountId_orgId_projectId_provisionerIdentifier_stageExecutionId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "provisionerIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+cloudformationConfig {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+cloudformationConfig {"name": "parentUniqueId_provisionerIdentifier_stageExecutionId_createdAt", "background": true} {"parentUniqueId": 1, "provisionerIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+cloudformationConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+connectors {"name": "accountId_orgId_projectId_name_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "name": 1}
+connectors {"name": "accountId_orgId_projectId_type_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "type": 1, "createdAt": -1}
+connectors {"name": "accountId_orgId_projectId_type_status_deletedAt_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "type": 1, "connectivityDetails.status": 1, "deleted": 1, "createdAt": -1}
+connectors {"name": "accountId_org_proj_identifier_isDefault_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1, "isFromDefaultBranch": 1}
+connectors {"name": "accountId_org_project_isDefault_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "isFromDefaultBranch": 1, "createdAt": -1}
+connectors {"name": "accountId_org_project_repo_branch_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "yamlGitConfigRef": 1, "branch": 1, "createdAt": -1}
+connectors {"name": "accountId_parentUniqueId_categories_decreasing_sort_createdAt_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "categories": 1, "createdAt": -1}
+connectors {"name": "accountId_parentUniqueId_deleted_decreasing_sort_timeWhenConnectorIsLastUpdated_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "deleted": 1, "timeWhenConnectorIsLastUpdated": -1}
+connectors {"name": "accountId_parentUniqueId_identifier_deleted_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "deleted": 1}
+connectors {"name": "accountId_parentUniqueId_identifier_isDefault_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "isFromDefaultBranch": 1}
+connectors {"name": "accountId_parentUniqueId_name_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "name": 1}
+connectors {"name": "accountId_parentUniqueId_repo_branch_decreasing_sort_createdAt_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "yamlGitConfigRef": 1, "branch": 1, "createdAt": -1}
+connectors {"name": "accountId_parentUniqueId_type_decreasing_sort_createdAt_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "type": 1, "createdAt": -1}
+connectors {"name": "accountId_parentUniqueId_type_status_deletedAt_decreasing_sort_createdAt_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "type": 1, "connectivityDetails.status": 1, "deleted": 1, "createdAt": -1}
+connectors {"name": "accountId_status_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "connectivityDetails.status": 1, "lastModifiedAt": -1}
+connectors {"name": "accountId_type_status_featuresEnabled_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "type": 1, "connectivityDetails.status": 1, "featuresEnabled": 1, "lastModifiedAt": -1}
+connectors {"name": "fullyQualifiedIdentifier_deleted_Index", "background": true} {"fullyQualifiedIdentifier": 1, "deleted": 1}
+connectors {"name": "nextTokenLookupIteration", "background": true} {"nextTokenLookupIteration": 1}
+connectors {"name": "nextTokenRenewIteration", "background": true} {"nextTokenRenewIteration": 1}
+connectors {"name": "type_nextTokenLookupIteration", "background": true} {"type": 1, "nextTokenLookupIteration": 1}
+connectors {"name": "type_nextTokenRenewIteration", "background": true} {"type": 1, "nextTokenRenewIteration": 1}
+connectors {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+connectors {"name": "unique_parentUniqueId_identifier_Index", "unique": true} {"parentUniqueId": 1, "identifier": 1, "yamlGitConfigRef": 1, "branch": 1}
+creditCard {"name": "uniqueCreditCardFingerprint", "unique": true} {"fingerprint": 1}
+creditOverUsage {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+credits {"name": "accountIdentifier_creditType_creditStatus", "background": true} {"accountIdentifier": 1, "creditType": 1, "creditStatus": 1}
+credits {"name": "creditStatus_creditExpiryCheckIteration_expiryTime", "background": true} {"creditStatus": 1, "creditExpiryCheckIteration": 1, "expiryTime": 1}
+credits {"name": "creditStatus_creditsSendToSegmentIteration", "background": true} {"creditStatus": 1, "creditsSendToSegmentIteration": 1}
+dailyAccountUsers {"name": "accountId_module_year_month_day_unique_index", "unique": true} {"moduleType": 1, "accountIdentifier": 1, "year": 1, "month": 1, "day": 1}
+delayQueue {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+delayQueue {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+deployables {"name": "index_accountIdentifier_orgId_projectId_createdAt_deleted_deletedAt", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "createdAt": 1, "deleted": 1, "deletedAt": 1}
+deployables {"name": "index_accountIdentifier_parentUniqueId_createdAt_deleted_deletedAt", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": 1, "deleted": 1, "deletedAt": 1}
+deployables {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+deployables {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+deployables {"name": "unique_accountIdentifier_orgId_projectId_deployableIdentifier", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+deployables {"name": "unique_accountIdentifier_parentUniqueId_deployableIdentifier", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+deploymentAccounts {"name": "instanceStatsMetricsPublisherIteration_1", "background": true} {"instanceStatsMetricsPublisherIteration": 1}
+deploymentAccounts {"name": "unique_account_id", "unique": true} {"accountIdentifier": 1}
+deploymentStagePlanCreationInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+deploymentStagePlanCreationInfo {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+deploymentStagePlanCreationInfo {"name": "unique_deployment_stage_plan_creation_info_using_parentUniqueId_plan_execution_id_stage_id_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "planExecutionId": 1, "stageIdentifier": 1}
+deploymentStagePlanCreationInfo {"name": "unique_deployment_stage_plan_creation_info_using_plan_execution_id_stage_id_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "planExecutionId": 1, "stageIdentifier": 1}
+deploymentSummaryNG {"name": "idx_accountIdentifier_orgIdentifier_projectIdentifier", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+deploymentSummaryNG {"name": "idx_instanceSyncKey_createdAt", "background": true} {"instanceSyncKey": 1, "createdAt": -1}
+deploymentSummaryNG {"name": "idx_instanceSyncKey_scope_infrastructureMappingId_createdAt", "background": true} {"instanceSyncKey": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "infrastructureMappingId": 1, "createdAt": -1}
+deploymentSummaryNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+deploymentSummaryNG {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+developerMappings {"name": "accountIdentifier_moduleType_secondaryEntitlement_query_index", "background": true} {"accountIdentifier": 1, "moduleType": 1, "secondaryEntitlement": 1}
+driftDetection {"name": "accountId_connectorRef", "background": true} {"accountId": 1, "connectorRef": 1}
+driftDetection {"name": "accountId_envRef", "background": true} {"accountId": 1, "envRef": 1}
+driftDetection {"name": "accountId_parentUniqueId_lastDeploymentAt", "background": true} {"accountId": 1, "parentUniqueId": 1, "lastDeploymentAt": -1}
+driftDetection {"name": "accountId_serviceRef", "background": true} {"accountId": 1, "serviceRef": 1}
+driftDetection {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+driftDetection {"name": "unique_accountId_parentUniqueId_entityId", "unique": true} {"accountId": 1, "parentUniqueId": 1, "entityId": 1}
+driftDetectionResult {"name": "accountId_connectorRef", "background": true} {"accountId": 1, "connectorRef": 1}
+driftDetectionResult {"name": "accountId_envRef", "background": true} {"accountId": 1, "envRef": 1}
+driftDetectionResult {"name": "accountId_parentUniqueId_status", "background": true} {"accountId": 1, "parentUniqueId": 1, "status": 1}
+driftDetectionResult {"name": "accountId_serviceRef", "background": true} {"accountId": 1, "serviceRef": 1}
+driftDetectionResult {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+driftDetectionResult {"name": "unique_accountId_parentUniqueId_entityId", "unique": true} {"accountId": 1, "parentUniqueId": 1, "entityId": 1}
+entityActivity {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+entityActivity {"name": "referredByEntityType_referredByEntityFqn_lastModifiedAt", "background": true} {"referredByEntityType": 1, "referredByEntityFQN": 1, "lastModifiedAt": -1}
+entityActivity {"name": "referredFqn_type_referredByType", "background": true} {"referredEntityFQN": 1, "referredEntityType": 1, "referredByEntityType": 1}
+entityActivity {"name": "referredFqn_type_time_referredByType_scope", "background": true} {"referredEntityFQN": 1, "referredEntityType": 1, "activityTime": 1, "referredByEntityType": 1, "referredByEntity.entityRef.scope": 1}
+entityActivity {"name": "referredParent_type_referredByType", "background": true} {"referredEntity.entityRef.accountIdentifier": 1, "referredEntity.entityRef.parentUniqueId": 1, "referredEntity.entityRef.identifier": 1, "referredEntityType": 1, "referredByEntityType": 1}
+entityActivity {"name": "referredParent_type_time_referredByType_scope", "background": true} {"referredEntity.entityRef.accountIdentifier": 1, "referredEntity.entityRef.parentUniqueId": 1, "referredEntity.entityRef.identifier": 1, "referredEntityType": 1, "activityTime": 1, "referredByEntityType": 1, "referredByEntity.entityRef.scope": 1}
+entityActivity {"name": "type_referredFqn_referredByType_desSort_Index", "background": true} {"type": 1, "referredEntityFQN": 1, "referredEntityType": 1, "referredByEntityType": 1, "activityTime": -1}
+entityActivity {"name": "type_referredParent_referredByType_desSort_Index", "background": true} {"type": 1, "referredEntity.entityRef.accountIdentifier": 1, "referredEntity.entityRef.parentUniqueId": 1, "referredEntity.entityRef.identifier": 1, "referredEntityType": 1, "referredByEntityType": 1, "activityTime": -1}
+entitySetupUsage {"name": "EntitySetupUsage_unique_index", "unique": true} {"referredByEntityType": 1, "referredByEntityFQN": 1, "referredByEntityRepoIdentifier": 1, "referredByEntityBranch": 1, "referredEntityType": 1, "referredEntityFQN": 1, "referredEntityRepoIdentifier": 1, "referredEntityBranch": 1, "accountIdentifier": 1}
+entitySetupUsage {"name": "ReferredByEntityIndex", "background": true} {"accountIdentifier": 1, "referredByEntityType": 1, "referredByEntityFQN": 1}
+entitySetupUsage {"name": "ReferredByEntityIndex_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredByEntityType": 1, "referredByEntity.entityRef.accountIdentifier": 1, "referredByEntity.entityRef.parentUniqueId": 1, "referredByEntity.entityRef.identifier": 1}
+entitySetupUsage {"name": "ReferredEntityIndex", "background": true} {"accountIdentifier": 1, "referredEntityType": 1, "referredEntityFQN": 1}
+entitySetupUsage {"name": "ReferredEntityIndex_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredEntityType": 1, "referredEntity.entityRef.accountIdentifier": 1, "referredEntity.entityRef.parentUniqueId": 1, "referredEntity.entityRef.identifier": 1}
+entitySetupUsage {"name": "account_referredByFQN_referredByIsDefault_createdAt_index", "background": true} {"accountIdentifier": 1, "referredByEntityFQN": 1, "referredByEntityIsDefault": 1, "createdAt": -1}
+entitySetupUsage {"name": "account_referredBy_createdAt_index", "background": true} {"accountIdentifier": 1, "referredByEntityFQN": 1, "referredByEntityType": 1, "referredEntityType": 1, "referredByEntityIsDefault": 1, "createdAt": -1}
+entitySetupUsage {"name": "account_referredBy_createdAt_index_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredByEntity.entityRef.accountIdentifier": 1, "referredByEntity.entityRef.parentUniqueId": 1, "referredByEntity.entityRef.identifier": 1, "referredByEntityType": 1, "referredEntityType": 1, "referredByEntityIsDefault": 1, "createdAt": -1}
+entitySetupUsage {"name": "account_referredBy_referredByIsDefault_createdAt_index_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredByEntity.entityRef.accountIdentifier": 1, "referredByEntity.entityRef.parentUniqueId": 1, "referredByEntity.entityRef.identifier": 1, "referredByEntityIsDefault": 1, "createdAt": -1}
+entitySetupUsage {"name": "account_referredBy_referred_index", "background": true} {"accountIdentifier": 1, "referredByEntityFQN": 1, "referredByEntityType": 1, "referredEntityFQN": 1, "referredEntityType": 1}
+entitySetupUsage {"name": "account_referredBy_referred_index_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredByEntity.entityRef.accountIdentifier": 1, "referredByEntity.entityRef.parentUniqueId": 1, "referredByEntity.entityRef.identifier": 1, "referredByEntityType": 1, "referredEntity.entityRef.accountIdentifier": 1, "referredEntity.entityRef.parentUniqueId": 1, "referredEntity.entityRef.identifier": 1, "referredEntityType": 1}
+entitySetupUsage {"name": "account_referredBy_referred_type_index", "background": true} {"accountIdentifier": 1, "referredByEntityFQN": 1, "referredByEntityType": 1, "referredEntityType": 1, "createdAt": 1}
+entitySetupUsage {"name": "account_referredBy_referred_type_index_with_ParentUniqueId", "background": true} {"accountIdentifier": 1, "referredByEntity.entityRef.accountIdentifier": 1, "referredByEntity.entityRef.parentUniqueId": 1, "referredByEntity.entityRef.identifier": 1, "referredByEntityType": 1, "referredEntityType": 1, "createdAt": 1}
+entitySetupUsage {"name": "nestedReferredByEntityType_createdAt_index", "background": true} {"referredByEntity.type": 1, "createdAt": 1}
+entitySetupUsage {"name": "referredByEntityFQN_1", "background": true} {"referredByEntityFQN": 1}
+entitySetupUsage {"name": "referredEntityFQN_1", "background": true} {"referredEntityFQN": 1}
+environmentEntityOpaStatus {"name": "accountIdentifier_repoURL_branch_idx", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branch": 1}
+environmentEntityOpaStatus {"name": "accountIdentifier_repoURL_filePath_branch_unique_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "filePath": 1, "branch": 1}
+environmentEntityOpaStatus {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+environmentGroupNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+environmentGroupNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+environmentGroupNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_envGroupIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+environmentGroupNG {"name": "unique_accountId_parentUniqueId_envGroupIdentifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1}
+environmentsNG {"name": "accountId_organizationIdentifier_projectIdentifier_deleted_collation_tertiary_en", "background": true, "collation": {"locale": "en", "strength": 3}} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "deleted": 1}
+environmentsNG {"name": "accountId_parentUniqueId_deleted_collation_tertiary_en", "background": true, "collation": {"locale": "en", "strength": 3}} {"accountId": 1, "parentUniqueId": 1, "deleted": 1}
+environmentsNG {"name": "accountId_repoName_filePath", "background": true} {"accountId": 1, "repo": 1, "filePath": 1}
+environmentsNG {"name": "accountId_repoUrl_filePath_deleted", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1, "deleted": 1}
+environmentsNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+environmentsNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+environmentsNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_envIdentifier_repo_branch", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1, "yamlGitConfigRef": 1, "branch": 1}
+environmentsNG {"name": "unique_accountId_parentUniqueId_envIdentifier_repo_branch", "unique": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1, "yamlGitConfigRef": 1, "branch": 1}
+eula {"name": "accountId_unique_idx", "unique": true} {"accountIdentifier": 1}
+favorites {"name": "accountIdentifier_orgIdentifier_projectIdentifier_resourceType_resourceId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "resourceType": 1, "resourceIdentifier": 1}
+favorites {"name": "accountIdentifier_userIdentifier_orgIdentifier_projectIdentifier_resourceType_resourceId_idx", "unique": true} {"accountIdentifier": 1, "userIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "resourceType": 1, "resourceIdentifier": 1}
+favorites {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+favorites {"name": "unique_accountIdentifier_userIdentifier_parentUniqueId_resourceType_resourceIdentifierIdx", "unique": true} {"accountIdentifier": 1, "userIdentifier": 1, "parentUniqueId": 1, "resourceType": 1, "resourceIdentifier": 1}
+favorites {"name": "unique_userIdentifier_parentUniqueId_resourceType_resourceIdentifierIdx", "unique": true} {"userIdentifier": 1, "parentUniqueId": 1, "resourceType": 1, "resourceIdentifier": 1}
+filterUniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+filters {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+filters {"name": "unique_accountId_orgId_projectId_name_type_Index", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "name": 1, "filterType": 1}
+filters {"name": "unique_accountId_organizationId_projectId_type", "unique": true} {"fullyQualifiedIdentifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_identifier_type", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_name_type_Index", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "name": 1, "filterType": 1}
+freezeConfigNG {"name": "account_org_type_project_idx", "background": true} {"accountId": 1, "orgIdentifier": 1, "type": 1, "projectIdentifier": 1}
+freezeConfigNG {"name": "account_parentUniqueId_type_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "type": 1}
+freezeConfigNG {"name": "createdAt_1", "background": true} {"createdAt": 1}
+freezeConfigNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+freezeConfigNG {"name": "status_nextIteration_shouldSendNotification_idx", "background": true} {"status": 1, "nextIteration": 1, "shouldSendNotification": 1}
+freezeConfigNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+frozenExecution {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+frozenExecution {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+frozenExecution {"name": "unique_accountId_orgId_projectId_planExecutionId_stageExecutionId_stepExecutionId_idx", "unique": true} {"accountId": 1, "orgId": 1, "projectId": 1, "planExecutionId": 1, "stageExecutionId": 1, "stepExecutionId": 1}
+frozenExecution {"name": "unique_account_parentUniqueId_planExecutionId_stageExecutionId_stepExecutionId_idx", "unique": true} {"accountId": 1, "parentUniqueId": 1, "planExecutionId": 1, "stageExecutionId": 1, "stepExecutionId": 1}
+frozenExecution {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+genericEvent {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+genericEvent {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+gitBranches {"name": "unique_accountIdentifier_repoURL_branchName_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "branchName": 1}
+gitCommitNG {"name": "accountIdentifier_repoURL_branchName_gitsyncdirection_createdAtSort", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branchName": 1, "gitSyncDirection": 1, "createdAt": -1}
+gitCommitNG {"name": "status_1", "background": true} {"status": 1}
+gitCommitNG {"name": "unique_commitId_repoURL_gitSyncDirection_idx", "unique": true} {"commitId": 1, "repoURL": 1, "gitSyncDirection": 1}
+gitDefaultBranchCache {"name": "accountIdentifier_repoUrl_idx", "unique": true} {"accountIdentifier": 1, "repoUrl": 1}
+gitDefaultBranchCache {"name": "createdAt_1", "background": true} {"createdAt": 1}
+gitDefaultBranchCache {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitFileActivityNG {"name": "lastUpdatedAt_1", "background": true} {"lastUpdatedAt": 1}
+gitFileCache {"name": "accountIdentifier_gitProvider_repoName_ref_completeFilepath_isDefaultBranch_idx", "background": true} {"accountIdentifier": 1, "gitProvider": 1, "repoName": 1, "ref": 1, "completeFilepath": 1, "isDefaultBranch": 1}
+gitFileCache {"name": "accountIdentifier_gitProvider_repoName_repoURL_ref_completeFilepath_isDefaultBranch_unique_idx", "unique": true} {"accountIdentifier": 1, "gitProvider": 1, "repoName": 1, "repoURL": 1, "ref": 1, "completeFilepath": 1, "isDefaultBranch": 1}
+gitFileCache {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitFileLocation {"name": "accountId_completeGitPath_repo_branch_idx", "background": true} {"accountId": 1, "completeGitPath": 1, "repo": 1, "branch": 1}
+gitFileLocation {"name": "account_org_project__idx", "background": true} {"accountId": 1, "organizationId": 1, "projectId": 1}
+gitFullSyncConfig {"name": "unique_accountIdentifier_organizationIdentifier_projectIdentifier", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+gitFullSyncEntityInfo {"name": "account_org_project_entityType_status_filePath_name_repo_branch_idx", "background": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "entityDetail.type": 1, "syncStatus": 1, "filePath": 1, "entityDetail.name": 1, "repoName": 1, "branchName": 1}
+gitFullSyncEntityInfo {"name": "nextRuntime_1", "background": true} {"nextRuntime": 1}
+gitFullSyncJob {"name": "account_org_project__idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+gitFullSyncJob {"name": "messageId_1", "unique": true} {"messageId": 1}
+gitFullSyncJob {"name": "nextRuntime_1", "background": true} {"nextRuntime": 1}
+gitOpsRolloutInstances {"name": "accountId_status", "background": true} {"accountId": 1, "status": 1}
+gitOpsRolloutInstances {"name": "callbackId_status", "background": true} {"callbackId": 1, "status": 1}
+gitOpsRolloutInstances {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+gitOpsRolloutInstances {"name": "status_lastModifiedAt", "background": true} {"status": 1, "lastModifiedAt": 1}
+gitOpsRolloutInstances {"name": "status_nextIteration", "background": true} {"status": 1, "nextIteration": 1}
+gitOpsRolloutInstances {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+gitOpsRolloutInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitProcessRequestSdk {"name": "accountId_repo_branch_commit_index", "background": true} {"accountId": 1, "repoUrl": 1, "branch": 1, "commitId": 1}
+gitRestraintInstances {"name": "releaseEntityId_state_idx", "background": true} {"releaseEntityId": 1, "state": 1}
+gitRestraintInstances {"name": "resourceUnit_order_idx", "unique": true} {"resourceUnit": 1, "order": 1}
+gitRestraintInstances {"name": "resourceUnit_state_idx", "background": true} {"resourceUnit": 1, "state": 1}
+gitRestraintInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitSyncErrorNG {"name": "accountId_commitId_repo_branch_errorType_filePath_unique_Index", "unique": true} {"accountIdentifier": 1, "additionalErrorDetails.gitCommitId": 1, "repoUrl": 1, "branchName": 1, "errorType": 1, "completeFilePath": 1, "createdAt": -1}
+gitSyncErrorNG {"name": "accountId_orgIdentifier_projectIdentifier_Index", "background": true} {"accountIdentifier": 1, "scopes.projectIdentifier": 1, "scopes.orgIdentifier": 1}
+gitSyncErrorNG {"name": "accountId_repo_branch_errorType_status_filePath_sort_Index", "background": true} {"accountIdentifier": 1, "repoUrl": 1, "branchName": 1, "errorType": 1, "status": 1, "completeFilePath": 1, "createdAt": -1}
+gitSyncErrorNG {"name": "accountId_repo_errorType_status_sort_Index", "background": true} {"accountIdentifier": 1, "repoUrl": 1, "errorType": 1, "status": 1, "createdAt": -1}
+gitSyncSettings {"name": "account_org_project_index", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+gitToHarnessProgress {"name": "yamlChangeSetId_1", "background": true} {"yamlChangeSetId": 1}
+gitXRateLimitEvent {"name": "accountIdentifier_parentUniqueId_connectorId_bucket_observedAtMs_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "connectorId": 1, "bucket": 1, "observedAtMs": 1}
+gitXRateLimitEvent {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+gitXRateLimitEvent {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitXRateLimitSnapshot {"name": "accountIdentifier_parentUniqueId_connectorId_provider_bucket_unique_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "connectorId": 1, "provider": 1, "bucket": 1}
+gitXRateLimitSnapshot {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+gitXRateLimitSnapshot {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitXTriggerExecutionTracker {"name": "accountIdentifier_eventIdentifier_unique_idx", "unique": true} {"accountIdentifier": 1, "eventIdentifier": 1}
+gitXTriggerExecutionTracker {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitXWebhook {"name": "accountIdentifier_parentUniqueId_identifier_unique_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+gitXWebhook {"name": "accountIdentifier_parentUniqueId_repoURL_unique_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "repoURL": 1}
+gitXWebhook {"name": "createdAt_1", "background": true} {"createdAt": 1}
+gitXWebhook {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+gitXWebhook {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+gitXWebhookEvent {"name": "accountIdentifier_createdAt_eventStatus_webhookIdentifierList_idx", "background": true} {"accountIdentifier": 1, "eventStatus": 1, "webhookIdentifierList": 1, "createdAt": 1}
+gitXWebhookEvent {"name": "accountIdentifier_eventIdentifier_unique_idx", "unique": true} {"accountIdentifier": 1, "eventIdentifier": 1}
+gitXWebhookEvent {"name": "accountIdentifier_repoURL_processedFilePaths", "background": true} {"accountIdentifier": 1, "repoURL": 1, "processedFilePaths": 1}
+gitXWebhookEvent {"name": "accountIdentifier_webhookIdentifierList_branch_afterCommitId_createdAt_sort_eventTriggeredTime_idx", "background": true} {"accountIdentifier": 1, "webhookIdentifierList": 1, "branch": 1, "afterCommitId": 1, "createdAt": 1, "eventTriggeredTime": 1}
+gitXWebhookEvent {"name": "createdAt_1", "background": true} {"createdAt": 1}
+gitXWebhookEvent {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitXWebhookEventValidationInfo {"name": "accountIdentifier_eventIdentifier_filePath_unique_idx", "unique": true} {"accountIdentifier": 1, "eventIdentifier": 1, "filePath": 1}
+gitXWebhookEventValidationInfo {"name": "createdAt_1", "background": true} {"createdAt": 1}
+gitXWebhookEventValidationInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+gitopsClusters {"name": "accountId_orgId_projId_envRef_createdAt", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "agentIdentifier": 1, "envRef": 1, "createdAt": 1}
+gitopsClusters {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+gitopsClusters {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+gitopsClusters {"name": "unique_accountId_orgId_projId_envRef_id", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "agentIdentifier": 1, "envRef": 1, "clusterRef": 1}
+gitopsproviders {"name": "unique_accIdentifier_orgIdentifier_projectIdentifier_gitOpsProvider_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+globalTemplateSyncStatus {"name": "lastCommitId_1", "background": true} {"lastCommitId": 1}
+infrastructureEntityOpaStatus {"name": "accountIdentifier_repoURL_branch_idx", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branch": 1}
+infrastructureEntityOpaStatus {"name": "accountIdentifier_repoURL_filePath_branch_unique_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "filePath": 1, "branch": 1}
+infrastructureEntityOpaStatus {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+infrastructureMappingNG {"name": "accountId_orgId_projectId_connectorRef_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "connectorRef": 1}
+infrastructureMappingNG {"name": "accountId_orgId_projectId_infrastructureKey_unique_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "infrastructureKey": 1}
+infrastructureMappingNG {"name": "accountId_orgId_projectId_serviceId_envId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "serviceId": 1, "envId": 1}
+infrastructureMappingNG {"name": "accountId_parentUniqueId_infrastructureKey_unique_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "infrastructureKey": 1}
+infrastructureMappingNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+infrastructureMappingNG {"name": "parentUniqueId_connectorRef_idx", "background": true} {"parentUniqueId": 1, "connectorRef": 1}
+infrastructureMappingNG {"name": "parentUniqueId_serviceId_envId_idx", "background": true} {"parentUniqueId": 1, "serviceId": 1, "envId": 1}
+infrastructureMappingNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+infrastructures {"name": "accountId_organizationIdentifier_projectIdentifier_envIdentifier_createdAt", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "createdAt": 1}
+infrastructures {"name": "accountId_organizationIdentifier_projectIdentifier_envIdentifier_infraIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "identifier": 1}
+infrastructures {"name": "accountId_parentUniqueId_envIdentifier_createdAt", "background": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "createdAt": 1}
+infrastructures {"name": "accountId_parentUniqueId_envIdentifier_infraIdentifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "identifier": 1}
+infrastructures {"name": "accountId_parentUniqueId_templateMetadata_templateRef_templateVersion", "background": true} {"accountId": 1, "parentUniqueId": 1, "templateMetadata.templateRef": 1, "templateMetadata.templateVersion": 1}
+infrastructures {"name": "accountId_repoName_filePath", "background": true} {"accountId": 1, "repo": 1, "filePath": 1}
+infrastructures {"name": "accountId_repoUrl_filePath", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1}
+infrastructures {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+infrastructures {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceDeploymentInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+instanceDeploymentInfo {"name": "stage_execution_instance_deployment_info_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1}
+instanceDeploymentInfo {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceDeploymentInfo {"name": "unique_instance_deployment_info_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "instanceInfo.host": 1}
+instanceDeploymentInfoV2 {"name": "instance_deployment_info_v2_scope_infraKey_instanceKey_sorted_idx", "background": true} {"accountIdentifier": 1, "infrastructureKey": 1, "instanceKey": 1, "orgIdentifier": 1, "projectIdentifier": 1, "lastModifiedAt": -1}
+instanceDeploymentInfoV2 {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+instanceDeploymentInfoV2 {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceDeploymentInfoV2 {"name": "unique_instance_deployment_info_v2_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "planExecutionId": 1, "stageNodeExecutionId": 1, "infrastructureKey": 1, "instanceKey": 1}
+instanceDeploymentInfoV2 {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+instanceNG {"name": "accountId_agentId_isDeleted_org_project_service_idx", "background": true} {"accountIdentifier": 1, "instanceInfo.agentIdentifier": 1, "isDeleted": 1, "orgIdentifier": 1, "projectIdentifier": 1, "serviceIdentifier": 1}
+instanceNG {"name": "accountId_infrastructureMappingId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "infrastructureMappingId": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_instanceInfo.Namespace_instanceInfoPodName_createdAt_idx", "background": true} {"accountIdentifier": 1, "instanceInfo.namespace": 1, "instanceInfo.podName": 1, "createdAt": 1}
+instanceNG {"name": "accountId_instanceInfoNamespace_instanceInfoReleaseName_isDeleted_createdAt_idx", "background": true} {"accountIdentifier": 1, "instanceInfo.namespace": 1, "instanceInfo.releaseName": 1, "isDeleted": 1, "createdAt": 1}
+instanceNG {"name": "accountId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_isDeleted_envId_clusterIdentifier_serviceId_primaryArtifact_lastPipelineExecutionId_idx", "background": true} {"accountIdentifier": 1, "isDeleted": 1, "envIdentifier": 1, "instanceInfo.clusterIdentifier": 1, "serviceIdentifier": 1, "primaryArtifact.tag": 1, "lastPipelineExecutionId": 1}
+instanceNG {"name": "accountId_isDeleted_envId_serviceId_primaryArtifact_lastPipelineExecutionId_infraIdentifier_idx", "background": true} {"accountIdentifier": 1, "isDeleted": 1, "envIdentifier": 1, "serviceIdentifier": 1, "primaryArtifact.tag": 1, "lastPipelineExecutionId": 1, "infraIdentifier": 1}
+instanceNG {"name": "accountId_lastDeployedAt_idx", "background": true} {"accountIdentifier": 1, "lastDeployedAt": 1}
+instanceNG {"name": "accountId_lastDeployedAt_serviceIdentifier_idx", "background": true} {"accountIdentifier": 1, "lastDeployedAt": 1, "serviceIdentifier": 1}
+instanceNG {"name": "accountId_parentUniqueId_infrastructureMappingId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "infrastructureMappingId": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_parentUniqueId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_parentUniqueId_isDeleted_envId_clusterIdentifier_serviceId_primaryArtifact_lastPipelineExecutionId_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "isDeleted": 1, "envIdentifier": 1, "instanceInfo.clusterIdentifier": 1, "serviceIdentifier": 1, "primaryArtifact.tag": 1, "lastPipelineExecutionId": 1}
+instanceNG {"name": "accountId_parentUniqueId_isDeleted_envId_serviceId_primaryArtifact_lastPipelineExecutionId_infraIdentifier_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "isDeleted": 1, "envIdentifier": 1, "serviceIdentifier": 1, "primaryArtifact.tag": 1, "lastPipelineExecutionId": 1, "infraIdentifier": 1}
+instanceNG {"name": "accountId_parentUniqueId_lastDeployedAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "lastDeployedAt": 1}
+instanceNG {"name": "accountId_parentUniqueId_lastDeployedAt_serviceIdentifier_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "lastDeployedAt": 1, "serviceIdentifier": 1}
+instanceNG {"name": "accountId_parentUniqueId_serviceId_envId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "serviceIdentifier": 1, "envIdentifier": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_parentUniqueId_serviceId_instanceInfo.Agent_ClusterIdentifier_createdAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "serviceIdentifier": 1, "instanceInfo.agentIdentifier": 1, "instanceInfo.clusterIdentifier": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_parentUniqueId_serviceId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "serviceIdentifier": 1, "isDeleted": 1, "deletedAt": 1, "createdAt": 1}
+instanceNG {"name": "accountId_primaryArtifactRegistryIdentifier_primaryArtifactArtifactIdentifier_isDeleted_createdAt_idx", "background": true} {"accountIdentifier": 1, "primaryArtifact.registryIdentifier": 1, "primaryArtifact.artifactIdentifier": 1, "isDeleted": 1, "createdAt": 1}
+instanceNG {"name": "accountId_serviceId_envId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "serviceIdentifier": 1, "envIdentifier": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_serviceId_instanceInfo.Agent_ClusterIdentifier_createdAt_idx", "background": true} {"accountIdentifier": 1, "serviceIdentifier": 1, "instanceInfo.agentIdentifier": 1, "instanceInfo.clusterIdentifier": 1, "isDeleted": 1, "createdAt": 1, "deletedAt": 1}
+instanceNG {"name": "accountId_serviceId_isDeleted_createdAt_deletedAt_idx", "background": true} {"accountIdentifier": 1, "serviceIdentifier": 1, "isDeleted": 1, "deletedAt": 1, "createdAt": 1}
+instanceNG {"name": "accountIdentifier_1_deletedAt_1_createdAt_1", "background": true} {"accountIdentifier": 1, "deletedAt": 1, "createdAt": 1}
+instanceNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+instanceNG {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+instanceNG {"name": "unique_instanceKey_infrastructureMappingId_idx", "unique": true} {"instanceKey": 1, "infrastructureMappingId": 1}
+instanceSyncPerpetualTaskMapping {"name": "accountId_connectorIdentifier_deploymentType_orgId_projectId_idx", "background": true} {"accountId": 1, "deploymentType": 1, "connectorIdentifier": 1, "orgId": 1, "projectId": 1}
+instanceSyncPerpetualTaskMapping {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+instanceSyncPerpetualTaskMapping {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceSyncPerpetualTaskMapping {"name": "unique_accountId_connectorIdentifier_perpetualTaskId_orgId_projectId_idx", "unique": true} {"accountId": 1, "connectorIdentifier": 1, "perpetualTaskId": 1, "orgId": 1, "projectId": 1}
+instanceSyncPerpetualTasksInfoNG {"name": "accountIdentifier_perpetualTaskIdV2_idx", "background": true} {"accountIdentifier": 1, "perpetualTaskIdV2": 1}
+instanceSyncPerpetualTasksInfoNG {"name": "infrastructureMappingId_1", "unique": true} {"infrastructureMappingId": 1}
+instanceSyncPerpetualTasksInfoNG {"name": "perpetualTaskId_1", "background": true} {"perpetualTaskId": 1}
+instanceSyncTaskJob {"name": "nextIterations_1", "background": true} {"nextIterations": 1}
+instanceSyncTaskJob {"name": "nextIterations_status", "background": true} {"nextIterations": 1, "status": 1}
+instanceSyncTaskJob {"name": "parentUniqueId_connectorRef", "background": true} {"parentUniqueId": 1, "connectorRef": 1}
+instanceSyncTaskJob {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceSyncTaskJob {"name": "unique_accountId_orgId_projectId_connectorRef", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "connectorRef": 1}
+instanceSyncTaskJobInfo {"name": "taskJobId_idx", "background": true} {"taskJobId": 1}
+instanceSyncTaskJobInfo {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+instanceSyncTaskJobInfo {"name": "unique_accountIdentifier_infrastructureMappingId_idx", "unique": true} {"accountIdentifier": 1, "infrastructureMappingId": 1}
+instanceSyncTaskSchedule {"name": "accountId_1", "unique": true} {"accountId": 1}
+invalidPerpetualTaskInfo {"name": "invalidPerpetualTaskIteration_1", "background": true} {"invalidPerpetualTaskIteration": 1}
+invalidPerpetualTaskInfo {"name": "perpetualTaskId_1", "background": true} {"perpetualTaskId": 1}
+invalidPerpetualTaskInfo {"name": "unique_account_id_perpetualTaskId", "unique": true} {"accountIdentifier": 1, "perpetualTaskId": 1}
+invites {"name": "ng_invite_account_createdAt", "background": true} {"accountIdentifier": 1, "createdAt": 1}
+invites {"name": "ng_invite_account_org_project_identifiers_email_role_deleted", "background": true} {"deleted": 1, "email": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+invites {"name": "ng_invite_account_parentuniqueid_email_role_deleted", "background": true} {"deleted": 1, "email": 1, "accountIdentifier": 1, "parentUniqueId": 1}
+invites {"name": "ng_invite_deleted_email_account_org_project_roleBindings_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"deleted": 1, "email": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "roleBindings": 1}
+invites {"name": "ng_invite_deleted_email_account_parentuniqueid_roleBindings_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"deleted": 1, "email": 1, "accountIdentifier": 1, "parentUniqueId": 1, "roleBindings": 1}
+invites {"name": "ng_invite_deleted_name_account_org_project_roleBindings_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"deleted": 1, "name": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "roleBindings": 1}
+invites {"name": "ng_invite_deleted_name_account_parentuniqueid_roleBindings_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"deleted": 1, "name": 1, "accountIdentifier": 1, "parentUniqueId": 1, "roleBindings": 1}
+invites {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+invites {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+ipAllowlist {"name": "accountId_allowedSourceType_index", "background": true} {"accountIdentifier": 1, "allowedSourceType": 1}
+ipAllowlist {"name": "accountId_identifier_unique_index", "unique": true} {"accountIdentifier": 1, "identifier": 1}
+ipAllowlist {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+ipAllowlist {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+k8sTrafficRoutingInfo {"name": "accountId_orgId_projectId_stageExecutionId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "stageExecutionId": 1, "createdAt": -1}
+k8sTrafficRoutingInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+k8sTrafficRoutingInfo {"name": "parentUniqueId_stageExecutionId_createdAt", "background": true} {"parentUniqueId": 1, "stageExecutionId": 1, "createdAt": -1}
+k8sTrafficRoutingInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+licenseUsage {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+licenseUsage {"name": "accountIdentifier_isProcessed", "background": true} {"accountIdentifier": 1, "isProcessed": 1}
+licenseUsage {"name": "isProcessed_accountIdentifier", "background": true} {"isProcessed": 1, "accountIdentifier": 1}
+licenseUsage {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+licenseUsage {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+licenseUsage {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+mockRoleAssignments {"name": "uniqueMockRoleAssignment", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "roleAssignment.roleIdentifier": 1, "roleAssignment.resourceGroupIdentifier": 1, "roleAssignment.resourceGroupIdentifier.identifier": 1, "roleAssignment.resourceGroupIdentifier.type": 1}
+moduleAccess {"name": "accountId_moduleType_index", "unique": true} {"accountIdentifier": 1, "moduleType": 1}
+moduleLicenseSnapshots {"name": "migrationId_1", "unique": true} {"migrationId": 1}
+moduleLicenses {"name": "accountIdentifier_moduleLicense_query_index", "background": true} {"accountIdentifier": 1}
+moduleLicenses {"name": "moduleType_status_provisionMonthlyCICreditsIteration", "background": true} {"moduleType": 1, "status": 1, "provisionMonthlyCICreditsIteration": 1}
+moduleVersionInfo {"name": "moduleName_1", "unique": true} {"moduleName": 1}
+moveProjectProgressStatus {"name": "accountIdentifier_destinationOrgIdentifier_projectIdentifier", "background": true} {"accountIdentifier": 1, "destinationOrgIdentifier": 1, "projectIdentifier": 1}
+moveProjectProgressStatus {"name": "accountIdentifier_sourceOrgIdentifier_projectIdentifier", "background": true} {"accountIdentifier": 1, "sourceOrgIdentifier": 1, "projectIdentifier": 1}
+ngApiKeys {"name": "accountIdentifier_parentUniqueId_parentIdentifier_identifier_apiKeyType_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "parentIdentifier": 1, "identifier": 1, "apiKeyType": 1}
+ngApiKeys {"name": "list_keys_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "parentIdentifier": 1}
+ngApiKeys {"name": "parentUniqueId_parentIdentifier_identifier_apiKeyType_idx", "unique": true} {"parentUniqueId": 1, "parentIdentifier": 1, "identifier": 1, "apiKeyType": 1}
+ngApiKeys {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+ngBanners {"name": "account_parentUniqueId_createdAt_desc_sort_index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": -1}
+ngBanners {"name": "parentUniqueId_identifier_unique_index", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+ngBanners {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+ngCertificates {"name": "account_parentUniqueId_createdAt_desc_sort_index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": -1}
+ngCertificates {"name": "account_parentUniqueId_lastModifiedAt_desc_sort_index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "lastModifiedDate": -1}
+ngCertificates {"name": "account_parentUniqueId_name_sort_index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "name": 1}
+ngCertificates {"name": "parentUniqueId_identifier_unique_index", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+ngCertificates {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+ngEncryptedRecords {"name": "accountIdentifierParentUniqueIdIdentifierIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+ngEncryptedRecords {"name": "nGEncryptedDataIdx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+ngEncryptedRecords {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+ngEncryptedRecords {"name": "unique_parentUniqueIdIdentifierIdx", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+ngFiles {"name": "list_files_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+ngFiles {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+ngFiles {"name": "path_idx", "background": true} {"path": 1}
+ngFiles {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+ngFiles {"name": "unique_accountIdentifier_parentUniqueId_identifier_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+ngFiles {"name": "unique_accountIdentifier_parentUniqueId_parentIdentifier_name_idx", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "parentUniqueId": 1, "parentIdentifier": 1, "name": 1}
+ngFiles {"name": "unique_idx", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "parentIdentifier": 1, "name": 1}
+ngGcsFileMetadata {"name": "accountId_1", "background": true} {"accountId": 1}
+ngGcsFileMetadata {"name": "entityId_1", "background": true} {"entityId": 1}
+ngGcsFileMetadata {"name": "fileId_1", "background": true} {"fileId": 1}
+ngGcsFileMetadata {"name": "gcsFileId_1", "background": true} {"gcsFileId": 1}
+ngS3FileMetadata {"name": "accountId_1", "background": true} {"accountId": 1}
+ngS3FileMetadata {"name": "entityId_1", "background": true} {"entityId": 1}
+ngS3FileMetadata {"name": "fileId_1", "background": true} {"fileId": 1}
+ngS3FileMetadata {"name": "s3FileId_1", "background": true} {"s3FileId": 1}
+ngSsoSettings {"name": "accountTypeIdx", "unique": true} {"accountIdentifier": 1, "type": 1, "identifier": 1}
+ngSsoSettings {"name": "nextIterations_1", "background": true} {"nextIterations": 1}
+ngSsoSettings {"name": "syncNextIterationIdx", "background": true} {"type": 1, "nextIterations": 1}
+ngSsoSettings {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+notifyQueue {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+notifyQueue {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+notifyQueue {"name": "waitInstanceId_1", "unique": true} {"waitInstanceId": 1}
+notifyResponses {"name": "createdAt_1", "background": true} {"createdAt": 1}
+notifyResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+notifyResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+organizations {"name": "accountIdentifierDeletedHarnessManagedNameWithCollationIdx", "background": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "deleted": 1, "harnessManaged": -1, "name": 1}
+organizations {"name": "accountIdentifierDeletedIdentifierIdx", "background": true} {"accountIdentifier": 1, "deleted": 1, "identifier": 1}
+organizations {"name": "accountIdentifierIdentifierDeletedHarnessManagedNameWithCollationIdx", "background": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "identifier": 1, "deleted": 1, "harnessManaged": -1, "name": 1}
+organizations {"name": "accountIdentifierParentUniqueIdDeletedIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "deleted": 1}
+organizations {"name": "accountIdentifierParentUniqueIdIdentifierDeletedIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "deleted": 1}
+organizations {"name": "identifier_1", "background": true} {"identifier": 1}
+organizations {"name": "parentUniqueIdIdentifierIdx", "unique": true, "collation": {"locale": "en", "strength": 1}} {"parentUniqueId": 1, "identifier": 1}
+organizations {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+organizations {"name": "unique_accountIdentifier_organizationIdentifier", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "identifier": 1}
+outboxEvents {"name": "blocked_createdAt_nextUnblockAttemptAt_outbox_Idx", "background": true} {"blocked": 1, "createdAt": 1, "nextUnblockAttemptAt": 1}
+outboxEvents {"name": "eventType_blocked_outbox_Idx", "background": true} {"eventType": 1, "blocked": 1}
+perpetualTaskEntityReferences {"name": "accountId_parentUniqueId_referredEntityType_referredEntityRef", "background": true} {"accountId": 1, "parentUniqueId": 1, "referredEntityType": 1, "referredEntityRef": 1}
+perpetualTaskEntityReferences {"name": "unique_perpetualTaskId_referredEntityType_referredEntityRef", "unique": true} {"perpetualTaskId": 1, "referredEntityType": 1, "referredEntityRef": 1}
+pollingDocuments {"name": "accountId_organizationIdentifier_projectIdentifier_pollingType_pollingItem", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pollingType": 1, "pollingInfo": 1, "signatures": 1}
+pollingDocuments {"name": "accountId_parentUniqueId_pollingType_pollingItem", "background": true} {"accountId": 1, "parentUniqueId": 1, "pollingType": 1, "pollingInfo": 1, "signatures": 1}
+pollingDocuments {"name": "accountId_pollingInfo.connectorRef", "background": true} {"accountId": 1, "pollingInfo.connectorRef": 1}
+pollingDocuments {"name": "accountId_signatures", "background": true} {"accountId": 1, "signatures": 1}
+pollingDocuments {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+pollingDocuments {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+primaryVersion {"name": "createdAt_1", "background": true} {"createdAt": 1}
+primaryVersion {"name": "lastUpdatedAt_1", "background": true} {"lastUpdatedAt": 1}
+privateConnectivityConfig {"name": "accountIdentifier_1", "unique": true} {"accountIdentifier": 1}
+privateConnectivityConfig {"name": "providerNetworkName_unique_sparse", "unique": true, "sparse": true} {"providerNetworkName": 1}
+privateConnectivityConfig {"name": "providerNetworkRef_unique_sparse", "unique": true, "sparse": true} {"providerNetworkRef": 1}
+privateConnectivityConfig {"name": "status_createdAt", "background": true} {"status": 1, "createdAt": 1}
+privateConnectivityConfig {"name": "status_lastModifiedAt", "background": true} {"status": 1, "lastModifiedAt": 1}
+privateConnectivityConfig {"name": "status_nextRetryAt", "background": true} {"status": 1, "nextRetryAt": 1}
+progressUpdate {"name": "correlation", "background": true} {"correlationId": 1, "createdAt": -1}
+progressUpdate {"name": "createdAt_1", "background": true} {"createdAt": 1}
+progressUpdate {"name": "processAfter_1", "background": true} {"processAfter": 1}
+progressUpdate {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+projects {"name": "accountDeletedLastModifiedAtIdx", "background": true} {"accountIdentifier": 1, "deleted": 1, "lastModifiedAt": -1}
+projects {"name": "accountDeletedModulesLastModifiedAtIdx", "background": true} {"accountIdentifier": 1, "deleted": 1, "modules": 1, "lastModifiedAt": -1}
+projects {"name": "accountDeletedOrgIdentifierSortLastModifiedAtIdx", "background": true} {"accountIdentifier": 1, "deleted": 1, "orgIdentifier": 1, "identifier": 1, "lastModifiedAt": -1}
+projects {"name": "accountIdentifierParentUniqueIdIdentifierDeletedIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "deleted": 1}
+projects {"name": "accountIdentifierParentUniqueIdIdentifierIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+projects {"name": "accountOrgIdentifierDeletedCreatedAtLastModifiedAtIdx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "identifier": 1, "deleted": 1, "createdAt": 1, "lastModifiedAt": 1}
+projects {"name": "accountParentUniqueIdIdentifierDeletedCreatedAtLastModifiedAtIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "deleted": 1, "createdAt": 1, "lastModifiedAt": 1}
+projects {"name": "lastMovedAt_1", "background": true} {"lastMovedAt": 1}
+projects {"name": "parentUniqueIdIdentifierIdx", "unique": true, "collation": {"locale": "en", "strength": 1}} {"parentUniqueId": 1, "identifier": 1}
+projects {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+projects {"name": "unique_accountIdentifier_organizationIdentifier_projectIdentifier", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "orgIdentifier": 1, "identifier": 1}
+providers {"name": "unique_accountId_providerIdentifier", "unique": true} {"accountIdentifier": 1, "identifier": 1}
+releaseDetailsMappingNG {"name": "accountId_orgIdentifier_projectIdentifier_releaseKey_infraKey_unique_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "releaseKey": 1, "infraKey": 1}
+releaseDetailsMappingNG {"name": "accountId_parentUniqueId_releaseKey_infraKey_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "releaseKey": 1, "infraKey": 1}
+releaseDetailsMappingNG {"name": "accountId_releaseKey_idx", "background": true} {"accountIdentifier": 1, "releaseKey": 1}
+releaseDetailsMappingNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+releaseDetailsMappingNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+salesforceChangesets {"name": "index_accountIdentifier_parentUniqueId_createdAt", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": 1}
+salesforceChangesets {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+salesforceChangesets {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+salesforceChangesets {"name": "unique_accountIdentifier_parentUniqueId_identifier", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+salesforceChangesets {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+salesforceComparisonPairs {"name": "index_accountIdentifier_parentUniqueId_createdAt", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": 1}
+salesforceComparisonPairs {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+salesforceComparisonPairs {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+salesforceComparisonPairs {"name": "unique_accountIdentifier_parentUniqueId_identifier", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+salesforceExecutions {"name": "index_accountIdentifier_parentUniqueId_createdAt", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": 1}
+salesforceExecutions {"name": "index_accountIdentifier_pipelineExecutionId", "background": true} {"accountIdentifier": 1, "pipelineExecutionId": 1}
+salesforceExecutions {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+salesforceExecutions {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+salesforceExecutions {"name": "unique_accountIdentifier_parentUniqueId_identifier", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+salesforceExecutions {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+salesforcePrepareRollbackInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+salesforcePrepareRollbackInfo {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+salesforcePrepareRollbackInfo {"name": "unique_salesforce_prepare_rollback_info_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "artifactIdentifier": 1}
+salesforcePrepareRollbackInfo {"name": "unique_salesforce_prepare_rollback_info_parent_unique_id_idx", "background": true} {"parentUniqueId": 1, "pipelineIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "artifactIdentifier": 1}
+salesforcePrepareRollbackInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+scheduledPollingTaskInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+scheduledPollingTaskInfo {"name": "scheduledTaskId_idx", "background": true} {"scheduledTaskId": 1}
+scheduledPollingTaskInfo {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+scheduledPollingTaskInfo {"name": "unique_accountIdentifier_pollingDocumentId_idx", "unique": true} {"accountIdentifier": 1, "pollingDocumentId": 1}
+scheduledTaskInfo {"name": "unique_accountIdentifier_infrastructureMappingId_idx", "unique": true} {"accountIdentifier": 1, "infrastructureMappingId": 1}
+secrets {"name": "accountIdentifierOrgIdentifierProjectIdentifierIdentifierIdx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+secrets {"name": "accountIdentifierParentUniqueIdIdentifierIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+secrets {"name": "migratedFromManager_1", "background": true} {"migratedFromManager": 1}
+secrets {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+secrets {"name": "unique_parentUniqueIdIdentifierIdx", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+serviceAccounts {"name": "accountId_parentUniqueId_identifier_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+serviceAccounts {"name": "accountId_uniqueId_index", "background": true} {"accountIdentifier": 1, "uniqueId": 1}
+serviceAccounts {"name": "list_accounts_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+serviceAccounts {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+serviceAccounts {"name": "unique_parentUniqueId_identifier_Index", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+serviceEntityOpaStatus {"name": "accountIdentifier_repoURL_branch_idx", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branch": 1}
+serviceEntityOpaStatus {"name": "accountIdentifier_repoURL_filePath_branch_unique_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "filePath": 1, "branch": 1}
+serviceEntityOpaStatus {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+serviceOverrideOpaStatus {"name": "accountIdentifier_repoURL_branch_idx", "background": true} {"accountIdentifier": 1, "repoURL": 1, "branch": 1}
+serviceOverrideOpaStatus {"name": "accountIdentifier_repoURL_filePath_branch_unique_idx", "unique": true} {"accountIdentifier": 1, "repoURL": 1, "filePath": 1, "branch": 1}
+serviceOverrideOpaStatus {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+serviceOverridesNG {"name": "accountId_repoName_filePath", "background": true} {"accountId": 1, "repo": 1, "filePath": 1}
+serviceOverridesNG {"name": "index_accountId_repoURL_filePath", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1}
+serviceOverridesNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+serviceOverridesNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+serviceOverridesNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_environmentRef_serviceRef_infraIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "serviceRef": 1, "environmentRef": 1, "infraIdentifier": 1}
+serviceOverridesNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_identifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+serviceOverridesNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_identifier_type_lastModifiedAt", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1, "type": 1, "lastModifiedAt": -1}
+serviceOverridesNG {"name": "unique_accountId_parentUniqueId_environmentRef_serviceRef_infraIdentifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "serviceRef": 1, "environmentRef": 1, "infraIdentifier": 1}
+serviceOverridesNG {"name": "unique_accountId_parentUniqueId_identifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1}
+serviceSequence {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+serviceSequence {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+serviceSequence {"name": "unique_accountId_organizationIdentifier_projectIdentifier_serviceIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "serviceIdentifier": 1}
+serviceSequence {"name": "unique_accountId_parentUniqueId_serviceIdentifier", "unique": true} {"accountId": 1, "parentUniqueId": 1, "serviceIdentifier": 1}
+servicesNG {"name": "accountId_orgId_projectId_deleted_collation_tertiary_en", "background": true, "collation": {"locale": "en", "strength": 3}} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "deleted": 1}
+servicesNG {"name": "accountId_parentUniqueId_createdAt_deleted_deletedAt_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "createdAt": 1, "deleted": 1, "deletedAt": 1}
+servicesNG {"name": "accountId_parentUniqueId_deleted_collation_tertiary_en_idx", "background": true, "collation": {"locale": "en", "strength": 3}} {"accountId": 1, "parentUniqueId": 1, "deleted": 1}
+servicesNG {"name": "accountId_parentUniqueId_templateMetadata_templateRef_templateVersion", "background": true} {"accountId": 1, "parentUniqueId": 1, "templateMetadata.templateRef": 1, "templateMetadata.templateVersion": 1}
+servicesNG {"name": "accountId_parentUniqueId_type_createdAt_deleted_deletedAt_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "type": 1, "createdAt": 1, "deleted": 1, "deletedAt": 1}
+servicesNG {"name": "accountId_repoName_filePath", "background": true} {"accountId": 1, "repo": 1, "filePath": 1}
+servicesNG {"name": "index_accountId_orgId_projectId_createdAt_deleted_deletedAt", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "createdAt": 1, "deleted": 1, "deletedAt": 1}
+servicesNG {"name": "index_accountId_repoURL_filePath_deleted", "background": true} {"accountId": 1, "repoURL": 1, "filePath": 1, "deleted": 1}
+servicesNG {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+servicesNG {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+servicesNG {"name": "unique_accountId_organizationIdentifier_projectIdentifier_serviceIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+servicesNG {"name": "unique_accountId_parentUniqueId_serviceIdentifier_idx", "unique": true} {"accountId": 1, "parentUniqueId": 1, "identifier": 1}
+settingConfigurations {"name": "category_idx", "background": true} {"category": 1}
+settingConfigurations {"name": "identifier_unique_idx", "unique": true} {"identifier": 1}
+settings {"name": "accountIdentifier_orgIdentifier_projectIdentifier_category_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "category": 1}
+settings {"name": "accountIdentifier_orgIdentifier_projectIdentifier_identifier_userId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1, "userId": 1}
+settings {"name": "accountIdentifier_parentUniqueId_category_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "category": 1}
+settings {"name": "accountIdentifier_parentUniqueId_identifier_userId_unique_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "userId": 1}
+settings {"name": "parentUniqueId_identifier_userId_unique_idx", "unique": true} {"parentUniqueId": 1, "identifier": 1, "userId": 1}
+settings {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+settingsConfigurationState {"name": "identifier_1", "background": true} {"identifier": 1}
+signupVerificationTokens {"name": "token_signupVerificationToken_query_index", "background": true} {"token": 1}
+sourceCodeManagers {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+sourceCodeManagers {"name": "uniqueIndex", "unique": true} {"userIdentifier": 1, "name": 1, "accountIdentifier": 1}
+stageExecutionInfo {"name": "billing_cd_accounts_by_endts_idx", "background": true} {"stageStatus": 1, "endts": 1, "serviceIdentifier": 1, "accountIdentifier": 1, "executionSummaryDetails.serviceInfo.gitOpsEnabled": 1}
+stageExecutionInfo {"name": "billing_cd_services_by_endts_idx", "background": true} {"accountIdentifier": 1, "stageStatus": 1, "endts": 1, "executionSummaryDetails.serviceInfo.gitOpsEnabled": 1}
+stageExecutionInfo {"name": "createdAt_1", "background": true} {"createdAt": 1}
+stageExecutionInfo {"name": "parentId_sorted_stage_execution_info_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+stageExecutionInfo {"name": "parentId_sorted_stage_execution_info_with_stage_status_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageStatus": 1, "createdAt": -1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "parentId_stage_execution_info_deployment_identifier_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "deploymentIdentifier": 1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "parentId_stage_execution_info_using_stage_execution_id_idx", "background": true} {"accountIdentifier": 1, "stageExecutionId": 1, "parentUniqueId": 1}
+stageExecutionInfo {"name": "parentId_unique_stage_execution_info_idx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+stageExecutionInfo {"name": "sorted_stage_execution_info_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+stageExecutionInfo {"name": "sorted_stage_execution_info_with_stage_status_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageStatus": 1, "createdAt": -1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+stageExecutionInfo {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+stageExecutionInfo {"name": "unique_stage_execution_info_deployment_identifier_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "deploymentIdentifier": 1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "unique_stage_execution_info_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1}
+stageExecutionInfo {"name": "unique_stage_execution_info_using_stage_execution_id_idx", "background": true} {"accountIdentifier": 1, "stageExecutionId": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+stageExecutionInstanceInfo {"name": "acc_org_proj_pipelineexecId_stageexecid", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineExecutionId": 1, "stageExecutionId": 1}
+stageExecutionInstanceInfo {"name": "acc_parentId_pipelineexecId_stageexecid", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "pipelineExecutionId": 1, "stageExecutionId": 1}
+stageExecutionInstanceInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+stageExecutionInstanceInfo {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+standAloneTrafficShiftRollbackInfo {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+standAloneTrafficShiftRollbackInfo {"name": "uniqueId_1", "background": true} {"uniqueId": 1}
+standAloneTrafficShiftRollbackInfo {"name": "unique_standalone_traffic_shift_rollback_info_idx", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "planExecutionId": 1, "stageNodeExecutionId": 1, "loadBalancer": 1, "listenerArn": 1, "listenerRuleArn": 1}
+standAloneTrafficShiftRollbackInfo {"name": "unique_standalone_traffic_shift_rollback_info_parent_unique_id_idx", "unique": true} {"parentUniqueId": 1, "planExecutionId": 1, "stageNodeExecutionId": 1, "loadBalancer": 1, "listenerArn": 1, "listenerRuleArn": 1}
+standAloneTrafficShiftRollbackInfo {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+stepExecutionEntity {"name": "parentId_planExecutionId_stepType_idx", "background": true} {"parentUniqueId": 1, "planExecutionId": 1, "stepType": 1}
+stepExecutionEntity {"name": "stageExecutionId_parentId_idx", "background": true} {"stageExecutionId": 1, "parentUniqueId": 1}
+stepExecutionEntity {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+stepExecutionEntity {"name": "unique_stepExecutionId_parentId_idx", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "stepExecutionId": 1}
+stepExecutionEntity {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+terraformApplyExecutionDetails {"name": "accountId_organizationId_projectId_pipelineExecutionId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineExecutionId": 1}
+terraformApplyExecutionDetails {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terraformApplyExecutionDetails {"name": "parentUniqueId_pipelineExecutionId_idx", "background": true} {"parentUniqueId": 1, "pipelineExecutionId": 1}
+terraformApplyExecutionDetails {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+terraformCloudConfig {"name": "accountId_orgId_projectId_entityId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "provisionerIdentifier": 1, "createdAt": -1}
+terraformCloudConfig {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terraformCloudConfig {"name": "parentUniqueId_entityId_createdAt", "background": true} {"parentUniqueId": 1, "provisionerIdentifier": 1, "createdAt": -1}
+terraformCloudConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+terraformCloudPlanExecutionDetails {"name": "accountId_organizationId_projectId_pipelineExecutionId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineExecutionId": 1}
+terraformCloudPlanExecutionDetails {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terraformCloudPlanExecutionDetails {"name": "parentUniqueId_pipelineExecutionId_idx", "background": true} {"parentUniqueId": 1, "pipelineExecutionId": 1}
+terraformCloudPlanExecutionDetails {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+terraformConfig {"name": "accountId_orgId_projectId_entityId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "entityId": 1, "createdAt": -1}
+terraformConfig {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terraformConfig {"name": "parentUniqueId_entityIdV2_createdAt", "background": true} {"parentUniqueId": 1, "entityIdV2": 1, "createdAt": -1}
+terraformConfig {"name": "parentUniqueId_entityId_createdAt", "background": true} {"parentUniqueId": 1, "entityId": 1, "createdAt": -1}
+terraformConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+terraformPlanExecutionDetails {"name": "accountId_organizationId_projectId_pipelineExecutionId_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "pipelineExecutionId": 1}
+terraformPlanExecutionDetails {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terraformPlanExecutionDetails {"name": "parentUniqueId_pipelineExecutionId_idx", "background": true} {"parentUniqueId": 1, "pipelineExecutionId": 1}
+terraformPlanExecutionDetails {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+terragruntConfig {"name": "accountId_orgId_projectId_entityId_createdAt", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "entityId": 1, "createdAt": -1}
+terragruntConfig {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+terragruntConfig {"name": "parentUniqueId_entityIdV2_createdAt", "background": true} {"parentUniqueId": 1, "entityIdV2": 1, "createdAt": -1}
+terragruntConfig {"name": "parentUniqueId_entityId_createdAt", "background": true} {"parentUniqueId": 1, "entityId": 1, "createdAt": -1}
+terragruntConfig {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+tokens {"name": "accountIdentifier_apiKeyType_pgpFingerPrint_idx", "background": true} {"accountIdentifier": 1, "apiKeyType": 1, "pgpPublicKey.fingerprint": 1}
+tokens {"name": "accountIdentifier_apiKeyType_pgpKeyId_idx", "background": true} {"accountIdentifier": 1, "apiKeyType": 1, "pgpPublicKey.keyId": 1}
+tokens {"name": "accountIdentifier_apiKeyType_pgpParentKeyId_idx", "background": true} {"accountIdentifier": 1, "apiKeyType": 1, "pgpPublicKey.parentKeyId": 1}
+tokens {"name": "accountIdentifier_apiKeyType_sshFingerPrint_idx", "background": true} {"accountIdentifier": 1, "apiKeyType": 1, "sshPublicKey.fingerPrint": 1}
+tokens {"name": "accountIdentifier_parentIdentifier_apiKeyType_tokenMode_idx", "background": true} {"accountIdentifier": 1, "parentIdentifier": 1, "apiKeyType": 1, "tokenMode": 1}
+tokens {"name": "accountIdentifier_parentUniqueId_identifier_apiKeyType_parentIdentifier_apiKeyIdentifier", "unique": true, "collation": {"locale": "en", "strength": 1}} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "apiKeyType": 1, "parentIdentifier": 1, "apiKeyIdentifier": 1}
+tokens {"name": "accountIdentifier_scopedResourceMetadata_parentResourceId_apiKeyType_idx", "background": true} {"accountIdentifier": 1, "scopedResourceMetadata.parentResourceId": 1, "apiKeyType": 1}
+tokens {"name": "encodedPassword_1", "background": true} {"encodedPassword": 1}
+tokens {"name": "fingerPrint_accountIdentifier_idx", "background": true} {"sshPublicKey.fingerPrint": 1, "accountIdentifier": 1}
+tokens {"name": "list_tokens_idx", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "apiKeyType": 1, "parentIdentifier": 1, "apiKeyIdentifier": 1}
+tokens {"name": "parentUniqueId_identifier_apiKeyType_parentIdentifier_apiKeyIdentifier_unique_idx", "unique": true} {"parentUniqueId": 1, "identifier": 1, "apiKeyType": 1, "parentIdentifier": 1, "apiKeyIdentifier": 1}
+tokens {"name": "pgpFingerPrint_accountIdentifier_idx", "background": true} {"pgpPublicKey.fingerprint": 1, "accountIdentifier": 1}
+tokens {"name": "tokenExpiryAlertNextIteration_1", "background": true} {"tokenExpiryAlertNextIteration": 1}
+tokens {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+totalAccountUsers {"name": "accountId_year_month_unique_index", "unique": true} {"accountIdentifier": 1, "year": 1, "month": 1}
+transientExecutionDataInstance {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+transientExecutionDataInstance {"name": "unique_planExecutionId_name_levelRuntimeIdx", "unique": true} {"planExecutionId": 1, "name": 1, "levelRuntimeIdIdx": 1}
+transientExecutionDataInstance {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+tsdbUniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+tunnel {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+uniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+user-groups {"name": "accountIdentifierParentUniqueIdIdentifierIdx", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+user-groups {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+user-groups {"name": "unique_parentUniqueIdIdentifierIdx", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+user-groups {"name": "user_groups_accountid_externallymanaged", "background": true} {"accountIdentifier": 1, "externallyManaged": 1}
+user-groups {"name": "user_groups_index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+user-groups {"name": "user_groups_ssoid_index", "background": true} {"linkedSsoId": 1, "isSsoLinked": 1}
+userMemberships {"name": "nextIteration_1", "background": true} {"nextIteration": 1}
+userMemberships {"name": "uniqueUserMembershipUserId", "unique": true} {"userId": 1}
+userMemberships {"name": "userMembershipAccountOrgProject", "background": true} {"scopes.accountIdentifier": 1, "scopes.orgIdentifier": 1, "scopes.projectIdentifier": 1}
+userMembershipsV2 {"name": "nextIteration_1", "background": true} {"nextIteration": 1}
+userMembershipsV2 {"name": "uniqueUserMembershipV2UserAccountOrgProject", "unique": true} {"userId": 1, "scope.accountIdentifier": 1, "scope.orgIdentifier": 1, "scope.projectIdentifier": 1}
+userMembershipsV2 {"name": "uniqueUserMembershipV2UserAccountParentUniqueId", "unique": true} {"userId": 1, "accountIdentifier": 1, "parentUniqueId": 1}
+userMembershipsV2 {"name": "userMembershipV2AccountOrgProjectList", "background": true} {"scope.accountIdentifier": 1, "scope.orgIdentifier": 1, "scope.projectIdentifier": 1}
+userMembershipsV2 {"name": "userMembershipV2AccountOrgProjectUserIdList", "background": true} {"scope.accountIdentifier": 1, "scope.orgIdentifier": 1, "scope.projectIdentifier": 1, "userId": 1}
+userMembershipsV2 {"name": "userMembershipV2AccountParentUniqueIdScopeLevel", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "scopeLevel": 1}
+userMembershipsV2 {"name": "userMembershipV2AccountParentUniqueIdUserIdList", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "userId": 1}
+userMembershipsV2 {"name": "userMembershipV2UserAccountParentUniqueIdScopeLevel", "background": true} {"userId": 1, "accountIdentifier": 1, "parentUniqueId": 1, "scopeLevel": 1}
+userMetadata {"name": "uniqueUserMetadataEmailId", "unique": true} {"email": 1}
+userSourceCodeManagers {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+userSourceCodeManagers {"name": "unique_accountIdentifier_userIdentifier_type_idx", "unique": true} {"accountIdentifier": 1, "userIdentifier": 1, "type": 1}
+variables {"name": "accountId_orgId_projectId_createdAt_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "createdAt": -1}
+variables {"name": "accountId_orgId_projectId_lastModifiedAt_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "lastModifiedAt": -1}
+variables {"name": "accountId_orgId_projectId_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+variables {"name": "accountId_parentUniqueId_createdAt_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "createdAt": -1}
+variables {"name": "accountId_parentUniqueId_identifier_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1}
+variables {"name": "accountId_parentUniqueId_lastModifiedAt_decreasing_sort_Index", "background": true} {"accountIdentifier": 1, "parentUniqueId": 1, "lastModifiedAt": -1}
+variables {"name": "parentId_identifier_unique_idx", "unique": true} {"parentUniqueId": 1, "identifier": 1}
+variables {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+waitInstances {"name": "correlationIds_1", "background": true} {"correlationIds": 1}
+waitInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+waitInstances {"name": "waitingOnCorrelationIds_1", "background": true} {"waitingOnCorrelationIds": 1}
+webhookEvents {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+yamlChangeSetNG {"name": "accountId_createdAt_index", "background": true} {"accountId": 1, "createdAt": -1}
+yamlChangeSetNG {"name": "accountId_queuekey_status_queuedOn_index", "background": true} {"accountId": 1, "queueKey": 1, "status": 1, "queuedOn": -1}
+yamlChangeSetNG {"name": "accountId_status_createdAt_index", "background": true} {"accountId": 1, "status": 1, "createdAt": 1}
+yamlChangeSetNG {"name": "accountId_status_retryCount_index", "background": true} {"accountId": 1, "status": 1, "retryCount": 1}
+yamlChangeSetNG {"name": "status_1", "background": true} {"status": 1}
+yamlGitConfigs {"name": "accountId_orgId_projectId_identifier_unique_Index", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+yamlGitConfigs {"name": "accountId_orgId_projectId_repo_unique_Index", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "repo": 1}
+yamlGitConfigs {"name": "repo_branch_index", "background": true} {"repo": 1, "branch": 1}

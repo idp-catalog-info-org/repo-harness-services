@@ -1,0 +1,69 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/src/main/java/io/harness/ng/config:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/delegate/client:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/modules/constants:module",
+        "//420-delegate-service/src/main/java/io/harness/delegate/beans:module",
+        "//920-delegate-service-beans/src/main/java/io/harness/delegate/beans:module",
+        "//930-ng-license-manager/src/main/java/io/harness/licensing/services:module",
+        "//932-connector-task/src/main/java/io/harness/connector/helper:module",
+        "//940-feature-flag/src/main/java/io/harness/ff:module",
+        "//940-secret-manager-client/src/main/java/io/harness/ng/core/api:module",
+        "//940-secret-manager-client/src/main/java/io/harness/secretmanagerclient/services/api:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//952-scm-java-client/src/main/java/io/harness/service:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-api-services/src/main/java/io/harness/git:module",
+        "//960-api-services/src/main/java/io/harness/k8s:module",
+        "//960-ng-license-beans/src/main/java/io/harness/licensing:module",
+        "//960-ng-license-beans/src/main/java/io/harness/licensing/beans/modules:module",
+        "//970-api-services-beans/src/main/java/io/harness/account:module",
+        "//970-api-services-beans/src/main/java/io/harness/security/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
+        "//970-ng-commons/src/main/java/io/harness/connector:module",
+        "//970-ng-commons/src/main/java/io/harness/constants:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-telemetry-beans/src/main/java/io/harness/telemetry:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/network:module",
+        "//980-commons/src/main/java/io/harness/rest:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_intellij_annotations",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:io_swagger_core_v3_swagger_annotations",
+        "@maven//:io_swagger_swagger_annotations",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_apache_logging_log4j_log4j_api",
+        "@maven//:org_hibernate_validator_hibernate_validator",
+        "@maven//:org_slf4j_slf4j_api",
+        "@maven//:org_zeroturnaround_zt_exec",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

@@ -1,0 +1,29 @@
+approval:
+  uses: custom
+  with:
+    script-timeout: 3m
+    retry: 15s
+    run:
+      container:
+        image: alpine
+      script: |-
+        test="approved"
+        export var="singh"
+        echo "hello world"
+      output:
+        - name: var1
+          type: String
+          value: test
+        - name: shobhit
+          type: String
+          value: var
+      delegate:
+        - primary
+    approve:
+        match-any-condition: true
+        conditions:
+          - var1:
+              eq: approved
+          - shobhit:
+              eq: singhs
+    reject: <+<+pipeline.name> == "CustomApprovalV1">

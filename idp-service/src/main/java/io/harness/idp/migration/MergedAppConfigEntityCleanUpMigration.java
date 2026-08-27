@@ -1,0 +1,33 @@
+/*
+ * Copyright 2024 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.idp.migration;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.idp.configmanager.entities.MergedAppConfigEntity;
+import io.harness.migration.beans.NGMigration;
+
+import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+
+@Slf4j
+@OwnedBy(HarnessTeam.IDP)
+public class MergedAppConfigEntityCleanUpMigration implements NGMigration {
+  @Inject MongoTemplate mongoTemplate;
+  @Override
+  public void migrate() {
+    log.info("Starting clean up of mergedAppConfig collections");
+    try {
+      mongoTemplate.dropCollection(MergedAppConfigEntity.class);
+    } catch (Exception exception) {
+      log.error("Error occurred while dropping the mergedAppConfigs collection");
+    }
+    log.info("Clean up of mergedAppConfig collections done successfully");
+  }
+}

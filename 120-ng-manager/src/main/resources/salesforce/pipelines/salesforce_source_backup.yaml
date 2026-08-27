@@ -1,0 +1,67 @@
+pipeline:
+  name: __PIPELINE_NAME__
+  identifier: __PIPELINE_IDENTIFIER__
+  projectIdentifier: __PROJECT_IDENTIFIER__
+  orgIdentifier: __ORG_IDENTIFIER__
+  tags: {}
+  stages:
+    - stage:
+        name: Salesforce Source Backup
+        identifier: salesforce_source_backup
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - stepGroup:
+                  name: Salesforce Source Backup
+                  identifier: salesforce_source_backup_sg
+                  steps:
+                    - step:
+                        type: SalesforceDownloadDeployables
+                        name: SalesforceDownloadDeployables
+                        identifier: SalesforceDownloadDeployables
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: <+input>
+                          source1Type: <+input>
+                          source2Type: <+input>
+                          source1Ref: <+input>
+                          source2Ref: <+input>
+                          metadataTypes: <+input>
+                        timeout: 10m
+                    - step:
+                        type: SalesforceEvaluateDiff
+                        name: SalesforceEvaluateDiff
+                        identifier: SalesforceEvaluateDiff
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: <+input>
+                        timeout: 10m
+                    - step:
+                        type: SalesforceSourceBackup
+                        name: SalesforceSourceBackup
+                        identifier: SalesforceSourceBackup
+                        spec:
+                          connectorRef: <+input>
+                          image: <+input>
+                          gitConnectorRef: <+input>
+                          repoName: <+input>
+                          branch: <+input>
+                          targetBranch: <+input>
+                          branchAction: raisePR
+                        timeout: 10m
+                  stepGroupInfra:
+                    type: KubernetesDirect
+                    spec:
+                      connectorRef: <+input>
+                      namespace: <+input>
+            rollbackSteps: []
+          serviceDependencies: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback

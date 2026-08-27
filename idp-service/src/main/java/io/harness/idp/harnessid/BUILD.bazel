@@ -1,0 +1,23 @@
+# Copyright 2026 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["**/*.java"]),
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/harnessid/src/main/java/io/harness/harnessid/client:module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_harness_harnessid_proto",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_slf4j_slf4j_api",
+    ],
+)

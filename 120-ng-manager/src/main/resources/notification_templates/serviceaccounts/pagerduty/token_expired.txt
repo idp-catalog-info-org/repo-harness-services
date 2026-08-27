@@ -1,0 +1,4 @@
+summary: "Token expired — ${TOKEN_IDENTIFIER} | Service Account: ${SERVICE_ACCOUNT_NAME} | API Key: ${API_KEY_IDENTIFIER} | Any pipelines or integrations using this token will fail. Create a new token to avoid failures."
+link:
+    href: harness.io
+    text: Harness

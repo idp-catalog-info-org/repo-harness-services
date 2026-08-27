@@ -1,0 +1,20 @@
+name: Step Concurrency Rebuild Metrics
+identifier: StepConcurrencyRebuildMetrics
+metricGroup: StepConcurrencyRebuildMetricsGroup
+metrics:
+  - metricName: pipeline_step_concurrency_counter_drift
+    metricDefinition: Signed drift (mongoCount - redisCountBeforeRecompute) observed during a step-concurrency counter rebuild. scope in {account, cluster}.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_step_concurrency_rebuild_run_total
+    metricDefinition: Outcome of each step-concurrency counter rebuild run. outcome in {success, leader_lock_held_by_other, error}.
+    type: Count
+    unit: "1"
+  - metricName: pipeline_step_concurrency_rebuild_accounts_recomputed
+    metricDefinition: Number of accounts recomputed during the last step-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_step_concurrency_rebuild_stale_accounts_zeroed
+    metricDefinition: Number of accounts with a stale non-zero Redis counter zeroed during the last step-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"

@@ -1,0 +1,10 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "summary": "Harness Incident Response: High Error Budget Burn Rate for SLO ${SLO_NAME}",
+  "sections": [
+    {
+      "activityTitle": "Harness Incident Response: High Error Budget Burn Rate detected for SLO - ${SLO_NAME} under project - ${SLO_PROJECT_NAME}, in the organization - ${SLO_ORG_NAME}."
+    }
+  ]
+}

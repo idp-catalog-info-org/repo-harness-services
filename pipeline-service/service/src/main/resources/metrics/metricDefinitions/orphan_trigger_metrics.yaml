@@ -1,0 +1,8 @@
+name: Orphan Trigger Metrics
+identifier: OrphanTriggerMetrics
+metricGroup: OrphanTriggerMetricsGroup
+metrics:
+  - metricName: orphan_triggers_count
+    metricDefinition: Number of leftover triggers per account whose parentUniqueId no longer matches the live project, or whose project is missing
+    type: LastValue
+    unit: count

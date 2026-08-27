@@ -1,0 +1,190 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Chaos Experiment has Errored :x: ",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*Summary:*\nHarness Chaos Experiment `${CHAOS_EXPERIMENT_NAME}` has errored for the project - `${PROJECT_ID}` under the organization - `${ORG_ID}` for the account - `${ACCOUNT_ID}`."
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Report Created On:*\n`${REPORT_CREATED_ON}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Experiment ID:*\n`${EXPERIMENT_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Project Name:*\n`${PROJECT_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Organization Name:*\n`${ORG_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Account Name:*\n`${ACCOUNT_ID}`"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Execution Link :arrow_upper_right: :",
+				"emoji": true
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Chaos Experiment URL",
+						"emoji": true
+					},
+					"url": "${CHAOS_EXPERIMENT_URL}"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Metadata :spiral_note_pad: :",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Experiment Name:*\n`${CHAOS_EXPERIMENT_NAME}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Description:*\n`${CHAOS_EXPERIMENT_DESCRIPTION}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Tags:*\n`${CHAOS_EXPERIMENT_TAGS}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Schedule Details:*\n`${SCHEDULE_DETAILS}`"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Execution Details :mag_right: :",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Experiment Run ID:*\n`${CHAOS_EXPERIMENT_RUN_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Run Sequence:*\n`${RUN_SEQUENCE}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Executed By:*\n`${USER_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Executed On:*\n`${EXECUTED_ON}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Executed Till:*\n`${EXECUTED_TILL}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Duration:*\n`${DURATION}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Notify ID:*\n`${NOTIFY_ID}`"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Experiment Statistics :bar_chart: :",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Resilience Score:*\n`${RESILIENCE_SCORE}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Number of Faults:*\n`${TOTAL_NUMBER_OF_FAULTS}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Number of Probes:*\n`${TOTAL_NUMBER_OF_PROBES}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Number of Actions:*\n`${TOTAL_NUMBER_OF_ACTIONS}`"
+				}
+			]
+		},
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Chaos Infrastructure Details :mag_right: :",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Chaos Infrastructure ID:*\n`${CHAOS_INFRASTRUCTURE_ID}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Chaos Infrastructure Type:*\n`${CHAOS_INFRASTRUCTURE_TYPE}`"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Environment:*\n`${ENVIRONMENT_ID}`"
+				}
+			]
+		}
+	]
+}

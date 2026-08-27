@@ -1,0 +1,126 @@
+/*
+ * Copyright 2025 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+{
+  "type": "record",
+  "name": "StepEndEventAvro",
+  "namespace": "io.harness.pms.contracts.execution",
+  "fields": [
+    { "name": "level", "type": "string" },
+    { "name": "accountIdentifier", "type": "string" },
+    { "name": "orgIdentifier", "type": "string" },
+    { "name": "projectIdentifier", "type": "string" },
+    { "name": "parentUniqueId", "type": ["null", "string"], "default": null },
+    { "name": "pipelineIdentifier", "type": "string" },
+    { "name": "pipelineName", "type": "string" },
+    { "name": "planExecutionId", "type": "string" },
+    { "name": "executionUrl", "type": "string" },
+    { "name": "stageExecutionId", "type": "string" },
+    { "name": "stageIdentifier", "type": "string" },
+    { "name": "stepExecutionId", "type": "string" },
+    { "name": "stepIdentifier", "type": "string" },
+    { "name": "stepName", "type": "string" },
+    { "name": "status", "type": "string" },
+    { "name": "eventType", "type": ["null", "string"], "default": null },
+    { "name": "stepType", "type": "string" },
+    { "name": "stepInputs", "type": "string" },
+    { "name": "isRetried", "type": "boolean" },
+    {
+      "name": "retryIds",
+      "type": ["null", { "type": "array", "items": "string" }],
+      "default": null
+    },
+    { "name": "createdAt", "type": "string" },
+    { "name": "startTs", "type": "string" },
+    { "name": "lastModifiedAt", "type": "string" },
+    { "name": "endTs", "type": "string" },
+    { "name": "duration", "type": "string" },
+    { "name": "logUrl", "type": ["null", "string"], "default": null },
+    {
+      "name": "stepOutputs",
+      "type": { "type": "array", "items": "string" }
+    },
+    {
+      "name": "failureInfo",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "FailureInfoAvro",
+          "fields": [
+            {
+              "name": "failureData",
+              "type": [
+                "null",
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "record",
+                    "name": "FailureDataAvro",
+                    "fields": [
+                      { "name": "code", "type": ["null", "string"], "default": null },
+                      { "name": "level", "type": ["null", "string"], "default": null },
+                      { "name": "message", "type": ["null", "string"], "default": null },
+                      { "name": "failureType", "type": ["null", "string"], "default": null },
+                      { "name": "failureSubType", "type": ["null", "string"], "default": null }
+                    ]
+                  }
+                }
+              ],
+              "default": null
+            }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "moduleInfo",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "ModuleInfo",
+          "fields": [
+            {
+              "name": "cd",
+              "type": [
+                "null",
+                {
+                  "type": "record",
+                  "name": "CDInfo",
+                  "fields": [
+                    { "name": "envRef", "type": ["null", "string"], "default": null },
+                    { "name": "infra", "type": ["null", "string"], "default": null },
+                    { "name": "service", "type": ["null", "string"], "default": null },
+                    { "name": "artifactVersion", "type": ["null", "string"], "default": null }
+                  ]
+                }
+              ],
+              "default": null
+            },
+            {
+              "name": "ci",
+              "type": [
+                "null",
+                {
+                  "type": "record",
+                  "name": "CIInfo",
+                  "fields": []
+                }
+              ],
+              "default": null
+            }
+          ]
+        }
+      ],
+      "default": null
+    }
+    ,
+    { "name": "failureInfoJson", "type": ["null", "string"], "default": null }
+  ]
+}

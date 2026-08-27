@@ -1,0 +1,6 @@
+{{- include "harnesscommon.pdb.renderPodDistributionBudget" (dict "ctx" $) }}
+---
+
+{{- if .Values.pipelineSplitting.enabled }}
+{{- include "harnesscommon.pdb.renderPodDistributionBudget" (dict "ctx" $ "nameOverride" "orchestration-engine") }}
+{{- end }}

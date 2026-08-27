@@ -1,0 +1,20 @@
+pipeline:
+  name: CIPipeline
+  identifier: CIPipeline
+  projectIdentifier: testProject
+  orgIdentifier: testOrg
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: RunTests
+                  identifier: RunTests
+                  spec:
+                    command: echo "running tests"

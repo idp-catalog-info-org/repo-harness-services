@@ -1,0 +1,20 @@
+{
+  "identifier": "PXXXXXX",
+  "name": "payments-service",
+  "pagerdutyStatus": "active",
+  "pagerdutyUrl": "https://example.pagerduty.com/services/PXXXXXX",
+  "teams": [
+    {
+      "id": "PTEAM001",
+      "summary": "Payments Team"
+    },
+    {
+      "id": "PTEAM002",
+      "summary": "Platform Oncall"
+    }
+  ],
+  "onCallName": "Alice Smith",
+  "analyticsTotalIncidents": 12,
+  "analyticsMeanSecondsToResolve": 900,
+  "analyticsMeanSecondsToFirstAck": 45
+}

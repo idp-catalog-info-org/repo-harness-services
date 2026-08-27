@@ -1,0 +1,40 @@
+identifier: dx
+name: DX Plugin
+description: View DX metrics and insights for your projects in Harness IDP.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: getdx.com
+category: Developer Experience
+source: https://github.com/get-dx/backstage-plugin
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/dx/
+config: |-
+  proxy:
+    endpoints:
+      "/dx-web-api":
+        target: https://api.getdx.com
+        pathRewrite:
+          '/api/proxy/dx-web-api/?': '/'  
+        headers:
+          Authorization: Bearer ${DX_API_TOKEN}
+        allowedHeaders:
+          - X-Client-Type
+          - X-Client-Version
+  
+  dx: #optional
+    appId: staging  #optional
+environmentVariables:
+  - DX_API_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityDXDashboardContent
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityDXDashboardContent
+        specs:
+          gridProps:
+            md: 6

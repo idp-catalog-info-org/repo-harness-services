@@ -1,0 +1,4 @@
+name: Webhook Event Times in Metrics Group
+identifier: webhook_event_times_group
+labels:
+  - accountId

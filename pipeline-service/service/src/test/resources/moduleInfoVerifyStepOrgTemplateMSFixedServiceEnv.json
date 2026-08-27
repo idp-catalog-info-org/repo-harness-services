@@ -1,0 +1,496 @@
+{
+  "__recast": "io.harness.plancreator.steps.common.StepElementParameters",
+  "uuid": "Q50VaZtxS3miuJ91o_F6uw",
+  "identifier": "Verify_1",
+  "name": "Verify_1",
+  "timeout": {
+    "__recast": "parameterField",
+    "__encodedValue": {
+      "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+      "expressionValue": null,
+      "expression": false,
+      "valueDoc": {
+        "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+        "value": "2h"
+      },
+      "valueClass": "java.lang.String",
+      "typeString": true,
+      "skipAutoEvaluation": false,
+      "jsonResponseField": false,
+      "responseField": null
+    }
+  },
+  "failureStrategies": [
+    {
+      "__recast": "io.harness.yaml.core.failurestrategy.FailureStrategyConfig",
+      "onFailure": {
+        "__recast": "io.harness.yaml.core.failurestrategy.OnFailureConfig",
+        "errors": [
+          "VERIFICATION_ERROR"
+        ],
+        "action": {
+          "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.ManualInterventionFailureActionConfig",
+          "type": "MANUAL_INTERVENTION",
+          "specConfig": {
+            "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.ManualFailureSpecConfig",
+            "timeout": {
+              "__recast": "parameterField",
+              "__encodedValue": {
+                "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+                "expressionValue": null,
+                "expression": false,
+                "valueDoc": {
+                  "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+                  "value": {
+                    "__recast": "io.harness.yaml.core.timeout.Timeout",
+                    "timeoutString": "2h",
+                    "timeoutInMillis": 7200000
+                  }
+                },
+                "valueClass": "io.harness.yaml.core.timeout.Timeout",
+                "typeString": false,
+                "skipAutoEvaluation": false,
+                "jsonResponseField": false,
+                "responseField": null
+              }
+            },
+            "onTimeout": {
+              "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.OnTimeoutConfig",
+              "action": {
+                "__recast": "io.harness.yaml.core.failurestrategy.rollback.StageRollbackFailureActionConfig",
+                "type": "STAGE_ROLLBACK"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "__recast": "io.harness.yaml.core.failurestrategy.FailureStrategyConfig",
+      "onFailure": {
+        "__recast": "io.harness.yaml.core.failurestrategy.OnFailureConfig",
+        "errors": [
+          "UNKNOWN"
+        ],
+        "action": {
+          "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.ManualInterventionFailureActionConfig",
+          "type": "MANUAL_INTERVENTION",
+          "specConfig": {
+            "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.ManualFailureSpecConfig",
+            "timeout": {
+              "__recast": "parameterField",
+              "__encodedValue": {
+                "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+                "expressionValue": null,
+                "expression": false,
+                "valueDoc": {
+                  "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+                  "value": {
+                    "__recast": "io.harness.yaml.core.timeout.Timeout",
+                    "timeoutString": "2h",
+                    "timeoutInMillis": 7200000
+                  }
+                },
+                "valueClass": "io.harness.yaml.core.timeout.Timeout",
+                "typeString": false,
+                "skipAutoEvaluation": false,
+                "jsonResponseField": false,
+                "responseField": null
+              }
+            },
+            "onTimeout": {
+              "__recast": "io.harness.yaml.core.failurestrategy.manualintervention.OnTimeoutConfig",
+              "action": {
+                "__recast": "io.harness.yaml.core.failurestrategy.ignore.IgnoreFailureActionConfig",
+                "type": "IGNORE"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "skipCondition": {
+    "__recast": "parameterField",
+    "__encodedValue": {
+      "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+      "expressionValue": null,
+      "expression": false,
+      "valueDoc": {
+        "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+      },
+      "valueClass": "java.lang.String",
+      "typeString": true,
+      "skipAutoEvaluation": false,
+      "jsonResponseField": false,
+      "responseField": null
+    }
+  },
+  "type": "Verify",
+  "spec": {
+    "__recast": "io.harness.cvng.cdng.beans.CVNGStepParameter",
+    "serviceIdentifier": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+          "value": "notifysvc"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "envIdentifier": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+          "value": "notifyenv"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "deploymentTag": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "sensitivity": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+          "value": "HIGH"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "failOnNoAnalysis": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+          "value": false
+        },
+        "valueClass": "java.lang.Boolean",
+        "typeString": false,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "shouldUseCDNodes": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+        },
+        "valueClass": "java.lang.Boolean",
+        "typeString": false,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "testNodeRegExPattern": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "controlNodeRegExPattern": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "spec": {
+      "__recast": "io.harness.cvng.cdng.beans.AutoVerificationJobSpec",
+      "trafficSplitPercentage": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "shouldUseCDNodes": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.Boolean",
+          "typeString": false,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "testNodeRegExPattern": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "controlNodeRegExPattern": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "uuid": "rxvUCForRVKadC68PWCN1A",
+      "deploymentTag": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "duration": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+            "value": "5m"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "sensitivity": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+            "value": "HIGH"
+          },
+          "valueClass": "java.lang.String",
+          "typeString": true,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "failOnNoAnalysis": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.Boolean",
+          "typeString": false,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      },
+      "failIfAnyCustomMetricInNoAnalysis": {
+        "__recast": "parameterField",
+        "__encodedValue": {
+          "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+          "expressionValue": null,
+          "expression": false,
+          "valueDoc": {
+            "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+          },
+          "valueClass": "java.lang.Boolean",
+          "typeString": false,
+          "skipAutoEvaluation": false,
+          "jsonResponseField": false,
+          "responseField": null
+        }
+      }
+    },
+    "baseline": {
+      "__recast": "parameterField",
+      "__encodedValue": {
+        "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+        "expressionValue": null,
+        "expression": false,
+        "valueDoc": {
+          "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+        },
+        "valueClass": "java.lang.String",
+        "typeString": true,
+        "skipAutoEvaluation": false,
+        "jsonResponseField": false,
+        "responseField": null
+      }
+    },
+    "monitoredService": {
+      "__recast": "io.harness.cvng.cdng.beans.MonitoredServiceNode",
+      "uuid": "05tvFvLfThSLvxmWAXR7AA",
+      "type": "Template",
+      "spec": {
+        "__recast": "io.harness.cvng.cdng.beans.TemplateMonitoredServiceSpec",
+        "monitoredServiceTemplateRef": {
+          "__recast": "parameterField",
+          "__encodedValue": {
+            "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+            "expressionValue": null,
+            "expression": false,
+            "valueDoc": {
+              "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+              "value": "org.og_ms_temp"
+            },
+            "valueClass": "java.lang.String",
+            "typeString": true,
+            "skipAutoEvaluation": false,
+            "jsonResponseField": false,
+            "responseField": null
+          }
+        },
+        "versionLabel": {
+          "__recast": "parameterField",
+          "__encodedValue": {
+            "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+            "expressionValue": null,
+            "expression": false,
+            "valueDoc": {
+              "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper",
+              "value": "v1"
+            },
+            "valueClass": "java.lang.String",
+            "typeString": true,
+            "skipAutoEvaluation": false,
+            "jsonResponseField": false,
+            "responseField": null
+          }
+        },
+        "templateInputs": {
+          "__recast": "com.fasterxml.jackson.databind.JsonNode",
+          "__encodedValue": {
+            "__uuid": "4d5CsQ3xSNG7lQN8U9zMnQ"
+          }
+        },
+        "uuid": "Q-1IV-RyR6G1PQ5o4vbSug"
+      }
+    }
+  },
+  "delegateSelectors": {
+    "__recast": "parameterField",
+    "__encodedValue": {
+      "__recast": "io.harness.pms.yaml.ParameterDocumentField",
+      "expressionValue": null,
+      "expression": false,
+      "valueDoc": {
+        "__recast": "io.harness.pms.yaml.ParameterFieldValueWrapper"
+      },
+      "valueClass": "java.util.List",
+      "typeString": false,
+      "skipAutoEvaluation": false,
+      "jsonResponseField": false,
+      "responseField": null
+    }
+  }
+}

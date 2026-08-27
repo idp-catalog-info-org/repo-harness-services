@@ -1,0 +1,42 @@
+identifier: jfrog-artifactory
+name: Container Image Registry for JFrog Artifactory
+description: View container image details from JFrog Artifactory in Backstage.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: Red Hat
+category: Image
+source: https://janus-idp.io/plugins/jfrog-artifactory/#installation-and-configuration
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/image-jfrog
+config: |-
+  proxy:
+    endpoints:
+      '/jfrog-artifactory/api':
+        target: 'http://<hostname>:8082' # or https://<customer>.jfrog.io
+        pathRewrite:
+          api/proxy/jfrog-artifactory/api/?: /
+        headers:
+          Authorization: 'Bearer ${JFROG_TOKEN}'
+        # Change to "false" in case of using self hosted artifactory instance with a self-signed certificate
+        secure: true
+environmentVariables:
+  - JFROG_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: JfrogArtifactoryPage
+      addByDefault: true
+      defaultRoute: /jfrog-artifactory
+      layoutSchemaSpecs:
+        name: JfrogArtifactoryPage
+        title: Jfrog Artifactory
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isJfrogArtifactoryAvailable
+                  content:
+                    component: JfrogArtifactoryPage

@@ -1,0 +1,17 @@
+name: Expression Functor Metrics
+identifier: ExpressionFunctorMetrics
+metricGroup: ExpressionFunctorMetricsGroup
+metrics:
+  - metricName: expression_functor_duration
+    metricDefinition: >
+      Time taken to resolve an expression functor in milliseconds.
+      Functor types: outcome, sweeping_output, ancestor, child, qualified, strategy, expanded_json
+    type: Duration
+    distribution: [ 1ms, 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 2500ms, 5000ms ]
+    unit: "ms"
+  - metricName: expression_functor_call_count
+    metricDefinition: >
+      Total number of expression functor invocations.
+      Functor types: outcome, sweeping_output, ancestor, child, qualified, strategy, expanded_json
+    type: Count
+    unit: "1"

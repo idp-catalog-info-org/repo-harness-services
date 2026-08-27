@@ -1,0 +1,9 @@
+name: CI Manager System API Metrics Group
+identifier: CISystemApiMetricsGroup
+labels:
+  - accountId
+  - infraType
+  - operation
+  - outcome
+  - phase
+  - stepType

@@ -1,0 +1,44 @@
+service:
+  name: ecs_service_test
+  identifier: ecs_service_test
+  orgIdentifier: default
+  projectIdentifier: ciproject
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: ecs_task_definition
+            type: EcsTaskDefinition
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>.regex(^[a-zA-Z0-9_-]+$).allowedValues(github_connector,bitbucket_connector,gitlab_connector)
+                  gitFetchType: Branch
+                  paths: <+input>.regex(^[a-zA-Z0-9_/.-]+\\.(json|yaml|yml)$)
+                  repoName: <+input>.regex(^[a-zA-Z0-9_/-]+$)
+                  branch: <+input>.regex(^[a-zA-Z0-9/_.-]+$).allowedValues(main,master,develop)
+        - manifest:
+            identifier: ecs_service_definition
+            type: EcsServiceDefinition
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>.regex(^[a-zA-Z0-9_-]+$).allowedValues(github_connector,bitbucket_connector,gitlab_connector)
+                  gitFetchType: Branch
+                  paths: <+input>.regex(^[a-zA-Z0-9_/.-]+\\.(json|yaml|yml)$)
+                  repoName: <+input>.regex(^[a-zA-Z0-9_/-]+$)
+                  branch: <+input>.regex(^[a-zA-Z0-9/_.-]+$).allowedValues(main,master,develop)
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>.regex(^[a-zA-Z0-9_-]+$).allowedValues(ecr_artifact)
+          sources:
+            - spec:
+                connectorRef: <+input>.regex(^[a-zA-Z0-9_-]+$).allowedValues(ecr_connector,docker_connector)
+                imagePath: <+input>.regex(^[a-zA-Z0-9._/-]+$)
+                tag: <+input>.regex(^[a-zA-Z0-9._-]+$).allowedValues(latest,stable)
+                region: <+input>.regex(^[a-z]{2}-[a-z]+-[0-9]$).allowedValues(us-east-1,us-west-2,eu-west-1,ap-south-1)
+              identifier: ecr_artifact
+              type: Ecr
+    type: ECS

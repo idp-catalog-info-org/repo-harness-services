@@ -1,0 +1,128 @@
+pipeline:
+  identifier: pp
+  name: pp
+  tags: {}
+  stages:
+    - parallel:
+        - insert:
+            identifier: emp
+            name: emp
+            stages:
+              - parallel:
+                  - stage:
+                      identifier: qqqq
+                      type: Deployment
+                      name: qqqq
+                      description: ""
+                      spec:
+                        deploymentType: Kubernetes
+                        service:
+                          serviceRef: ss
+                        environment:
+                          environmentRef: env
+                          deployToAll: false
+                          infrastructureDefinitions:
+                            - identifier: inf
+                        execution:
+                          steps:
+                            - step:
+                                identifier: ShellScript_1
+                                type: ShellScript
+                                name: ShellScript_1
+                                spec:
+                                  shell: Bash
+                                  executionTarget: {}
+                                  source:
+                                    type: Inline
+                                    spec:
+                                      script: echo hi
+                                  environmentVariables: []
+                                  outputVariables: []
+                                timeout: 10m
+                          rollbackSteps: []
+                      tags: {}
+                      failureStrategies:
+                        - onFailure:
+                            errors:
+                              - AllErrors
+                            action:
+                              type: StageRollback
+                  - stage:
+                      identifier: cus
+                      type: Custom
+                      name: cus
+                      description: ""
+                      spec:
+                        execution:
+                          steps:
+                            - step:
+                                identifier: Wait_1
+                                type: Wait
+                                name: Wait_1
+                                spec:
+                                  duration: 10m
+                      tags: {}
+                  - insert:
+                      name: inject1234
+                      identifier: inject1234
+                      stages: ""
+              - stage:
+                  identifier: cus2
+                  type: Custom
+                  name: cus2
+                  description: ""
+                  spec:
+                    execution:
+                      steps:
+                        - step:
+                            identifier: Wait_1
+                            type: Wait
+                            name: Wait_1
+                            spec:
+                              duration: 10m
+                  tags: {}
+        - stage:
+            identifier: www
+            type: Deployment
+            name: www
+            description: ""
+            spec:
+              deploymentType: Kubernetes
+              environment:
+                environmentRef: env
+                deployToAll: false
+                environmentInputs: <+input>
+                serviceOverrideInputs: <+input>
+                infrastructureDefinitions:
+                  - identifier: inf
+              service:
+                serviceRef: ss
+                serviceInputs: <+input>
+              execution:
+                steps:
+                  - step:
+                      identifier: Wait_1
+                      type: Wait
+                      name: Wait_1
+                      spec:
+                        duration: 10m
+                rollbackSteps:
+                  - step:
+                      identifier: Wait_1
+                      type: Wait
+                      name: Wait_1
+                      spec:
+                        duration: 10m
+            tags: {}
+            failureStrategies:
+              - onFailure:
+                  errors:
+                    - AllErrors
+                  action:
+                    type: PipelineRollback
+        - insert:
+            identifier: e
+            name: e
+            stages: ""
+  projectIdentifier: utktest
+  orgIdentifier: Pipelines_NonK8s_Org_NG

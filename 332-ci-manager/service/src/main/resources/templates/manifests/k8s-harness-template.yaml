@@ -1,0 +1,39 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store K8s manifest. Content (files) and values (valuesPaths) are fetched from the
+# Harness File Store by the manifest step and written to the runner workspace; the run step below is
+# only the vehicle that materializes those files into the shared workspace.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: Manifest file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  valuesPaths:
+    type: list
+    description: Values YAML file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store manifest 'ID_PLACEHOLDER' on the runner"

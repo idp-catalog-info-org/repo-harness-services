@@ -1,0 +1,8 @@
+name: CDC Graph Consumer Records Metrics
+identifier: CdcGraphConsumerRecordsMetrics
+metricGroup: CdcGraphConsumerMetricGroup
+metrics:
+  - metricName: cdc_pg_records_processed_total
+    metricDefinition: Total CDC records processed, labeled by collection and operation type (create/update)
+    type: Count
+    unit: "1"

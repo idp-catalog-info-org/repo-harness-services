@@ -1,0 +1,29 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Playwright Run ${PLAYWRIGHT_RUN_STATUS}: ${PLAYWRIGHT_RUN_NAME}"
+			}
+		},
+		${RUN_DETAILS_SLACK}
+		${RESULTS_SLACK}
+		${TOP_FAILURE_REASONS_SLACK}
+		${FAILED_TESTS_SLACK}
+		${AI_FAILURE_SUMMARY_SLACK}
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "${BUTTON_TEXT}"
+					},
+					"url": "${PLAYWRIGHT_RUN_URL}"
+				}
+			]
+		}
+	]
+}

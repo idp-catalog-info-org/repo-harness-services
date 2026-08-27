@@ -1,0 +1,126 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ci.states.codebase;
+
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+import static io.harness.steps.SdkCoreStepUtils.createStepResponseFromChildResponse;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.execution.ExecutionSource;
+import io.harness.beans.execution.ManualExecutionSource;
+import io.harness.beans.serializer.RunTimeInputHandler;
+import io.harness.beans.sweepingoutputs.ContextElement;
+import io.harness.beans.sweepingoutputs.StageDetails;
+import io.harness.ci.execution.buildstate.ConnectorUtils;
+import io.harness.ci.execution.utils.PrivateConnectUtils;
+import io.harness.ci.ff.CIFeatureFlagService;
+import io.harness.delegate.beans.ci.pod.ConnectorDetails;
+import io.harness.exception.ngexception.CIStageExecutionException;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.execution.ChildExecutableResponse;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.pms.sdk.core.data.OptionalSweepingOutput;
+import io.harness.pms.sdk.core.resolver.RefObjectUtils;
+import io.harness.pms.sdk.core.resolver.outputs.ExecutionSweepingOutputService;
+import io.harness.pms.sdk.core.steps.executables.ChildExecutable;
+import io.harness.pms.sdk.core.steps.io.StepInputPackage;
+import io.harness.pms.sdk.core.steps.io.StepResponse;
+import io.harness.tasks.ResponseData;
+
+import com.google.inject.Inject;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@OwnedBy(HarnessTeam.CI)
+public class CodeBaseStep implements ChildExecutable<CodeBaseStepParameters> {
+  public static final StepType STEP_TYPE =
+      StepType.newBuilder().setType("CI_CODEBASE").setStepCategory(StepCategory.STEP).build();
+
+  @Inject private ConnectorUtils connectorUtils;
+  @Inject private ExecutionSweepingOutputService executionSweepingOutputResolver;
+  @Inject private CIFeatureFlagService featureFlagService;
+
+  @Override
+  public Class<CodeBaseStepParameters> getStepParametersClass() {
+    return CodeBaseStepParameters.class;
+  }
+
+  @Override
+  public ChildExecutableResponse obtainChild(
+      Ambiance ambiance, CodeBaseStepParameters stepParameters, StepInputPackage inputPackage) {
+    String childNodeId = getChildNodeId(ambiance, stepParameters);
+    return ChildExecutableResponse.newBuilder().setChildNodeId(childNodeId).build();
+  }
+
+  // determines if we are going to execute task to get additional information or we are going to execute sync task just
+  // to expose data that we have
+  private String getChildNodeId(Ambiance ambiance, CodeBaseStepParameters stepParameters) {
+    ExecutionSource executionSource = getExecutionSource(ambiance, stepParameters.getExecutionSource());
+    if (!isManualWithGitRef(executionSource)) {
+      return stepParameters.getCodeBaseSyncTaskId();
+    }
+
+    ConnectorDetails connectorDetails = resolveConnectorDetails(ambiance, stepParameters);
+    if (shouldUseDelegateTask(ambiance, connectorDetails)) {
+      return stepParameters.getCodeBaseDelegateTaskId();
+    }
+    return stepParameters.getCodeBaseSyncTaskId();
+  }
+
+  private boolean isManualWithGitRef(ExecutionSource executionSource) {
+    if (executionSource == null || executionSource.getType() != ExecutionSource.Type.MANUAL) {
+      return false;
+    }
+    ManualExecutionSource manualExecutionSource = (ManualExecutionSource) executionSource;
+    return isNotEmpty(manualExecutionSource.getPrNumber()) || isNotEmpty(manualExecutionSource.getBranch())
+        || isNotEmpty(manualExecutionSource.getTag()) || isNotEmpty(manualExecutionSource.getCommitSha());
+  }
+
+  private ConnectorDetails resolveConnectorDetails(Ambiance ambiance, CodeBaseStepParameters stepParameters) {
+    String connectorRef = RunTimeInputHandler.resolveStringParameterV2(
+        "connectorRef", STEP_TYPE.getType(), ambiance.getStageExecutionId(), stepParameters.getConnectorRef(), false);
+    return connectorUtils.getConnectorDetails(AmbianceUtils.getNgAccess(ambiance), connectorRef, true);
+  }
+
+  private boolean shouldUseDelegateTask(Ambiance ambiance, ConnectorDetails connectorDetails) {
+    if (!connectorUtils.hasApiAccess(connectorDetails)) {
+      return false;
+    }
+    return isExecuteOnDelegate(connectorDetails)
+        || PrivateConnectUtils.isPrivateConnectivityHelperEnabled(
+            featureFlagService, AmbianceUtils.getAccountId(ambiance), connectorDetails);
+  }
+
+  private boolean isExecuteOnDelegate(ConnectorDetails connectorDetails) {
+    return connectorDetails.getExecuteOnDelegate() == null || connectorDetails.getExecuteOnDelegate();
+  }
+
+  @Override
+  public StepResponse handleChildResponse(
+      Ambiance ambiance, CodeBaseStepParameters stepParameters, Map<String, ResponseData> responseDataMap) {
+    log.info("Completed execution for codebase node step [{}]", stepParameters);
+    return createStepResponseFromChildResponse(responseDataMap);
+  }
+
+  private ExecutionSource getExecutionSource(Ambiance ambiance, ExecutionSource executionSource) {
+    if (executionSource != null) {
+      return executionSource;
+    }
+    OptionalSweepingOutput optionalSweepingOutput = executionSweepingOutputResolver.resolveOptional(
+        ambiance, RefObjectUtils.getSweepingOutputRefObject(ContextElement.stageDetails));
+    if (!optionalSweepingOutput.isFound()) {
+      throw new CIStageExecutionException("Unable to fetch stage details. Please retry or verify pipeline yaml");
+    }
+    StageDetails stageDetails = (StageDetails) optionalSweepingOutput.getOutput();
+    return stageDetails.getExecutionSource();
+  }
+}

@@ -1,0 +1,10 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harness/drone-git:1.6.4
+    connector: account.harnessImage
+  env:
+    PLUGIN_OUTPUT_FILE_PATHS_CONTENT: PLUGIN_OUTPUT_FILE_PATHS_CONTENT_PLACEHOLDER
+    PLUGIN_ONLY_COPY_FILE_CONTENT: true

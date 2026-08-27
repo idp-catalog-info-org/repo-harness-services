@@ -1,0 +1,6 @@
+name: Step Execution Metrics Group
+identifier: StepExecutionMetricsGroup
+labels:
+  - status
+  - stepType
+  - module

@@ -1,0 +1,56 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Artifact Registry Firewall Exemption Status Changed"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "A firewall exemption status has been updated:"
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Package Name:* ${PACKAGE_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Version List:* ${VERSION_LIST}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Registry:* ${REGISTRY_NAME} - ${REGISTRY_URL}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Status:* ${STATUS}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Changed By:* ${CHANGED_BY}"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Exemption in Harness"
+					},
+					"url": "${EXCEPTION_URL}"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,13 @@
+name: Expression Resolution Metrics
+identifier: ExpressionResolutionMetrics
+metricGroup: ExpressionResolutionMetricsGroup
+metrics:
+  - metricName: expression_resolution_count
+    metricDefinition: Count of expression resolution operations during step parameter resolution
+    type: Count
+    unit: "1"
+  - metricName: expression_resolution_duration_ms
+    metricDefinition: Duration of expression resolution operations
+    type: Duration
+    distribution: [ 0ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m ]
+    unit: "ms"

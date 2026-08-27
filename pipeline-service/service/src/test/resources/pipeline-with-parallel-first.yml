@@ -1,0 +1,59 @@
+pipeline:
+  identifier: p1
+  name: pipeline1
+  stages:
+    - parallel:
+        - stage:
+            identifier: stageA
+            type: Custom
+            name: stageA
+            spec:
+              execution:
+                steps:
+                  - step:
+                      type: ShellScript
+                      name: s1
+                      identifier: s1
+                      spec:
+                        shell: Bash
+                        onDelegate: true
+                        source:
+                          type: Inline
+                          spec:
+                            script: exit 0
+        - stage:
+            identifier: stageB
+            type: Custom
+            name: stageB
+            spec:
+              execution:
+                steps:
+                  - step:
+                      type: ShellScript
+                      name: s2
+                      identifier: s2
+                      spec:
+                        shell: Bash
+                        onDelegate: true
+                        source:
+                          type: Inline
+                          spec:
+                            script: exit 0
+    - stage:
+        identifier: stageC
+        type: Custom
+        name: stageC
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: s3
+                  identifier: s3
+                  spec:
+                    shell: Bash
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: exit 0

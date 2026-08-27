@@ -1,0 +1,105 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.steps.resourcerestraint;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.FeatureName;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.engine.observers.NodeStatusUpdateObserver;
+import io.harness.engine.observers.NodeUpdateInfo;
+import io.harness.engine.observers.OrchestrationEndObserver;
+import io.harness.execution.NodeExecution;
+import io.harness.execution.NodeExecutionContextUtils;
+import io.harness.logging.AutoLogContext;
+import io.harness.observer.AsyncInformObserver;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.pms.execution.utils.StatusUtils;
+import io.harness.springdata.TransactionHelper;
+import io.harness.steps.resourcerestraint.beans.ResourceRestraintInstance;
+import io.harness.steps.resourcerestraint.service.ResourceRestraintInstanceService;
+import io.harness.utils.PmsFeatureFlagHelper;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import lombok.extern.slf4j.Slf4j;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
+@Slf4j
+@Singleton
+public class ResourceRestraintObserver
+    implements OrchestrationEndObserver, NodeStatusUpdateObserver, AsyncInformObserver {
+  private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+  @Inject private ResourceRestraintInstanceService restraintService;
+  @Inject private TransactionHelper transactionHelper;
+  @Inject private PmsFeatureFlagHelper pmsFeatureFlagHelper;
+
+  @Override
+  public void onEnd(Ambiance ambiance, Status endStatus) {
+    try (AutoLogContext ignore = AmbianceUtils.autoLogContext(ambiance)) {
+      unblockConstraints(ambiance.getPlanExecutionId(), AmbianceUtils.getAccountId(ambiance));
+    } catch (RuntimeException exception) {
+      // Do not block the execution for possible exception in the RC update
+      log.error("Something wrong with resource constraints update", exception);
+    }
+  }
+
+  @Override
+  public void onNodeStatusUpdate(NodeUpdateInfo nodeUpdateInfo) {
+    NodeExecution nodeExecution = nodeUpdateInfo.getNodeExecution();
+    if (nodeExecution.getStepType().getStepCategory() != StepCategory.STAGE
+        || !StatusUtils.isFinalStatus(nodeExecution.getStatus())) {
+      return;
+    }
+    try (AutoLogContext ignore = NodeExecutionContextUtils.autoLogContext(nodeExecution)) {
+      unblockConstraints(nodeExecution.getUuid(), nodeExecution.getAccountId());
+    } catch (RuntimeException exception) {
+      // Do not block the execution for possible exception in the RC update
+      log.error("Something wrong with resource constraints update", exception);
+    }
+  }
+
+  private void unblockConstraints(String releaseEntityId, String accountId) {
+    log.info("Update Active Resource constraints");
+    final List<ResourceRestraintInstance> restraintInstances =
+        restraintService.findAllActiveAndBlockedByReleaseEntityId(releaseEntityId);
+
+    log.info("Found {} active resource restraint instances", restraintInstances.size());
+    if (EmptyPredicate.isNotEmpty(restraintInstances)) {
+      for (ResourceRestraintInstance ri : restraintInstances) {
+        if (pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PIPE_RESTRAINT_UNBLOCKING_V2)) {
+          transactionHelper.performTransaction(() -> {
+            restraintService.finishInstance(ri.getUuid(), ri.getResourceUnit());
+            restraintService.updateBlockedConstraints(ri);
+            return null;
+          });
+        } else {
+          transactionHelper.performTransaction(() -> {
+            restraintService.finishInstance(ri.getUuid(), ri.getResourceUnit());
+            restraintService.updateBlockedConstraints(ImmutableSet.of(ri.getResourceRestraintId()));
+            return null;
+          });
+        }
+      }
+      log.info("Updated Blocked Resource constraints");
+    }
+  }
+
+  @Override
+  public ExecutorService getInformExecutorService() {
+    return executorService;
+  }
+}

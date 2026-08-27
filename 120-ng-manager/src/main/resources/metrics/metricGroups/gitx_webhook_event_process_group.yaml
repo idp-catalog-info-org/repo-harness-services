@@ -1,0 +1,6 @@
+name: GitX Webhook Processing Metrics Group
+identifier: gitx_webhook_processing_group
+labels:
+  - accountId
+  - status
+  - flowType

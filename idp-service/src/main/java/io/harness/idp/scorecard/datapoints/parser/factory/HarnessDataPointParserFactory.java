@@ -1,0 +1,69 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.idp.scorecard.datapoints.parser.factory;
+
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.EXTRACT_STRING_FROM_A_FILE;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.IS_FILE_EXISTS;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.IS_POLICY_EVALUATION_SUCCESSFUL_IN_PIPELINE;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.MATCH_STRING_IN_A_FILE;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.PERCENTAGE_OF_CI_PIPELINE_FAILING_IN_SEVEN_DAYS;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.PIPELINE_TEST_FAILING_IN_CI_IS_ZERO;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.STO_ACTIVE_VULNERABILITIES;
+import static io.harness.idp.scorecard.datapoints.constants.DataPoints.STO_ADDED_IN_PIPELINE;
+
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.idp.scorecard.datapoints.parser.DataPointParser;
+import io.harness.idp.scorecard.datapoints.parser.harness.HarnessSTOActiveVulnerabilitiesParser;
+import io.harness.idp.scorecard.datapoints.parser.harness.PipelineIsPolicyEvaluationSuccessfulParser;
+import io.harness.idp.scorecard.datapoints.parser.harness.PipelinePercentageOfCIPipelineFailingInSevenDaysParser;
+import io.harness.idp.scorecard.datapoints.parser.harness.PipelineStoStageAddedParser;
+import io.harness.idp.scorecard.datapoints.parser.harness.PipelineTestFailingInCiIsZeroParser;
+import io.harness.idp.scorecard.datapoints.parser.scm.harnesscode.HarnessCodeFileContainsParser;
+import io.harness.idp.scorecard.datapoints.parser.scm.harnesscode.HarnessCodeFileContentsParser;
+import io.harness.idp.scorecard.datapoints.parser.scm.harnesscode.HarnessCodeFileExistsParser;
+import io.harness.idp.scorecard.datasourcelocations.beans.DataSourceLocationType;
+
+import com.google.inject.Inject;
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor(onConstructor = @__({ @Inject }))
+@OwnedBy(HarnessTeam.IDP)
+public class HarnessDataPointParserFactory implements DataPointParserFactory {
+  private PipelineStoStageAddedParser pipelineStoStageAddedParser;
+  private PipelineIsPolicyEvaluationSuccessfulParser pipelineIsPolicyEvaluationSuccessfulParser;
+  private PipelinePercentageOfCIPipelineFailingInSevenDaysParser pipelinePercentageOfCIPipelineFailingInSevenDaysParser;
+  private PipelineTestFailingInCiIsZeroParser pipelineTestFailingInCiIsZeroParser;
+  private HarnessCodeFileContainsParser harnessCodeFileContainsParser;
+  private HarnessCodeFileContentsParser harnessCodeFileContentsParser;
+  private HarnessCodeFileExistsParser harnessCodeFileExistsParser;
+  private HarnessSTOActiveVulnerabilitiesParser harnessSTOActiveVulnerabilitiesParser;
+
+  public DataPointParser getParser(String identifier, DataSourceLocationType dataSourceLocationType) {
+    switch (identifier) {
+      case STO_ADDED_IN_PIPELINE:
+        return pipelineStoStageAddedParser;
+      case IS_POLICY_EVALUATION_SUCCESSFUL_IN_PIPELINE:
+        return pipelineIsPolicyEvaluationSuccessfulParser;
+      case PERCENTAGE_OF_CI_PIPELINE_FAILING_IN_SEVEN_DAYS:
+        return pipelinePercentageOfCIPipelineFailingInSevenDaysParser;
+      case PIPELINE_TEST_FAILING_IN_CI_IS_ZERO:
+        return pipelineTestFailingInCiIsZeroParser;
+      case EXTRACT_STRING_FROM_A_FILE:
+        return harnessCodeFileContentsParser;
+      case MATCH_STRING_IN_A_FILE:
+        return harnessCodeFileContainsParser;
+      case IS_FILE_EXISTS:
+        return harnessCodeFileExistsParser;
+      case STO_ACTIVE_VULNERABILITIES:
+        return harnessSTOActiveVulnerabilitiesParser;
+      default:
+        throw new UnsupportedOperationException(String.format("Could not find DataPoint parser for %s", identifier));
+    }
+  }
+}

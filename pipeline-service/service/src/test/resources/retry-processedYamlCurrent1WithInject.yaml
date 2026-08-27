@@ -1,0 +1,150 @@
+---
+pipeline:
+  identifier: "selectiveStagePipe"
+  name: "selectiveStagePipe"
+  tags:
+    __uuid: "6L7Ynj0UQZSmkPyAR8PN1w"
+  projectIdentifier: "cxsa"
+  orgIdentifier: "ljik"
+  stages:
+    - stage:
+        name: "wqw"
+        identifier: "wqw"
+        description: ""
+        type: "Custom"
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: "Wait"
+                  name: "Wait_1"
+                  identifier: "Wait_1"
+                  spec:
+                    duration: "10s"
+                    __uuid: "F54CLszqRVCPVWPcwm0GMQ"
+                  __uuid: "YDMx7ZqnS3iuQlGGhHotDA"
+                __uuid: "1wHevN2NQry4DtSIlWuAZA"
+            __uuid: "1vZBwrKbS9CUMVYKZeOfJQ"
+          __uuid: "UYwSqr8QQeC8l_yHRVSYOA"
+        tags:
+          __uuid: "6zZd0b8pTgK3ZN6BgtRsbw"
+        __uuid: "uU6Okn1ST-i1IyNgAhfASQ"
+      __uuid: "JJhh6LiwRrujRCZNJSAbvg"
+    - insert:
+        identifier: "inject1"
+        name: "inject1"
+        stages:
+          - parallel:
+              - stage:
+                  name: "dsa"
+                  identifier: "dsa"
+                  description: ""
+                  type: "Custom"
+                  spec:
+                    execution:
+                      steps:
+                        - step:
+                            type: "Wait"
+                            name: "Wait_1"
+                            identifier: "Wait_1"
+                            spec:
+                              duration: "10s"
+                              __uuid: "xfjTSe0wTyKBSqnwGEy46A"
+                            __uuid: "Sx84ttDtS7ybarCDRVr6QQ"
+                          __uuid: "xbRQZJAAQZ-cmnuWcGDBWw"
+                      __uuid: "wMtCFnwBSl-Z5ZU3IsR-kA"
+                    __uuid: "-3dJgELVSXuyDnGOHRsv2g"
+                  tags:
+                    __uuid: "3-QjnTkTRTaBEh0_Gks6Dg"
+                  strategy:
+                    matrix:
+                      a:
+                        - 1
+                        - 2
+                        - 3
+                      __uuid: "wrARG5EsTPG7CBje0SZApA"
+                    __uuid: "2k-X5WDKTWaKxW5hfLDkjQ"
+                  __uuid: "brMfUFSOTi2YLXXwGm27yw"
+                __uuid: "zm2Ui9EPRT2KnTu0b4g7Hg"
+              - stage:
+                  name: "dsadsa"
+                  identifier: "dsadsa"
+                  description: ""
+                  type: "Custom"
+                  spec:
+                    execution:
+                      steps:
+                        - step:
+                            type: "ShellScript"
+                            name: "ShellScript_12"
+                            identifier: "ShellScript_12"
+                            spec:
+                              shell: "Bash"
+                              executionTarget:
+                                __uuid: "t0Jf1Y-6TXyiJBV4o-9Ciw"
+                              source:
+                                type: "Inline"
+                                spec:
+                                  script: "echo hi"
+                                  __uuid: "WJIOQdtiSo-vCOAuE8zGvQ"
+                                __uuid: "nHLXbSJVTbWPBRgTehc29w"
+                              environmentVariables: []
+                              outputVariables: []
+                              __uuid: "8YXMcKsZRhuRefdzWE6S6g"
+                            timeout: "10m"
+                            __uuid: "y8Nj4ukdSQWiUqEHcVrKVA"
+                          __uuid: "6i9Twa3RSBebuM7pTMiLDQ"
+                      __uuid: "FaaXTSpwSkGl4ThVrSxksA"
+                    __uuid: "lq6n4rRbTE2VRhlH9Om0ew"
+                  tags:
+                    __uuid: "5M-LAS8pTdyA-q60pMoN0A"
+                  __uuid: "nXjwQTl0SNqZ15-p80qNUw"
+                __uuid: "Vac9OH1jQDWF8TGqv5rl7w"
+            __uuid: "eUPpaXVzSuiyvBPukeiD_A"
+        __uuid: "fxEGWi7SRCiN2H8JWCg7mg"
+      __uuid: "5mQD6m-jQF2en3Grzdsqcw"
+    - stage:
+        identifier: "fdsf1"
+        type: "Custom"
+        name: "fdsf1sd"
+        description: "sdew"
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: "baharWait"
+                  type: "Wait"
+                  name: "baharWait"
+                  spec:
+                    duration: "10s"
+                    __uuid: "WM8Nz8sYRzG8g7_cacmx0g"
+                  __uuid: "dqKrzkqaRRyVdLo5XiDOnA"
+                __uuid: "H75w68rqQJK3YOysG-FNcw"
+            __uuid: "NxG-dtlzSaCtCCA6aueYwA"
+          __uuid: "sMClg6EgRna1Nl-7bFlXlg"
+        __uuid: "G8kd2BuYSlmbfl3kQvSydQ"
+      __uuid: "bsMegCTwTMinBv4CLD8NUw"
+    - stage:
+        identifier: "fdsf2"
+        type: "Custom"
+        name: "fdsf2"
+        description: ""
+        spec:
+          execution:
+            steps:
+              - step:
+                  identifier: "baharWait2"
+                  type: "Wait"
+                  name: "baharWait2"
+                  spec:
+                    duration: "10s"
+                    __uuid: "-buwoiuwQJOPWhonT6Gstg"
+                  __uuid: "rSZwFU9xTuuIVOSk_iqNHg"
+                __uuid: "b90Msx-8RIWxT7Koa15PJw"
+            __uuid: "uv6fIzxORI64xsaNo-2StQ"
+          __uuid: "0qvRQQooTGi6rcvhD16oVQ"
+        __uuid: "_-A2RgUzR8i51KTRfl3hXQ"
+      __uuid: "mq_haJOuSfy-jpTbZvhndg"
+  allowStageExecutions: true
+  __uuid: "LRrI-bQvRTODk0sn1a_fuw"
+__uuid: "6RK6KcSgSAe_KYXz_Q1YWg"

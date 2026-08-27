@@ -1,0 +1,13 @@
+name: Elasticsearch Client Metrics
+identifier: ElasticsearchClientMetrics
+metricGroup: ElasticsearchClientMetricsGroup
+metrics:
+  - metricName: elasticsearch_client_operation_latency
+    metricDefinition: Latency of Elasticsearch client operations
+    type: Duration
+    distribution: [ 0ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s, 30s ]
+    unit: "s"
+  - metricName: elasticsearch_client_operation_count
+    metricDefinition: Total count of Elasticsearch client operations
+    type: Count
+    unit: "1"

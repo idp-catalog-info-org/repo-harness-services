@@ -1,0 +1,68 @@
+{
+    "blocks": [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": "Harness Incident Response",
+                "emoji": true
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Description:*\nThe remaining percentage for the error budget of SLO `${SLO_NAME}` is critically low."
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*SLO Name:*\n`${SLO_NAME}`"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Account:*\n`${ACCOUNT_NAME}`"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Project Name:*\n`${SLO_PROJECT_NAME}`"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Organization Name:*\n`${SLO_ORG_NAME}`"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Trigger:*\nThe incident was triggered due to a high error budget burn rate."
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Incident Time:*\nIncident detected at `${INCIDENT_TIME}`"
+            }
+        },
+        {
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "View SLO Details",
+                        "emoji": true
+                    },
+                    "url": "${SLO_URL}",
+                }
+            ]
+        }
+    ]
+}

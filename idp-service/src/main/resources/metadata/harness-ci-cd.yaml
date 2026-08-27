@@ -1,0 +1,36 @@
+identifier: harness-ci-cd
+name: Harness CI/CD
+description: This plugin lets you view Harness pipeline execution details inside Harness IDP Catalog.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: harness.io
+category: CI/CD
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-ci-cd
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-ci-cd/
+config: |-
+  proxy:
+    endpoints:
+      '/harness/prod':
+        target: 'https://app.harness.io/'
+        pathRewrite:
+          '/api/proxy/harness/prod/?': '/'
+        allowedHeaders:
+          - authorization
+          - Harness-Account
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityHarnessCiCdContent
+      addByDefault: true
+      defaultRoute: /ci-cd
+      layoutSchemaSpecs:
+        name: EntityHarnessCiCdContent
+        title: CI/CD
+        contents:
+          - component: EntityHarnessCiCdContent

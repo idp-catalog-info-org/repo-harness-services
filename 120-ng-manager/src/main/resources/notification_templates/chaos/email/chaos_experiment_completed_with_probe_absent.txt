@@ -1,0 +1,203 @@
+subject: >-
+  Harness Chaos Experiment ${CHAOS_EXPERIMENT_NAME} has been completed with probe absent
+body: >-
+  <html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <meta name="format-detection" content="telephone=no">
+    <style>
+      @media all and (max-width: 580px) {
+        a.logo img {
+          margin-left: 15px !important;
+        }
+      }
+    </style>
+    <title>Harness</title>
+  </head>
+
+  <body topmargin="0" rightmargin="0" bottommargin="0" leftmargin="0" marginwidth="0" marginheight="0" width="100%" style="min-width: 100%; border-collapse: collapse; border-spacing: 0; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; background-color: #EFEFF1; color: #000000; width: 100%; height: 100%;" bgcolor="#EFEFF1" text="#000000">
+    <table width="100%" align="center" border="0" cellpadding="0" cellspacing="0" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; width: 100%; border-collapse: collapse;" class="background">
+      <tr>
+        <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; border-collapse: collapse;" bgcolor="#EFEFF1">
+          <table border="0" cellpadding="0" cellspacing="0" align="center" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: block; border-spacing: 0; padding: 0; width: inherit; max-width: 580px; border-collapse: collapse;" class="wrapper">
+            <tr>
+              <td align="left" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 0; padding-right: 6.25%; width: 87.5%; padding-top: 25px; padding-bottom: 25px; border-collapse: collapse;" width="87.5%">
+
+              </td>
+            </tr>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" align="center" bgcolor="#FFFFFF" width="580" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; padding: 0; width: inherit; max-width: 580px; border-collapse: collapse;" class="container">
+            <tr>
+              <td valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-top: 0; border-collapse: collapse;" class="hero">
+                <a target="_blank" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; color: #00ade4; text-decoration: none;" href="https://harness.io">
+                  <img border="0" vspace="0" hspace="0" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/ng-background.png" alt="Please enable images to view this content" title="Harness Hero" width="580" style="line-height: 100%; width: 100%; max-width: 580px; color: #000000; font-size: 13px; margin: 0; padding: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;">
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; padding-top: 25px; border-collapse: collapse;" class="button" width="87.5%">
+                Harness Chaos Experiment: <b>${CHAOS_EXPERIMENT_NAME}</b>, with the ID: <b>${EXPERIMENT_ID}</b>, has been <b>completed with probe absent</b> for the project: <b>${PROJECT_ID}</b>, under the organization: <b>${ORG_ID}</b>, for the account: <b>${ACCOUNT_ID}</b>.
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; padding-top: 20px; border-collapse: collapse;" width="87.5%">
+                <table border="0" cellpadding="8" cellspacing="0" width="100%" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 13px;">
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;" width="40%">Run Sequence</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${RUN_SEQUENCE}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Report Created On</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${REPORT_CREATED_ON}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Resilience Score</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${RESILIENCE_SCORE}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Account ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${ACCOUNT_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Organization ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${ORG_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Project ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${PROJECT_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Experiment ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${EXPERIMENT_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Description</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${CHAOS_EXPERIMENT_DESCRIPTION}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Tags</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${CHAOS_EXPERIMENT_TAGS}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Schedule Details</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${SCHEDULE_DETAILS}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Experiment Run ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${CHAOS_EXPERIMENT_RUN_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Chaos Infrastructure</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${CHAOS_INFRASTRUCTURE_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Chaos Infrastructure Type</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${CHAOS_INFRASTRUCTURE_TYPE}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Notify ID</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${NOTIFY_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Environment</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${ENVIRONMENT_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Executed By</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${USER_ID}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Executed On</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${EXECUTED_ON}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Executed Till</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${EXECUTED_TILL}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Duration</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${DURATION}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Number of Faults</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${TOTAL_NUMBER_OF_FAULTS}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Number of Probes</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${TOTAL_NUMBER_OF_PROBES}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #5E6470; font-weight: 600;">Number of Actions</td>
+                    <td align="left" valign="top" style="padding: 8px; border-bottom: 1px solid #DBDCDD; color: #000000;">${TOTAL_NUMBER_OF_ACTIONS}</td>
+                  </tr>
+                  <tr>
+                    <td align="left" valign="top" style="padding: 8px; color: #5E6470; font-weight: 600;">Chaos Experiment URL</td>
+                    <td align="left" valign="top" style="padding: 8px; color: #000000;"><a href="${CHAOS_EXPERIMENT_URL}" style="color: #00ade4; text-decoration: none;">View Experiment</a></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; padding-top: 25px; border-collapse: collapse;" class="line" width="87.5%">
+                <hr color="#DBDCDD" align="center" width="100%" size="1" noshade="" style="margin: 0; padding: 0;">
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; font-size: 14px; font-weight: 600; line-height: 33px; padding-top: 20px; padding-bottom: 25px; color: #000000; font-family: 'Inter', sans-serif; border-collapse: collapse;" class="paragraph" width="87.5%">
+                Have a question?
+                <a href="mailto:support@harness.io" target="_blank" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; text-decoration: none; color: #00ade4; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; line-height: 33px;">support@harness.io</a>
+              </td>
+            </tr>
+          </table>
+          <table border="0" cellpadding="0" cellspacing="0" align="center" width="580" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; padding: 0; width: inherit; max-width: 580px; border-collapse: collapse;" class="wrapper">
+            <tr>
+              <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; padding-top: 25px; border-collapse: collapse;" class="social-icons" width="87.5%">
+                <table width="256" border="0" cellpadding="0" cellspacing="0" align="center" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; padding: 0; border-collapse: collapse;">
+                  <tr>
+                    <!-- Facebook -->
+                    <td align="center" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 0;  padding-left: 0; padding-right: 0; border-spacing: 0; border-collapse: collapse;">
+                      <a target="_blank" href="https://www.facebook.com/harnessinc/" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; color: #00ade4; text-decoration: none;">
+                        <img border="0" vspace="0" hspace="0" style="line-height: 100%; padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: inline-block; color: #000000;" alt="I" title="Follow us on LinkedIn" width="44" height="44" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logofb.png">
+                      </a>
+                    </td>
+                    <!-- LinkedIn -->
+                    <td align="center" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 0;  padding-left: 0; padding-right: 0; border-spacing: 0; border-collapse: collapse;">
+                      <a target="_blank" href="https://www.linkedin.com/company/18249313/" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; color: #00ade4; text-decoration: none;">
+                        <img border="0" vspace="0" hspace="0" style="line-height: 100%; padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: inline-block; color: #000000;" alt="I" title="Follow us on LinkedIn" width="44" height="44" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logolinkedin.png">
+                      </a>
+                    </td>
+                    <!-- Instagram -->
+                    <td align="center" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 0;  padding-left: 0; padding-right: 0; border-spacing: 0; border-collapse: collapse;">
+                      <a target="_blank" href="https://www.instagram.com/harness.io/" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; color: #00ade4; text-decoration: none;">
+                        <img border="0" vspace="0" hspace="0" style="line-height: 100%; padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: inline-block; color: #000000;" alt="I" title="Follow us on LinkedIn" width="44" height="44" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logoinstagram.png">
+                      </a>
+                    </td>
+                    <!-- Twitter -->
+                    <td align="center" valign="middle" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 0; padding-left: 0; padding-right: 0; border-spacing: 0; border-collapse: collapse;">
+                      <a target="_blank" href="https://twitter.com/harnessio" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; color: #00ade4; text-decoration: none;">
+                        <img border="0" vspace="0" hspace="0" style="line-height: 100%; padding: 0; margin: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: inline-block; color: #000000;" alt="T" title="Follow us on Twitter" width="44" height="44" src="https://s3.amazonaws.com/wings-assets/ng-mail-assets/logotwitter.png">
+                      </a>
+                    </td>
+
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" valign="top" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; margin: 0; padding: 0; padding-left: 6.25%; padding-right: 6.25%; width: 87.5%; font-size: 13px; font-weight: 400; line-height: 150%; padding-top: 20px; padding-bottom: 20px; color: #999999; font-family: 'Inter', sans-serif; border-collapse: collapse;" class="footer" width="87.5%">
+                <a href="https://www.google.com/maps/place/116+New+Montgomery+St+%23200,+San+Francisco,+CA+94105/@37.7857739,-122.4006368#if,16.55z/data=!4m5!3m4!1s0x8085807d496517f3:0x6b10cbd0d6af2855!8m2!3d37.7870722!4d-122.4004509" target="_blank" style="-webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; text-decoration: none; color: #999999; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; line-height: 150%;">
+                  Harness.io 116 New Montgomery Street, Suite 200 San Francisco, CA 94105
+                </a>
+                <br>
+                copyright &copy; 2025 Harness Inc.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+
+  </html>

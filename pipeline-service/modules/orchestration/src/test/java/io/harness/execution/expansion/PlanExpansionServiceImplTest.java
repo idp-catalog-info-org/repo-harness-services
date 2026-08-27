@@ -1,0 +1,321 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+package io.harness.execution.expansion;
+
+import static io.harness.rule.OwnerRule.AVEESHA_JINDAL;
+import static io.harness.rule.OwnerRule.BRIJESH;
+import static io.harness.rule.OwnerRule.SAHIL;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import io.harness.CategoryTest;
+import io.harness.category.element.UnitTests;
+import io.harness.config.OrchestrationModuleConfig;
+import io.harness.execution.PlanExecutionExpansion;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.ambiance.Level;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.plan.ExecutionMetadata;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.data.PmsOutcome;
+import io.harness.pms.data.stepparameters.PmsStepParameters;
+import io.harness.pms.utils.NGPipelineSettingsConstant;
+import io.harness.repositories.planExecutionJson.ExpandedJsonLockConfig;
+import io.harness.repositories.planExecutionJson.PlanExecutionExpansionRepository;
+import io.harness.rule.Owner;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import org.assertj.core.util.Maps;
+import org.bson.Document;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.mongodb.core.query.Update;
+
+public class PlanExpansionServiceImplTest extends CategoryTest {
+  private static final String PLAN_EXECUTION_ID = "planExecutionId";
+  private static final String PIPELINE = "pipeline";
+  private static final String SPEC = "spec";
+
+  @Mock PlanExecutionExpansionRepository planExecutionExpansionRepository;
+
+  @Mock OrchestrationModuleConfig orchestrationModuleConfig;
+
+  @InjectMocks PlanExpansionServiceImpl planExpansionService;
+
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    Mockito.when(orchestrationModuleConfig.getExpandedJsonLockConfig())
+        .thenReturn(ExpandedJsonLockConfig.builder().lockTimeOutInMinutes(1).build());
+  }
+
+  @Test
+  @Owner(developers = SAHIL)
+  @Category(UnitTests.class)
+  public void testGetExpansionPathUsingLevels() {
+    Ambiance ambiance = Ambiance.newBuilder()
+                            .setPlanExecutionId(PLAN_EXECUTION_ID)
+                            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                            .addLevels(Level.newBuilder().setIdentifier("spec").setSkipExpressionChain(true).build())
+                            .build();
+
+    assertThat(planExpansionService.getExpansionPathUsingLevels(ambiance))
+        .isEqualTo(String.format("%s.%s", PlanExpansionConstants.EXPANDED_JSON, PIPELINE));
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder().setIdentifier(SPEC).setSkipExpressionChain(false).build())
+                   .build();
+
+    assertThat(planExpansionService.getExpansionPathUsingLevels(ambiance))
+        .isEqualTo(String.format("%s.%s.%s", PlanExpansionConstants.EXPANDED_JSON, PIPELINE, SPEC));
+  }
+
+  @Test
+  @Owner(developers = SAHIL)
+  @Category(UnitTests.class)
+  public void testUpdateStatus() {
+    Ambiance ambiance =
+        Ambiance.newBuilder()
+            .setPlanExecutionId(PLAN_EXECUTION_ID)
+            .putSetupAbstractions("accountId", "accountId")
+            .setMetadata(
+                ExecutionMetadata.newBuilder()
+                    .putSettingToValueMap(NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                    .build())
+            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+            .addLevels(Level.newBuilder().setIdentifier("spec").setSkipExpressionChain(true).build())
+            .build();
+
+    planExpansionService.updateStatus(ambiance, Status.SUCCEEDED);
+    Mockito.verifyNoInteractions(planExecutionExpansionRepository);
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .putSetupAbstractions("accountId", "accountId")
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder().setIdentifier(SPEC).setSkipExpressionChain(false).build())
+                   .setMetadata(ExecutionMetadata.newBuilder()
+                                    .putSettingToValueMap(
+                                        NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                                    .build())
+                   .build();
+
+    ArgumentCaptor<Update> updateCaptor = ArgumentCaptor.forClass(Update.class);
+    planExpansionService.updateStatus(ambiance, Status.SUCCEEDED);
+    ArgumentCaptor<String> planExecutionCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Long> lockTimeoutCaptor = ArgumentCaptor.forClass(Long.class);
+    Mockito.verify(planExecutionExpansionRepository)
+        .update(planExecutionCaptor.capture(), updateCaptor.capture(), lockTimeoutCaptor.capture());
+    Update update = updateCaptor.getValue();
+    Set<String> fieldsUpdated = new HashSet<>();
+    if (update.getUpdateObject().containsKey("$set")) {
+      fieldsUpdated.addAll(((Document) update.getUpdateObject().get("$set")).keySet());
+    }
+    assertThat(fieldsUpdated.size()).isEqualTo(1);
+    assertThat(fieldsUpdated.iterator().next()).isEqualTo("expandedJson.pipeline.spec.status");
+  }
+
+  @Test
+  @Owner(developers = SAHIL)
+  @Category(UnitTests.class)
+  public void testAddOutcomes() {
+    Ambiance ambiance =
+        Ambiance.newBuilder()
+            .setPlanExecutionId(PLAN_EXECUTION_ID)
+            .putSetupAbstractions("accountId", "accountId")
+            .setMetadata(
+                ExecutionMetadata.newBuilder()
+                    .putSettingToValueMap(NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                    .build())
+            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+            .addLevels(Level.newBuilder().setIdentifier("spec").setSkipExpressionChain(true).build())
+            .build();
+
+    planExpansionService.addOutcomes(ambiance, "name", PmsOutcome.parse(new HashMap<>()));
+    Mockito.verifyNoInteractions(planExecutionExpansionRepository);
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .setMetadata(ExecutionMetadata.newBuilder()
+                                    .putSettingToValueMap(
+                                        NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                                    .build())
+                   .putSetupAbstractions("accountId", "accountId")
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder().setIdentifier(SPEC).setSkipExpressionChain(false).build())
+                   .build();
+
+    ArgumentCaptor<Update> updateCaptor = ArgumentCaptor.forClass(Update.class);
+    planExpansionService.addOutcomes(ambiance, "name", PmsOutcome.parse(new HashMap<>()));
+    ArgumentCaptor<String> planExecutionCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Long> lockTimeout = ArgumentCaptor.forClass(Long.class);
+
+    Mockito.verify(planExecutionExpansionRepository)
+        .update(planExecutionCaptor.capture(), updateCaptor.capture(), lockTimeout.capture());
+    Update update = updateCaptor.getValue();
+    Set<String> fieldsUpdated = new HashSet<>();
+    if (update.getUpdateObject().containsKey("$set")) {
+      fieldsUpdated.addAll(((Document) update.getUpdateObject().get("$set")).keySet());
+    }
+    assertThat(fieldsUpdated.size()).isEqualTo(1);
+    assertThat(fieldsUpdated.iterator().next()).isEqualTo("expandedJson.pipeline.spec.outcome.name");
+  }
+
+  @Test
+  @Owner(developers = SAHIL)
+  @Category(UnitTests.class)
+  public void testAddStepInputs() {
+    Ambiance ambiance =
+        Ambiance.newBuilder()
+            .setPlanExecutionId(PLAN_EXECUTION_ID)
+            .putSetupAbstractions("accountId", "accountId")
+            .setMetadata(
+                ExecutionMetadata.newBuilder()
+                    .putSettingToValueMap(NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                    .build())
+
+            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+            .addLevels(Level.newBuilder().setIdentifier("spec").setSkipExpressionChain(true).build())
+            .build();
+
+    planExpansionService.addStepInputs(ambiance, PmsStepParameters.parse(Maps.newHashMap("a", "b")));
+    Mockito.verifyNoInteractions(planExecutionExpansionRepository);
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .putSetupAbstractions("accountId", "accountId")
+                   .setMetadata(ExecutionMetadata.newBuilder()
+                                    .putSettingToValueMap(
+                                        NGPipelineSettingsConstant.ENABLE_EXPRESSION_ENGINE_V2.getName(), "true")
+                                    .build())
+
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder().setIdentifier(SPEC).setSkipExpressionChain(false).build())
+                   .build();
+
+    ArgumentCaptor<Update> updateCaptor = ArgumentCaptor.forClass(Update.class);
+    planExpansionService.addStepInputs(ambiance, PmsStepParameters.parse(Maps.newHashMap("a", "b")));
+    ArgumentCaptor<String> planExecutionCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Long> lockCaptor = ArgumentCaptor.forClass(Long.class);
+
+    Mockito.verify(planExecutionExpansionRepository)
+        .update(planExecutionCaptor.capture(), updateCaptor.capture(), lockCaptor.capture());
+    Update update = updateCaptor.getValue();
+    Set<String> fieldsUpdated = new HashSet<>();
+    if (update.getUpdateObject().containsKey("$set")) {
+      fieldsUpdated.addAll(((Document) update.getUpdateObject().get("$set")).keySet());
+    }
+    assertThat(fieldsUpdated.size()).isEqualTo(1);
+    assertThat(fieldsUpdated.iterator().next()).isEqualTo("expandedJson.pipeline.spec.stepInputs");
+  }
+
+  @Test
+  @Owner(developers = BRIJESH)
+  @Category(UnitTests.class)
+  public void testUpdateExpansionForRetriedNode() {
+    Ambiance ambiance =
+        Ambiance.newBuilder()
+            .setPlanExecutionId(PLAN_EXECUTION_ID)
+            .putSetupAbstractions("accountId", "accountId")
+            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+            .addLevels(Level.newBuilder()
+                           .setStepType(StepType.newBuilder().setStepCategory(StepCategory.STEP).build())
+                           .setIdentifier("stage_1")
+                           .setSkipExpressionChain(false)
+                           .build())
+            .build();
+    String originalExecutionId = "originalExecutionId";
+    planExpansionService.updateExpansionForRetriedNode(ambiance, originalExecutionId);
+
+    Mockito.verify(planExecutionExpansionRepository, Mockito.times(0)).findWithProjections(any(), any());
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .putSetupAbstractions("accountId", "accountId")
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder()
+                                  .setStepType(StepType.newBuilder().setStepCategory(StepCategory.STAGE).build())
+                                  .setIdentifier("stage_1")
+                                  .setGroup("STAGE")
+                                  .setSkipExpressionChain(false)
+                                  .build())
+                   .build();
+
+    doReturn(
+        PlanExecutionExpansion.builder()
+            .expandedJson(Document.parse(
+                "{\"pipeline\":{\"stepInputs\":{},\"stage_1\":{\"status\":\"SUCCEEDED\",\"stepInputs\":{\"name\":\"stage_1\"}}}}"))
+            .build())
+        .when(planExecutionExpansionRepository)
+        .findWithProjections(any(), any());
+
+    ArgumentCaptor<Update> argumentCaptor = ArgumentCaptor.forClass(Update.class);
+    planExpansionService.updateExpansionForRetriedNode(ambiance, originalExecutionId);
+    verify(planExecutionExpansionRepository, times(1)).update(eq(PLAN_EXECUTION_ID), argumentCaptor.capture(), eq(1L));
+    Update UpdateOps = argumentCaptor.getValue();
+    assertThat(UpdateOps.toString())
+        .isEqualTo(
+            "{ \"$set\" : { \"expandedJson.pipeline.stage_1\" : { \"status\" : \"SUCCEEDED\", \"stepInputs\" : { \"name\" : \"stage_1\"}}}}");
+  }
+
+  @Test
+  @Owner(developers = AVEESHA_JINDAL)
+  @Category(UnitTests.class)
+  public void testUpdateExpansionForRetriedNode_NPEHandling() {
+    Ambiance ambiance =
+        Ambiance.newBuilder()
+            .setPlanExecutionId(PLAN_EXECUTION_ID)
+            .putSetupAbstractions("accountId", "accountId")
+            .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+            .addLevels(Level.newBuilder()
+                           .setStepType(StepType.newBuilder().setStepCategory(StepCategory.STEP).build())
+                           .setIdentifier("stage_1")
+                           .setSkipExpressionChain(false)
+                           .build())
+            .build();
+    String originalExecutionId = "originalExecutionId";
+    planExpansionService.updateExpansionForRetriedNode(ambiance, originalExecutionId);
+
+    Mockito.verify(planExecutionExpansionRepository, Mockito.times(0)).findWithProjections(any(), any());
+
+    ambiance = Ambiance.newBuilder()
+                   .setPlanExecutionId(PLAN_EXECUTION_ID)
+                   .putSetupAbstractions("accountId", "accountId")
+                   .addLevels(Level.newBuilder().setIdentifier(PIPELINE).setSkipExpressionChain(false).build())
+                   .addLevels(Level.newBuilder()
+                                  .setStepType(StepType.newBuilder().setStepCategory(StepCategory.STAGE).build())
+                                  .setIdentifier("stage_1")
+                                  .setGroup("STAGE")
+                                  .setSkipExpressionChain(false)
+                                  .build())
+                   .build();
+
+    doReturn(PlanExecutionExpansion.builder().expandedJson(null).build())
+        .when(planExecutionExpansionRepository)
+        .findWithProjections(any(), any());
+
+    ArgumentCaptor<Update> argumentCaptor = ArgumentCaptor.forClass(Update.class);
+    planExpansionService.updateExpansionForRetriedNode(ambiance, originalExecutionId);
+    verify(planExecutionExpansionRepository, times(0)).update(eq(PLAN_EXECUTION_ID), argumentCaptor.capture(), eq(0));
+  }
+}

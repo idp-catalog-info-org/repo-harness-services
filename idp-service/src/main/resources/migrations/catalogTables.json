@@ -1,0 +1,1516 @@
+[
+  {
+    "id": "68cadbac33ef019d5b94fa3e",
+    "identifier": "__Harness_API_Table__",
+    "name": "Default API Table",
+    "kind": "api",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "security",
+        "type": "SECURITY",
+        "headerName": "Security",
+        "accessorKey": "decorator",
+        "size": 114,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "none",
+        "properties": null
+      },
+      {
+        "id": "scorecards",
+        "harnessManaged": true,
+        "headerName": "Scorecards",
+        "accessorKey": "scorecards",
+        "type": "SCORECARDS",
+        "size": 434,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68cad8d6bcde2bdbfe39e4c7",
+    "identifier": "__Harness_Component_Table__",
+    "name": "Default Component Table",
+    "kind": "component",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "security",
+        "type": "SECURITY",
+        "headerName": "Security",
+        "accessorKey": "decorator",
+        "size": 114,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "none",
+        "properties": null
+      },
+      {
+        "id": "scorecards",
+        "harnessManaged": true,
+        "headerName": "Scorecards",
+        "accessorKey": "scorecards",
+        "type": "SCORECARDS",
+        "size": 434,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68d0c1fb8b47a7d18e9f8c4e",
+    "identifier": "__Harness_default_Table__",
+    "name": "Default Table",
+    "kind": "default",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68cadd5a8d63306b37c0eb65",
+    "identifier": "__Harness_Group_Table__",
+    "name": "Default Group Table",
+    "kind": "group",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "parent",
+        "harnessManaged": true,
+        "accessorKey": "spec.parent",
+        "type": "OWNER",
+        "headerName": "Parent",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "email",
+        "harnessManaged": true,
+        "accessorKey": "spec.profile.email",
+        "type": "TEXT",
+        "headerName": "Email",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "member_count",
+        "harnessManaged": true,
+        "accessorKey": "relations.hasMember",
+        "type": "COUNT",
+        "headerName": "Members",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68cadc16a5f1e7ce9ed94bf5",
+    "identifier": "__Harness_Resource_Table__",
+    "name": "Default Resource Table",
+    "kind": "resource",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "security",
+        "type": "SECURITY",
+        "headerName": "Security",
+        "accessorKey": "decorator",
+        "size": 114,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "none",
+        "properties": null
+      },
+      {
+        "id": "scorecards",
+        "harnessManaged": true,
+        "headerName": "Scorecards",
+        "accessorKey": "scorecards",
+        "type": "SCORECARDS",
+        "size": 434,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68cadce9c2c3b47ebebfada3",
+    "identifier": "__Harness_Workflow_Table__",
+    "name": "Default Workflow Table",
+    "kind": "workflow",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "execute",
+        "type": "EXECUTE",
+        "headerName": "",
+        "accessorKey": "execute",
+        "size": 48,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "parent",
+        "harnessManaged": true,
+        "accessorKey": "spec.parent",
+        "type": "OWNER",
+        "headerName": "Parent",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68f858e2fb26c07519bb41a6",
+    "identifier": "__Harness_System_Table__",
+    "name": "Default System Table",
+    "kind": "system",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "security",
+        "type": "SECURITY",
+        "headerName": "Security",
+        "accessorKey": "decorator",
+        "size": 114,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "none",
+        "properties": null
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68fa19edba0e7e8cf4f9a058",
+    "identifier": "__Harness_All_Table__",
+    "name": "Default All Table",
+    "kind": "all",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "security",
+        "type": "SECURITY",
+        "headerName": "Security",
+        "accessorKey": "decorator",
+        "size": 114,
+        "harnessManaged": true,
+        "visible": true,
+        "pinned": "none",
+        "properties": null
+      },
+      {
+        "id": "scorecards",
+        "harnessManaged": true,
+        "headerName": "Scorecards",
+        "accessorKey": "scorecards",
+        "type": "SCORECARDS",
+        "size": 434,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68fa1bf51f4077492e8d7e60",
+    "identifier": "__Harness_Environment_Table__",
+    "name": "Default Environment Table",
+    "kind": "environment",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68fa1be6882cd5a6d88aea78",
+    "identifier": "__Harness_EnvironmentBlueprint_Table__",
+    "name": "Default EnvironmentBlueprint Table",
+    "kind": "environmentblueprint",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+    "id": "68fa1c7082da477daea800a3",
+    "identifier": "__Harness_Docs_Table__",
+    "name": "Default Docs Table",
+    "kind": "docs",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "kind",
+        "harnessManaged": true,
+        "accessorKey": "kind",
+        "type": "KIND",
+        "headerName": "Kind",
+        "size": 372,
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "git_details",
+        "harnessManaged": true,
+        "accessorKey": "git_details",
+        "type": "GIT_DETAILS",
+        "headerName": "Git Details",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  },
+  {
+      "id": "6968918c7a4db6a07b44c2f4",
+      "identifier": "__Harness_Hierarchy_Table__",
+      "name": "Default Hierarchy Table",
+      "kind": "hierarchy",
+      "type": "all",
+      "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+      "filter": {
+        "owners": [],
+        "tags": [],
+        "lifecycles": [],
+        "scopes": [
+          "account.*"
+        ]
+      },
+      "columnDetails": [
+        {
+          "id": "name",
+          "type": "ENTITY_NAME",
+          "harnessManaged": true,
+          "headerName": "Name",
+          "size": 372,
+          "accessorKey": "metadata.name",
+          "visible": true,
+          "pinned": "left"
+        },
+        {
+          "id": "type",
+          "harnessManaged": true,
+          "accessorKey": "spec.type",
+          "type": "TEXT",
+          "headerName": "Type",
+          "size": 256,
+          "visible": true
+        },
+        {
+          "id": "project_name",
+          "harnessManaged": true,
+          "accessorKey": "project_name",
+          "type": "TEXT",
+          "headerName": "Project",
+          "size": 256,
+          "visible": true,
+          "properties": {
+            "icon": "nav-project"
+          }
+        },
+        {
+          "id": "org_name",
+          "harnessManaged": true,
+          "accessorKey": "org_name",
+          "type": "TEXT",
+          "headerName": "Organization",
+          "size": 256,
+          "visible": true,
+          "properties": {
+            "icon": "nav-organization"
+          }
+        },
+        {
+          "id": "scope",
+          "harnessManaged": true,
+          "accessorKey": "scope",
+          "type": "SCOPE",
+          "headerName": "Scope",
+          "size": 256,
+          "visible": true
+        },
+        {
+          "id": "actions",
+          "harnessManaged": true,
+          "accessorKey": "actions",
+          "type": "ENTITY_ACTIONS",
+          "headerName": "Actions",
+          "size": 102,
+          "visible": true,
+          "pinned": "right"
+        }
+      ]
+    },
+  {
+    "id": "69689a1c7b5ec7b18c55d3e5",
+    "identifier": "__Harness_AIAsset_Table__",
+    "name": "Default AI Asset Table",
+    "kind": "aiasset",
+    "type": "all",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "filter": {
+      "owners": [],
+      "tags": [],
+      "lifecycles": [],
+      "scopes": [
+        "account.*"
+      ]
+    },
+    "columnDetails": [
+      {
+        "id": "name",
+        "type": "ENTITY_NAME",
+        "harnessManaged": true,
+        "headerName": "Name",
+        "size": 372,
+        "accessorKey": "metadata.name",
+        "visible": true,
+        "pinned": "left"
+      },
+      {
+        "id": "type",
+        "harnessManaged": true,
+        "accessorKey": "spec.type",
+        "type": "TEXT",
+        "headerName": "Type",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "owner",
+        "harnessManaged": true,
+        "accessorKey": "spec.owner",
+        "type": "OWNER",
+        "headerName": "Owner",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "provider",
+        "harnessManaged": true,
+        "accessorKey": "spec.provider",
+        "type": "TEXT",
+        "headerName": "Provider",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "lifecycle",
+        "harnessManaged": true,
+        "accessorKey": "spec.lifecycle",
+        "type": "TEXT",
+        "headerName": "Lifecycle",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "tags",
+        "harnessManaged": true,
+        "accessorKey": "metadata.tags",
+        "type": "TAGS",
+        "headerName": "Tags",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "project_name",
+        "harnessManaged": true,
+        "accessorKey": "project_name",
+        "type": "TEXT",
+        "headerName": "Project",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-project"
+        }
+      },
+      {
+        "id": "org_name",
+        "harnessManaged": true,
+        "accessorKey": "org_name",
+        "type": "TEXT",
+        "headerName": "Organization",
+        "size": 256,
+        "visible": true,
+        "properties": {
+          "icon": "nav-organization"
+        }
+      },
+      {
+        "id": "scope",
+        "harnessManaged": true,
+        "accessorKey": "scope",
+        "type": "SCOPE",
+        "headerName": "Scope",
+        "size": 256,
+        "visible": true
+      },
+      {
+        "id": "actions",
+        "harnessManaged": true,
+        "accessorKey": "actions",
+        "type": "ENTITY_ACTIONS",
+        "headerName": "Actions",
+        "size": 102,
+        "visible": true,
+        "pinned": "right"
+      }
+    ]
+  }
+]

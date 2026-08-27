@@ -1,0 +1,46 @@
+# Copyright 2025 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//332-ci-manager/service/src/main/java/io/harness/ci/execution/buildstate/providers:module",
+        "//332-ci-manager/service/src/test/java/io/harness/ci/executionplan/base:tests",
+        "//332-ci-manager/service/src/test/java/io/harness/ci/executionplan/rule:tests",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/sweepingoutputs:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/yaml/extended/infrastrucutre:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/commonconstants:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/ff:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/ci/pod:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//clients/ngsettings/src/main/java/io/harness/ngsettings/client/remote:module",
+        "//pipeline-service/modules/pms-contracts/src/main/proto:pms_contracts_java_proto",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_jooq_joor",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_powermock_powermock_reflect",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

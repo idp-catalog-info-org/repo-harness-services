@@ -1,0 +1,24 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "title": "Harness Artifact Registry Firewall Exemption Created",
+  "summary": "Harness Artifact Registry Firewall Exemption Created",
+  "sections": [
+    {
+      "title": "Firewall Exemption Created",
+      "text": "A firewall exemption has been created and waiting for your approval.<br><br>Package Name: ${PACKAGE_NAME}<br>Version List: ${VERSION_LIST}<br>Registry: ${REGISTRY_NAME} - ${REGISTRY_URL}<br>Reason: ${REASON}<br>Created By: ${CREATED_BY}<br><br>View Details: ${EXCEPTION_URL}",
+      "potentialAction": [
+        {
+            "@type": "OpenUri",
+            "name": "View Details",
+            "targets": [
+                {
+                "os": "default",
+                "uri": "${EXCEPTION_URL}"
+                }
+            ]
+        }
+      ]
+    }
+  ]
+}

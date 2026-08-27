@@ -1,0 +1,9 @@
+name: GitX Webhook Cache Update Time Metrics
+identifier: GitXWebhookCacheUpdateTime
+metricGroup: gitx_webhook_cache_update_time_group
+metrics:
+  - metricName: gitx_webhook_cache_update_time
+    metricDefinition: Time taken to process webhook cache updates.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m]
+    unit: "ms"

@@ -1,0 +1,43 @@
+variables:
+- name: cdc_event
+  rules:
+  - transformationConfig:
+      jexlExpression:
+        jexlExpression: $s.payload
+- name: idp_entity_ref
+  rules:
+  - transformationConfig:
+      jexlScript:
+        jexlScript: "var fd = cdc_event.fullDocument;\nvar acc = fd.accountIdentifier.getAsString();\nvar id = fd.identifier.getAsString();\nvar orgNode = fd.orgIdentifier;\nvar projNode = fd.projectIdentifier;\nvar hasOrg = orgNode != null && orgNode.getAsString() != \"\";\nvar hasProj = projNode != null && projNode.getAsString() != \"\";\nif (hasOrg && hasProj) {\n  return acc + \".\" + orgNode.getAsString() + \".\" + projNode.getAsString() + \":\" + id;\n}\nif (hasOrg) {\n  return acc + \".\" + orgNode.getAsString() + \":\" + id;\n}\nreturn acc + \":\" + id;"
+      outputType: FIELD_TYPE_STR
+scopeExpression:
+  jexlExpression: (cdc_event.ns.db.getAsString() == 'idp-harness' || cdc_event.ns.db.getAsString() == 'harness-idp') && cdc_event.ns.coll.getAsString()
+    == 'catalog' && cdc_event.fullDocument.kind.getAsString() == '__CDC_KIND_LITERAL__'
+source:
+  cdcSourceConfig:
+    cdcDatabaseType: MONGODB
+    cdcTableFqn: idp-harness.catalog
+    eventStream:
+      topic: data-platform-cdc-ingestion-streaming
+tenantId:
+  name: tenant_id
+  type: FIELD_TYPE_STR
+  rules:
+  - transformationConfig:
+      jexlExpression:
+        jexlExpression: cdc_event.fullDocument.accountIdentifier.getAsString()
+      outputType: FIELD_TYPE_STR
+  - transformationConfig:
+      staticValue: unknown_account
+      outputType: FIELD_TYPE_STR
+eventTimestamp:
+  name: event_timestamp
+  type: FIELD_TYPE_TIMESTAMP
+  rules:
+  - transformationConfig:
+      jexlExpression:
+        jexlExpression: cdc_event.fullDocument.lastUpdatedAt['$numberLong'].getAsLong()
+      outputType: FIELD_TYPE_TIMESTAMP
+attributes: []
+entities: []
+relationships: []

@@ -1,0 +1,54 @@
+# Copyright 2026 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//878-ng-common-utilities/src/main/java/io/harness/gitaware/helper:module",
+        "//952-scm-java-client/src/main/java/io/harness/beans/request:module",
+        "//952-scm-java-client/src/main/java/io/harness/beans/response:module",
+        "//952-scm-java-client/src/main/java/io/harness/impl/scm:module",
+        "//952-scm-java-client/src/main/java/io/harness/service:module",
+        "//952-scm-java-client/src/main/java/io/harness/utils:module",
+        "//954-connector-beans/src/main/java/io/harness/connector/utils:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/scm:module",
+        "//954-connector-beans/src/main/java/io/harness/delegate/beans/connector/scm/harness:module",
+        "//955-account-mgmt/src/main/java/io/harness/account/services:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/encryption:module",
+        "//970-ng-commons/src/main/java/io/harness/gitsync/interceptor:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/acl/api:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "//clients/pipeline-service/pms-client/src/main/java/io/harness/pipeline/remote:module",
+        "//idp-service/contracts/openapi/v1:idp-service-server-spec-module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/helpers:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/service:module",
+        "//idp-service/src/main/java/io/harness/idp/catalog/utils:module",
+        "//idp-service/src/main/java/io/harness/idp/common:module",
+        "//idp-service/src/main/java/io/harness/idp/workflowlibrary/config:module",
+        "//idp-service/src/main/java/io/harness/idp/workflowlibrary/entity:module",
+        "//idp-service/src/main/java/io/harness/idp/workflowlibrary/repositories:module",
+        "//idp-service/src/main/java/io/harness/idp/workflowlibrary/utils:module",
+        "//pipeline-service/contracts/openapi/v1:pipeline-server-spec-module",
+        "//product/ci/scm/proto:ciscm_java_proto",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

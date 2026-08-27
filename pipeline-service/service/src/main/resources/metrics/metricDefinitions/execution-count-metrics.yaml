@@ -1,0 +1,16 @@
+name: Core Pipeline Metrics
+identifier: PipelineCoreMetrics
+metricGroup: PipelineAccountIdMetricsGroup
+metrics:
+  - metricName: pipeline_executions_gauge
+    metricDefinition: Number of active pipeline executions at a given instant
+    type: LastValue
+    unit: "1"
+  - metricName: node_execution_active_count
+    metricDefinition: Number of active node executions at a given instant
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_executions_gauge_per_trigger_type
+    metricDefinition: Number of active pipeline executions at a given instant per triggerType
+    type: LastValue
+    unit: "1"

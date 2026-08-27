@@ -1,0 +1,36 @@
+identifier: argo-cd
+name: Argo CD
+description: View Argo CD status for your projects in Harness IDP.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: roadie.io
+category: CI/CD
+source: https://github.com/RoadieHQ/roadie-backstage-plugins/tree/main/plugins/frontend/backstage-plugin-argo-cd
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/argo-cd/
+config: |-
+  argocd:
+    username: your-username
+    password: ${ARGOCD_PASSWORD}
+    appLocatorMethods:
+      - type: 'config'
+        instances:
+          - name: argoInstance1
+            url: https://argoInstance1.com
+            token: ${ARGOCD_AUTH_TOKEN}
+environmentVariables:
+  - ARGOCD_AUTH_TOKEN
+  - ARGOCD_PASSWORD
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityArgoCDOverviewCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityArgoCDOverviewCard
+        specs:
+          gridProps:
+            md: 6

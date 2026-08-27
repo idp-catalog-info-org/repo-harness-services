@@ -1,0 +1,174 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object123456.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy",
+    "sysdig"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/sysdig"
+          ],
+          "properties": {
+            "/sysdig": {
+              "$id": "#root/proxy/endpoints//sysdig",
+              "title": "/sysdig",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "changeOrigin",
+                "allowedMethods",
+                "credentials",
+                "pathRewrite",
+                "headers"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints//sysdig/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "https://sysdig.com",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "changeOrigin": {
+                  "$id": "#root/proxy/endpoints//sysdig/changeOrigin",
+                  "title": "Changeorigin",
+                  "type": "boolean",
+                  "default": false
+                },
+                "allowedMethods": {
+                  "$id": "#root/proxy/endpoints//sysdig/allowedMethods",
+                  "title": "Allowedmethods",
+                  "type": "array",
+                  "items": {
+                    "$id": "#root/proxy/endpoints//sysdig/allowedMethods/items",
+                    "title": "Items",
+                    "type": "string",
+                    "default": "GET",
+                    "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+                  }
+                },
+                "credentials": {
+                  "$id": "#root/proxy/endpoints//sysdig/credentials",
+                  "title": "Credentials",
+                  "type": "string",
+                  "default": "dangerously-allow-unauthenticated",
+                  "enum": [
+                    "dangerously-allow-unauthenticated",
+                    "require",
+                    "forward"
+                  ]
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints//sysdig/pathRewrite",
+                  "title": "Pathrewrite",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "api/proxy/sysdig/?"
+                  ],
+                  "properties": {
+                    "api/proxy/sysdig/?": {
+                      "$id": "#root/proxy/endpoints//sysdig/pathRewrite/api/proxy/sysdig/?",
+                      "title": "Api/proxy/sysdig/?",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "headers": {
+                  "$id": "#root/proxy/endpoints//sysdig/headers",
+                  "title": "Headers",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "Authorization",
+                    "Content-Type",
+                    "Accept",
+                    "X-Sysdig-Product"
+                  ],
+                  "properties": {
+                    "Authorization": {
+                      "$id": "#root/proxy/endpoints//sysdig/headers/Authorization",
+                      "title": "Authorization",
+                      "type": "string",
+                      "default": "Bearer ${SYSDIG_SECURE_TOKEN}",
+                      "pattern": "^.*$"
+                    },
+                    "Content-Type": {
+                      "$id": "#root/proxy/endpoints//sysdig/headers/Content-Type",
+                      "title": "Content-type",
+                      "type": "string",
+                      "default": "application/json",
+                      "pattern": "^.*$"
+                    },
+                    "Accept": {
+                      "$id": "#root/proxy/endpoints//sysdig/headers/Accept",
+                      "title": "Accept",
+                      "type": "string",
+                      "default": "application/json",
+                      "pattern": "^.*$"
+                    },
+                    "X-Sysdig-Product": {
+                      "$id": "#root/proxy/endpoints//sysdig/headers/X-Sysdig-Product",
+                      "title": "X-Sysdig-Product",
+                      "type": "string",
+                      "default": "SDS",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sysdig": {
+      "$id": "#root/sysdig",
+      "title": "Sysdig",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "backlink"
+      ],
+      "properties": {
+        "endpoint": {
+          "$id": "#root/sysdig/endpoint",
+          "title": "Endpoint",
+          "type": "string",
+          "default": "https://sysdig.com",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        },
+        "backlink": {
+          "$id": "#root/sysdig/backlink",
+          "title": "Backlink",
+          "type": "string",
+          "default": "https://example.sysdig.com/",
+          "pattern": "^https://.*\\/$"
+        }
+      }
+    }
+  }
+}

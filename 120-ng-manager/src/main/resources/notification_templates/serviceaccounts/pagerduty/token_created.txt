@@ -1,0 +1,4 @@
+summary: "Token created — ${TOKEN_IDENTIFIER} | Service Account: ${SERVICE_ACCOUNT_NAME} | API Key: ${API_KEY_IDENTIFIER}"
+link:
+    href: harness.io
+    text: Harness

@@ -1,0 +1,90 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.preflight.entity;
+
+import static io.harness.logging.AutoLogContext.OverrideBehavior.OVERRIDE_NESTS;
+
+import io.harness.annotation.HarnessEntity;
+import io.harness.annotations.StoreIn;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.logging.AutoLogContext;
+import io.harness.mongo.index.CompoundMongoIndex;
+import io.harness.mongo.index.FdTtlIndex;
+import io.harness.mongo.index.MongoIndex;
+import io.harness.ng.DbAliases;
+import io.harness.ng.core.EntityDetail;
+import io.harness.persistence.UniqueIdAware;
+import io.harness.persistence.UuidAware;
+import io.harness.pms.preflight.PreFlightEntityErrorInfo;
+import io.harness.pms.preflight.PreFlightStatus;
+import io.harness.pms.preflight.connector.ConnectorCheckResponse;
+import io.harness.pms.preflight.inputset.PipelineInputResponse;
+
+import com.google.common.collect.ImmutableList;
+import dev.morphia.annotations.Entity;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Builder
+@FieldNameConstants(innerTypeName = "PreFlightEntityKeys")
+@StoreIn(DbAliases.PMS)
+@Entity(value = "preFlightEntity")
+@Document("preFlightEntity")
+@TypeAlias("preFlightEntity")
+@HarnessEntity(exportable = false)
+@OwnedBy(HarnessTeam.PIPELINE)
+public class PreFlightEntity implements UuidAware, UniqueIdAware {
+  @Id @dev.morphia.annotations.Id String uuid;
+
+  String accountIdentifier;
+  @Deprecated String orgIdentifier;
+  @Deprecated String projectIdentifier;
+  String pipelineIdentifier;
+
+  @NonNull String pipelineYaml;
+  List<PipelineInputResponse> pipelineInputResponse;
+  List<ConnectorCheckResponse> connectorCheckResponse;
+  PreFlightStatus preFlightStatus;
+  PreFlightEntityErrorInfo errorInfo;
+  @FdTtlIndex Date validUntil;
+  List<EntityDetail> connectorEntityDetails;
+  String uniqueId;
+  String parentUniqueId;
+
+  public static List<MongoIndex> mongoIndexes() {
+    return ImmutableList.<MongoIndex>builder()
+        .add(CompoundMongoIndex.builder()
+                 .name("accountId_parentUniqueId_pipelineId_idx")
+                 .field(PreFlightEntityKeys.accountIdentifier)
+                 .field(PreFlightEntityKeys.parentUniqueId)
+                 .field(PreFlightEntityKeys.pipelineIdentifier)
+                 .build())
+        .build();
+  }
+
+  public AutoLogContext autoLogContext() {
+    Map<String, String> logContext = new HashMap<>();
+    logContext.put(PreFlightEntityKeys.accountIdentifier, accountIdentifier);
+    logContext.put(PreFlightEntityKeys.projectIdentifier, projectIdentifier);
+    logContext.put(PreFlightEntityKeys.orgIdentifier, orgIdentifier);
+    logContext.put(PreFlightEntityKeys.pipelineIdentifier, pipelineIdentifier);
+    logContext.put(PreFlightEntityKeys.parentUniqueId, parentUniqueId);
+    return new AutoLogContext(logContext, OVERRIDE_NESTS);
+  }
+}

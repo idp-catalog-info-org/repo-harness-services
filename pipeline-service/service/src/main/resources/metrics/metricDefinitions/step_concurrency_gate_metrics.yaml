@@ -1,0 +1,8 @@
+name: Step Concurrency Gate Metrics
+identifier: StepConcurrencyGateMetrics
+metricGroup: StepConcurrencyGateMetricsGroup
+metrics:
+  - metricName: pipeline_step_concurrency_gate_decision_total
+    metricDefinition: Counter-based step concurrency gate decisions. decision in {queue, allow}; reason in {cluster, account, none}; mode in {enforce, shadow, disabled}.
+    type: Count
+    unit: "1"

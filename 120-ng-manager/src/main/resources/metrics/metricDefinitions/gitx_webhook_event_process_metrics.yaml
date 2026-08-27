@@ -1,0 +1,33 @@
+name: GitX Webhook Processing Metrics
+identifier: GitXWebhookProcessing
+metricGroup: gitx_webhook_processing_group
+metrics:
+  - metricName: gitx_webhook_push_event_process_time
+    metricDefinition: Time taken to process webhook push events.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"
+  - metricName: gitx_webhook_branch_create_delete_event_process_time
+    metricDefinition: Time taken to process webhook branch create/delete events.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"
+  - metricName: gitx_webhook_push_event_queued_time
+    metricDefinition: Time spent in queue by webhook push events.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"
+  - metricName: gitx_webhook_pull_request_event_process_time
+    metricDefinition: Time taken to process webhook pull request events.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"
+  - metricName: gitx_webhook_pull_request_event_queued_time
+    metricDefinition: Time spent in queue by webhook pull request events.
+    type: Duration
+    distribution: [ 0ms, 100ms, 200ms, 500ms, 700ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 15m ]
+    unit: "ms"
+  - metricName: gitx_webhook_pr_cache_clear_flow
+    metricDefinition: Count of GitX webhook PR cache-clear events by flow type (optimized vs non_optimized).
+    type: Count
+    unit: "1"

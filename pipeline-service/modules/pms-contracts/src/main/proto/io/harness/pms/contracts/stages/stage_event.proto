@@ -1,0 +1,31 @@
+// Copyright 2025 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.stage;
+import "io/harness/pms/contracts/ambiance/ambiance.proto";
+
+option java_multiple_files = true;
+
+message StageStatusEvent {
+  string accountIdentifier = 1;
+  string orgIdentifier = 2;
+  string projectIdentifier = 3;
+  string pipelineIdentifier = 4;
+  string planExecutionId = 5;
+  string stageExecutionId = 6;
+  string nodeExecutionId = 7;
+  string stageType = 8;
+  string stageName = 9;
+  string customStageName = 10;
+  int64 startTs = 11;
+  int64 endTs = 12;
+  int64 createdAt = 13;
+  int64 lastModifiedAt = 14;
+  string status = 15;
+  map<string, string> metadata = 16;
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 17;
+}

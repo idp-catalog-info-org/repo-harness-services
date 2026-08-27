@@ -1,0 +1,34 @@
+pipeline:
+  name: test-pipeline
+  identifier: testPipeline
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.gitconnector
+        repoName: test.git
+        build: <+input>
+  stages:
+    - stage:
+        identifier: stage1
+        name: stage1
+        type: CI
+        spec:
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: k8sConnector
+              namespace: default
+          cloneCodebase: true
+          permissions:
+            pipeline: "view|execute"
+            code_repository: "push|pull"
+            artifact_registry: "read"
+          execution:
+            steps:
+              - step:
+                  identifier: run1
+                  name: Run Step
+                  type: Run
+                  spec:
+                    command: echo hello
+                    image: alpine

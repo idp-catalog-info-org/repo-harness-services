@@ -1,0 +1,32 @@
+{
+  "pipeline": {
+    "name": "DynamicStageWithGitStore",
+    "identifier": "DynamicStageWithGitStore",
+    "projectIdentifier": "Proj",
+    "orgIdentifier": "Org",
+    "stages": [
+      {
+        "stage": {
+          "name": "dynamicStage",
+          "identifier": "dynamicStage",
+          "description": "",
+          "type": "Dynamic",
+          "spec": {
+            "sourceConfig": {
+              "type": "Git",
+              "spec": {
+                "connectorRef": "account.git",
+                "branchName": "feature/test",
+                "commitId": "commit-sha",
+                "filePath": ".harness/pipeline.yaml",
+                "repoName": "repo"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+
+

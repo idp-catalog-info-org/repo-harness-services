@@ -1,0 +1,16 @@
+name: IDP Service Billing Metrics
+identifier: IdpServiceBillingMetrics
+metricGroup: IdpServiceBillingMetricsGroup
+metrics:
+  - metricName: idp_user_billing_duration
+    metricDefinition: IDP Service User Billing Processing Duration
+    type: LastValue
+    unit: count
+  - metricName: idp_user_billing_processed_total
+    metricDefinition: IDP Service User Billing Records Processed Total
+    type: LastValue
+    unit: count
+  - metricName: idp_user_billing_error_total
+    metricDefinition: IDP Service User Billing Processing Error Total
+    type: LastValue
+    unit: count

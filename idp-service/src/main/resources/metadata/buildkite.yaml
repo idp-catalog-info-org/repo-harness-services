@@ -1,0 +1,52 @@
+identifier: buildkite
+name: Buildkite
+description: Buildkite is a platform for fast, secure, and scalable continuous integration and continuous delivery. It runs on your infrastructure, giving you complete control over security, cost and performance.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Harness
+category: CI/CD
+source: https://github.com/harness/backstage-plugins/buildkite
+iconUrl: https://buildkite.com/assets/graphics/brand-assets/logo/logo-brandmark-3c-on-light-3bd8adb.svg
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/buildkite/
+config: |-
+  proxy:
+    endpoints:
+      '/buildkite/api':
+        target: https://api.buildkite.com/v2
+        headers:
+          Authorization: Bearer ${BUILDKITE_API_TOKEN}
+        pathRewrite:
+          '^/api/proxy/buildkite/api' : ''
+environmentVariables:
+  - BUILDKITE_API_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityBuildkiteContent
+      addByDefault: true
+      defaultRoute: /ci-cd
+      layoutSchemaSpecs:
+        name: EntityBuildkiteContent
+        title: CI/CD
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isBuildkiteAvailable
+                  content:
+                    component: EntityBuildkiteContent
+    - type: CARD
+      name: EntityLatestBuildkiteRunCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityLatestBuildkiteRunCard
+        specs:
+          props:
+            branch: "main,master"
+            variant: "gridItem"
+          gridProps:
+            sm: 6

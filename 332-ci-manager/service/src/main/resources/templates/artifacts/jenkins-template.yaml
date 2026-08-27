@@ -1,0 +1,53 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Jenkins connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  jobName:
+    type: string
+    description: Jenkins job name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.jobName}}
+  build:
+    type: string
+    description: Jenkins build number/version to resolve (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.build}}
+  artifactPath:
+    type: string
+    description: Artifact file path filter within the build (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.artifactPath}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/jenkins-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ACTION_TYPE: get-builds
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_JOB_NAME: ${{inputs.jobName}}
+    PLUGIN_ARTIFACT_BUILD_NUMBER: ${{inputs.build}}
+    PLUGIN_ARTIFACT_ARTIFACT_PATHS: ${{inputs.artifactPath}}
+    PLUGIN_JENKINS_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_JENKINS_URL: ${{inputs.artifactConnector.jenkinsUrl}}
+    PLUGIN_JENKINS_USERNAME: ${{inputs.artifactConnector.userName}}
+    PLUGIN_JENKINS_PASSWORD: ${{inputs.artifactConnector.password}}
+    PLUGIN_JENKINS_TOKEN: ${{inputs.artifactConnector.token}}

@@ -1,0 +1,30 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store Serverless AWS Lambda manifest. Serverless content (files) and values
+# (valuesPaths) are fetched from the Harness File Store and written to the runner workspace.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: Serverless file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  valuesPaths:
+    type: list
+    description: Values YAML file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  configOverridePath:
+    type: string
+    description: Serverless config override path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.configOverridePath}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store Serverless manifest 'ID_PLACEHOLDER' on the runner"

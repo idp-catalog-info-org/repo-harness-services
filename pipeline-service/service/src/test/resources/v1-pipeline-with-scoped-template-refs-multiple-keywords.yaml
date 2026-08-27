@@ -1,0 +1,18 @@
+pipeline:
+  clone:
+    disabled: true
+  stages:
+    - runtime: shell
+      steps:
+        - action:
+            uses: org.OrgActionTemplate
+            with:
+              input1: <+input>
+        - build:
+            uses: account.AccountBuildTemplate
+            with:
+              input2: <+input>
+        - deploy:
+            uses: ProjectDeployTemplate
+            with:
+              input3: <+input>

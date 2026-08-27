@@ -1,0 +1,21 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/artifactory-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_REPOSITORY_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.repo}}
+    PLUGIN_ARTIFACT_REPOSITORY_URL: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.url}}
+    PLUGIN_ARTIFACT_CHART_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartName}}
+    PLUGIN_ARTIFACT_CHART_VERSION: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartVersion}}
+    PLUGIN_ARTIFACT_REPOSITORY_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACTORY_NAME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).name}}
+    PLUGIN_ARTIFACTORY_URL: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).url}}
+    PLUGIN_ARTIFACTORY_USERNAME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).username}}
+    PLUGIN_ARTIFACTORY_PASSWORD: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).password}}

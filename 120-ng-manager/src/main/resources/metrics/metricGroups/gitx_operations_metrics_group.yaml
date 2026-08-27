@@ -1,0 +1,11 @@
+name: GitX Operations Times in Metrics Group
+identifier: gitx_operations_times_group
+labels:
+  - accountId
+  - operationType
+  - status
+  - isDelegateUsed
+#  - isCacheUsed
+  - repoName
+#  - connectorRef
+  - isRateLimitHit

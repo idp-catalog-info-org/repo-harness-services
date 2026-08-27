@@ -1,0 +1,1400 @@
+[
+  {
+    "id": "64d4f1a9b308cf71096284be",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__bfeece93-8892-4459-be93-b7a647df7e5f",
+    "name": "GitHub Mean time to merge PR is less than 2 days",
+    "description": "GitHub Mean time to merge PR is less than 2 days",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "c318da62-7bbd-40d5-b838-c90d5250fa3f",
+        "data_source_identifier": "github",
+        "data_point_identifier": "meanTimeToMerge",
+        "input_values": [
+          {
+            "key": "branchName",
+            "value": "\"refs/\""
+          }
+        ],
+        "operator": "<",
+        "value": "48"
+      }
+    ],
+    "expression": "github.meanTimeToMerge < 48",
+    "tags": ["Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean time to merge PR is more than 2 days"
+  },
+  {
+    "id": "64d5c42b5e0ec884f30df85c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__457c6903-8a02-46ae-a054-9397175fa3be",
+    "name": "Pagerduty is setup",
+    "description": "Pagerduty is setup",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "3960758a-922d-4a57-8206-cd67a51681ec",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "pagerdutyAnnotationExists",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.pagerdutyAnnotationExists == true",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Pagerduty is not setup"
+  },
+  {
+    "id": "64d5f23eb90d6686d2a9a007",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__a9b98e87-d9c1-4c5e-9ba6-4485f171dbc4",
+    "name": "GitHub Branch protection is set",
+    "description": "GitHub Branch protection is set",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "d7dabd82-5e87-4812-aa7f-b116b3853d58",
+        "data_source_identifier": "github",
+        "data_point_identifier": "isBranchProtected",
+        "input_values":  [
+          {
+            "key": "branchName",
+            "value": "\"refs/\""
+          }
+        ],
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "github.isBranchProtected == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Branch protection is not set"
+  },
+  {
+    "id": "64d5f5119b82f2e2eb2bd6ce",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__953cc558-3035-4cd8-8c1c-7fb1b1382af6",
+    "name": "Tech Docs exists",
+    "description": "Tech Docs exists",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "84da9ae2-3be5-4e64-bc87-ecabde1cb97e",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "techDocsAnnotationExists",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.techDocsAnnotationExists == true",
+    "tags": ["Software quality", "Development maturity" ,"DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Tech docs doesn't exists"
+  },
+  {
+    "id": "64e45c34770dcc1b1d52cc12",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ff13378c-eaeb-4568-a6de-1fda0ac20d6a",
+    "name": "Spec owner exists",
+    "description": "Spec owner exists",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7451322a-b8f3-4ace-8004-a14109bb903c",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "specOwnerExists",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.specOwnerExists == true",
+    "tags": ["Software quality", "Development maturity" ,"DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Spec owner doesn't exists"
+  },
+  {
+    "id": "64ede62a8b4004661f8e59aa",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b9a99e87-d9c1-4c5e-9ba6-4605a771dbc4",
+    "name": "GitHub Gitleaks file exists",
+    "description": "GitHub Gitleaks file exists",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "a476c2e3-73c0-48a6-84b7-71159fefe853",
+        "data_source_identifier": "github",
+        "data_point_identifier": "isFileExists",
+        "input_values":  [
+          {
+            "key": "filePath",
+            "value": "\".gitleaks.toml\""
+          }
+        ],
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "github.isFileExists.\".gitleaks.toml\" == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Gitleaks file does not exist"
+  },
+  {
+    "id": "64ef7bb0f616c89330020df9",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__dfc93822-604a-4dfe-8e65-b71928034897",
+    "name": "Is STO scan stage setup in pipeline",
+    "description": "Check will pass if STO stage is added in pipeline",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "b8e7571c-fbb0-4ff9-bd83-8f318de288e7",
+        "data_source_identifier": "harness",
+        "data_point_identifier": "stoStageAdded",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "harness.stoStageAdded == true",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "STO stage is not setup in pipeline"
+  },
+  {
+    "id": "64ef7cfff616c89330020dfa",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__76549f1d-f342-4875-ac1c-ff33036aa1f0",
+    "name": "Is policy evaluation successful for pipelines",
+    "description": "Check will pass if policy evaluation will be successful for pipelines",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "89b8d8e9-3039-44c7-8e55-7ec418e78189",
+        "data_source_identifier": "harness",
+        "data_point_identifier": "isPolicyEvaluationSuccessful",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "harness.isPolicyEvaluationSuccessful == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Policy evaluation is failing for pipelines"
+  },
+  {
+    "id": "64ef7d8bf616c89330020dfb",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__d4bc06ee-6f27-43f6-b095-f90b48d6061c",
+    "name": "Percentage of CI pipelines passing in past 7 days is more than 80",
+    "description": "Percentage of CI pipelines passing in past 7 days is more than 80",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "75b89b87-cbe3-4c92-8d59-5268a96259e4",
+        "data_source_identifier": "harness",
+        "data_point_identifier": "PercentageOfCIPipelinePassingInPastSevenDays",
+        "operator": ">",
+        "value": "80"
+      }
+    ],
+    "expression": "harness.PercentageOfCIPipelinePassingInPastSevenDays > 80",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Percentage of CI pipelines passing is less than 80 in past 7 days"
+  },
+  {
+    "id": "64ef7e41f616c89330020dfc",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b5e32af1-1c66-4501-9bdf-571ba9cdee16",
+    "name": "No test failing on CI pipeline",
+    "description": "No test failing on CI pipeline",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "0318dbf6-4890-4e47-ac15-10423ea7b155",
+        "data_source_identifier": "harness",
+        "data_point_identifier": "noTestsFailingInCiPipeline",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "harness.noTestsFailingInCiPipeline == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Tests are failing on CI pipeline"
+  },
+  {
+    "id": "65009e1bc28a1a3f5607f80c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__712025a1-c192-4212-8c29-252a37a44225",
+    "name": "Is on-call set",
+    "description": "Checks if on-call is set on PagerDuty for the service.",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "4e7cec95-98c6-4d8e-b0a1-694489a3d12f",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "isOnCallSet",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "pagerduty.isOnCallSet == true",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "On-call is not set on PagerDuty [Reference for setting up on-call - https://support.pagerduty.com/docs/schedule-basics ]"
+  },
+  {
+    "id": "65009bfec28a1a3f5607f809",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__566ff4fa-1ba8-40bf-bd4a-fd1ddb9a9b21",
+    "name": "Is escalation policy set",
+    "description": "Checks if the Escalation Policy is set on PagerDuty.",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "5d9fe176-c150-4ac7-9b67-2fc8c720ac03",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "isEscalationPolicySet",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "pagerduty.isEscalationPolicySet == true",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Escalation policy is not set on PagerDuty. [Reference for setting up Escalation Policy - https://support.pagerduty.com/docs/escalation-policies ]"
+  },
+  {
+    "id": "6500ac528ea5a4798502f512",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__c758266c-22b4-454f-83c4-bd205f0ea277",
+    "name": "Number of incidents in last 30 days is less than 20",
+    "description": "Checks if number of incidents in last 30 days is less than 20 on PagerDuty",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "790ac20a-1e5b-4659-86e8-8d20829b45dc",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "noOfIncidentsInLastThirtyDays",
+        "operator": "<",
+        "value": "20"
+      }
+    ],
+    "expression": "pagerduty.noOfIncidentsInLastThirtyDays < 20",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of incidents in last 30 days is more than 20 on PagerDuty."
+  },
+  {
+    "id": "6500ce178ea5a4798502f516",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__565c5545-2b7f-4400-95e2-6b8ac470f40e",
+    "name": "Average resolved time for the last 10 resolved incidents is less than 50 minutes",
+    "description": "Checks if the average resolved time for last 10 resolved incidents is less than 50 minutes on PagerDuty",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "1a235921-6408-49f4-8653-420aa8d5bc38",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "avgResolvedTimeForLastTenResolvedIncidentsInMinutes",
+        "operator": "<",
+        "value": "50"
+      }
+    ],
+    "expression": "pagerduty.avgResolvedTimeForLastTenResolvedIncidentsInMinutes < 50",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Average resolved time for last 10 resolved incidents is more than 50 minutes."
+  },
+  {
+    "id": "64fec4369a5dcde88b2137c7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ce1ea812-868e-457e-a547-00638dbcafb2",
+    "name": "Replicas count greater than 1",
+    "description": "Replicas count greater than 1",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "ddbcde02-026a-4ad1-a8af-af751e941dc5",
+        "data_source_identifier": "kubernetes",
+        "data_point_identifier": "replicas",
+        "operator": ">",
+        "value": 1
+      }
+    ],
+    "expression": "kubernetes.replicas > 1",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Make sure you have minimum 2 replicas configured for the application to be considered minimally available"
+  },
+  {
+    "id": "65083295bd13c114730fe02c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__43957df0-d59b-4799-a2ed-14ecbd32fe3f",
+    "name": "Deployed within last 7 days",
+    "description": "Checks if the most recent deployment was done within the past 7 days.",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "5a2a7d7d-d41b-4f98-984b-f0290a181ce8",
+        "data_source_identifier": "kubernetes",
+        "data_point_identifier": "daysSinceLastDeployed",
+        "operator": "<=",
+        "value": 7
+      }
+    ],
+    "expression": "kubernetes.daysSinceLastDeployed <= 7",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Application should be deployed within a week"
+  },
+  {
+    "id": "650c3ff3b0979ea005707417",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__beefce94-8892-5590-be93-b7a247ef7e5e",
+    "name": "Bitbucket Mean time to merge PR is less than 2 days",
+    "description": "Bitbucket Mean time to merge PR is less than 2 days",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "2a97f5fb-3be6-48a4-a0b1-b2638400c4fe",
+        "data_source_identifier": "bitbucket",
+        "data_point_identifier": "meanTimeToMerge",
+        "input_values":  [
+          {
+            "key": "branchName",
+            "value": "\"refs/\""
+          }
+        ],
+        "operator": "<",
+        "value": "48"
+      }
+    ],
+    "expression": "bitbucket.meanTimeToMerge < 48",
+    "tags": ["Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean time to merge PR is more than 2 days"
+  },
+  {
+    "id": "65155fe3bc2fee7d40edbd10",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__d3823a2b-390a-f44b-d351-214ab64d37456",
+    "name": "Mean time to resolve P0/P1 bugs in last 90 days is less than 2 days",
+    "description": "Mean time to resolve P0/P1 bugs in last 90 days is less than 2 days",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "0fb81262-83b2-420b-971e-a0574be41fc8",
+        "data_source_identifier": "jira",
+        "data_point_identifier": "meanTimeToResolve",
+        "input_values":  [
+          {
+            "key": "jql",
+            "value": "\"issuetype = Bug AND priority in (P0,P1) AND resolved >= -90d\""
+          }
+        ],
+        "operator": "<",
+        "value": "48"
+      }
+    ],
+    "expression": "jira.meanTimeToResolve < 48",
+    "tags": ["Quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean time to resolve P0/P1 bugs is more than 2 days"
+  },
+  {
+    "id": "65155fe8e7060235c286443e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__a05fdb1e-c709-2a45-7b06-528ee4c26f01",
+    "name": "Number of open P0/P1 bugs is less than 5",
+    "description": "Number of open P0/P1 bugs is less than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "68611489-d8ab-4e13-8fee-68956893095b",
+        "data_source_identifier": "jira",
+        "data_point_identifier": "issuesCount",
+        "input_values":  [
+          {
+            "key": "jql",
+            "value": "\"issuetype = Bug AND priority in (P0,P1) AND statusCategory != Done\""
+          }
+        ],
+        "operator": "<",
+        "value": "5"
+      }
+    ],
+    "expression": "jira.issuesCount < 5",
+    "tags": ["Quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open P0/P1 bugs is more than 5"
+  },
+  {
+    "id": "65155ff0c0d13e55a1949910",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__f60d48a5-ca8e-38ca-5031-95cab6ede5b1",
+    "name": "Features delivered in last 90 days is more than 5",
+    "description": "Features delivered in last 90 days is more than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "e623e506-0b0a-4b64-a06b-e61b57d186a3",
+        "data_source_identifier": "jira",
+        "data_point_identifier": "issuesCount",
+        "input_values":  [
+          {
+            "key": "jql",
+            "value": "\"issuetype in (Epic, 'New Feature') AND resolved >= -90d\""
+          }
+        ],
+        "operator": ">",
+        "value": "5"
+      }
+    ],
+    "expression": "jira.issuesCount > 5",
+    "tags": ["Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Features delivered in last 90 days is less than 5"
+  },
+  {
+    "id": "65157ea246474b8c022d26c5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__a4818149-8eb2-fb94-673a-70c9f4ec65e6",
+    "name": "P0/P1 bugs Open/Close ratio is less than 3 (last 90 days)",
+    "description": "P0/P1 bugs Open/Close ratio is less than 3 (last 90 days)",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "f63502de-a890-4b90-967c-d7c0e74dccff",
+        "data_source_identifier": "jira",
+        "data_point_identifier": "issuesOpenCloseRatio",
+        "input_values":  [
+          {
+            "key": "jql",
+            "value": "\"issuetype = Bug AND priority in (P0,P1) AND created >= -90d\""
+          }
+        ],
+        "operator": "<",
+        "value": "3"
+      }
+    ],
+    "expression": "jira.issuesOpenCloseRatio < 3",
+    "tags": ["Quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "P0/P1 bugs Open/Close ratio is more than 3"
+  },
+  {
+    "id": "64d4f2a0b309cf72096284be",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__bfffcf93-8892-4459-be93-b7a690df7f6f",
+    "name": "GitLab Mean time to merge PR is less than 2 days",
+    "description": "GitLab Mean time to merge PR is less than 2 days",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "9444bcaf-62b0-474d-86bc-cb6e0058a73c",
+        "data_source_identifier": "gitlab",
+        "data_point_identifier": "meanTimeToMerge",
+        "input_values":  [
+          {
+            "key": "branchName",
+            "value": "\"refs/\""
+          }
+        ],
+        "operator": "<",
+        "value": "48"
+      }
+    ],
+    "expression": "gitlab.meanTimeToMerge < 48",
+    "tags": ["Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean time to merge PR is more than 2 days"
+  },
+  {
+    "id": "64e5e23fb11d6686d2a9a007",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b9e98e87-e9f1-4c5e-9ba6-49085f71dbc4",
+    "name": "GitLab Branch protection is set",
+    "description": "GitLab Branch protection is set",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "17ff0d2b-e58d-427c-a062-bacfea372d77",
+        "data_source_identifier": "gitlab",
+        "data_point_identifier": "isBranchProtected",
+        "input_values":  [
+          {
+            "key": "branchName",
+            "value": "\"refs/\""
+          }
+        ],
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "gitlab.isBranchProtected == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Branch protection is not set"
+  },
+  {
+    "id": "64ffe63a8b4005661f8e59ff",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b8a10e98-d9c1-4c5e-9ba6-4605a772fbc4",
+    "name": "GitLab Gitleaks file exists",
+    "description": "GitLab Gitleaks file exists",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "0692a62d-d9f7-4c76-b5a2-d6a94001fa76",
+        "data_source_identifier": "gitlab",
+        "data_point_identifier": "isFileExists",
+        "input_values":  [
+          {
+            "key": "filePath",
+            "value": "\".gitleaks.toml\""
+          }
+        ],
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "gitlab.isFileExists.\".gitleaks.toml\" == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Gitleaks file does not exist"
+  },
+  {
+    "id": "652409ac837e048f84560598",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__c659266c-33f5-555f-84e4-be204f9ea287",
+    "name": "Number of workflows is greater than 3",
+    "description": "Number of workflows is greater than 3",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "8f783dc6-8410-4b05-a1d3-fc2784ff0f98",
+        "data_source_identifier": "github",
+        "data_point_identifier": "workflowsCount",
+        "operator": ">",
+        "value": "3"
+      }
+    ],
+    "expression": "github.workflowsCount > 3",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of workflows is less than or equal to 3."
+  },
+  {
+    "id": "652e8e9116ff017907f1bc64",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__864af47a-cb3b-7d98-ada7-9478ab7d6a5e",
+    "name": "Open Dependabot critical alerts is less than 3",
+    "description": "Number of open critical alerts reported by Dependabot is less than 3",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "e155c3aa-ad1f-4d35-b01d-dfcff12800fc",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openDependabotAlerts",
+        "input_values":  [
+          {
+            "key": "severityType",
+            "value": "critical"
+          }
+        ],
+        "operator": "<",
+        "value": "3"
+      }
+    ],
+    "expression": "github.openDependabotAlerts.critical < 3",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open critical alerts reported by Dependabot is more than 3."
+  },
+  {
+    "id": "652e8e9efb8c46fec7c1bfc2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__65c707a3-bc78-7d8c-0d14-bd4f1be63476",
+    "name": "Open Dependabot high alerts is less than 5",
+    "description": "Number of open high alerts reported by Dependabot is less than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "885b99e0-3456-499a-8aff-45f11c885a7f",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openDependabotAlerts",
+        "input_values":  [
+          {
+            "key": "severityType",
+            "value": "high"
+          }
+        ],
+        "operator": "<",
+        "value": "5"
+      }
+    ],
+    "expression": "github.openDependabotAlerts.high < 5",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open high alerts reported by Dependabot is more than 5."
+  },
+  {
+    "id": "652e8ea437aa0b34736d34c2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__1e7a1199-4362-710c-afb7-01a45283d768",
+    "name": "Open code scanning critical alerts is less than 3",
+    "description": "Number of open critical alerts reported in code scanning is less than 3",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "b90d69d8-cd9c-4893-8128-c7e97eade60c",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openCodeScanningAlerts",
+        "input_values":  [
+          {
+            "key": "severityType",
+            "value": "critical"
+          }
+        ],
+        "operator": "<",
+        "value": "3"
+      }
+    ],
+    "expression": "github.openCodeScanningAlerts.critical < 3",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open critical alerts reported in code scanning is more than 3."
+  },
+  {
+    "id": "652e8ea96cf7c70b0086080b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__d059266c-33f5-555f-84e4-be304f0eg298",
+    "name": "Open code scanning high alerts is less than 5",
+    "description": "Number of open high alerts reported in code scanning is less than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "619d9a18-e905-4fde-8dc9-a46c6051663d",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openCodeScanningAlerts",
+        "input_values":  [
+          {
+            "key": "severityType",
+            "value": "high"
+          }
+        ],
+        "operator": "<",
+        "value": "5"
+      }
+    ],
+    "expression": "github.openCodeScanningAlerts.high < 5",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open high alerts reported in code scanning is more than 5."
+  },
+  {
+    "id": "652e8eafe7ec5f0134b7694b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__c659266c-33f5-555f-95f5-be305f0es287",
+    "name": "Open secret scanning alerts is less than 5",
+    "description": "Number of open alerts reported in secret scanning is less than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "c264abbd-247e-4054-a9b5-3d2d7e253ebe",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openSecretScanningAlerts",
+        "operator": "<",
+        "value": "5"
+      }
+    ],
+    "expression": "github.openSecretScanningAlerts < 5",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open alerts reported in secret scanning is more than 5."
+  },
+  {
+    "id": "652e8ff2a70f8c97105bfed7",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__bb1ae673-d05f-d705-21fd-58e6e73fd81c",
+    "name": "Open Dependabot pull requests is less than 5",
+    "description": "Number of open pull requests raised by Dependabot is less than 5",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "a437712d-cb9e-4e17-8236-f93188f669c1",
+        "data_source_identifier": "github",
+        "data_point_identifier": "openPullRequestsByAccount",
+        "input_values":  [
+          {
+            "key": "accountName",
+            "value": "\"app/dependabot\""
+          }
+        ],
+        "operator": "<",
+        "value": "5"
+      }
+    ],
+    "expression": "github.openPullRequestsByAccount.\"app/dependabot\" < 5",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Number of open pull requests raised by Dependabot is more than 5."
+  },
+  {
+    "id": "6a13f32b01639eeb94d9874a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__fe12378c-eaeb-5568-b7de-1fda0ac20d6a",
+    "name": "AIAsset source file pattern matches the standard",
+    "description": "AIAsset source file pattern matches the standard",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7451322a-b8f3-4ace-8004-a14109bb903c",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "aiAssetSourceFilePatternMatch",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.aiAssetSourceFilePatternMatch == true",
+    "tags": ["AIAsset"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "AIAsset source file pattern doesn't match the standard"
+  },
+  {
+    "id": "6a13f32f3ea85d5b16a467c9",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ff12378b-eaeb-4568-a6de-1eea0ac20d6a",
+    "name": "AIAsset asset id prefix matches the standard",
+    "description": "AIAsset asset id prefix matches the standard",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7451222b-b8f3-4ace-8004-a24109bc903f",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "aiAssetIdPrefixMatch",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.aiAssetIdPrefixMatch == true",
+    "tags": ["AIAsset"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "AIAsset asset id doesn't prefix match the standard"
+  },
+  {
+    "id": "6a13f33301f598c00b6deba5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ff13378c-faec-4567-a6de-1fda0ac20d6a",
+    "name": "AIAsset provider exists",
+    "description": "AIAsset provider exists",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7451522b-b8f3-4ace-8004-a14109bc903f",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "aiAssetProviderExists",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "catalog.aiAssetProviderExists == true",
+    "tags": ["AIAsset"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "AIAsset provider doesn't exist"
+  },
+  {
+    "id": "6a1421cdaee65f9725a2193d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ff13479d-faed-3568-a6df-1fea1ac20d7a",
+    "name": "AIAsset discovered within last 30 days",
+    "description": "AIAsset discovered within last 30 days",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7351622b-b8f3-4ace-8004-a14109cc9133",
+        "data_source_identifier": "catalog",
+        "data_point_identifier": "aiAssetDiscoveredAt",
+        "operator": "<=",
+        "value": 30
+      }
+    ],
+    "expression": "catalog.aiAssetDiscoveredAt <= 30",
+    "tags": ["AIAsset"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "AIAsset has not discovered within last 30 days"
+  },
+  {
+    "id": "6a71d27c244edf90d288c1fb",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__a691b196-3657-4d0d-9720-4f4c377594d3",
+    "name": "Bitbucket Description is set",
+    "description": "Bitbucket repository description is set",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "8abe6d55-e848-4994-9d64-be9ac8ca35d5",
+        "data_source_identifier": "bitbucket",
+        "data_point_identifier": "description",
+        "operator": "=~",
+        "value": ".*\\S.*"
+      }
+    ],
+    "expression": "bitbucket.description =~ .*\\S.*",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Repository description is not set"
+  },
+  {
+    "id": "6a71d27c95b91c353edd3514",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__012e5f6d-3f57-4fb7-9e6e-f5fa55957a27",
+    "name": "Bitbucket Standard default branch",
+    "description": "Bitbucket repository default branch is main",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "c4fc1d40-e001-4439-8e9e-fd6a8c631a9d",
+        "data_source_identifier": "bitbucket",
+        "data_point_identifier": "defaultBranch",
+        "operator": "==",
+        "value": "main"
+      }
+    ],
+    "expression": "bitbucket.defaultBranch == main",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Default branch is not main"
+  },
+  {
+    "id": "6a71d27c7d7aedae028741ce",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b2dc7307-25ff-4523-b9b7-9ab70fed3dcf",
+    "name": "Bitbucket Visibility Private",
+    "description": "Bitbucket repository visibility is private",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "1c4d7c2a-6b41-4c29-85ef-41e7845052bb",
+        "data_source_identifier": "bitbucket",
+        "data_point_identifier": "isPrivate",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "bitbucket.isPrivate == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Repository is not private"
+  },
+  {
+    "id": "6a71d27cb9ccf7f487b8ab20",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__3e57c9b0-0e53-4d28-b252-cb8d8f6f533e",
+    "name": "Bitbucket Belongs to a project",
+    "description": "Bitbucket repository belongs to a project",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "ebfc85c0-fb90-4bd3-9058-ae36495a38ff",
+        "data_source_identifier": "bitbucket",
+        "data_point_identifier": "projectKey",
+        "operator": "=~",
+        "value": ".*\\S.*"
+      }
+    ],
+    "expression": "bitbucket.projectKey =~ .*\\S.*",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Repository does not belong to a project"
+  },
+  {
+    "id": "6a71dbbdae9ea12c4d251a7f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__2ef893ac-c98d-47fc-874f-df32beb56f42",
+    "name": "GitHub Primary language is set",
+    "description": "GitHub repository primary language is set",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "8db131fd-5542-4cec-a8ca-1b3f78ab7f2c",
+        "data_source_identifier": "github",
+        "data_point_identifier": "primaryLanguageName",
+        "operator": "=~",
+        "value": ".*\\S.*"
+      }
+    ],
+    "expression": "github.primaryLanguageName =~ .*\\S.*",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Primary language is not set"
+  },
+  {
+    "id": "6a71dbbe4ecd6e1ceb90a8a5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ea10e584-bb71-4b6c-9efd-7c8b19b352e4",
+    "name": "GitHub AGENTS.md exists",
+    "description": "GitHub repository has AGENTS.md file",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "b1238215-8562-4770-87fb-583544787567",
+        "data_source_identifier": "github",
+        "data_point_identifier": "hasAgentsFile",
+        "operator": "==",
+        "value": "true"
+      }
+    ],
+    "expression": "github.hasAgentsFile == true",
+    "tags": ["Software quality", "Development maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "AGENTS.md does not exist"
+  },
+  {
+    "id": "6a71dc76149e27af1013f04a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__90aba22a-6a62-44ff-bb74-2a528e6cc4fa",
+    "name": "Datadog Monitoring configured",
+    "description": "Datadog monitoring is configured for the service",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "82cb4075-d61c-48a8-acfa-d65b7142966a",
+        "data_source_identifier": "datadog",
+        "data_point_identifier": "monitorCount",
+        "operator": ">",
+        "value": "0"
+      }
+    ],
+    "expression": "datadog.monitorCount > 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Monitoring is not configured"
+  },
+  {
+    "id": "6a71dc7719580c8255b95df5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__41c8461e-a82f-4326-ac57-aa8bdac65392",
+    "name": "Datadog No firing alerts",
+    "description": "Datadog has no firing (red) alerts",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "c85c396f-9e0f-4987-88b1-bc8648f0fd43",
+        "data_source_identifier": "datadog",
+        "data_point_identifier": "monitorsSummaryCountRed",
+        "operator": "==",
+        "value": "0"
+      }
+    ],
+    "expression": "datadog.monitorsSummaryCountRed == 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "There are firing alerts"
+  },
+  {
+    "id": "6a71dc78f120218151e4765d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__d555302c-ff8f-479e-b27a-e08e776f8b8c",
+    "name": "Datadog On-call contact set",
+    "description": "Datadog on-call contact is set",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "8039b7a4-7cea-47e6-b1c3-b99f4f673816",
+        "data_source_identifier": "datadog",
+        "data_point_identifier": "contactsSize",
+        "operator": ">",
+        "value": "0"
+      }
+    ],
+    "expression": "datadog.contactsSize > 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "On-call contact is not set"
+  },
+  {
+    "id": "6a71dc79a2149f92f35796e0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ecef9a30-129e-428d-a068-7b9eff31443f",
+    "name": "Datadog Runbook / docs linked",
+    "description": "Datadog runbook or docs are linked",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "2f818fbf-edba-47b6-873a-efc51f71b581",
+        "data_source_identifier": "datadog",
+        "data_point_identifier": "docsSize",
+        "operator": ">",
+        "value": "0"
+      }
+    ],
+    "expression": "datadog.docsSize > 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Runbook or docs are not linked"
+  },
+  {
+    "id": "6a71dc7ae99a275119b1bc22",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__d7b9a875-72cd-458d-b672-d6f777f6613a",
+    "name": "Datadog Source linked",
+    "description": "Datadog source repository is linked",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "96fbcf18-bc35-41fe-a2c2-9ff57285eecc",
+        "data_source_identifier": "datadog",
+        "data_point_identifier": "githubHtmlUrl",
+        "operator": "=~",
+        "value": ".*\\S.*"
+      }
+    ],
+    "expression": "datadog.githubHtmlUrl =~ .*\\S.*",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Source is not linked"
+  },
+  {
+    "id": "6a71dd2a9394adefb5f71dcc",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__e93ed71f-519e-429b-80ac-985f0ab139d2",
+    "name": "Dynatrace Monitoring configured",
+    "description": "Dynatrace monitoring is configured for the service",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "82f65406-92dc-49f3-bf62-fde93b51c1e5",
+        "data_source_identifier": "dynatrace",
+        "data_point_identifier": "monitorCount",
+        "operator": ">",
+        "value": "0"
+      }
+    ],
+    "expression": "dynatrace.monitorCount > 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Monitoring is not configured"
+  },
+  {
+    "id": "6a71dd2b678ce38868a93700",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__331d63ba-a9ce-449d-af37-dec4190a19e4",
+    "name": "Dynatrace No open problems",
+    "description": "Dynatrace has no open problems",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "bb07a5a4-c8a3-4a60-bccc-acd5d5379606",
+        "data_source_identifier": "dynatrace",
+        "data_point_identifier": "problemCount",
+        "operator": "==",
+        "value": "0"
+      }
+    ],
+    "expression": "dynatrace.problemCount == 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "There are open problems"
+  },
+  {
+    "id": "6a71dd2ceaad54123a33581b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__804d11ff-6430-479e-a530-c11cad5ceab8",
+    "name": "Dynatrace SLO defined",
+    "description": "Dynatrace SLO is defined for the service",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "f0665cc4-c0f2-43f3-ac13-2f0517d22325",
+        "data_source_identifier": "dynatrace",
+        "data_point_identifier": "sloCount",
+        "operator": ">",
+        "value": "0"
+      }
+    ],
+    "expression": "dynatrace.sloCount > 0",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "SLO is not defined"
+  },
+  {
+    "id": "6a71de3f3a77537ed28c2b4e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__8ec93635-a174-4d06-aaeb-298ad56b00dc",
+    "name": "GCP Resource active",
+    "description": "GCP resource is in an active state",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "4f14f81c-372f-4b5f-9703-5700bd281577",
+        "data_source_identifier": "gcp",
+        "data_point_identifier": "state",
+        "operator": "=~",
+        "value": "[\"ACTIVE\",\"RUNNING\",\"RUNNABLE\"]"
+      }
+    ],
+    "expression": "gcp.state =~ [\"ACTIVE\",\"RUNNING\",\"RUNNABLE\"]",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Resource is not active"
+  },
+  {
+    "id": "6a71df199a5a8f84fb4a983b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__43128c10-b842-4fbb-9a86-ad3ff74109da",
+    "name": "Harness CD Deploys regularly",
+    "description": "Harness CD deployment frequency per sprint is at least 1",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "7b22ac9f-a0fe-4fe2-82aa-0d77b9d039b9",
+        "data_source_identifier": "harness_cd",
+        "data_point_identifier": "deploymentFrequencyPerSprint",
+        "operator": ">=",
+        "value": "1"
+      }
+    ],
+    "expression": "harness_cd.deploymentFrequencyPerSprint >= 1",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Deployment frequency per sprint is less than 1"
+  },
+  {
+    "id": "6a71df1a28cac9e26da1f17d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__48ff44bc-a107-439c-bcbe-f811bda85e33",
+    "name": "Harness CD Low change failure rate",
+    "description": "Harness CD change failure rate percent is less than 15",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "6e69febf-e0c8-4eb8-8717-f07f81faf98b",
+        "data_source_identifier": "harness_cd",
+        "data_point_identifier": "changeFailureRatePercent",
+        "operator": "<",
+        "value": "15"
+      }
+    ],
+    "expression": "harness_cd.changeFailureRatePercent < 15",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Change failure rate percent is 15 or more"
+  },
+  {
+    "id": "6a71dfff2e7f98158ef42370",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__4bbef4ff-4120-469f-9c95-7046320d34d3",
+    "name": "PagerDuty Registered in PagerDuty",
+    "description": "Entity is registered in PagerDuty",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "763ce187-9320-4eea-b9fa-3e856d6fe3d7",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "identifier",
+        "operator": "=~",
+        "value": ".*\\S.*"
+      }
+    ],
+    "expression": "pagerduty.identifier =~ .*\\S.*",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Not registered in PagerDuty"
+  },
+  {
+    "id": "6a71e0014f34d5b1b7b1ed03",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__764ce05d-f629-408d-bb64-ca74db6fa3b9",
+    "name": "PagerDuty Service active",
+    "description": "PagerDuty service status is active",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "e831606a-d270-4f17-b1dd-ab638ed139ad",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "status",
+        "operator": "==",
+        "value": "active"
+      }
+    ],
+    "expression": "pagerduty.status == active",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "PagerDuty service is not active"
+  },
+  {
+    "id": "6a71e002484ff799b93d4cc6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__02ddc9a4-8c2a-4bbd-80bd-a19a0e5d6f55",
+    "name": "PagerDuty Fast acknowledgement",
+    "description": "PagerDuty mean seconds to first ack is at most 300",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "e8a8d598-a187-4942-a4fe-dbb40fdb2538",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "analyticsMeanSecondsToFirstAck",
+        "operator": "<=",
+        "value": "300"
+      }
+    ],
+    "expression": "pagerduty.analyticsMeanSecondsToFirstAck <= 300",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean seconds to first ack is more than 300"
+  },
+  {
+    "id": "6a71e003ade7761b73a2fc6a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__2d83ffd5-b71a-446a-a73d-e7bff0be7e11",
+    "name": "PagerDuty Fast resolution",
+    "description": "PagerDuty mean seconds to resolve is at most 14400",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "b8405d07-80f8-433b-af1e-34a801b09dde",
+        "data_source_identifier": "pagerduty",
+        "data_point_identifier": "analyticsMeanSecondsToResolve",
+        "operator": "<=",
+        "value": "14400"
+      }
+    ],
+    "expression": "pagerduty.analyticsMeanSecondsToResolve <= 14400",
+    "tags": ["DevOps maturity"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Mean seconds to resolve is more than 14400"
+  },
+  {
+    "id": "6a71e163794236b06e8c7f57",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__6db09b1f-f4c0-491e-b094-beb89a2301c0",
+    "name": "SonarQube Quality gate passing",
+    "description": "SonarQube quality gate status is OK",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "ff3729eb-6d62-4f4c-9b30-f0db3da71708",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "qualityGateStatus",
+        "operator": "==",
+        "value": "OK"
+      }
+    ],
+    "expression": "sonarqube.qualityGateStatus == OK",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Quality gate is not passing"
+  },
+  {
+    "id": "6a71e164daa2d85145cccc63",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__5b656fc4-a7d4-4524-8555-20b4e562f005",
+    "name": "SonarQube Coverage threshold",
+    "description": "SonarQube line coverage is at least 80%",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "2b45cf65-78bb-4d71-a46c-0039dacb0bd2",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "measuresLineCoverage",
+        "operator": ">=",
+        "value": "80"
+      }
+    ],
+    "expression": "sonarqube.measuresLineCoverage >= 80",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Line coverage is less than 80%"
+  },
+  {
+    "id": "6a71e1654029c4359ee16936",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__ba7e6f26-8609-44b9-94a5-9e53fe2a4f92",
+    "name": "SonarQube No bugs",
+    "description": "SonarQube bugs count is 0",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "9e4de964-9f6b-410b-8d2f-d3732e8b2d6f",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "measuresBugs",
+        "operator": "==",
+        "value": "0"
+      }
+    ],
+    "expression": "sonarqube.measuresBugs == 0",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "There are bugs"
+  },
+  {
+    "id": "6a71e166be06ea9fedc30f04",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__408a5582-a37f-4403-8879-738ce8032571",
+    "name": "SonarQube No vulnerabilities",
+    "description": "SonarQube vulnerabilities count is 0",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "ffa8b3a2-2975-4efd-970c-8328a27e6740",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "measuresVulnerabilities",
+        "operator": "==",
+        "value": "0"
+      }
+    ],
+    "expression": "sonarqube.measuresVulnerabilities == 0",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "There are vulnerabilities"
+  },
+  {
+    "id": "6a71e1673f1703180c39a59e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__b9e0b8c7-ff57-478e-952b-bdbff78713c9",
+    "name": "SonarQube Hotspots reviewed",
+    "description": "SonarQube security hotspots count is 0",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "9afd954b-ae2f-492d-8552-a93de2d90130",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "measuresSecurityHotspots",
+        "operator": "==",
+        "value": "0"
+      }
+    ],
+    "expression": "sonarqube.measuresSecurityHotspots == 0",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "There are security hotspots to review"
+  },
+  {
+    "id": "6a71e1682bbeb1bec49a47a0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "__HARNESS__44b4026d-c1ef-42f9-88a4-cb313d363c81",
+    "name": "SonarQube Low duplication",
+    "description": "SonarQube duplicated lines density is at most 3%",
+    "ruleStrategy": "ALL_OF",
+    "rules": [
+      {
+        "identifier": "413a9b64-f164-4fd0-a4e0-831fbcf30391",
+        "data_source_identifier": "sonarqube",
+        "data_point_identifier": "measuresDuplicatedLinesDensity",
+        "operator": "<=",
+        "value": "3"
+      }
+    ],
+    "expression": "sonarqube.measuresDuplicatedLinesDensity <= 3",
+    "tags": ["Software quality"],
+    "defaultBehaviour": "FAIL",
+    "failMessage": "Duplicated lines density is more than 3%"
+  }
+]

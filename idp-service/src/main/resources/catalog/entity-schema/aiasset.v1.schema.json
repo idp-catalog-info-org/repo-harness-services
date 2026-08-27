@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "An AIAsset describes a functional, reusable AI component such as plugins, skills, agents, commands, or agent instructions. These are executable components that can be integrated into various workflows.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "type",
+        "owner",
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "AIASSET",
+            "AIAsset",
+            "aiasset"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of AI asset.",
+          "examples": [
+            "plugin",
+            "skill",
+            "agent",
+            "command",
+            "agent_instructions"
+          ],
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the AI asset.",
+          "examples": [
+            "group:default/ai-platform",
+            "user:john.doe"
+          ],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "required": [
+            "lifecycle"
+          ],
+          "properties": {
+            "lifecycle": {
+              "type": "string",
+              "description": "The lifecycle state of the AI asset.",
+              "examples": [
+                "experimental",
+                "production",
+                "deprecated"
+              ],
+              "minLength": 1
+            },
+            "provider": {
+              "type": "string",
+              "description": "The AI provider (OpenAI, Anthropic, Google, etc.)",
+              "examples": [
+                "OpenAI",
+                "Anthropic",
+                "Google",
+                "Microsoft",
+                "Meta"
+              ],
+              "minLength": 1
+            },
+            "partOf": {
+              "type": "array",
+              "description": "An array of entity references to parent AI assets (e.g., skills that are part of a plugin).",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dependsOn": {
+              "type": "array",
+              "description": "An array of references to AI dependencies that this asset requires to function.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short description of the AI asset."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Key/value pairs of identifying information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Key/value pairs of non-identifying auxiliary information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": ["array", "object", "string"]
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags to classify the AI asset.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "A list of external hyperlinks related to the AI asset.",
+          "items": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A url in a standard uri format.",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "description": "A user friendly display name for the link.",
+                "minLength": 1
+              },
+              "icon": {
+                "type": "string",
+                "description": "A key representing a visual icon to be displayed in the UI.",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "description": "An optional value to categorize links into specific groups.",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

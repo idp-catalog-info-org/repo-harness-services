@@ -1,0 +1,42 @@
+# Copyright 2021 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/macros.bzl", "resources")
+
+package(default_visibility = ["//visibility:public"])
+
+resources()
+
+# Full resource target for NG Manager itself (includes everything)
+filegroup(
+    name = "resource",
+    srcs = glob(["**"]) + [
+        "//120-ng-manager/src/main/resources/notification_templates/ait:resource",
+        "//120-ng-manager/src/main/resources/notification_templates/har:resource",
+        "//120-ng-manager/src/main/resources/onboarding/pipeline-templates:resource",
+        "//120-ng-manager/src/main/resources/salesforce:resource",
+    ],
+)
+
+# Notification templates only (for notification client)
+filegroup(
+    name = "notification-templates",
+    srcs = glob([
+        "notification_templates/**",
+    ]) + [
+        "//120-ng-manager/src/main/resources/notification_templates/ait:resource",
+        "//120-ng-manager/src/main/resources/notification_templates/har:resource",
+    ],
+)
+
+# SCIM schema files only (for SCIM module)
+filegroup(
+    name = "scim-schemas",
+    srcs = [
+        "outputResourceTypes.json",
+        "outputSchemas.json",
+        "outputServiceConfigProvider.json",
+    ],
+)

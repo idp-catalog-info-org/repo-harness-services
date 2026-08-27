@@ -1,0 +1,27 @@
+pipeline:
+  stages:
+    - name: parallelStages
+      parallel:
+        stages:
+          - name: custom
+            id: st1
+            steps:
+              - name: run
+                desc: my http step
+                id: run1
+                run:
+                  script: echo "hello"
+          - name: custom2
+            id: st2
+            steps:
+              - name: run
+                desc: my http step
+                id: http2
+                run:
+                  script: echo "world"
+    - name: stage1
+      steps:
+        - run:
+            script: echo 12345
+          id: shellscript_1
+      id: stage1_1

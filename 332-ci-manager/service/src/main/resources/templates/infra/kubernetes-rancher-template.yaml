@@ -1,0 +1,33 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  infraConnector:
+    type: connector
+    description: Rancher connector reference
+    default: ${{ngInfra.spec.connectorRef}}
+  cluster:
+    type: string
+    description: Rancher cluster name
+    default: ${{ngInfra.spec.cluster}}
+  namespace:
+    type: string
+    description: Kubernetes namespace
+    default: ${{ngInfra.spec.namespace}}
+  releaseName:
+    type: string
+    description: Helm release name
+    default: ${{ngInfra.spec.releaseName}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/kubeconfig:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_INFRA_TYPE: kubernetes-rancher
+    PLUGIN_INFRA_RANCHER_CLUSTER: ${{inputs.cluster}}
+    PLUGIN_NAMESPACE: ${{inputs.namespace}}
+    PLUGIN_RANCHER_NAME: ${{inputs.infraConnector.name}}
+    PLUGIN_RANCHER_URL: ${{inputs.infraConnector.url}}
+    PLUGIN_RANCHER_TOKEN: ${{inputs.infraConnector.password}}

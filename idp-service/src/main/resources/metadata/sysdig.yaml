@@ -1,0 +1,45 @@
+identifier: sysdig
+name: Sysdig
+description: Generate security reports using Sysdig Secure
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: Sysdig
+category:
+  Security
+source: https://github.com/sysdiglabs/backstage-plugin-sysdig
+iconUrl: https://sysdig.com/wp-content/uploads/sysdig-logo-new-white.svg
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/sysdig
+config: |-
+  proxy:
+    endpoints:
+      '/sysdig':
+        target: https://sysdig.com
+        changeOrigin: true
+        allowedMethods: ['GET']
+        credentials: dangerously-allow-unauthenticated
+        pathRewrite: 
+          api/proxy/sysdig/?: /
+        headers:
+          Authorization: 'Bearer ${SYSDIG_SECURE_TOKEN}'
+          Content-Type: 'application/json'
+          Accept: 'application/json'
+          X-Sysdig-Product: 'SDS'
+  sysdig:
+    endpoint: https://sysdig.com
+    backlink: https://example.sysdig.com/
+environmentVariables:
+  - SYSDIG_SECURE_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: SysdigPage
+      addByDefault: true
+      defaultRoute: /sysdig
+      layoutSchemaSpecs:
+        name: SysdigPage
+        title: Sysdig
+        contents:
+          - component: SysdigPage

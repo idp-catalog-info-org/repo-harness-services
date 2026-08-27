@@ -1,0 +1,76 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "A lifecycle rule dry run has completed with status: ${EXECUTION_STATUS}.\n\nNo artifacts were modified. The results below show what would have happened if the lifecycle rule had been executed."
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Lifecycle Rule:* ${POLICY_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution Type:* Dry Run"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution Start Time:* ${EXECUTION_START_TIME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution End Time:* ${EXECUTION_END_TIME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution Status:* ${EXECUTION_STATUS}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Scheduled Execution Time:* ${SCHEDULED_EXECUTION_TIME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Artifacts Protected (Protection Rule):* ${ARTIFACTS_SKIPPED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Artifacts That Would Be Deleted:* ${ARTIFACTS_DELETED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Registries Affected:* ${REGISTRIES_AFFECTED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Estimated Storage Reclamation:* ${STORAGE_RECLAIMED}"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Execution Details"
+					},
+					"url": "${EXECUTION_URL}"
+				}
+			]
+		}
+	]
+}

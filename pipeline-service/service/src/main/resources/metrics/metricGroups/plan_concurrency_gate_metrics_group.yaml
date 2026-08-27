@@ -1,0 +1,7 @@
+name: Plan Concurrency Gate Metrics Group
+identifier: PlanConcurrencyGateMetricsGroup
+labels:
+  - accountId
+  - decision
+  - reason
+  - mode

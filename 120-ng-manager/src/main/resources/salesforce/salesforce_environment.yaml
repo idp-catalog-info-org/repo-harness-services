@@ -1,0 +1,7 @@
+environment:
+  name: Salesforce
+  identifier: salesforce_runtime
+  tags: {}
+  type: PreProduction
+  orgIdentifier: __ORG_IDENTIFIER__
+  projectIdentifier: __PROJECT_IDENTIFIER__

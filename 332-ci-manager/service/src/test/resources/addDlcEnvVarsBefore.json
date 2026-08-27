@@ -1,0 +1,296 @@
+[
+  {
+    "version": null,
+    "step": {
+      "identifier": "Run",
+      "type": "Run",
+      "name": "Create Dockerfile",
+      "spec": {
+        "connectorRef": "account.harnessImage",
+        "image": "alpine",
+        "shell": "Sh",
+        "command": "mkdir docker\n\ncat > Dockerfile <<- \"EOF\"\nFROM ubuntu:bionic as base-builder\n\nENV GOPATH=$HOME/go\nENV PATH=$PATH:/usr/local/go/bin:$GOPATH/bin\n\nRUN apt-get update \\\n    && apt-get install -y curl git\n\nFROM base-builder as base-builder-extended\nRUN curl -sL https://deb.nodesource.com/setup_14.x\n\nFROM base-builder as golang\nRUN curl -O https://storage.googleapis.com/golang/go1.15.2.linux-amd64.tar.gz && touch go\n\nFROM base-builder as source-code\nRUN git clone https://github.com/prometheus/prometheus.git prometheus/\n\nFROM base-builder-extended as builder\nCOPY --from=golang go /usr/local\nCOPY --from=source-code prometheus/ prometheus/\nRUN cd prometheus/ && echo \"Change\" > change.txt\n\nFROM ubuntu:bionic as final\n\nCOPY --from=builder prometheus/change.txt change.txt\nEOF\n\ncat Dockerfile\nmv Dockerfile docker/\n\n# docker pull harness/buildkit:1.0.1",
+        "__uuid": "91t8Uul4QUygnCS891Eenw"
+      },
+      "__uuid": "7SBHRw9QShKMr7L8yL7bUQ"
+    },
+    "parallel": null,
+    "stepGroup": null,
+    "insert": null
+  },
+  {
+    "version": null,
+    "step": null,
+    "parallel": [
+      {
+        "stepGroup": {
+          "identifier": "Parallel_Step_Group_DLC",
+          "name": "Parallel Step Group DLC",
+          "steps": [
+            {
+              "parallel": [
+                {
+                  "step": {
+                    "identifier": "DLC",
+                    "type": "BuildAndPushDockerRegistry",
+                    "name": "DLC",
+                    "spec": {
+                      "connectorRef": "anuragdockerhub",
+                      "repo": "anuragharness/satya",
+                      "tags": [
+                        "1.0"
+                      ],
+                      "caching": true,
+                      "dockerfile": "docker/Dockerfile",
+                      "resources": {
+                        "limits": {
+                          "memory": "1.5Gi",
+                          "cpu": "800m",
+                          "__uuid": "ooiJ1n5GScGKWFt6TNGK1A"
+                        },
+                        "__uuid": "OqCVOG7aSiqVE7EUhOIrmQ"
+                      },
+                      "__uuid": "vWqkK1XcTFuIH-GZEIZeNA"
+                    },
+                    "when": {
+                      "stageStatus": "Success",
+                      "__uuid": "LE00V8UpT6CD7i8GpUJo9Q"
+                    },
+                    "__uuid": "EdlAOdAEToOYdKG2HQCKew"
+                  },
+                  "__uuid": "1sWB_9pWRw28W1Gy22UqPg"
+                },
+                {
+                  "step": {
+                    "identifier": "Run_2",
+                    "type": "Run",
+                    "name": "Run_2",
+                    "spec": {
+                      "connectorRef": "account.harnessImage",
+                      "image": "alpine",
+                      "shell": "Sh",
+                      "command": "ls -l",
+                      "__uuid": "J9cne2-XT7aB2nncVR8W7Q"
+                    },
+                    "__uuid": "1HQRw6QCRuWnp3IjIoeYxQ"
+                  },
+                  "__uuid": "C9rncs6rSbCcz7ALto08Pg"
+                }
+              ],
+              "__uuid": "JLqXUsHGR2WiJMKymYzfgg"
+            },
+            {
+              "step": {
+                "identifier": "Run_4",
+                "type": "Run",
+                "name": "Run_4",
+                "spec": {
+                  "connectorRef": "account.harnessImage",
+                  "image": "alpine",
+                  "shell": "Sh",
+                  "command": "ls",
+                  "__uuid": "HciwtQ6_SUmV7TD1fW-slA"
+                },
+                "__uuid": "AjP8pn-RR-unGud-aBcCvw"
+              },
+              "__uuid": "wbSRebPhSUCQJmlV5cI5Mg"
+            }
+          ],
+          "__uuid": "vcyM4006S--m6zNrbVKOMQ"
+        },
+        "__uuid": "2BAnOQ5qRxuBVyfyHVYC7w"
+      },
+      {
+        "step": {
+          "identifier": "Run_3",
+          "type": "Run",
+          "name": "Run_3",
+          "spec": {
+            "connectorRef": "account.harnessImage",
+            "image": "alpine",
+            "shell": "Sh",
+            "command": "ls",
+            "__uuid": "QY7koALJQzWX14ktyWi76Q"
+          },
+          "__uuid": "ZW5G2Y7OTE-0hMr7KZZusg"
+        },
+        "__uuid": "zw9mcqeJTx6Pz69cADNNzQ"
+      }
+    ],
+    "stepGroup": null,
+    "insert": null
+  },
+  {
+    "version": null,
+    "step": null,
+    "parallel": [
+      {
+        "step": {
+          "identifier": "DLC",
+          "type": "BuildAndPushDockerRegistry",
+          "name": "DLC",
+          "spec": {
+            "connectorRef": "anuragdockerhub",
+            "repo": "anuragharness/satya",
+            "tags": [
+              "1.0"
+            ],
+            "caching": true,
+            "dockerfile": "docker/Dockerfile",
+            "resources": {
+              "limits": {
+                "memory": "1.5Gi",
+                "cpu": "800m",
+                "__uuid": "ZbYjc2bfQsK2lh4u65HTgg"
+              },
+              "__uuid": "eC2xMx1xSaWtcau790XZQw"
+            },
+            "__uuid": "aYG8d4cuT5ubGPOK9sqxPQ"
+          },
+          "when": {
+            "stageStatus": "Success",
+            "__uuid": "QAxbQlEWSBOWNUbhhACtJQ"
+          },
+          "__uuid": "dXFNug4PTb-gf5RSPoJfCg"
+        },
+        "__uuid": "R3UQi669R52tUKDnI5f1Lg"
+      },
+      {
+        "step": {
+          "identifier": "Run_5",
+          "type": "Run",
+          "name": "Run_5",
+          "spec": {
+            "connectorRef": "account.harnessImage",
+            "image": "alpine",
+            "shell": "Sh",
+            "command": "ls",
+            "__uuid": "8fiXA2VSScGNPxt9OG5X2w"
+          },
+          "__uuid": "bb4xSXoDQI6DF2LMq3eoJg"
+        },
+        "__uuid": "uUweeFyMSS-FHUOBrFkTMQ"
+      }
+    ],
+    "stepGroup": null,
+    "insert": null
+  },
+  {
+    "version": null,
+    "step": null,
+    "parallel": null,
+    "stepGroup": {
+      "identifier": "Normal_Step_Group",
+      "name": "Normal Step Group",
+      "steps": [
+        {
+          "step": {
+            "identifier": "Run_6",
+            "type": "Run",
+            "name": "Run_6",
+            "spec": {
+              "connectorRef": "account.harnessImage",
+              "image": "alpine",
+              "shell": "Sh",
+              "command": "ls",
+              "__uuid": "r-kvk4QHT2KUxV2ohUnylA"
+            },
+            "__uuid": "i_WiyFDUQL-eSnCKybZHoA"
+          },
+          "__uuid": "bARipSVERJSf6C749kqL_g"
+        },
+        {
+          "step": {
+            "identifier": "DLC",
+            "type": "BuildAndPushDockerRegistry",
+            "name": "DLC",
+            "spec": {
+              "connectorRef": "anuragdockerhub",
+              "repo": "anuragharness/satya",
+              "tags": [
+                "1.0"
+              ],
+              "caching": true,
+              "dockerfile": "docker/Dockerfile",
+              "resources": {
+                "limits": {
+                  "memory": "1.5Gi",
+                  "cpu": "800m",
+                  "__uuid": "xRe4d-_JSBGd_GjKobmkVg"
+                },
+                "__uuid": "_LHbJSZkRAugm4mwcNnznQ"
+              },
+              "envVariables": {
+                "test": "new",
+                "__uuid": "wHEYunzRQx20uBU3j4Cpzg"
+              },
+              "__uuid": "pieyID_-RiicBhWriBK7Bw"
+            },
+            "__uuid": "Yc1M84FlRVuztmGhUY7ldQ"
+          },
+          "__uuid": "bULXUMQFQqWT6AbdqhWjcA"
+        }
+      ],
+      "__uuid": "B-Jq4cg8TL6C-K-ZEOmodA"
+    },
+    "insert": null
+  },
+  {
+    "version": null,
+    "step": null,
+    "parallel": null,
+    "stepGroup": null,
+    "insert": {
+      "identifier": "Test",
+      "name": "Test",
+      "steps": [
+        {
+          "step": {
+            "identifier": "BuildAndPushDockerRegistry_2",
+            "type": "BuildAndPushDockerRegistry",
+            "name": "BuildAndPushDockerRegistry_2",
+            "spec": {
+              "connectorRef": "anuragdockerhub",
+              "repo": "anuragharness/satya",
+              "tags": [
+                "1.0"
+              ],
+              "caching": true,
+              "dockerfile": "docker/Dockerfile",
+              "__uuid": "_4n41Vt8Ttmu-9sdyEAlvA"
+            },
+            "__uuid": "qUiVFD5zTO-5FZeNivKRfA"
+          },
+          "__uuid": "qKOH6eG6TESdxPLQtBFRGw"
+        }
+      ],
+      "__uuid": "VNhtoaXvTSSbORt7yQjUWQ"
+    }
+  },
+  {
+    "version": null,
+    "step": {
+      "identifier": "DLC_Step",
+      "type": "BuildAndPushDockerRegistry",
+      "name": "DLC Step",
+      "spec": {
+        "connectorRef": "account.harnessImage",
+        "repo": "anuragharness/satya",
+        "tags": [
+          "1.0"
+        ],
+        "caching": true,
+        "dockerfile": "docker/Dockerfile",
+        "envVariables": {
+          "PLUGIN_PATH_STYLE": "true",
+          "__uuid": "pAd2CB70TOaI1z2xa3cG1A"
+        },
+        "__uuid": "eXGa6QxtSo-AvHC8gsSrhQ"
+      },
+      "__uuid": "b2PpMMVfQBWNlkhdf5BbtQ"
+    },
+    "parallel": null,
+    "stepGroup": null,
+    "insert": null
+  }
+]

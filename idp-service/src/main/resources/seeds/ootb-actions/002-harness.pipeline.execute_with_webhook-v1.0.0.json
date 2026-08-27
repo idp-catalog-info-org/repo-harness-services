@@ -1,0 +1,16 @@
+{
+  "identifier": "harness.pipeline.execute_with_webhook",
+  "name": "Execute Pipeline via Webhook",
+  "description": "Trigger a Harness pipeline via its webhook trigger (fire and return execution id).",
+  "version": "1.0.0",
+  "handler": "harness.pipeline.execute_with_webhook",
+  "category": "harness",
+  "inputSchema": {
+    "type": "object",
+    "required": ["triggerRef"],
+    "properties": {
+      "triggerRef": { "type": "string" },
+      "payload":    { "type": "object" }
+    }
+  }
+}

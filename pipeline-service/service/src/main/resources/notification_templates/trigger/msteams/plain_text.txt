@@ -1,0 +1,30 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "summary": "${EVENT_TYPE}",
+  "sections": [
+    {
+      "activityTitle": "Pipeline [${PIPELINE}](${PIPELINE_URL}) failed to start",
+      "activitySubtitle": "In Org ${ORG}",
+      "activityImage": "https://s3.amazonaws.com/wings-assets/slackicons/${IMAGE_STATUS}.png",
+      "facts": [
+             {
+                  "name": "Pipeline",
+                  "value": "${PIPELINE}"
+             },
+             {
+                  "name": "Project",
+                  "value": "${PROJECT}"
+             },
+             {
+                  "name": "Events",
+                  "value": "Triggered on ${START_DATE}"
+             },
+             {
+                  "name": "ActivityHistory",
+                  "value": "[${TRIGGER}](${TRIGGER_ACTIVITY_URL})"
+             },
+      ],
+    }
+  ]
+}

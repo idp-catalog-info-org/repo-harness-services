@@ -1,0 +1,16 @@
+name: Webhook Event Process Time Metrics
+identifier: WebhookEventProcessTime
+metricGroup: webhook_event_times_group
+metrics:
+  - metricName: webhook_event_process_time
+    metricDefinition: Time taken to process Webhook event.
+    type: LastValue
+    unit: count
+  - metricName: trigger_failure_count
+    metricDefinition: Total number of failure count for triggers
+    type: Count
+    unit: "1"
+  - metricName: trigger_activation_count
+    metricDefinition: Total number of activation count for triggers
+    type: Count
+    unit: "1"

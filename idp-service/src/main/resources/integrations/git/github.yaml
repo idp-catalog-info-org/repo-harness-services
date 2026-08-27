@@ -1,0 +1,5 @@
+integrations:
+  github:
+    - host: ${HOST}
+      apiBaseUrl: ${API_BASE_URL}
+      token: ${GITHUB_TOKEN}

@@ -1,0 +1,30 @@
+name: CD SLO Metrics
+identifier: cd_slo_metrics
+metricGroup: cd_slo_metrics_group
+metrics:
+  # Stage-level deployment metrics (each CD stage = 1 deployment)
+  - metricName: deployment_count
+    metricDefinition: Total CD stage deployments (each CD stage = 1 deployment)
+    type: Count
+    unit: "1"
+  - metricName: deployment_success_count
+    metricDefinition: Successful CD stage deployments
+    type: Count
+    unit: "1"
+  - metricName: deployment_failure_count
+    metricDefinition: Failed CD stage deployments (FAILED or ABORTED)
+    type: Count
+    unit: "1"
+  - metricName: stage_execution_duration_ms
+    metricDefinition: CD stage execution duration in milliseconds
+    type: LastValue
+    unit: "1"
+  # Rollback metrics (stage-level, from StageExecutionInfo.rollbackDuration)
+  - metricName: rollback_count
+    metricDefinition: Number of CD stages with rollbacks
+    type: Count
+    unit: "1"
+  - metricName: rollback_duration_ms
+    metricDefinition: Rollback duration in milliseconds (from StageExecutionInfo)
+    type: LastValue
+    unit: "1"

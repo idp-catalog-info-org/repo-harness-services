@@ -1,0 +1,56 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: Docker registry connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  imagePath:
+    type: string
+    description: Docker image path
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.imagePath}}
+  imageTag:
+    type: string
+    description: Docker image tag (optional, mutually exclusive with imageTagRegex)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  imageTagRegex:
+    type: string
+    description: Docker image tag regex pattern (optional, mutually exclusive with imageTag)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  imageDigest:
+    type: string
+    description: Docker image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/docker-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_IMAGE_PATH: ${{inputs.imagePath}}
+    PLUGIN_ARTIFACT_IMAGE_TAG: ${{inputs.imageTag}}
+    PLUGIN_ARTIFACT_IMAGE_TAG_REGEX: ${{inputs.imageTagRegex}}
+    PLUGIN_ARTIFACT_IMAGE_DIGEST: ${{inputs.imageDigest}}
+    PLUGIN_DOCKER_PROVIDER: ${{inputs.artifactConnector.providerType}}
+    PLUGIN_DOCKER_URL: ${{inputs.artifactConnector.url}}
+    PLUGIN_DOCKER_USERNAME: ${{inputs.artifactConnector.username}}
+    PLUGIN_DOCKER_PASSWORD: ${{inputs.artifactConnector.password}}

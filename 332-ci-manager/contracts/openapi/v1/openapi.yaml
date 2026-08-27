@@ -1,0 +1,1240 @@
+openapi: 3.0.3
+info:
+  title: Harness CI Manager CD Entities API
+  version: '1.0'
+  description: This is the OpenAPI Spec 3 for the CI Manager Environment, Service, Infra API. This API allows for creating, retrieving, updating, and deleting Environment, Service, Infra.
+  contact:
+    email: contact@harness.io
+servers:
+  - url: 'https://app.harness.io'
+    description: Harness host URL.
+tags:
+  - name: Environments
+    description: This contains APIs for performing CRUD operations on Environments.
+    x-displayName: 'Environments [Beta]'
+paths:
+  '/v1/environment':
+    post:
+      summary: Create an Environment at Account level
+      operationId: createEnvironment
+      description: Creates an Environment at Account level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Account Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Details of the Environment to be created
+      responses:
+        '201':
+          description: Successfully created Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    get:
+      summary: Get all Environments at Account level
+      operationId: getEnvironments
+      description: Retrieves all Environments at Account level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+        - schema:
+            type: integer
+            default: 0
+          in: query
+          name: page
+          required: false
+          description: Page index for pagination.
+        - schema:
+            type: integer
+            default: 20
+            maximum: 1000
+          in: query
+          name: limit
+          required: false
+          description: Number of items per page.
+        - schema:
+            type: string
+          in: query
+          name: sort
+          required: false
+          description: Sort criteria in the format 'property,asc|desc'.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: is_access_list
+          description: Specifies whether the list is an access list. An access list is a list of environments that you are permitted to use in a pipeline.
+        - schema:
+            type: string
+          in: query
+          name: search_term
+          required: false
+          description: This would be used to filter resources having attributes matching with search term.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: include_children_scope
+          required: false
+          description: Specify true if environments with runtime access to be fetched.
+      tags:
+        - Account Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    put:
+      summary: Update an Environment at Account level
+      operationId: updateEnvironment
+      description: Updates an Environment by its identifier at Account level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Account Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Updated details of the Environment
+      responses:
+        '200':
+          description: Successfully updated Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  '/v1/orgs/{orgIdentifier}/environment':
+    post:
+      summary: Create an Environment at Organization level
+      operationId: createEnvironment
+      description: Creates an Environment at Organization level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Organization Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Details of the Environment to be created
+      responses:
+        '201':
+          description: Successfully created Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    put:
+      summary: Update an Environment Organization level
+      operationId: updateEnvironment
+      description: Updates an Environment at Organization level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Organization Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Updated details of the Environment
+      responses:
+        '200':
+          description: Successfully updated Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    get:
+      summary: Get all Environments at Organization level
+      operationId: getEnvironments
+      description: Retrieves all Environments at Organization level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+        - schema:
+            type: integer
+            default: 0
+          in: query
+          name: page
+          required: false
+          description: Page index for pagination.
+        - schema:
+            type: integer
+            default: 20
+            maximum: 1000
+          in: query
+          name: limit
+          required: false
+          description: Number of items per page.
+        - schema:
+            type: string
+          in: query
+          name: sort
+          required: false
+          description: Sort criteria in the format 'property,asc|desc'.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: is_access_list
+          description: Specifies whether the list is an access list. An access list is a list of environments that you are permitted to use in a pipeline.
+        - schema:
+            type: string
+          in: query
+          name: search_term
+          required: false
+          description: This would be used to filter resources having attributes matching with search term.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: include_children_scope
+          required: false
+          description: Specify true if environments with runtime access to be fetched.
+      tags:
+        - Organization Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  '/v1/orgs/{orgIdentifier}/projects/{projectIdentifier}/environment':
+    post:
+      summary: Create an Environment at Project level
+      operationId: createEnvironment
+      description: Creates an Environment at Project level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: projectIdentifier
+          required: true
+          description: Project Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Project Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Details of the Environment to be created
+      responses:
+        '201':
+          description: Successfully created Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    put:
+      summary: Update an Environment at Project level
+      operationId: updateEnvironment
+      description: Updates an Environment at Project level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: projectIdentifier
+          required: true
+          description: Project Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Project Environments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/EnvironmentRequest'
+        required: true
+        description: Updated details of the Environment
+      responses:
+        '200':
+          description: Successfully updated Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    get:
+      summary: Get all Environments at Project level
+      operationId: getEnvironments
+      description: Retrieves all Environments at Project level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: projectIdentifier
+          required: true
+          description: Project Identifier for the entity.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+        - schema:
+            type: integer
+            default: 0
+          in: query
+          name: page
+          required: false
+          description: Page index for pagination.
+        - schema:
+            type: integer
+            default: 20
+            maximum: 1000
+          in: query
+          name: limit
+          required: false
+          description: Number of items per page.
+        - schema:
+            type: string
+          in: query
+          name: sort
+          required: false
+          description: Sort criteria in the format 'property,asc|desc'.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: is_access_list
+          description: Specifies whether the list is an access list. An access list is a list of environments that you are permitted to use in a pipeline.
+        - schema:
+             type: string
+          in: query
+          name: search_term
+          required: false
+          description: This would be used to filter resources having attributes matching with search term.
+        - schema:
+            type: boolean
+            default: false
+          in: query
+          name: include_children_scope
+          required: false
+          description: Specify true if environments with runtime access to be fetched.
+      tags:
+        - Project Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentListResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  '/v1/environment/{environmentIdentifier}':
+    get:
+      summary: Get an Environment by identifier at Account level
+      operationId: getEnvironmentByIdentifier
+      description: Retrieves an Environment by its identifier at Account level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be retrieved.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Account Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    delete:
+      summary: Delete an Environment by identifier at Account level
+      operationId: deleteEnvironmentByIdentifier
+      description: Deletes an Environment by its identifier at Account level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be deleted.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Account Environments
+      responses:
+        '204':
+          description: Successfully deleted Environment
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  '/v1/orgs/{orgIdentifier}/environment/{environmentIdentifier}':
+    get:
+      summary: Get an Environment by identifier at Organization level
+      operationId: getEnvironmentByIdentifier
+      description: Retrieves an Environment by its identifier at Organization level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be retrieved.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Organization Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    delete:
+      summary: Delete an Environment by identifier at Organization level
+      operationId: deleteEnvironmentByIdentifier
+      description: Deletes an Environment by its identifier at Organization level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be deleted.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Organization Environments
+      responses:
+        '204':
+          description: Successfully deleted Environment
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  '/v1/orgs/{orgIdentifier}/projects/{projectIdentifier}/environment/{environmentIdentifier}':
+    get:
+      summary: Get an Environment by identifier at Project level
+      operationId: getEnvironmentByIdentifier
+      description: Retrieves an Environment by its identifier at Project level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: projectIdentifier
+          required: true
+          description: Project Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be retrieved.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Project Environments
+      responses:
+        '200':
+          description: Successfully retrieved Environment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/EnvironmentResponseWrapper'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    delete:
+      summary: Delete an Environment by identifier at Project level
+      operationId: deleteEnvironmentByIdentifier
+      description: Deletes an Environment by its identifier at Project level.
+      security:
+        - x-api-key: [ ]
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: orgIdentifier
+          required: true
+          description: Organization Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: projectIdentifier
+          required: true
+          description: Project Identifier for the entity.
+        - schema:
+            type: string
+          in: path
+          name: environmentIdentifier
+          required: true
+          description: Identifier of the Environment to be deleted.
+        - schema:
+            type: string
+          in: header
+          name: Harness-Account
+          required: true
+          description: Account Identifier for the entity.
+      tags:
+        - Project Environments
+      responses:
+        '204':
+          description: Successfully deleted Environment
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '404':
+          description: Environment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/FailureDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+components:
+  schemas:
+    EnvironmentRequest:
+      type: object
+      required:
+        - identifier
+        - name
+        - type
+        - harnessVersion
+      properties:
+        identifier:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]+$'
+          minLength: 1
+          maxLength: 128
+          description: Identifier of the Environment.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: Name of the Environment.
+        description:
+          type: string
+          maxLength: 1024
+          description: Description of the Environment.
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Tags associated with the Environment.
+        yaml:
+          type: string
+          description: YAML content of the Environment.
+        orgIdentifier:
+          type: string
+          description: Organization Identifier for the Environment.
+        projectIdentifier:
+          type: string
+          description: Project Identifier for the Environment.
+        type:
+          $ref: '#/components/schemas/EnvironmentType'
+        harnessVersion:
+          type: string
+          description: YAML version of the Environment.
+    EnvironmentType:
+      type: string
+      enum:
+        - PreProduction
+        - Production
+    EnvironmentResponse:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Identifier of the Environment.
+        name:
+          type: string
+          description: Name of the Environment.
+        description:
+          type: string
+          description: Description of the Environment.
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Tags associated with the Environment.
+        yaml:
+          type: string
+          description: YAML content of the Environment.
+        orgIdentifier:
+          type: string
+          description: Organization Identifier for the Environment.
+        projectIdentifier:
+          type: string
+          description: Project Identifier for the Environment.
+        type:
+          type: string
+          description: Type of the Environment.
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation timestamp.
+        lastModifiedAt:
+          type: integer
+          format: int64
+          description: Last modification timestamp.
+    EnvironmentResponseWrapper:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          description: Status of the response.
+        data:
+          $ref: '#/components/schemas/EnvironmentResponse'
+          description: Environment data.
+        metaData:
+          type: object
+          additionalProperties: true
+          description: Additional metadata.
+        correlationId:
+          type: string
+          description: Correlation ID for the request.
+    EnvironmentListResponseWrapper:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          description: Status of the response.
+        data:
+          $ref: '#/components/schemas/PageResponseEnvironmentResponse'
+          description: Environment list data.
+        metaData:
+          type: object
+          additionalProperties: true
+          description: Additional metadata.
+        correlationId:
+          type: string
+          description: Correlation ID for the request.
+    PageResponseEnvironmentResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvironmentResponse'
+          description: List of Environments.
+        pageIndex:
+          type: integer
+          format: int32
+          description: Current page index.
+        pageSize:
+          type: integer
+          format: int32
+          description: Size of each page.
+        totalPages:
+          type: integer
+          format: int32
+          description: Total number of pages.
+        totalItems:
+          type: integer
+          format: int64
+          description: Total number of items.
+    BooleanResponseWrapper:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          description: Status of the response.
+        data:
+          type: boolean
+          description: Boolean result.
+        metaData:
+          type: object
+          additionalProperties: true
+          description: Additional metadata.
+        correlationId:
+          type: string
+          description: Correlation ID for the request.
+    FailureDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code.
+        message:
+          type: string
+          description: Error message.
+        correlationId:
+          type: string
+          description: Correlation ID for the request.
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          description: Status of the response.
+    ErrorDTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code.
+        message:
+          type: string
+          description: Error message.
+        correlationId:
+          type: string
+          description: Correlation ID for the request.
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          description: Status of the response.
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      name: x-api-key
+      in: header

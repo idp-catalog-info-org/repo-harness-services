@@ -1,0 +1,9 @@
+name: CI Manager VM Queued Time
+identifier: CIManagerVMQueuedTime
+metricGroup: CIManagerVMQueuedTimeGroup
+metrics:
+  - metricName: ci_vm_queued_time
+    metricDefinition: Time a VM Stage spends being queued due to concurrency
+    type: Duration
+    distribution: [ 0m, 1m, 5m, 10m, 15m, 30m, 60m, 120m, 240m ]
+    unit: "ms"

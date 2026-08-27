@@ -1,0 +1,83 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  connector:
+    type: connector
+    description: AWS connector (resolved from connectorRef)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.config.spec.connectorRef}}
+  region:
+    type: string
+    description: ECR region
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.config.spec.region}}
+  registryId:
+    type: string
+    description: ECR registry ID (optional)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.config.spec.registryId}}
+  basePath:
+    type: string
+    description: OCI base path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.basePath}}
+  chartName:
+    type: string
+    description: Helm chart name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartName}}
+  chartVersion:
+    type: string
+    description: Helm chart version
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartVersion}}
+  valuesPaths:
+    type: list
+    description: Paths to values YAML files
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  subChartPath:
+    type: string
+    description: Sub-chart path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.subChartPath}}
+  fetchHelmChartMetadata:
+    type: boolean
+    description: Whether to fetch Helm chart metadata
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.fetchHelmChartMetadata}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/ecr-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_CHART_NAME: ${{inputs.chartName}}
+    PLUGIN_ARTIFACT_CHART_VERSION: ${{inputs.chartVersion}}
+    PLUGIN_ARTIFACT_CHART_PATH: ${{inputs.basePath}}
+    PLUGIN_ARTIFACT_REGION: ${{inputs.region}}
+    PLUGIN_ARTIFACT_REGISTRY_ID: ${{inputs.registryId}}
+    PLUGIN_AWS_NAME: ${{inputs.connector.name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{inputs.connector.accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{inputs.connector.secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{inputs.connector.sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.connector.crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{inputs.connector.externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.connector.assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{inputs.connector.iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.connector.oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{inputs.connector.sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.connector.baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.connector.maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.connector.retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.connector.fixedBackoff}}

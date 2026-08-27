@@ -1,0 +1,184 @@
+{
+  "properties": {
+    "uuid": {
+      "type": "keyword"
+    },
+    "runSequence": {
+      "type": "integer"
+    },
+    "accountId": {
+      "type": "keyword"
+    },
+    "orgIdentifier": {
+      "type": "keyword"
+    },
+    "projectIdentifier": {
+      "type": "keyword"
+    },
+    "parentUniqueId": {
+      "type": "keyword"
+    },
+    "pipelineIdentifier": {
+      "type": "keyword"
+    },
+    "planExecutionId": {
+      "type": "keyword"
+    },
+    "name": {
+      "type": "keyword"
+    },
+    "status": {
+      "type": "keyword"
+    },
+    "tags": {
+      "type": "nested",
+      "properties": {
+        "key": {
+          "type": "keyword"
+        },
+        "value": {
+          "type": "keyword"
+        }
+      }
+    },
+    "labels": {
+      "type": "nested",
+      "properties": {
+        "key": {
+          "type": "keyword"
+        },
+        "value": {
+          "type": "keyword"
+        }
+      }
+    },
+    "startTs": {
+      "type": "date"
+    },
+    "endTs": {
+      "type": "date"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "retryExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "rootExecutionId": {
+          "type": "keyword"
+        }
+      }
+    },
+    "entityGitDetails": {
+      "type": "object",
+      "properties": {
+        "branch": {
+          "type": "keyword"
+        },
+        "repoName": {
+          "type": "keyword"
+        },
+        "repoIdentifier": {
+          "type": "keyword"
+        }
+      }
+    },
+    "modules": {
+      "type": "keyword"
+    },
+    "cdModuleInfo": {
+      "type": "object",
+      "properties": {
+        "serviceDefinitionTypes": {
+          "type": "keyword"
+        },
+        "serviceIdentifiers": {
+          "type": "keyword"
+        },
+        "envIdentifiers": {
+          "type": "keyword"
+        },
+        "artifactDisplayNames": {
+          "type": "keyword"
+        },
+        "helmChartVersions": {
+          "type": "keyword"
+        },
+        "gitOpsAppIdentifiers": {
+          "type": "keyword"
+        }
+      }
+    },
+    "ciModuleInfo": {
+      "type": "object",
+      "properties": {
+        "ciExecutionInfoDTO": {
+          "type": "object",
+          "properties": {
+            "event": {
+              "type": "keyword"
+            },
+            "pullRequest": {
+              "type": "object",
+              "properties": {
+                "sourceBranch": {
+                  "type": "keyword"
+                },
+                "targetBranch": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "buildType": {
+          "type": "keyword"
+        },
+        "repoName": {
+          "type": "keyword"
+        },
+        "branch": {
+          "type": "keyword"
+        },
+        "tag": {
+          "type": "keyword"
+        }
+      }
+    },
+    "executionMode": {
+      "type": "keyword"
+    },
+    "childPipeline": {
+      "type": "boolean"
+    },
+    "deleted": {
+      "type": "boolean"
+    },
+    "triggerType": {
+      "type": "keyword"
+    },
+    "triggeredBy": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "keyword"
+        },
+        "gitUser": {
+          "type": "keyword"
+        },
+        "triggerIdentifier": {
+          "type": "keyword"
+        }
+      }
+    },
+    "inputSetIdentifiers": {
+      "type": "keyword"
+    },
+    "notes": {
+      "type": "keyword"
+    },
+    "pipelineTimeoutTs": {
+      "type": "date"
+    }
+  }
+}

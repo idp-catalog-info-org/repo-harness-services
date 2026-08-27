@@ -1,0 +1,4 @@
+summary: "Token expiring in ${DURATION} — ${TOKEN_IDENTIFIER} | Service Account: ${SERVICE_ACCOUNT_NAME} | API Key: ${API_KEY_IDENTIFIER} | Update the token before expiry to avoid authentication failures."
+link:
+    href: harness.io
+    text: Harness

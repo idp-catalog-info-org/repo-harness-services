@@ -1,0 +1,44 @@
+trigger:
+  name: first trigger
+  identifier: first_trigger
+  enabled: true
+  description: ""
+  tags: {}
+  orgIdentifier: org
+  projectIdentifier: proj
+  pipelineIdentifier: pipeline
+  source:
+    type: Artifact
+    spec:
+      type: GceImage
+      spec:
+        connectorRef: GCPConnector
+        project: cd-play
+        labels: []
+        filters: []
+        versionRegex: <+input>
+        eventConditions: [ ]
+        metaDataConditions: [ ]
+
+  inputYaml: |
+    pipeline:
+      identifier: GCE
+      stages:
+        - stage:
+            identifier: GCE
+            type: Deployment
+            spec:
+              service:
+                serviceInputs:
+                  serviceDefinition:
+                    type: GoogleManagedInstanceGroup
+                    spec:
+                      artifacts:
+                        primary:
+                          primaryArtifactRef: GCE
+                          sources:
+                            - identifier: GCE
+                              type: GceImage
+                              spec:
+                                version: <+input>
+

@@ -1,0 +1,4 @@
+summary: "Harness Artifact Registry Lifecycle Rule Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}. Start Time: ${EXECUTION_START_TIME}. End Time: ${EXECUTION_END_TIME}. Artifacts Protected (Protection Rule): ${ARTIFACTS_SKIPPED}. Artifacts Soft Deleted: ${ARTIFACTS_DELETED}. Registries Affected: ${REGISTRIES_AFFECTED}. Storage Reclaimed: ${STORAGE_RECLAIMED}"
+link:
+    href: ${EXECUTION_URL}
+    text: View Execution Details

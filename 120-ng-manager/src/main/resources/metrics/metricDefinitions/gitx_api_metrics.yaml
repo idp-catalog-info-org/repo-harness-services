@@ -1,0 +1,13 @@
+name: GitX API Metrics
+identifier: GitXApiMetrics
+metricGroup: gitx_api_metrics_group
+metrics:
+  - metricName: gitx_api_requests_total
+    metricDefinition: Count of GitX read API requests, labelled by operationType, statusClass (2xx/4xx/5xx), and accountId.
+    type: Count
+    unit: "1"
+  - metricName: gitx_api_process_time
+    metricDefinition: Time taken to serve a successful (2xx) GitX read API request, labelled by operationType and accountId.
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s ]
+    unit: "ms"

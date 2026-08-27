@@ -1,0 +1,5 @@
+name: Queued Pipeline Bulk Abort Metrics Group
+identifier: QueuedPipelineBulkAbortMetricsGroup
+labels:
+  - accountId
+  - status

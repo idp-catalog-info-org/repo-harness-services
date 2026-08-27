@@ -1,0 +1,7 @@
+name: CI Manager VM Queued Time Group
+identifier: CIManagerVMQueuedTimeGroup
+labels:
+  - accountId
+  - stageExecutionId
+  - osType
+  - osArch

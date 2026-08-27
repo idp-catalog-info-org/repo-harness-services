@@ -1,0 +1,16 @@
+auth:
+  environment: development
+  providers:
+    atlassian:
+      development:
+        clientId: ${AUTH_ATLASSIAN_CLIENT_ID}
+        clientSecret: ${AUTH_ATLASSIAN_CLIENT_SECRET}
+        additionalScopes:
+          - read:project:jira
+          - read:board-scope:jira-software
+          - read:sprint:jira-software
+        signIn:
+          resolvers:
+            - resolver: emailMatchingUserEntityProfileEmail
+            - resolver: emailLocalPartMatchingUserEntityName
+            - resolver: usernameMatchingUserEntityName

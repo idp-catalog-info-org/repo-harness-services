@@ -1,0 +1,10 @@
+pipeline:
+  identifier: secrethttp1
+  stages:
+    - stage:
+        identifier: qaStage
+        spec:
+          infrastructure:
+          infrastructureDefinition:
+            spec:
+            releaseName: releaseName1

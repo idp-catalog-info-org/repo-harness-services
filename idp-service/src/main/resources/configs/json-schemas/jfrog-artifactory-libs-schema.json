@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/jfrog-artifactory-proxy-schema.json",
+  "title": "JFrog Artifactory Proxy Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy",
+    "jfrog"
+  ],
+  "properties": {
+    "proxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/artifactory-proxy/"
+          ],
+          "properties": {
+            "/artifactory-proxy/": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "headers",
+                "pathRewrite"
+              ],
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "description": "The URL of the JFrog Artifactory instance.",
+                  "default": "https://your-jfrog-artifactory-instance.com",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "Authorization": {
+                      "type": "string",
+                      "description": "Bearer token for authorization.",
+                      "default": "Bearer ${TOKEN}",
+                      "pattern": "^.*$"
+                    },
+                    "X-Result-Detail": {
+                      "type": "string",
+                      "description": "Specifies the level of detail for returned results.",
+                      "default": "properties"
+                    },
+                    "Accept": {
+                      "type": "string",
+                      "description": "Specifies the media types that are acceptable for the response.",
+                      "default": "*"
+                    }
+                  }
+                },
+                "pathRewrite": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "api/proxy/artifactory-proxy/?"
+                  ],
+                  "properties": {
+                    "api/proxy/artifactory-proxy/?": {
+                      "type": "string",
+                      "description": "Rewrites the URL path.",
+                      "default": "/",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "jfrog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactory"
+      ],
+      "properties": {
+        "artifactory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "proxyPath"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL of the JFrog Artifactory instance.",
+              "default": "https://your-jfrog-artifactory-instance.com",
+              "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+            },
+            "proxyPath": {
+              "type": "string",
+              "description": "The proxy path for Artifactory.",
+              "default": "/artifactory-proxy/",
+              "pattern": "^/[-a-zA-Z0-9/]*$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

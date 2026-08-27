@@ -1,0 +1,61 @@
+identifier: github-codespaces
+name: Github Codespaces
+description: Integrates GitHub Codespaces for a Backstage component with the Authenticated User.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Aditya Singhal - Lab45
+category: Development
+source: https://github.com/adityasinghal26/backstage-plugins/tree/main/plugins/github-codespaces
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/github-codespaces
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityGithubCodespacesContent
+      addByDefault: true
+      defaultRoute: /github-codespaces-entity
+      layoutSchemaSpecs:
+        name: EntityGithubCodespacesContent
+        title: CodespacesEntityContent
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isGithubCodespacesAvailable
+                  content:
+                    component: EntityGithubCodespacesContent
+    - type: TAB_CONTENT
+      name: EntityGithubCodespacesRepoContent
+      addByDefault: true
+      defaultRoute: /github-codespaces-repo
+      layoutSchemaSpecs:
+        name: EntityGithubCodespacesRepoContent
+        path: /github-codespaces-repo
+        title: CodespacesRepoContent
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isGithubCodespacesAvailable
+                  content:
+                    component: EntityGithubCodespacesRepoContent
+    - type: CARD
+      name: EntityGithubCodespacesCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityGithubCodespacesCard
+        specs:
+          gridProps:
+            md: 6
+    - type: CARD
+      name: EntityGithubCodespacesWidget
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityGithubCodespacesWidget
+        specs:
+          gridProps:
+            md: 6

@@ -1,0 +1,7 @@
+name: Step Concurrency Gate Metrics Group
+identifier: StepConcurrencyGateMetricsGroup
+labels:
+  - accountId
+  - decision
+  - reason
+  - mode

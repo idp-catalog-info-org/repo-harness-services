@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "A user describes a person, such as an employee, a contractor, or similar. Users belong to Group entities in the catalog.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "USER",
+            "User",
+            "user"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "description": "Specification of the entity",
+          "additionalProperties": true
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Metadata of the entity",
+          "additionalProperties": true
+        }
+      }
+    }
+  ]
+}

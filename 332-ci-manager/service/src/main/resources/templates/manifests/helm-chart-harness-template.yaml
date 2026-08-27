@@ -1,0 +1,42 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store Helm chart manifest. The chart (files) and values (valuesPaths) are fetched
+# from the Harness File Store and written to the runner workspace by the manifest step.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: Helm chart file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  valuesPaths:
+    type: list
+    description: Values YAML file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  subChartPath:
+    type: string
+    description: Sub-chart path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.subChartPath}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store Helm chart manifest 'ID_PLACEHOLDER' on the runner"

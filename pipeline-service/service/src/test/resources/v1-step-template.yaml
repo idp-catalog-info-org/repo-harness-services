@@ -1,0 +1,17 @@
+template:
+  inputs:
+    input1:
+      type: string
+    input2:
+      type: boolean
+    input3:
+      type: number
+    input4:
+      type: string
+  step:
+    group:
+      steps:
+        - run:
+            script: echo <+inputs.abc>
+        - run:
+            script: echo <+inputs.def>

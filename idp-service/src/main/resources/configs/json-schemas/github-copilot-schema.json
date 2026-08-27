@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Copilot Plugin Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["copilot"],
+  "properties": {
+    "copilot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host"],
+      "anyOf": ["schedule", "host", "enterprise", "organization"],
+      "properties": {
+        "host": {
+          "$id": "#root/azureDevOps/host",
+          "title": "Host",
+          "type": "string",
+          "default": "",
+          "examples": [
+            "<host-name>"
+          ],
+          "pattern": "(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        },
+        "enterprise":   { "type": "string" },
+        "organization": { "type": "string" },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["frequency", "timeout"],
+          "properties": {
+            "frequency": {
+              "type": "object",
+              "properties": {
+                "cron": { "type": "string" },
+                "years": { "type": "integer", "minimum": 1 },
+                "months": { "type": "integer", "minimum": 1 },
+                "weeks": { "type": "integer", "minimum": 1 },
+                "days": { "type": "integer", "minimum": 1 },
+                "hours": { "type": "integer", "minimum": 1 },
+                "minutes": { "type": "integer", "minimum": 1 },
+                "seconds": { "type": "integer", "minimum": 1 },
+                "milliseconds": { "type": "integer", "minimum": 1 }
+              },
+              "oneOf": [
+                {
+                  "required": ["cron"],
+                  "not": {
+                    "anyOf": [
+                      { "required": ["years"] },
+                      { "required": ["months"] },
+                      { "required": ["weeks"] },
+                      { "required": ["days"] },
+                      { "required": ["hours"] },
+                      { "required": ["minutes"] },
+                      { "required": ["seconds"] },
+                      { "required": ["milliseconds"] }
+                    ]
+                  }
+                },
+                {
+                  "anyOf": [
+                    { "required": ["years"] },
+                    { "required": ["months"] },
+                    { "required": ["weeks"] },
+                    { "required": ["days"] },
+                    { "required": ["hours"] },
+                    { "required": ["minutes"] },
+                    { "required": ["seconds"] },
+                    { "required": ["milliseconds"] }
+                  ],
+                  "not": { "required": ["cron"] }
+                }
+              ],
+              "additionalProperties": false
+            },
+            "timeout": {
+              "type": "object",
+              "properties": {
+                "years": { "type": "integer", "minimum": 1 },
+                "months": { "type": "integer", "minimum": 1 },
+                "weeks": { "type": "integer", "minimum": 1 },
+                "days": { "type": "integer", "minimum": 1 },
+                "hours": { "type": "integer", "minimum": 1 },
+                "minutes": { "type": "integer", "minimum": 1, "default": 15 },
+                "seconds": { "type": "integer", "minimum": 1 },
+                "milliseconds": { "type": "integer", "minimum": 1 }
+              },
+              "additionalProperties": false,
+              "minProperties": 1,
+              "maxProperties": 1
+            },
+            "initialDelay": {
+              "type": "object",
+              "properties": {
+                "years": { "type": "integer", "minimum": 1 },
+                "months": { "type": "integer", "minimum": 1 },
+                "weeks": { "type": "integer", "minimum": 1 },
+                "days": { "type": "integer", "minimum": 1 },
+                "hours": { "type": "integer", "minimum": 1 },
+                "minutes": { "type": "integer", "minimum": 1 },
+                "seconds": { "type": "integer", "minimum": 0, "default": 15 },
+                "milliseconds": { "type": "integer", "minimum": 1 }
+              },
+              "additionalProperties": false,
+              "minProperties": 1,
+              "maxProperties": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

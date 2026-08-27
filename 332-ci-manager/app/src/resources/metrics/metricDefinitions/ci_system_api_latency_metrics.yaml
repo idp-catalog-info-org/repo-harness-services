@@ -1,0 +1,9 @@
+name: CI Manager System API Latency Metrics
+identifier: CISystemApiLatencyMetrics
+metricGroup: CISystemApiLatencyMetricsGroup
+metrics:
+  - metricName: ci_system_api_call_latency_ms
+    metricDefinition: CI Manager system/infra API call latency by operation, outcome, and phase
+    type: Duration
+    distribution: [ 100ms, 250ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m, 2m, 5m, 10m ]
+    unit: "ms"

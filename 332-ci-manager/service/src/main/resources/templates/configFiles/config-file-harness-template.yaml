@@ -1,0 +1,19 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Inputs-only template for Harness store config files.
+# Mirrors the NG Harness store, which supports both Harness File Store scoped paths (files)
+# and inline encrypted/secret file references (secretFiles).
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: File references from the Harness File Store
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.files}}
+  secretFiles:
+    type: list
+    description: Secret file references from the Harness store
+    default: ${{ngService.spec.configFiles.ID_PLACEHOLDER.configFile.spec.store.spec.secretFiles}}

@@ -1,0 +1,64 @@
+{
+  "prod": [
+    {
+      "namespace": "payments",
+      "kind": "Service",
+      "name": "payments-service",
+      "replicas": 3,
+      "labels": {
+        "app": "payments-service",
+        "tier": "backend"
+      },
+      "annotations": {
+        "harness.io/service-ref": "payments-service"
+      },
+      "description": "Payments service discovered in Kubernetes",
+      "tags": ["payments", "kubernetes"],
+      "environmentIdentifier": "prod",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "protocol": "TCP",
+          "appProtocol": "http",
+          "port": 8080,
+          "targetPort": 8080
+        }
+      ],
+      "fqdn": ["payments-service.payments.svc.cluster.local"],
+      "ip": ["10.96.12.34"],
+      "uid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    }
+  ],
+  "staging": [
+    {
+      "namespace": "payments",
+      "kind": "Service",
+      "name": "payments-service",
+      "replicas": 1,
+      "labels": {
+        "app": "payments-service",
+        "tier": "backend"
+      },
+      "annotations": {
+        "harness.io/service-ref": "payments-service"
+      },
+      "description": "Payments service discovered in Kubernetes",
+      "tags": ["payments", "kubernetes"],
+      "environmentIdentifier": "staging",
+      "serviceType": "ClusterIP",
+      "ports": [
+        {
+          "name": "http",
+          "protocol": "TCP",
+          "appProtocol": "http",
+          "port": 8080,
+          "targetPort": 8080
+        }
+      ],
+      "fqdn": ["payments-service.payments.svc.cluster.local"],
+      "ip": ["10.96.56.78"],
+      "uid": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+    }
+  ]
+}

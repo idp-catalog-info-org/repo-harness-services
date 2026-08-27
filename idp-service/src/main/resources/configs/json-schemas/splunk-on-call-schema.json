@@ -1,0 +1,128 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1707813580.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy",
+    "splunkOnCall"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/splunk-on-call"
+          ],
+          "properties": {
+            "/splunk-on-call": {
+              "$id": "#root/proxy/endpoints//splunk-on-call",
+              "title": "/splunk-on-call",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "pathRewrite",
+                "headers"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints//splunk-on-call/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints//splunk-on-call/pathRewrite",
+                  "title": "PathRewrite",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "api/proxy/splunk-on-call/?"
+                  ],
+                  "properties": {
+                    "api/proxy/splunk-on-call/?": {
+                      "$id": "#root/proxy/endpoints//splunk-on-call/pathRewrite/api/proxy/splunk-on-call/?",
+                      "title": "Api/proxy/splunk-on-call/?",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "headers": {
+                  "$id": "#root/proxy/endpoints//splunk-on-call/headers",
+                  "title": "Headers",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "X-VO-Api-Id",
+                    "X-VO-Api-Key"
+                  ],
+                  "properties": {
+                    "X-VO-Api-Id": {
+                      "$id": "#root/proxy/endpoints//splunk-on-call/headers/X-VO-Api-Id",
+                      "title": "X-VO-Api-Id",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    },
+                    "X-VO-Api-Key": {
+                      "$id": "#root/proxy/endpoints//splunk-on-call/headers/X-VO-Api-Key",
+                      "title": "X-VO-Api-Key",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "allowedMethods": {
+                  "$id": "#root/proxy/endpoints//splunk-on-call/allowedMethods",
+                  "title": "AllowedMethods",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "default": [],
+                    "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "splunkOnCall": {
+      "$id": "#root/splunkOnCall",
+      "title": "Splunk On Call",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventsRestEndpoint"
+      ],
+      "properties": {
+        "eventsRestEndpoint": {
+          "$id": "#root/splunkOnCall/eventsRestEndpoint",
+          "title": "EventsRestEndpoint",
+          "type": "string",
+          "default": "",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        }
+      }
+    }
+  }
+}

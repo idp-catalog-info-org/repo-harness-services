@@ -1,0 +1,68 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Artifact Registry Lifecycle Rule Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "A lifecycle rule execution has completed with status: ${EXECUTION_STATUS}."
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Lifecycle Rule:* ${POLICY_NAME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution Start Time:* ${EXECUTION_START_TIME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution End Time:* ${EXECUTION_END_TIME}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Execution Status:* ${EXECUTION_STATUS}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Artifacts Protected (Protection Rule):* ${ARTIFACTS_SKIPPED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Artifacts Soft Deleted:* ${ARTIFACTS_DELETED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Registries Affected:* ${REGISTRIES_AFFECTED}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Storage Reclaimed:* ${STORAGE_RECLAIMED}"
+				}
+			]
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Execution Details"
+					},
+					"url": "${EXECUTION_URL}"
+				}
+			]
+		}
+	]
+}

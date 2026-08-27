@@ -1,0 +1,20 @@
+pipeline:
+  name: p1
+  identifier: p1
+  projectIdentifier: p1
+  orgIdentifier: o1
+  tags: {}
+  stages:
+    - stage:
+        name: s1
+        identifier: s1
+        tags: {}
+        template:
+          templateRef: t1
+          versionLabel: v1
+          templateInputs:
+            type: Deployment
+            spec:
+              service:
+                useFromStage:
+                  stage: s0

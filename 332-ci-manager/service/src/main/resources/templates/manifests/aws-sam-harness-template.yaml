@@ -1,0 +1,26 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store AWS SAM manifest. SAM directory content (files) and values (valuesPaths) are
+# fetched from the Harness File Store and written to the runner workspace by the manifest step.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: AWS SAM file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  valuesPaths:
+    type: list
+    description: Values YAML file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store AWS SAM manifest 'ID_PLACEHOLDER' on the runner"

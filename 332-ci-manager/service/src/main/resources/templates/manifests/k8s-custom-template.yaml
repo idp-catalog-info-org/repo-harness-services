@@ -1,0 +1,45 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  extractionScript:
+    type: string
+    description: Extraction script for custom remote store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.extractionScript}}
+  paths:
+    type: list
+    description: File path for custom remote store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.filePath}}
+  delegateSelectors:
+    type: list
+    description: Delegate selectors for custom remote task
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.delegateSelectors}}
+  valuesPaths:
+    type: list
+    description: Paths to values YAML files
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+  flags:
+    type: string
+    description: Command flags
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.commandFlags}}
+
+run:
+  type: run
+  container:
+    image: alpine
+  script: |-
+    [ ! -d "ID_PLACEHOLDER" ] && mkdir -p ID_PLACEHOLDER
+    cd ID_PLACEHOLDER
+    ${{inputs.extractionScript}}

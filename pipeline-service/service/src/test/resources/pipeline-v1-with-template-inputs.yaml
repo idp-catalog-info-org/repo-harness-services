@@ -1,0 +1,18 @@
+pipeline:
+  clone: false
+  stages:
+    - steps:
+        - group:
+            steps:
+              - template:
+                  uses: group_steps
+                  with:
+                    abc: <+input>
+              - template:
+                  uses: group_steps
+                  with:
+                    abc: <+input>
+        - run:
+            script: <+input>
+      runtime: shell
+

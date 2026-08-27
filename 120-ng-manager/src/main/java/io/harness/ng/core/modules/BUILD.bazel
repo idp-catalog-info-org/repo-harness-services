@@ -1,0 +1,56 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/src/main/java/io/harness/ng/config:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/api:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/api/impl:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/invites/api/impl:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/service/services:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/core/events:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/core/invites/api:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector/services:module",
+        "//440-secret-management-service/src/main/java/io/harness:module",
+        "//440-secret-management-service/src/main/java/io/harness/secret/dao/impl:module",
+        "//440-secret-management-service/src/main/java/io/harness/secret/services/impl:module",
+        "//890-sm-core/src/main/java/io/harness/ng/core/api:module",
+        "//890-sm-core/src/main/java/io/harness/ng/core/dao:module",
+        "//890-sm-core/src/main/java/io/harness/repositories:module",
+        "//890-sm-core/src/main/java/io/harness/secrets:module",
+        "//890-sm-core/src/main/java/software/wings/service/impl/security:module",
+        "//920-delegate-service-beans/src/main/java/io/harness/delegate/filter:module",
+        "//940-secret-manager-client/src/main/java/io/harness/ng/core/api:module",
+        "//950-ng-core/src/main/java/io/harness/ng/core/accountsetting/services:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/impl:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//953-events-api/src/main/java/io/harness/eventsframework:module",
+        "//953-events-api/src/main/java/io/harness/ng/core/event:module",
+        "//955-filters-sdk/src/main/java/io/harness/filter/mapper:module",
+        "//959-file-service-commons/src/main/java/software/wings/service/intfc:module",
+        "//960-persistence/src/main/java/io/harness/mongo:module",
+        "//960-persistence/src/main/java/io/harness/persistence:module",
+        "//970-api-services-beans/src/main/java/io/harness/filter:module",
+        "//980-commons/src/main/java/io/harness/manage:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/access-control/admin-client/src/main/java/io/harness/accesscontrol:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

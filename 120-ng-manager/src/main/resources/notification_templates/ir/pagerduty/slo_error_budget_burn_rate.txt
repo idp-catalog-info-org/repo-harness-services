@@ -1,0 +1,4 @@
+summary: "Harness Incident Response: High Error Budget Burn Rate detected for SLO - ${SLO_NAME} under project - ${SLO_PROJECT_NAME}, in the organization - ${SLO_ORG_NAME}."
+link:
+    href: harness.io
+    text: Harness

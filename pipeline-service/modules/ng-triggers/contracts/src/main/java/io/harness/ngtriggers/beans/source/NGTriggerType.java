@@ -1,0 +1,26 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+package io.harness.ngtriggers.beans.source;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.OwnedBy;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.TypeAlias;
+
+@TypeAlias("ngTriggerType")
+@OwnedBy(PIPELINE)
+public enum NGTriggerType {
+  @JsonProperty("Webhook") WEBHOOK,
+  @JsonProperty("Artifact") ARTIFACT,
+  @JsonProperty("Manifest") MANIFEST,
+  @JsonProperty("Scheduled") SCHEDULED,
+  @JsonProperty("MultiRegionArtifact") MULTI_REGION_ARTIFACT,
+  @JsonProperty("SystemEvent") SYSTEM_EVENT
+}

@@ -1,0 +1,46 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  infraConnector:
+    type: connector
+    description: Azure connector reference
+    default: ${{ngInfra.spec.connectorRef}}
+  subscription:
+    type: string
+    description: Azure subscription ID
+    default: ${{ngInfra.spec.subscriptionId}}
+  resourceGroup:
+    type: string
+    description: Azure resource group
+    default: ${{ngInfra.spec.resourceGroup}}
+  cluster:
+    type: string
+    description: AKS cluster name
+    default: ${{ngInfra.spec.cluster}}
+  namespace:
+    type: string
+    description: Kubernetes namespace
+    default: ${{ngInfra.spec.namespace}}
+  releaseName:
+    type: string
+    description: Helm release name
+    default: ${{ngInfra.spec.releaseName}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/kubeconfig:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_INFRA_TYPE: kubernetes-azure
+    PLUGIN_INFRA_AZURE_SUBSCRIPTION_ID: ${{inputs.subscription}}
+    PLUGIN_INFRA_AZURE_RESOURCE_GROUP: ${{inputs.resourceGroup}}
+    PLUGIN_INFRA_AZURE_CLUSTER: ${{inputs.cluster}}
+    PLUGIN_NAMESPACE: ${{inputs.namespace}}
+    PLUGIN_AZURE_NAME: ${{inputs.infraConnector.name}}
+    PLUGIN_AZURE_CLIENT_ID: ${{inputs.infraConnector.clientId}}
+    PLUGIN_AZURE_TENANT_ID: ${{inputs.infraConnector.tenantId}}
+    PLUGIN_AZURE_ENV: ${{inputs.infraConnector.envType}}
+    PLUGIN_AZURE_SECRET: ${{inputs.infraConnector.clientSecret}}
+    PLUGIN_AZURE_CERTIFICATE_DATA: ${{inputs.infraConnector.clientCertificate}}

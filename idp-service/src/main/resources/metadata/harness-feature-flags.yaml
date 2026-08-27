@@ -1,0 +1,26 @@
+identifier: harness-feature-flags
+name: Harness Feature Flags
+description: This plugin lets you view Harness Feature Flags created in your project inside Harness IDP Catalog.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: harness.io
+category: Feature Flags
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-feature-flags
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-feature-flags/
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityHarnessFeatureFlagContent
+      addByDefault: true
+      defaultRoute: /feature-flag
+      layoutSchemaSpecs:
+        name: EntityHarnessFeatureFlagContent
+        title: Feature Flags
+        contents:
+          - component: EntityHarnessFeatureFlagContent

@@ -1,0 +1,69 @@
+{
+  "inputs": {
+    "image": {
+      "required": false,
+      "default": "golang",
+      "type": "string",
+      "description": "image name",
+      "pattern": "^[a-z0-9]+$"
+    },
+    "repo": {
+      "required": true,
+      "type": "string",
+      "description": "repository name"
+    },
+    "count": {
+      "required": false,
+      "type": "number",
+      "default": 5
+    },
+    "password": {
+      "required": true,
+      "type": "secret",
+      "description": "docker password",
+      "enum": ["secret1", "secret2"]
+    },
+    "enableLogging": {
+      "required": false,
+      "type": "boolean",
+      "description": "enable debug logging",
+      "default": false
+    },
+    "tags": {
+      "required": false,
+      "type": "array",
+      "description": "list of tags for the build",
+      "items": ["dev", "staging", "production"],
+      "default": ["dev"]
+    },
+    "dockerConnector": {
+      "required": true,
+      "type": "connector",
+      "description": "docker registry connector",
+      "options": ["connector1", "connector2", "connector3"]
+    },
+    "buildConfig": {
+      "required": false,
+      "type": "object",
+      "description": "build configuration options",
+      "ui": {
+        "tooltip": "Advanced build configuration",
+        "hidden": false
+      }
+    },
+    "kubeconfigPath": {
+      "required": false,
+      "type": "string",
+      "default": "/path/to/kubeconfig",
+      "ui": {
+        "tooltip": "Enter the path to the kubeconfig file"
+      }
+    }
+  },
+  "template_yaml": null,
+  "resolved_yaml": null,
+  "has_input_sets": null,
+  "replaced_expressions": [],
+  "replaced_expressions_per_stage": null,
+  "modules": []
+}

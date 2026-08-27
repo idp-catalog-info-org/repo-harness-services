@@ -1,0 +1,30 @@
+pipeline:
+  clone:
+    disabled: true
+  allow-stage-executions: true
+  stages:
+    - runtime: shell
+      steps:
+        - run:
+            script: |-
+              echo CEL: 
+              echo stage_1
+      id: stage_1
+      name: stage_1
+    - parallel:
+        - runtime: shell
+          steps:
+            - run:
+                script: |-
+                  echo CEL: 
+                  echo STAGE_1_PARALLEL
+          id: stage_1_parallel
+          name: stage_1_parallel
+        - runtime: shell
+          steps:
+            - run:
+                script: |-
+                  echo CEL: 
+                  echo STAGE_2_PARALLEL
+          id: stage_2_parallel
+          name: stage_2_parallel

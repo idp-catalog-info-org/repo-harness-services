@@ -1,0 +1,14 @@
+{
+  "identifier": "payments-api",
+  "name": "payments-api",
+  "displayName": "payments-api",
+  "resourceName": "//compute.googleapis.com/projects/harness-prod/zones/us-central1-a/instances/payments-api",
+  "assetType": "compute.googleapis.com/Instance",
+  "project": "harness-prod",
+  "location": "us-central1-a",
+  "state": "RUNNING",
+  "description": "Compute instance hosting the payments API",
+  "createTime": "2026-06-15T10:30:00Z",
+  "updateTime": "2026-07-20T14:45:00Z",
+  "organization": "123456789012"
+}

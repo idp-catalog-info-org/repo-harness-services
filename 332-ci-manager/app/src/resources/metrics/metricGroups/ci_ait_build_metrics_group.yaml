@@ -1,0 +1,4 @@
+name: CI AIT Build Metrics Group
+identifier: CIAitBuildMetricsGroup
+labels:
+  - accountId

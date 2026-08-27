@@ -1,0 +1,1044 @@
+# Default values for ci-manager
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  jfr:
+    enabled: false
+  autoscaling:
+    enabled: false
+  pdb:
+    create: false
+  fips: false
+  commonAnnotations: {}
+  commonLabels: {}
+  loadbalancerURL: ""
+  loadbalancerContext: ""
+  airgap: false
+  imagePullSecrets: []
+  stackDriverLoggingEnabled: false
+  # configuration for enabling monitoring
+  monitoring:
+    enabled: false
+    managedPlatform: ""
+    port: 8889
+    path: /metrics
+  externalSecretsLoader:
+    enabled: false
+    provider: "vault"
+    image:
+      repository: "repo/image"
+      tag: "tag"
+      pullPolicy: "IfNotPresent"
+    vault:
+      address: ""
+      engine: ""
+      basePath: ""
+      auth:
+        method: "token"
+        # For Token auth:
+        token: "vault-token"
+        # For AppRole:
+        roleId: ""
+        secretId: ""
+        # For Kubernetes auth:
+        role: ""
+    databases:
+      mongo:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      redis:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        overridePath: ""
+        databaseRole: ""
+      postgres:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+      timescaledb:
+        useDatabaseSecretsEngine: false
+        engine: ""
+        basePath: ""
+        databaseRole: ""
+  database:
+    postgres:
+      ## - installed = true if installed within cluster
+      installed: true
+      ## - protocol to use for connection
+      protocol: postgres
+      ## - host array for external
+      hosts:
+        - postgres:5432
+      ## - secret name containing external values
+      secretName: ""
+      ## - key within secret containing username
+      userKey: ""
+      ## - key within secret containing password
+      passwordKey: ""
+      ## - extra arguments set to connection string
+      extraArgs: ""
+    mongo:
+      installed: true
+      protocol: mongodb
+      # --  provide default values if mongo.installed is set to false
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    timescaledb:
+      installed: true
+      protocol: "jdbc:postgresql"
+      # --  provide default values if mongo.installed is set to false
+      hosts:
+        - timescaledb-single-chart:5432
+      # -- Enable TimescaleDB SSL
+      sslEnabled: false
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      certName: ""
+      certKey: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              TIMESCALEDB_USERNAME: ""
+              TIMESCALEDB_PASSWORD: ""
+              TIMESCALEDB_SSL_ROOT_CERT: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                TIMESCALEDB_USERNAME:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_PASSWORD:
+                  name: ""
+                  property: ""
+                TIMESCALEDB_SSL_ROOT_CERT:
+                  name: ""
+                  property: ""
+    redis:
+      installed: true
+      protocol: "redis"
+      # --  provide default values if redis.installed is set to false
+      hosts:
+        - redis:6379
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              REDIS_USERNAME: ""
+              REDIS_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+  ingress:
+    # -- create ingress objects
+    enabled: false
+    # -- set ingress object classname
+
+    className: harness
+    # -- set host of ingressObjects
+    hosts:
+      - my-host.example.org
+    # -- set tls for ingress objects
+    tls:
+      enabled: true
+      secretName: ''
+    # -- add annotations to ingress objects
+    objects:
+      annotations: {}
+    disableHostInIngress: false
+    pathPrefix: ""
+    pathType: ""
+  istio:
+    # -- create virtualServices objects
+    enabled: false
+    # -- create gateway and use in virtualservice
+    gateway:
+      create: false
+    # -- if gateway not created, use specified gateway and host
+    virtualService:
+      gateways:
+      hosts:
+  ssca:
+    enabled: false
+  waitForInitContainer:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: harness/helm-init-container
+      pullPolicy: Always
+      tag: "latest"
+      digest: ""
+      imagePullSecrets: []
+  fileLogging:
+    enabled: false
+    logFilename: /opt/harness/logs/pod.log
+    maxFileSize: 50MB
+    maxBackupFileCount: 10
+    totalFileSizeCap: 1GB
+
+enableAuth: true
+replicaCount: 1
+progressDeadlineSeconds: 600
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+image:
+  registry: us-west1-docker.pkg.dev/gar-setup/docker
+  repository: ci-manager
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "na"
+  digest: ""
+  imagePullSecrets: []
+securityImage:
+  image:
+    registry: docker.io
+    repository: harness/sto-plugin
+    tag: latest # DO NOT OVERRIDE without checking in with STO team
+    digest: ""
+    imagePullSecrets: []
+ci_images:
+  addon:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.18.31"
+      repository: harness/ci-addon
+      imagePullSecrets: []
+  addon_rootless:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "rootless-1.18.31"
+      repository: harness/ci-addon
+      imagePullSecrets: []
+  lite_engine:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.18.31"
+      repository: harness/ci-lite-engine
+      imagePullSecrets: []
+  lite_engine_rootless:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "rootless-1.18.31"
+      repository: harness/ci-lite-engine
+      imagePullSecrets: []
+  cache_proxy:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.7.25"
+      repository: harness/harness-cache-server
+      imagePullSecrets: []
+  git_clone:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.7.25-rootless"
+      repository: harness/drone-git
+      imagePullSecrets: []
+  kaniko:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.13.10"
+      repository: plugins/kaniko
+      imagePullSecrets: []
+  kaniko_ecr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.13.10"
+      repository: plugins/kaniko-ecr
+      imagePullSecrets: []
+  kaniko_gcr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.13.10"
+      repository: plugins/kaniko-gcr
+      imagePullSecrets: []
+  kaniko_acr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.13.10"
+      repository: plugins/kaniko-acr
+      imagePullSecrets: []
+  build_push_docker:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "21.3.3"
+      repository: plugins/docker
+  build_push_ecr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "21.3.3"
+      repository: plugins/ecr
+  build_push_acr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "21.3.3"
+      repository: plugins/acr
+  build_push_gcr:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "21.3.3"
+      repository: plugins/gcr
+  build_push_gar:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "21.3.3"
+      repository: plugins/gar
+  build_push_docker_dlc:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.3.26"
+      repository: plugins/buildx
+  build_push_ecr_dlc:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.5.6"
+      repository: plugins/buildx-ecr
+  build_push_acr_dlc:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.5.6"
+      repository: plugins/buildx-acr
+  build_push_gcr_dlc:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.5.5"
+      repository: plugins/buildx-gcr
+  build_push_gar_dlc:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.5.6"
+      repository: plugins/buildx-gar
+  buildkit:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.0.21"
+      repository: harness/buildkit
+      imagePullSecrets: []
+  gcs_upload:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.6.12"
+      repository: plugins/gcs
+      imagePullSecrets: []
+  s3_upload:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.8.2"
+      repository: plugins/s3
+      imagePullSecrets: []
+  artifactory_upload:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.9.0"
+      repository: plugins/artifactory
+      imagePullSecrets: []
+  gcs_cache:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.10.10"
+      repository: plugins/cache
+      imagePullSecrets: []
+  s3_cache:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.10.10"
+      repository: plugins/cache
+      imagePullSecrets: []
+  azure_cache:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.10.10"
+      repository: plugins/cache
+      imagePullSecrets: []
+  generic_cache:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "1.10.10"
+      repository: plugins/cache
+      imagePullSecrets: []
+  ssca_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-plugin
+      imagePullSecrets: []
+  slsa_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/slsa-plugin
+      imagePullSecrets: []
+  ssca_cdxgen_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-cdxgen-plugin
+      imagePullSecrets: []
+  ssca_compliance_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-compliance-plugin
+      imagePullSecrets: []
+  ssca_attestation_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-attestation-plugin
+      imagePullSecrets: []
+  ssca_aibom_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-ai-bom-plugin
+      imagePullSecrets: []
+  enforce_attestation_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.1.0"
+      repository: harness/enforce-attestation-plugin
+      imagePullSecrets: []
+  ssca_artifact_signing_plugin:
+    image:
+      registry: docker.io
+      digest: ""
+      tag: "0.67.0"
+      repository: harness/ssca-artifact-signing-plugin
+      imagePullSecrets: []
+mongoSecrets:
+  userName:
+    name: harness-secrets
+    key: mongodbUsername
+  password:
+    name: mongodb-replicaset-chart
+    key: mongodb-root-password
+timescaleSecret:
+  password:
+    name: harness-secrets
+    key: timescaledbPostgresPassword
+java:
+  memory: 4096m
+appLogLevel: INFO
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "harness-default"
+podAnnotations: {}
+podSecurityContext: {}
+# fsGroup: 2000
+
+timescaledb:
+  # -- TimescaleDB host names
+  hosts: []
+  # -- Enable TimescaleDB SSL
+  # sslEnabled: false
+  # -- TimescaleDB secrets
+  secrets:
+    kubernetesSecrets:
+      - secretName: ""
+        keys:
+          TIMESCALEDB_USERNAME: ""
+          TIMESCALEDB_PASSWORD: ""
+          TIMESCALEDB_SSL_ROOT_CERT: ""
+    secretManagement:
+      externalSecretsOperator:
+        - secretStore:
+            name: ""
+            kind: ""
+          remoteKeys:
+            TIMESCALEDB_USERNAME:
+              name: ""
+              property: ""
+            TIMESCALEDB_PASSWORD:
+              name: ""
+              property: ""
+            TIMESCALEDB_SSL_ROOT_CERT:
+              name: ""
+              property: ""
+
+database:
+  mongo:
+    harness:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    harnessci:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+    pmsharness:
+      enabled: false
+      protocol: ""
+      hosts: []
+      extraArgs: ""
+      secrets:
+        kubernetesSecrets:
+          - secretName: ""
+            keys:
+              MONGO_USER: ""
+              MONGO_PASSWORD: ""
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                MONGO_USER:
+                  name: ""
+                  property: ""
+                MONGO_PASSWORD:
+                  name: ""
+                  property: ""
+
+  redis:
+    events:
+      enabled: false
+      protocol: ""
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      ssl:
+        secret: ""
+        enabled: false
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+                REDIS_CA:
+                  name: ""
+                  property: ""
+                REDIS_SSL_CA_TRUST_STORE_PASSWORD:
+                  name: ""
+                  property: ""
+    lock:
+      enabled: false
+      protocol: ""
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+                REDIS_CA:
+                  name: ""
+                  property: ""
+                REDIS_SSL_CA_TRUST_STORE_PASSWORD:
+                  name: ""
+                  property: ""
+    cache:
+      enabled: false
+      protocol: ""
+      hosts: []
+      secretName: ""
+      userKey: ""
+      passwordKey: ""
+      extraArgs: ""
+      ssl:
+        enabled: false
+        secret: ""
+        caFileKey: ""
+        trustStoreKey: ""
+        trustStorePasswordKey: ""
+      secrets:
+        secretManagement:
+          externalSecretsOperator:
+            - secretStore:
+                name: ""
+                kind: ""
+              remoteKeys:
+                REDIS_USERNAME:
+                  name: ""
+                  property: ""
+                REDIS_PASSWORD:
+                  name: ""
+                  property: ""
+                REDIS_CA:
+                  name: ""
+                  property: ""
+                REDIS_SSL_CA_TRUST_STORE_PASSWORD:
+                  name: ""
+                  property: ""
+
+
+securityContext:
+  runAsUser: 65534
+  runAsNonRoot: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+service:
+  annotations: {}
+  type: ClusterIP
+  port: 7090
+  grpcport: 9979
+resources:
+  limits:
+    memory: 8192Mi
+  requests:
+    cpu: 1
+    memory: 1400Mi
+autoscaling:
+  enabled: false
+  targetCPU: 80
+  targetMemory: ""
+nodeSelector: {}
+tolerations: []
+affinity: {}
+additionalConfigs: {}
+java17flags: ""
+# extraVolumes:
+# - name: volume-test
+#   configMap:
+#     name: test-config
+#     readOnly: true
+extraVolumes: []
+# extraVolumeMounts:
+#   - name: test-volume-mount
+#     mountPath: /opt/harness/config
+extraVolumeMounts: []
+shutdownHooksEnabled: false
+# lifecycleHooks:
+#   postStart:
+#     exec:
+#       command:
+#   preStop:
+#     exec:
+#       command:
+
+# extraEnvVars:
+# - name: POD_NAME
+#   valueFrom:
+#     fieldRef:
+#       fieldPath: metadata.name
+extraEnvVars: []
+virtualService:
+  annotations: {}
+  objects:
+    - name: ci-manager
+      pathMatchType: prefix
+      pathRewrite: "/"
+      paths:
+        - path: '{{ .Values.global.istio.virtualService.pathPrefix }}/ci/'
+ingress:
+  annotations: {}
+  objects:
+  - annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+    paths:
+    - path: '{{ .Values.global.ingress.pathPrefix }}/ci(/|$)(.*)'
+secrets:
+  default:
+    LOG_SERVICE_GLOBAL_TOKEN: "c76e567a-b341-404d-a8dd-d9738714eb82"
+    TI_SERVICE_GLOBAL_TOKEN: "59MR5RlVARcdH7zb7pNx6GzqiglBmXR8"
+    CACHE_SERVICE_GLOBAL_TOKEN: "f47c6470-2483-4e06-8f44-3c35d6b55b26"
+    ANNOTATIONS_SERVICE_SECRET: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+    HSQS_AUTH_TOKEN: "UeWgUReGXlbrB0zkDCBFz1EDfU1zrXbhAbGfQ8jsSCaA881SYFMlHqnn3OQnAKAU6hTQ5NniwuMeKSFW"
+    OPA_SERVER_SECRET: "dOkdsVqdRPPRJG31XU0qY4MPqmBBMk0PTAGIKM6O7TGqhjyxScIdJe80mwh5Yb5zF3KxYBHw6B3Lfzlq"
+    STO_SERVICE_GLOBAL_TOKEN: ""
+    JWT_DATA_HANDLER_SECRET: "RdL7j9ZdCz6TVSHO7obJRS6ywYLJjH8tdfPP39i4MbevKjVodvjdhakdhashsh4371dasjldas"
+    SPLIT_TOKEN: "localhost"
+    CVNG_SERVICE_SECRET: "IC04LYMBf1lDP5oeY4hupxd4HJhLmN6azUku3xEbeE3SUx5G3ZYzhbiwVtK4i7AmqyU9OZkwB4v8E9qM"
+    SECRET_CONNECTOR_SERVICE_SECRET: "dummySecretConnectorServiceSecret"
+    PLATFORM_CONFIG_SERVICE_SECRET: "dummyPlatformConfigServiceSecret"
+  kubernetesSecrets:
+    - secretName: ""
+      keys:
+        LOG_SERVICE_GLOBAL_TOKEN: ""
+        TI_SERVICE_GLOBAL_TOKEN: ""
+        CACHE_SERVICE_GLOBAL_TOKEN: ""
+        ANNOTATIONS_SERVICE_SECRET: ""
+        OPA_SERVER_SECRET: ""
+        JWT_DATA_HANDLER_SECRET: ""
+        SPLIT_TOKEN: ""
+        CVNG_SERVICE_SECRET: ""
+        SECRET_CONNECTOR_SERVICE_SECRET: ""
+        PLATFORM_CONFIG_SERVICE_SECRET: ""
+    - secretName: "harness-secrets"
+      keys:
+        STO_SERVICE_GLOBAL_TOKEN: "stoAppHarnessToken"
+  secretManagement:
+    externalSecretsOperator:
+      - secretStore:
+          name: ""
+          kind: ""
+        remoteKeys:
+          LOG_SERVICE_GLOBAL_TOKEN:
+            name: ""
+            property: ""
+          TI_SERVICE_GLOBAL_TOKEN:
+            name: ""
+            property: ""
+          STO_SERVICE_GLOBAL_TOKEN:
+            name: ""
+            property: ""
+          CVNG_SERVICE_SECRET:
+            name: ""
+            property: ""
+          SECRET_CONNECTOR_SERVICE_SECRET:
+            name: ""
+            property: ""
+          PLATFORM_CONFIG_SERVICE_SECRET:
+            name: ""
+            property: ""
+          CACHE_SERVICE_GLOBAL_TOKEN:
+            name: ""
+            property: ""
+          ANNOTATIONS_SERVICE_SECRET:
+            name: ""
+            property: ""
+          OPA_SERVER_SECRET:
+            name: ""
+            property: ""
+          JWT_DATA_HANDLER_SECRET:
+            name: ""
+            property: ""
+          SPLIT_TOKEN:
+            name: ""
+            property: ""
+sto_step_default_tag: "latest"
+config:
+  STO_STEP_CONFIG_DEFAULT_TAG: '{{ .Values.sto_step_default_tag }}'
+  CACHE_BACKEND: REDIS
+  CACHE_CONFIG_SENTINEL_MASTER_NAME: harness-redis
+  DEPLOY_MODE: KUBERNETES_ONPREM
+  MANAGER_TARGET: harness-manager:9879
+  MANAGER_AUTHORITY: harness-manager:9879
+  INTERNAL_MANAGER_TARGET: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  INTERNAL_MANAGER_AUTHORITY: '{{ ternary "harness-manager:9879" "dns:///harness-manager-headless:9879" .Values.global.istio.enabled }}'
+  SCM_SERVICE_URI: '{{ ternary "scm-service:8091" "dns:///scm-service-headless:8091" .Values.global.istio.enabled }}'
+  PMS_TARGET: pipeline-service:12011
+  PMS_AUTHORITY: pipeline-service:12011
+  EVENTS_FRAMEWORK_SENTINEL_MASTER_NAME: harness-redis
+  LOCK_CONFIG_SENTINEL_MASTER_NAME: harness-redis
+  SHOULD_CONFIGURE_WITH_PMS: "true"
+  APPLY_CI_PLUGIN_DEFAULTS: "false"
+  ENABLE_DASHBOARD_TIMESCALE: "true"
+  USE_REDIS_FOR_SDK_RESPONSE_EVENTS: "true"
+  MANAGER_URL: http://harness-manager:9090/api/
+  OPA_SERVER_BASEURL: http://policy-mgmt:3000/
+  LOG_SERVICE_INTERNAL_URL: http://log-service:8079/
+  ACCESS_CONTROL_BASE_URL: http://access-control:9006/api/
+  TI_SERVICE_INTERNAL_URL: http://ti-service:8078/
+  CACHE_SERVICE_INTERNAL_ENDPOINT: http://cache-service:8082/
+  GITNESS_INTERNAL_URL: http://code-api:80/
+  STO_IMAGE: 'harness/sto-plugin:{{ .Values.sto_step_default_tag }}'
+  ANCHORE_IMAGE: 'harness/anchore-job-runner:{{ .Values.sto_step_default_tag }}'
+  AQUA_SECURITY_IMAGE: 'harness/aqua-security-job-runner:{{ .Values.sto_step_default_tag }}'
+  AQUA_TRIVY_IMAGE: 'harness/aqua-trivy-job-runner:{{ .Values.sto_step_default_tag }}'
+  AWS_ECR_IMAGE: 'harness/aws-ecr-job-runner:{{ .Values.sto_step_default_tag }}'
+  AWS_SECURITY_HUB_IMAGE: 'harness/aws-security-hub-job-runner:{{ .Values.sto_step_default_tag }}'
+  BANDIT_IMAGE: 'harness/bandit-job-runner:{{ .Values.sto_step_default_tag }}'
+  BLACKDUCK_IMAGE: 'harness/blackduckhub-job-runner:{{ .Values.sto_step_default_tag }}'
+  BRAKEMAN_IMAGE: 'harness/brakeman-job-runner:{{ .Values.sto_step_default_tag }}'
+  BURP_IMAGE: 'harness/burp-job-runner:{{ .Values.sto_step_default_tag }}'
+  CHECKMARX_IMAGE: 'harness/checkmarx-job-runner:{{ .Values.sto_step_default_tag }}'
+  CHECKMARX_ONE_IMAGE: 'harness/checkmarx-job-runner:{{ .Values.sto_step_default_tag }}'
+  CHECKOV_IMAGE: 'harness/checkov-job-runner:{{ .Values.sto_step_default_tag }}'
+  CORTEX_CLOUD_IMAGE: 'harness/cortex-cloud-job-runner:{{ .Values.sto_step_default_tag }}'
+  DOCKER_CONTENT_TRUST_IMAGE: 'harness/docker-content-trust-job-runner:{{ .Values.sto_step_default_tag }}'
+  FOSSA_IMAGE: 'harness/fossa-job-runner:{{ .Values.sto_step_default_tag }}'
+  GITLEAKS_IMAGE: 'harness/gitleaks-job-runner:{{ .Values.sto_step_default_tag }}'
+  GITHUB_ADVANCED_SECURITY_IMAGE: 'harness/github-advanced-security-job-runner:{{ .Values.sto_step_default_tag }}'
+  GRYPE_IMAGE: 'harness/grype-job-runner:{{ .Values.sto_step_default_tag }}'
+  NEXUSIQ_IMAGE: 'harness/nexusiq-job-runner:{{ .Values.sto_step_default_tag }}'
+  NIKTO_IMAGE: 'harness/nikto-job-runner:{{ .Values.sto_step_default_tag }}'
+  NMAP_IMAGE: 'harness/nmap-job-runner:{{ .Values.sto_step_default_tag }}'
+  OSV_IMAGE: 'harness/osv-job-runner:{{ .Values.sto_step_default_tag }}'
+  OWASP_DEPENDENCY_CHECK_IMAGE: 'harness/owasp-dependency-check-job-runner:{{ .Values.sto_step_default_tag }}'
+  PROWLER_IMAGE: 'harness/prowler-job-runner:{{ .Values.sto_step_default_tag }}'
+  REFID_CACHE_IMAGE: harness/refid_cache:latest
+  SEMGREP_IMAGE: 'harness/semgrep-job-runner:{{ .Values.sto_step_default_tag }}'
+  SHIFTLEFT_IMAGE: 'harness/shiftleft-job-runner:{{ .Values.sto_step_default_tag }}'
+  SNYK_IMAGE: 'harness/snyk-job-runner:{{ .Values.sto_step_default_tag }}'
+  SONARQUBE_AGENT_IMAGE: 'harness/sonarqube-agent-job-runner:{{ .Values.sto_step_default_tag }}'
+  SYSDIG_IMAGE: 'harness/sysdig-job-runner:{{ .Values.sto_step_default_tag }}'
+  TRACEABLE_IMAGE: 'harness/traceable-job-runner:{{ .Values.sto_step_default_tag }}'
+  TWISTLOCK_IMAGE: 'harness/twistlock-job-runner:{{ .Values.sto_step_default_tag }}'
+  MODELSCAN_IMAGE: 'harness/modelscan-job-runner:{{ .Values.sto_step_default_tag }}'
+  VERACODE_AGENT_IMAGE: 'harness/veracode-agent-job-runner:{{ .Values.sto_step_default_tag }}'
+  WHITESOURCE_AGENT_IMAGE: 'harness/whitesource-agent-job-runner:{{ .Values.sto_step_default_tag }}'
+  WIZ_IMAGE: 'harness/wiz-job-runner:{{ .Values.sto_step_default_tag }}'
+  ZAP_IMAGE: 'harness/zap-job-runner:{{ .Values.sto_step_default_tag }}'
+  ASYNC_DELEGATE_RESPONSE_THREAD_COUNT: "10"
+  DISTRIBUTED_LOCK_IMPLEMENTATION: "REDIS"
+  ENABLE_ASYNC_RESOURCE_CLEANUP: "true"
+  ENABLE_QUEUE: "true"
+  ENFORCEMENT_CHECK_ENABLED: "true"
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_CORE_SIZE: "150"
+  PLAN_CREATOR_SERVICE_EXECUTOR_POOL_MAX_SIZE: "200"
+  PMS_SDK_EXECUTION_POOL_CORE_SIZE: "300"
+  PMS_SDK_EXECUTION_POOL_MAX_SIZE: "500"
+  HSQS_BASE_URL: http://queue-service:9091/
+  HARNESS_CODE_GIT_URL: '{{ .Values.global.loadbalancerURL }}/code/git'
+  TI_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}/ti-service/'
+  ACCESS_CONTROL_ENABLED: "true"
+  FEATURE_FLAG_SYSTEM: "LOCAL"
+  ENABLE_AUTH: '{{ .Values.enableAuth }}'
+  GRPC_SERVER_PORT: '{{.Values.service.grpcport }}'
+  ADDON_IMAGE: '{{ .Values.ci_images.addon.image.repository }}:{{ .Values.ci_images.addon.image.tag }}'
+  ADDON_IMAGE_ROOTLESS: '{{ .Values.ci_images.addon_rootless.image.repository }}:{{ .Values.ci_images.addon_rootless.image.tag }}'
+  LE_IMAGE: '{{ .Values.ci_images.lite_engine.image.repository }}:{{ .Values.ci_images.lite_engine.image.tag }}'
+  LE_IMAGE_ROOTLESS: '{{ .Values.ci_images.lite_engine_rootless.image.repository }}:{{ .Values.ci_images.lite_engine_rootless.image.tag }}'
+  CACHE_PROXY_IMAGE: '{{ .Values.ci_images.cache_proxy.image.repository }}:{{ .Values.ci_images.cache_proxy.image.tag }}'
+  GIT_CLONE_IMAGE: '{{ .Values.ci_images.git_clone.image.repository }}:{{ .Values.ci_images.git_clone.image.tag }}'
+  DOCKER_PUSH_IMAGE: '{{ .Values.ci_images.kaniko.image.repository }}:{{ .Values.ci_images.kaniko.image.tag }}'
+  ECR_PUSH_IMAGE: '{{ .Values.ci_images.kaniko_ecr.image.repository }}:{{ .Values.ci_images.kaniko_ecr.image.tag }}'
+  GCR_PUSH_IMAGE: '{{ .Values.ci_images.kaniko_gcr.image.repository }}:{{ .Values.ci_images.kaniko_gcr.image.tag }}'
+  ACR_PUSH_IMAGE: '{{ .Values.ci_images.kaniko_acr.image.repository }}:{{ .Values.ci_images.kaniko_acr.image.tag }}'
+  VM_DOCKER_PUSH_IMAGE: '{{ .Values.ci_images.build_push_docker.image.repository }}:{{ .Values.ci_images.build_push_docker.image.tag }}'
+  VM_ECR_PUSH_IMAGE: '{{ .Values.ci_images.build_push_ecr.image.repository }}:{{ .Values.ci_images.build_push_ecr.image.tag }}'
+  VM_ACR_PUSH_IMAGE: '{{ .Values.ci_images.build_push_acr.image.repository }}:{{ .Values.ci_images.build_push_acr.image.tag }}'
+  VM_GCR_PUSH_IMAGE: '{{ .Values.ci_images.build_push_gcr.image.repository }}:{{ .Values.ci_images.build_push_gcr.image.tag }}'
+  VM_GAR_PUSH_IMAGE: '{{ .Values.ci_images.build_push_gar.image.repository }}:{{ .Values.ci_images.build_push_gar.image.tag }}'
+  BUILD_PUSH_DOCKER_DLC_IMAGE: '{{ .Values.ci_images.build_push_docker_dlc.image.repository }}:{{ .Values.ci_images.build_push_docker_dlc.image.tag }}'
+  BUILD_PUSH_ECR_DLC_IMAGE: '{{ .Values.ci_images.build_push_ecr_dlc.image.repository }}:{{ .Values.ci_images.build_push_ecr_dlc.image.tag }}'
+  BUILD_PUSH_ACR_DLC_IMAGE: '{{ .Values.ci_images.build_push_acr_dlc.image.repository }}:{{ .Values.ci_images.build_push_acr_dlc.image.tag }}'
+  BUILD_PUSH_GCR_DLC_IMAGE: '{{ .Values.ci_images.build_push_gcr_dlc.image.repository }}:{{ .Values.ci_images.build_push_gcr_dlc.image.tag }}'
+  BUILD_PUSH_GAR_DLC_IMAGE: '{{ .Values.ci_images.build_push_gar_dlc.image.repository }}:{{ .Values.ci_images.build_push_gar_dlc.image.tag }}'
+  BUILDKIT_IMAGE: '{{ .Values.ci_images.buildkit.image.repository }}:{{ .Values.ci_images.buildkit.image.tag }}'
+  VM_BUILDKIT_IMAGE: '{{ .Values.ci_images.buildkit.image.repository }}:{{ .Values.ci_images.buildkit.image.tag }}'
+  GCS_UPLOAD_IMAGE: '{{ .Values.ci_images.gcs_upload.image.repository }}:{{ .Values.ci_images.gcs_upload.image.tag }}'
+  S3_UPLOAD_IMAGE: '{{ .Values.ci_images.s3_upload.image.repository }}:{{ .Values.ci_images.s3_upload.image.tag }}'
+  ARTIFACTORY_UPLOAD_IMAGE: '{{ .Values.ci_images.artifactory_upload.image.repository }}:{{ .Values.ci_images.artifactory_upload.image.tag }}'
+  GCS_CACHE_IMAGE: '{{ .Values.ci_images.gcs_cache.image.repository }}:{{ .Values.ci_images.gcs_cache.image.tag }}'
+  S3_CACHE_IMAGE: '{{ .Values.ci_images.s3_cache.image.repository }}:{{ .Values.ci_images.s3_cache.image.tag }}'
+  AZURE_CACHE_IMAGE: '{{ .Values.ci_images.azure_cache.image.repository }}:{{ .Values.ci_images.azure_cache.image.tag }}'
+  GENERIC_CACHE_IMAGE: '{{ .Values.ci_images.generic_cache.image.repository }}:{{ .Values.ci_images.generic_cache.image.tag }}'
+  SECURITY_IMAGE: '{{ .Values.securityImage.image.repository }}:{{ .Values.securityImage.image.tag }}'
+  LOGGING_LEVEL: '{{ .Values.appLogLevel }}'
+  MEMORY: '{{ .Values.java.memory }}'
+  NG_MANAGER_URL: 'http://ng-manager:7090/'
+  RHS_CLIENT_BASE_URL: http://resource-hierarchy-service:9009/
+  SECRET_CONNECTOR_SERVICE_CLIENT_BASE_URL: 'http://secrets-connectors-service:9008/'
+  SECRET_CONNECTOR_SERVICE_ENABLED: "false"
+  PLATFORM_CONFIG_SERVICE_CLIENT_BASE_URL: 'http://platform-config-service:9010/'
+  PLATFORM_CONFIG_SERVICE_ENABLED: "false"
+  LOG_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}/log-service/'
+  CACHE_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}/cache-service/'
+  API_URL: '{{ .Values.global.loadbalancerURL }}/ng/'
+  STO_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}{{ .Values.global.loadbalancerContext }}/sto/'
+  STO_SERVICE_INTERNAL_ENDPOINT: 'http://sto-core.{{ .Release.Namespace }}.svc.cluster.local:4000/'
+  STACK_DRIVER_LOGGING_ENABLED: '{{ .Values.global.stackDriverLoggingEnabled }}'
+  EVENTS_FRAMEWORK_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  EVENTS_FRAMEWORK_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  EVENTS_FRAMEWORK_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "events") }}'
+  LOCK_CONFIG_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  LOCK_CONFIG_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "lock") }}'
+  LOCK_CONFIG_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "lock") }}'
+  CACHE_CONFIG_REDIS_SENTINELS: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "cache") }}'
+  CACHE_CONFIG_USE_SENTINEL: '{{ .Values.global.database.redis.installed }}'
+  CACHE_CONFIG_REDIS_URL: '{{ include "harnesscommon.dbv3.redisConnection" (dict "ctx" $ "database" "cache") }}'
+  INTERNAL_PMS_TARGET: '{{ ternary "pipeline-service:12011" "dns:///pipeline-service-headless:12011" .Values.global.istio.enabled }}'
+  INTERNAL_PMS_AUTHORITY: '{{ ternary "pipeline-service:12011" "dns:///pipeline-service-headless:12011" .Values.global.istio.enabled }}'
+  GRPC_MAX_CONNECTION_AGE: "30"
+  REDISSON_PING_CONNECTION_INTERVAL_IN_MILLIS: "0"
+  JAVA_ADVANCED_FLAGS: '{{- include "harnesscommon.jfr.v1.printJavaAdvancedFlags" (dict "ctx" $) }}'
+  PIPELINE_SDK_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_RESPONSE_SPAWN_EVENT_MAX_TOPIC_SIZE: "10000"
+  PIPELINE_SDK_STEP_RESPONSE_EVENT_MAX_TOPIC_SIZE: "10000"
+  IACM_INFRACOST_API_ENDPOINT: '{{ .Values.global.loadbalancerURL }}/iac-pricing/'
+  IACM_EXTERNAL_SERVICE_ENDPOINT: '{{ .Values.global.loadbalancerURL }}/iacm/'
+  IACM_SERVICE_ENDPOINT: 'http://iac-server.{{ .Release.Namespace }}.svc.cluster.local:8080/'
+  FIPS_ENABLED: '{{ .Values.global.fips }}'
+  ENABLE_WAIT_NOTIFY_OPTIMISATION: "true"
+  ENABLE_NOTIFY_RESPONSES_ITERATOR_CONFIG: "true"
+  NOTIFY_RESPONSES_THREAD_POOL_SIZE: "50"
+  LOG_STREAMING_CLIENT_POOL_CORE_SIZE: "10"
+  CVNG_SERVICE_ENDPOINT: http://cv-nextgen:6060/cv/api/
+
+rbac:
+  rules: []
+
+probes:
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http-ci-manager
+    initialDelaySeconds: 60
+    timeoutSeconds: 5
+    periodSeconds: 5
+    failureThreshold: 8
+  livenessProbe:
+    httpGet:
+      path: /health/liveness
+      port: http-ci-manager
+    initialDelaySeconds: 40
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 20
+
+pdb:
+  create: false
+
+jfr:
+  image:
+    registry: registry.access.redhat.com
+    repository: ubi8/ubi-minimal
+    pullPolicy: Always
+    tag: "8.9-1029"
+    digest: ""
+    imagePullSecrets: []

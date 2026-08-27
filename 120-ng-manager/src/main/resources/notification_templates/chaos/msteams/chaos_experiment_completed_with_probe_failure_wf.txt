@@ -1,0 +1,117 @@
+{
+   "type": "message",
+   "attachments": [
+      {
+         "contentType": "application/vnd.microsoft.card.adaptive",
+         "content": {
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
+               {
+                  "type": "Image",
+                  "url": "https://s3.amazonaws.com/wings-assets/slackicons/rejected.png",
+                  "size": "Small"
+               },
+               {
+                  "type": "TextBlock",
+                  "size": "Medium",
+                  "weight": "Bolder",
+                  "text": "Chaos Experiment [${CHAOS_EXPERIMENT_NAME}](${CHAOS_EXPERIMENT_URL}) completed with probe failure",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "In Project ${PROJECT_ID}",
+                  "isSubtle": true,
+                  "wrap": true
+               },
+               {
+                  "type": "FactSet",
+                  "facts": [
+                     {
+                        "title": "Status:",
+                        "value": "Completed with Probe Failure"
+                     },
+                     {
+                        "title": "Experiment ID:",
+                        "value": "${EXPERIMENT_ID}"
+                     },
+                     {
+                        "title": "Run Sequence:",
+                        "value": "${RUN_SEQUENCE}"
+                     },
+                     {
+                        "title": "Resilience Score:",
+                        "value": "${RESILIENCE_SCORE}"
+                     },
+                     {
+                        "title": "Organization:",
+                        "value": "${ORG_ID}"
+                     },
+                     {
+                        "title": "Account:",
+                        "value": "${ACCOUNT_ID}"
+                     },
+                     {
+                        "title": "Description:",
+                        "value": "${CHAOS_EXPERIMENT_DESCRIPTION}"
+                     },
+                     {
+                        "title": "Tags:",
+                        "value": "${CHAOS_EXPERIMENT_TAGS}"
+                     },
+                     {
+                        "title": "Schedule:",
+                        "value": "${SCHEDULE_DETAILS}"
+                     },
+                     {
+                        "title": "Experiment Run ID:",
+                        "value": "${CHAOS_EXPERIMENT_RUN_ID}"
+                     },
+                     {
+                        "title": "Infrastructure:",
+                        "value": "${CHAOS_INFRASTRUCTURE_ID} (${CHAOS_INFRASTRUCTURE_TYPE})"
+                     },
+                     {
+                        "title": "Environment:",
+                        "value": "${ENVIRONMENT_ID}"
+                     },
+                     {
+                        "title": "Executed By:",
+                        "value": "${USER_ID}"
+                     },
+                     {
+                        "title": "Timeline:",
+                        "value": "Executed from ${EXECUTED_ON} to ${EXECUTED_TILL} (Duration: ${DURATION})"
+                     },
+                     {
+                        "title": "Faults:",
+                        "value": "${TOTAL_NUMBER_OF_FAULTS}"
+                     },
+                     {
+                        "title": "Probes:",
+                        "value": "${TOTAL_NUMBER_OF_PROBES}"
+                     },
+                     {
+                        "title": "Actions:",
+                        "value": "${TOTAL_NUMBER_OF_ACTIONS}"
+                     },
+                     {
+                        "title": "View Experiment:",
+                        "value": "[Open in Harness](${CHAOS_EXPERIMENT_URL})"
+                     }
+                  ]
+               }
+            ],
+            "actions": [
+               {
+                  "type": "Action.OpenUrl",
+                  "title": "View Experiment",
+                  "url": "${CHAOS_EXPERIMENT_URL}"
+               }
+            ]
+         }
+      }
+   ]
+}

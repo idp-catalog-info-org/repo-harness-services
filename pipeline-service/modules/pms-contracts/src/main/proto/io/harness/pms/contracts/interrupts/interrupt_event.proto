@@ -1,0 +1,29 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.interrupts;
+
+option java_multiple_files = true;
+
+import "io/harness/pms/contracts/interrupts/interrupt_type.proto";
+import "io/harness/pms/contracts/execution/executable_response.proto";
+import "io/harness/pms/contracts/ambiance/ambiance.proto";
+
+message InterruptEvent {
+  string interruptUuid = 1;
+  InterruptType type = 2;
+  map<string, string> metadata = 4;
+  string notifyId = 5;
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 6;
+  bytes stepParameters = 7;
+  oneof response {
+    io.harness.pms.contracts.execution.AsyncExecutableResponse async = 8;
+    io.harness.pms.contracts.execution.TaskExecutableResponse task = 9;
+    io.harness.pms.contracts.execution.TaskChainExecutableResponse taskChain = 10;
+    io.harness.pms.contracts.execution.AsyncChainExecutableResponse asyncChain = 11;
+  }
+}

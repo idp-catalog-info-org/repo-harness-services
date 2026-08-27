@@ -1,0 +1,29 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  extractionScript:
+    type: string
+    description: Extraction script for custom remote store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.extractionScript}}
+  filePath:
+    type: string
+    description: File path for custom remote store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.filePath}}
+  delegateSelectors:
+    type: list
+    description: Delegate selectors for custom remote task
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.delegateSelectors}}
+  configOverridePath:
+    type: string
+    description: Serverless config override path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.configOverridePath}}
+
+
+run:
+  type: run
+  container:
+    image: alpine
+  script: |-
+    ${{inputs.extractionScript}}
+

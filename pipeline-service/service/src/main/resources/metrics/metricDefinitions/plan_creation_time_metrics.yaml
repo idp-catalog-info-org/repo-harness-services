@@ -1,0 +1,9 @@
+name: Plan Creation Metrics
+identifier: PlanCreationMetrics
+metricGroup: PipelineAccountIdMetricsGroup
+metrics:
+  - metricName: plan_creation_time
+    metricDefinition: Number of ended pipeline executions at a given instant
+    type: Duration
+    distribution: [ 0m, 500ms, 1s, 2s, 5s, 10s, 15s, 30s, 1m, 2m, 4m]
+    unit: "ms"

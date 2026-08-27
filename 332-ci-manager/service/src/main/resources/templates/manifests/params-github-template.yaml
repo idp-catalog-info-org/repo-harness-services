@@ -1,0 +1,54 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  connector:
+    type: connector
+    description: Git connector (resolved from connectorRef)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.connectorRef}}
+  branch:
+    type: string
+    description: Branch name (optional, mutually exclusive with commitId)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.branch}}
+  commitId:
+    type: string
+    description: Commit SHA (optional, mutually exclusive with branch)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.commitId}}
+  paths:
+    type: list
+    description: List of file paths to fetch from the repository (OpenShift param files)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths}}
+  paramsPaths:
+    type: list
+    description: List of file paths to fetch from the repository (OpenShift param files)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths}}
+  repoName:
+    type: string
+    description: Repository name (optional, for GitHub connectors)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.repoName}}
+  folderPath:
+    type: string
+    description: Folder path in the repository
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.folderPath}}
+
+run:
+  type: run
+  container:
+    image: harness/drone-git:1.6.4
+    connector: account.harnessImage
+  env:
+    DRONE_BRANCH: ${{inputs.branch}}
+    DRONE_COMMIT_BRANCH: ${{inputs.branch}}
+    DRONE_GIT_HTTP_URL: ${{inputs.connector.url}}
+    DRONE_NETRC_PASSWORD: ${{inputs.connector.password}}
+    DRONE_NETRC_USERNAME: ${{inputs.connector.username}}
+    DRONE_REMOTE_URL: ${{inputs.connector.url}}
+    DRONE_REPO_BRANCH: ${{inputs.branch}}
+    DRONE_WORKSPACE: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    DRONE_NETRC_MACHINE: ${{inputs.connector.domain}}
+    DRONE_REPO_SCM: ${{inputs.connector.type}}
+    DRONE_SSH_KEY: ${{inputs.connector.sshKey}}
+    DRONE_GIT_SSH_URL: ${{inputs.connector.url}}
+    DRONE_COMMIT: ${{inputs.commitId}}
+    DRONE_COMMIT_SHA: ${{inputs.commitId}}
+    PLUGIN_OUTPUT_FILE_PATHS_CONTENT: ${{serviceOutput.manifests.ID_PLACEHOLDER.overrides}}

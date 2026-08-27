@@ -1,0 +1,45 @@
+service:
+  name: helm_primary_manifest
+  identifier: helm_primary_manifest
+  orgIdentifier: default
+  projectIdentifier: ciproject
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: m1
+            type: HelmChart
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  folderPath: <+input>
+                  repoName: <+input>
+                  branch: <+input>
+              subChartPath: <+input>
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+              helmVersion: V3
+              fetchHelmChartMetadata: false
+        - manifest:
+            identifier: m2
+            type: HelmChart
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  folderPath: <+input>
+                  repoName: <+input>
+                  branch: <+input>
+              subChartPath: <+input>
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+              helmVersion: V3
+              fetchHelmChartMetadata: false
+      manifestConfigurations:
+        primaryManifestRef: <+input>
+    type: NativeHelm

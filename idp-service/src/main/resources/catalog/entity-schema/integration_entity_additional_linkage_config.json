@@ -1,0 +1,23 @@
+{
+  "catalog": {
+    "HarnessCD": "spec.harnessService,metadata.annotations[\"harness.io/services\"]",
+    "HarnessScope": "",
+    "ServiceNow": "",
+    "PagerDuty": "",
+    "GitHub": "",
+    "HarnessCI": "",
+    "GCP": "",
+    "SonarQube": "",
+    "BitbucketCloud": "",
+    "DataDog": "",
+    "DynaTrace": "",
+    "CatalogInfo": ""
+  },
+  "git": {
+    "github": "",
+    "gitlab": "",
+    "bitbucket_server": "",
+    "bitbucket_cloud": "",
+    "azure": ""
+  }
+}

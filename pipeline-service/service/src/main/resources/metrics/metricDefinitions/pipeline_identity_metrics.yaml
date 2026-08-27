@@ -1,0 +1,56 @@
+name: Pipeline Identity Metrics
+identifier: PipelineIdentityMetrics
+metricGroup: PipelineIdentityMetricsGroup
+metrics:
+  - metricName: pipeline_identity_register_success
+    metricDefinition: Count of successful pipeline workload identity registrations (non-empty workload token minted)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_register_failure
+    metricDefinition: Count of pipeline workload identity registration failures (HarnessID register call threw)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_null_token_count
+    metricDefinition: Count of pipeline workload identity registrations that returned an empty workload token
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_generate_success
+    metricDefinition: Count of successful step-time OIDC ID token generations (register + generate both succeeded)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_generate_failure
+    metricDefinition: Count of step-time OIDC ID token generation failures (register or generate threw, or blank token)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_node_start_failure
+    metricDefinition: Count of pipeline workload identity token mint/save-back failures at node start
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_node_start_success
+    metricDefinition: Count of node-start enrichments that produced a changed identity context
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_node_start_no_audience
+    metricDefinition: Count of node-start enrichments skipped because the identity has no resolved audience
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_skipped_disabled
+    metricDefinition: Count of step-time token generations skipped because the identity is disabled
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_skipped_no_workload_token
+    metricDefinition: Count of step-time token generations skipped due to missing pre-minted workload token (plan-time registration likely failed)
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_skipped_no_audience
+    metricDefinition: Count of step-time token generations skipped because the audiencesList is empty
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_resolve_failure
+    metricDefinition: Count of step-time identity resolve failures caught by the §4.8 guard in StepIdentityHelper
+    type: Count
+    unit: "1"
+  - metricName: pipeline_identity_token_skipped_key_collision
+    metricDefinition: Count of step-time token generations skipped because the audience sanitizes to the same env var key as a prior audience for the same identity
+    type: Count
+    unit: "1"

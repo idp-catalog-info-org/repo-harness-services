@@ -1,0 +1,106 @@
+pipeline:
+  name: parentPipe
+  identifier: parentPipe
+  tags: {}
+  projectIdentifier: default
+  orgIdentifier: default
+  stages:
+    - stage:
+        name: cd
+        identifier: cd
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: tt
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: nginx
+                      sources:
+                        - identifier: nginx
+                          type: DockerRegistry
+                          spec:
+                            tag: stable-perl
+          environment:
+            environmentRef: env2
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: i2
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: echo 1
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+            rollbackSteps: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: MarkAsSuccess
+    - stage:
+        name: child
+        identifier: child
+        description: ""
+        type: Pipeline
+        spec:
+          org: defaultChildOrg
+          pipeline: childPipe
+          project: defaultChildProject
+          inputs:
+            identifier: childPipe
+            stages:
+              - stage:
+                  identifier: dev
+                  type: Deployment
+                  spec:
+                    service:
+                      serviceRef: tt
+                      serviceInputs:
+                        serviceDefinition:
+                          type: Kubernetes
+                          spec:
+                            artifacts:
+                              primary:
+                                primaryArtifactRef: nginx
+                                sources:
+                                  - identifier: nginx
+                                    type: DockerRegistry
+                                    spec:
+                                      tag: <+input>
+              - stage:
+                  identifier: test
+                  type: Deployment
+                  spec:
+                    service:
+                      serviceRef: serviceWithArtifact
+                      serviceInputs:
+                        serviceDefinition:
+                          type: Kubernetes
+                          spec:
+                            artifacts:
+                              primary:
+                                primaryArtifactRef: nginx
+                                sources:
+                                  - identifier: nginx
+                                    type: DockerRegistry
+                                    spec:
+                                      tag: <+pipeline.stages.dev.spec.artifacts.primary.tag>
+  allowStageExecutions: true

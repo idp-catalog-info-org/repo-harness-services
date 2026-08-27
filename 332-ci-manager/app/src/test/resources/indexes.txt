@@ -1,0 +1,101 @@
+!!!custom_delegateAsyncTaskResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateAsyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateSyncTaskResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+!!!custom_delegateTaskProgressResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+!!!custom_delegateTaskProgressResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+artifactDetails {"name": "accountId_1", "background": true} {"accountId": 1}
+artifactDetails {"name": "accountIdentifier_bucketName_filePath", "background": true} {"accountId": 1, "artifactMetadataList.bucketName": 1, "artifactMetadataList.filePath": 1}
+artifactDetails {"name": "accountIdentifier_file_digest", "background": true} {"accountId": 1, "artifactMetadataList.digest": 1}
+artifactDetails {"name": "accountIdentifier_imagePath_digest", "background": true} {"accountId": 1, "artifactMetadataList.imagePath": 1, "artifactMetadataList.digest": 1}
+artifactDetails {"name": "accountIdentifier_imagePath_tag", "background": true} {"accountId": 1, "artifactMetadataList.imagePath": 1, "artifactMetadataList.tag": 1}
+buildImageConfig {"name": "accountId_1", "background": true} {"accountId": 1}
+cache {"name": "accountId_1", "background": true} {"accountId": 1}
+cache {"name": "unique_commutative", "unique": true} {"_id": 1, "contextValue": 1}
+cache {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+ciExecutionMetadata {"name": "accountIdAndBuildType", "background": true} {"accountId": 1, "buildType": 1}
+ciExecutionMetadata {"name": "accountIdAndStatus", "background": true} {"accountId": 1, "status": 1}
+ciExecutionMetadata {"name": "accountIdAndStatusAndInfraType", "background": true} {"accountId": 1, "status": 1, "infraType": 1}
+ciExecutionMetadata {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciExecutionMetadata {"name": "stageExecutionIdAndAccountId", "background": true} {"stageExecutionId": 1, "accountId": 1}
+ciFeatureFlagTargets {"name": "flagName_1", "unique": true} {"flagName": 1}
+ciLogKeyMetadata {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciLogKeyMetadata {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+ciPipelineBaseline {"name": "accountIdAndOrgIdAndProjectIdAndPipelineId", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "pipelineId": 1}
+ciPipelineBaseline {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciPipelineBaseline {"name": "parentUniqueIdAndPipelineId", "background": true} {"parentUniqueId": 1, "pipelineId": 1}
+ciResourceCleanup {"name": "processAfterAndShouldStartAndType", "background": true} {"processAfter": 1, "shouldStart": 1, "type": 1}
+ciResourceCleanup {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+ciResourceCleanup {"name": "validUntil_1", "background": true, "expireAfterSeconds": 86400} {"validUntil": 1}
+ciStageBaseline {"name": "accountIdAndOrgIdAndProjectIdAndPipelineIdAndStageId", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "pipelineId": 1, "stageId": 1}
+ciStageBaseline {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciStageBaseline {"name": "parentUniqueIdAndPipelineIdAndStageId", "background": true} {"parentUniqueId": 1, "pipelineId": 1, "stageId": 1}
+ciStageSavingsInfo {"name": "accountIdAndPlanExecutionIdAndStageExecutionId", "background": true} {"accountId": 1, "planExecutionId": 1, "stageExecutionId": 1}
+ciStageSavingsInfo {"name": "accountIdAndStageExecutionId", "background": true} {"accountId": 1, "stageExecutionId": 1}
+ciStageSavingsInfo {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciStageTelemetryData {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciStageTelemetryData {"name": "planExecutionId_1", "background": true} {"planExecutionId": 1}
+ciStageTelemetryData {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+ciStepOptimizationState {"name": "accountIdAndOrgIdAndProjectIdAndPipelineIdAndStageIdAndPlanExecutionId", "background": true} {"accountId": 1, "orgId": 1, "projectId": 1, "pipelineId": 1, "stageId": 1, "planExecutionId": 1}
+ciStepOptimizationState {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+ciStepOptimizationState {"name": "parentUniqueIdAndPipelineIdAndStageIdAndPlanExecutionId", "background": true} {"parentUniqueId": 1, "pipelineId": 1, "stageId": 1, "planExecutionId": 1}
+ciTelemetrySentStatus {"name": "no_dup", "unique": true} {"accountId": 1}
+cibuild {"name": "createdAt_1", "background": true} {"createdAt": 1}
+cistageoutput {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+citaskdetails {"name": "accountId_1", "background": true} {"accountId": 1}
+citaskdetails {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+environmentGroups {"name": "unique_accountId_organizationIdentifier_projectIdentifier_envGroupIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+environments {"name": "accountId_organizationIdentifier_projectIdentifier_collation_tertiary_en", "background": true, "collation": {"locale": "en", "strength": 3}} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+environments {"name": "unique_accountId_organizationIdentifier_projectIdentifier_envIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+executionqueuelimit {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+filterUniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+filters {"name": "uniqueId_1", "unique": true} {"uniqueId": 1}
+filters {"name": "unique_accountId_orgId_projectId_name_type_Index", "unique": true} {"accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "name": 1, "filterType": 1}
+filters {"name": "unique_accountId_organizationId_projectId_type", "unique": true} {"fullyQualifiedIdentifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_identifier_type", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "filterType": 1}
+filters {"name": "unique_accountId_parentUniqueId_name_type_Index", "unique": true} {"accountIdentifier": 1, "parentUniqueId": 1, "identifier": 1, "name": 1, "filterType": 1}
+gitProcessRequestSdk {"name": "accountId_repo_branch_commit_index", "background": true} {"accountId": 1, "repoUrl": 1, "branch": 1, "commitId": 1}
+globalTemplateSyncStatus {"name": "lastCommitId_1", "background": true} {"lastCommitId": 1}
+infrastructures {"name": "accountId_organizationIdentifier_projectIdentifier_envIdentifier_createdAt", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "createdAt": 1}
+infrastructures {"name": "unique_accountId_organizationIdentifier_projectIdentifier_envIdentifier_infraIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "identifier": 1}
+notifyQueue {"name": "earliestGet_1", "background": true, "expireAfterSeconds": 86400} {"earliestGet": 1}
+notifyQueue {"name": "next4", "background": true} {"topic": 1, "earliestGet": 1}
+notifyQueue {"name": "waitInstanceId_1", "unique": true} {"waitInstanceId": 1}
+notifyResponses {"name": "createdAt_1", "background": true} {"createdAt": 1}
+notifyResponses {"name": "processAfter_1", "background": true} {"processAfter": 1}
+notifyResponses {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+outboxEvents {"name": "blocked_createdAt_nextUnblockAttemptAt_outbox_Idx", "background": true} {"blocked": 1, "createdAt": 1, "nextUnblockAttemptAt": 1}
+outboxEvents {"name": "eventType_blocked_outbox_Idx", "background": true} {"eventType": 1, "blocked": 1}
+pipelineModuleInfo {"name": "plan_execution_id", "unique": true} {"planExecutionId": 1}
+pipelineModuleInfo {"name": "stage_and_plan_execution_id", "unique": true} {"stageModuleInfoList.stageExecutionId": 1, "planExecutionId": 1}
+pipelineModuleInfo {"name": "stage_execution_id", "unique": true} {"stageModuleInfoList.stageExecutionId": 1}
+pluginMetadataConfig {"name": "pluginMetadataConfigIdx", "background": true} {"version": 1, "metadata.name": 1}
+podDetails {"name": "accountId_1", "background": true} {"accountId": 1}
+primaryVersion {"name": "createdAt_1", "background": true} {"createdAt": 1}
+primaryVersion {"name": "lastUpdatedAt_1", "background": true} {"lastUpdatedAt": 1}
+progressUpdate {"name": "correlation", "background": true} {"correlationId": 1, "createdAt": -1}
+progressUpdate {"name": "createdAt_1", "background": true} {"createdAt": 1}
+progressUpdate {"name": "processAfter_1", "background": true} {"processAfter": 1}
+progressUpdate {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+services {"name": "unique_accountId_organizationIdentifier_projectIdentifier_serviceIdentifier", "unique": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "identifier": 1}
+stageDetails {"name": "accountId_1", "background": true} {"accountId": 1}
+stageRollbackData {"name": "createdAt_1", "background": true} {"createdAt": 1}
+stageRollbackData {"name": "parentId_sorted_stage_execution_info_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1, "createdAt": -1}
+stageRollbackData {"name": "parentId_sorted_stage_execution_info_with_stage_status_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageStatus": 1, "createdAt": -1, "stageExecutionId": 1}
+stageRollbackData {"name": "parentId_stage_execution_info_deployment_identifier_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "deploymentId": 1, "stageExecutionId": 1}
+stageRollbackData {"name": "parentId_stage_execution_info_using_stage_execution_id_idx", "background": true} {"accountId": 1, "stageExecutionId": 1, "parentUniqueId": 1}
+stageRollbackData {"name": "parentId_unique_stage_execution_info_idx", "background": true} {"accountId": 1, "parentUniqueId": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageExecutionId": 1}
+stageRollbackData {"name": "parentUniqueId_1", "background": true} {"parentUniqueId": 1}
+stageRollbackData {"name": "sorted_stage_execution_info_with_stage_status_idx", "background": true} {"accountId": 1, "orgIdentifier": 1, "projectIdentifier": 1, "envIdentifier": 1, "infraIdentifier": 1, "serviceIdentifier": 1, "stageStatus": 1, "createdAt": -1, "stageExecutionId": 1}
+stageRollbackData {"name": "unique_stage_execution_info_using_stage_execution_id_idx", "background": true} {"accountId": 1, "stageExecutionId": 1, "orgIdentifier": 1, "projectIdentifier": 1}
+stageRollbackData {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+stepStatusMetadata {"name": "expireAfter_1", "background": true, "expireAfterSeconds": 0} {"expireAfter": 1}
+stepStatusMetadata {"name": "stageExecutionId_1", "background": true} {"stageExecutionId": 1}
+stepexecutionparameters {"name": "account_runtime", "background": true} {"accountId": 1, "runTimeId": 1}
+stepexecutionparameters {"name": "account_stageruntime", "background": true} {"accountId": 1, "stageRunTimeId": 1}
+transientExecutionDataInstance {"name": "accountIdentifier_1", "background": true} {"accountIdentifier": 1}
+transientExecutionDataInstance {"name": "unique_planExecutionId_name_levelRuntimeIdx", "unique": true} {"planExecutionId": 1, "name": 1, "levelRuntimeIdIdx": 1}
+transientExecutionDataInstance {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+uniqueIdParentIdMigrationStatus {"name": "entityClassName_1", "unique": true} {"entityClassName": 1}
+waitInstances {"name": "correlationIds_1", "background": true} {"correlationIds": 1}
+waitInstances {"name": "validUntil_1", "background": true, "expireAfterSeconds": 0} {"validUntil": 1}
+waitInstances {"name": "waitingOnCorrelationIds_1", "background": true} {"waitingOnCorrelationIds": 1}

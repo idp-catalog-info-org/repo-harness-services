@@ -1,0 +1,8 @@
+name: CI Manager Queued Execution Count
+identifier: CIManagerGlobalQueuedVMCount
+metricGroup: CIQueuedVmCounter
+metrics:
+  - metricName: ci_global_queued_vm_execution_count
+    metricDefinition: Global Capacity Queued Execution count for OsType and Arch
+    type: LastValue
+    unit: count

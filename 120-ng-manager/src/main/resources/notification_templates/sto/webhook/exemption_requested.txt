@@ -1,0 +1,46 @@
+{
+    "title": "Harness Exemption Requested",
+    "description": "Harness Security Test Exemption Requested for Issue: ${ISSUE_TITLE} for the project - ${PROJECT} under the organization - ${ORG}",
+    "fields": [
+        {
+            "label": "Organization",
+            "value": "${ORG}"
+        },
+        {
+            "label": "Project",
+            "value": "${PROJECT}"
+        },
+        {
+            "label": "Issue Title",
+            "value": "${ISSUE_TITLE}"
+        },
+        {
+            "label": "Scan Tool",
+            "value": "${SCAN_TOOL}"
+        },
+        {
+            "label": "Exemption URL",
+            "value": "${EXEMPTION_URL}"
+        },
+        {
+            "label": "Scope",
+            "value": "${SCOPE}"
+        },
+        {
+            "label": "Severity Code",
+            "value": "${SEVERITY_CODE}"
+        },
+        {
+            "label": "Requester",
+            "value": "${REQUESTER}"
+        },
+        {
+            "label": "Expiration",
+            "value": "${EXPIRATION}"
+        },
+        {
+            "label": "Reason",
+            "value": "${REASON}"
+        }
+    ]
+}

@@ -1,0 +1,292 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ng-manager
+  namespace: '{{ .Release.Namespace }}'
+  labels:
+    {{- if .Values.global.commonLabels }}
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.config "context" $) | nindent 2}}
+  {{ include "harnesscommon.harnessfunctions.java17flags" (dict "context" $) | nindent 2 }}
+  {{- if .Values.additionalConfigs }}
+  {{- toYaml .Values.additionalConfigs | nindent 2 }}
+  {{- end }}
+  {{- include "harnesscommon.monitoring.config" . | nindent 2 }}
+  {{- include "harnesscommon.logging.setFileLogging" . | nindent 2 }}
+  {{- include "harnesscommon.secretsLoader.configContent" (dict "ctx" $ "databaseSecrets" (list 
+    (dict "dbtype" "mongo" "usernamesecrets" (list "NGHARNESS_MONGO_USER" "NOTIFICATIONS_MONGO_USER") "passwordsecrets" (list "NGHARNESS_MONGO_PASSWORD" "NOTIFICATIONS_MONGO_PASSWORD"))
+    (dict "dbtype" "redis" "usernamesecrets" (list "LOCK_CONFIG_REDIS_USERNAME" "EVENTS_FRAMEWORK_REDIS_USERNAME") "passwordsecrets" (list "LOCK_CONFIG_REDIS_PASSWORD" "EVENTS_FRAMEWORK_REDIS_PASSWORD"))
+    (dict "dbtype" "postgres" "usernamesecrets" (list "ALLOYDB_USERNAME") "passwordsecrets" (list "ALLOYDB_PASSWORD"))
+    (dict "dbtype" "timescaledb" "usernamesecrets" (list "TIMESCALEDB_USERNAME" "SECONDARY_TIMESCALEDB_USERNAME") "passwordsecrets" (list "TIMESCALE_PASSWORD" "SECONDARY_TIMESCALE_PASSWORD"))
+  )) | nindent 2}}
+
+{{- if .Values.oidc.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oidc-config-ng-manager
+  namespace: '{{ .Release.Namespace }}'
+  {{- if .Values.global.commonLabels }}
+  labels:
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  oidc_config.json: |
+    {
+      "OPENID_CONFIGURATION" : {
+        "issuer": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+        "jwks_uri": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}/.wellknown/jwks",
+        "subject_types_supported":["public","pairwise"],
+        "response_types_supported":["id_token"],
+        "claims_supported":
+        [
+          "sub","aud","exp","iat","iss","account_id"
+        ],
+        "id_token_signing_alg_values_supported":["RS256"],
+        "scopes_supported":["openid"]
+      },
+      "AWS": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "aud": "sts.amazonaws.com",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        }
+      },
+      "CUSTOM": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        }
+      },
+      "GCP": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "aud": "https://iam.googleapis.com/projects/{gcp_project_id}/locations/global/workloadIdentityPools/{workload_pool_id}/providers/{provider_id}",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        },
+        "access_token_sts_endpoint": "https://sts.googleapis.com",
+        "access_token_iam_sa_credentials_endpoint": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/",
+        "workload_access_token_config": {
+          "audience": "//iam.googleapis.com/projects/{gcp_project_id}/locations/global/workloadIdentityPools/{workload_pool_id}/providers/{provider_id}",
+          "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+          "requested_token_type": "urn:ietf:params:oauth:token-type:access_token",
+          "scope": "https://www.googleapis.com/auth/cloud-platform",
+          "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+          "subject_token": "{SUBJECT_TOKEN_TYPE}",
+          "options": {
+            "userProject": "{gcp_project_id}"
+          }
+        }
+      },
+      "VAULT": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "aud": "{vault_jwt_auth_path}",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        }
+      },
+      "AZURE": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "aud": "api://AzureADTokenExchange",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        }
+      },   
+      "ARTIFACTORY": {
+        "header": {
+          "typ": "JWT",
+          "alg": "RS256",
+          "kid": "GENERATE_AT_RUNTIME"
+        },
+        "payload": {
+          "sub": "{account_id}",
+          "aud": "{artifactory_audience}",
+          "iss": "{{ .Values.global.issuerURL | default .Values.global.loadbalancerURL }}/ng/api/oidc/account/{account_id}",
+          "exp": 3600,
+          "iat": 0,
+          "account_id": "{account_id}"
+        }
+      }
+    }
+{{- end }}
+
+{{- if .Values.licenseManager.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devops-essentials-config-ng-manager
+  namespace: '{{ .Release.Namespace }}'
+  {{- if .Values.global.commonLabels }}
+  labels:
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  license_manager_config.json: |
+    {
+      "PRODUCT_CONFIGURATIONS" : [
+        {
+          "LICENSING_MODEL" : {
+            "LICENSING_TYPE" : "DEVOPS_ESSENTIALS"
+          },
+          "PRICING_MODEL" : [
+            {
+              "MODULE_TYPE": "HARNESS_CD",
+              "PREPAY_UNIT_COST": 0.5,
+              "POSTPAY_UNIT_COST": 0.575,
+              "INCLUDED_QUANTITY": 25000,
+              "PREPAY_EXTENSION_QUANTITY": 5000,
+              "DISPLAY_NAME": "Continuous Delivery & GitOps",
+              "DESCRIPTION": "Deploy applications with automated pipelines and GitOps workflows",
+              "ICON": "cd-main",
+              "ENABLED": true,
+              "UNIT": "deployment events",
+              "DISPLAY_TEXT": "{quantity:,} deployment events included"
+            },
+            {
+              "MODULE_TYPE": "HARNESS_CI",
+              "PREPAY_UNIT_COST": 0.005,
+              "POSTPAY_UNIT_COST": 0.00575,
+              "INCLUDED_QUANTITY": 300000,
+              "PREPAY_EXTENSION_QUANTITY": 2500000,
+              "DISPLAY_NAME": "Continuous Integration",
+              "DESCRIPTION": "Build, test, and scan your code with intelligent pipelines",
+              "ICON": "ci-main",
+              "ENABLED": true,
+              "UNIT": "build minutes",
+              "DISPLAY_TEXT": "{quantity:,} build minutes included"
+            },
+            {
+              "MODULE_TYPE": "HARNESS_STO",
+              "PREPAY_UNIT_COST": 1,
+              "POSTPAY_UNIT_COST": 1.15,
+              "INCLUDED_QUANTITY": 3600,
+              "PREPAY_EXTENSION_QUANTITY": 2500,
+              "DISPLAY_NAME": "Security Testing Orchestration",
+              "DESCRIPTION": "Comprehensive security testing integrated into your pipelines",
+              "ICON": "sto-color-filled",
+              "ENABLED": true,
+              "UNIT": "security scans",
+              "DISPLAY_TEXT": "{quantity:,} security scans included"
+            },
+            {
+              "MODULE_TYPE": "HARNESS_IACM",
+              "PREPAY_UNIT_COST": 1.5,
+              "POSTPAY_UNIT_COST": 1.725,
+              "INCLUDED_QUANTITY": 500,
+              "PREPAY_EXTENSION_QUANTITY": 1700,
+              "DISPLAY_NAME": "Infrastructure as Code Management",
+              "DESCRIPTION": "Provision and manage cloud infrastructure with confidence",
+              "ICON": "iacm-blue",
+              "ENABLED": true,
+              "UNIT": "resource hours",
+              "DISPLAY_TEXT": "{quantity:,} resource hours included"
+            }
+          ],
+          "CURRENCY": "USD",
+          "BASE_PRICE_PER_SEAT": 30.0,
+          "BILLING_OPTIONS": [
+            {
+              "CYCLE": "MONTHLY",
+              "PRICE_PER_SEAT": 30.0,
+              "DISCOUNT_PERCENTAGE": 0.0
+            },
+            {
+              "CYCLE": "ANNUAL",
+              "PRICE_PER_SEAT": 24.0,
+              "DISCOUNT_PERCENTAGE": 20.0
+            }
+          ],
+          "LIMITS": {
+            "MIN_SEATS": 1,
+            "MAX_SEATS": 500,
+            "DEFAULT_SEATS": 50
+          }
+        }
+      ]
+    }
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cgi-config-ng-manager
+  namespace: '{{ .Release.Namespace }}'
+  {{- if .Values.global.commonLabels }}
+  labels:
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  cgi-config.yaml: |
+    {{- .Values.cgiConfig | toYaml | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: task-binary-config-ng-manager
+  namespace: '{{ .Release.Namespace }}'
+  {{- if .Values.global.commonLabels }}
+  labels:
+    {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations: {{- include "harnesscommon.tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  task-binary-config.yaml: |
+    {{- .Values.taskBinaryConfig | toYaml | nindent 4 }}

@@ -1,0 +1,50 @@
+{
+    "title": "Harness Artifact Registry Lifecycle Rule Dry Run Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+    "description": "A lifecycle rule dry run has completed with status: ${EXECUTION_STATUS}. No artifacts were modified. The results below show what would have happened if the lifecycle rule had been executed.",
+    "fields": [
+        {
+            "label": "Lifecycle Rule",
+            "value": "${POLICY_NAME}"
+        },
+        {
+            "label": "Execution Type",
+            "value": "Dry Run"
+        },
+        {
+            "label": "Execution Start Time",
+            "value": "${EXECUTION_START_TIME}"
+        },
+        {
+            "label": "Execution End Time",
+            "value": "${EXECUTION_END_TIME}"
+        },
+        {
+            "label": "Execution Status",
+            "value": "${EXECUTION_STATUS}"
+        },
+        {
+            "label": "Scheduled Execution Time",
+            "value": "${SCHEDULED_EXECUTION_TIME}"
+        },
+        {
+            "label": "Artifacts Protected (Protection Rule)",
+            "value": "${ARTIFACTS_SKIPPED}"
+        },
+        {
+            "label": "Artifacts That Would Be Deleted",
+            "value": "${ARTIFACTS_DELETED}"
+        },
+        {
+            "label": "Registries Affected",
+            "value": "${REGISTRIES_AFFECTED}"
+        },
+        {
+            "label": "Estimated Storage Reclamation",
+            "value": "${STORAGE_RECLAIMED}"
+        },
+        {
+            "label": "Execution URL",
+            "value": "${EXECUTION_URL}"
+        }
+    ]
+}

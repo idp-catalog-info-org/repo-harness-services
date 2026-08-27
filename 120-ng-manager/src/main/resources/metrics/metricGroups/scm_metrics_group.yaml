@@ -1,0 +1,9 @@
+name: SCM Metrics Group
+identifier: scm_metrics_group
+labels:
+  - accountId
+  - flow
+  - action
+#  - repoName
+  - provider
+#  - caller

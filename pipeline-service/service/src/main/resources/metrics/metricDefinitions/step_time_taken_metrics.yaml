@@ -1,0 +1,9 @@
+name: Step Time Taken Metrics
+identifier: StepTimeTakenMetrics
+metricGroup: StepTimeTakenMetricsGroup
+metrics:
+  - metricName: step_time_taken
+    metricDefinition: Time taken by any node for completion
+    type: Duration
+    distribution: [ 0m, 30s, 1m, 2m, 4m, 8m, 16m, 32m, 64m, 128m ]
+    unit: "s"

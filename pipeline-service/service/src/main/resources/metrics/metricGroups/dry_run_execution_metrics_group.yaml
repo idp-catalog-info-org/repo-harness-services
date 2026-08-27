@@ -1,0 +1,7 @@
+name: Dry Run Metrics Group
+identifier: DryRunMetricsGroup
+labels:
+  - accountId
+  - orgId
+  - projectId
+  - status

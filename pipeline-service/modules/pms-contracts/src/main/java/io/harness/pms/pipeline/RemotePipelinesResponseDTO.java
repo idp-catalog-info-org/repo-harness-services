@@ -1,0 +1,35 @@
+/*
+ * Copyright 2026 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.pipeline;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.OwnedBy;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel("RemotePipelinesResponseDTO")
+@Schema(name = "RemotePipelinesResponseDTO",
+    description = "Resource-layer response for the list of remote pipelines grouped by repository.")
+@OwnedBy(PIPELINE)
+public class RemotePipelinesResponseDTO {
+  @Schema(description = "Total number of remote pipelines for the account (matches the optional repoName filter).")
+  long totalPipelines;
+  @Schema(description = "Total number of distinct remote repositories for the account.") long totalRepos;
+  @Schema(description = "Remote pipelines grouped by repository.") List<RemotePipelinesDTO> repositories;
+}

@@ -1,0 +1,284 @@
+{
+  "channel": {
+    "id": "C01L2RPDXCH",
+    "name": "#pipeline-alerts"
+  },
+  "sources": {
+    "pagerduty": {
+      "bot_id": "UJNCP5H6D",
+      "firing_pattern": "\\[FIRING:\\d+\\]",
+      "resolved_pattern": "\\[RESOLVED\\]"
+    },
+    "gcp_monitoring": {
+      "bot_id": "B0220TMEWE9",
+      "firing_pattern": "incident",
+      "resolved_pattern": "closed"
+    }
+  },
+  "idempotency_reaction": "robot_face",
+  "max_concurrent_investigations": 3,
+  "categories": {
+    "GITX_CACHE": {
+      "keywords": ["cache hit percentage", "cache hit rate", "cache hit < 75"],
+      "alert_rule_uids": ["cfe3ovfcqcetca", "ffedftyrarsowb"],
+      "dashboards": {
+        "primary": "beqmx58091m9sb",
+        "panels": [101, 102, 104, 115, 116, 119]
+      },
+      "criticality": "P0-P1",
+      "primary_drill_dimension": "gitProvider",
+      "investigation_focus": "Check cache invalidation rate, which accounts are causing excessive invalidations, and whether GITX_NEW_CACHE_STRATEGY FF is enabled"
+    },
+    "GITX_WEBHOOK": {
+      "keywords": ["webhook event processing", "gitx Webhook", "webhook.*exceeds"],
+      "alert_rule_uids": ["dfew5yil4ulfka"],
+      "dashboards": {
+        "primary": "beqmx58091m9sb",
+        "panels": [101, 102, 104, 115, 116, 119]
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "accountId",
+      "investigation_focus": "Check P95 webhook processing time, cache hit rate correlation, queue backlog, and stalled accounts"
+    },
+    "GITX_INVALIDATE": {
+      "keywords": ["Invalidate cache", "invalidate cache > 300", "cache invalidation", "invalidation rate"],
+      "alert_rule_uids": ["afewgnitmy0aob"],
+      "dashboards": {
+        "primary": "beqmx58091m9sb",
+        "panels": [101, 102, 104, 115, 116, 119]
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "accountId",
+      "investigation_focus": "Check invalidation rate and source, whether a specific account is triggering excessive invalidations"
+    },
+    "GITX_EVENTS": {
+      "keywords": ["No GitX events enqueued", "No GitX events dequeued", "GitX events"],
+      "alert_rule_uids": ["ef62iokaab4zkc", "ff62lb8aqz6yob", "ef63fzfeq1hc0c", "af63gb153uv40b"],
+      "dashboards": {
+        "primary": "beqmx58091m9sb",
+        "panels": [101, 102, 104, 115, 116, 119]
+      },
+      "criticality": "P1-P2",
+      "investigation_focus": "Check event queue health, whether events are being produced but not consumed"
+    },
+    "LOG_SERVICE_LATENCY": {
+      "keywords": ["Log Service.*Latency", "log-service.*latency", "End-to-End Latency"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": null,
+        "search_query": "log service"
+      },
+      "criticality": "P1",
+      "investigation_focus": "Check log-service latency, ClickHouse health, Kafka consumer lag for log-service topics"
+    },
+    "LOG_SERVICE_ERRORS": {
+      "keywords": ["Critical/Error Logs", "log-service.*error", "PIE Critical"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": null,
+        "search_query": "log service"
+      },
+      "criticality": "P1",
+      "investigation_focus": "Check error rate, recent log-service deployments, ClickHouse connectivity"
+    },
+    "KAFKA_LAG": {
+      "keywords": ["Kafka consumer lag", "consumer lag above"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": [102, 104, 80, 116]
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "topic",
+      "investigation_focus": "Check consumer lag per topic, event processing rate, dead letter queue, consumer failure count"
+    },
+    "THREAD_POOL": {
+      "keywords": ["Queued Task Count", "Thread Pools", "thread pool"],
+      "alert_rule_uids": ["eefrazeq69o1sa"],
+      "dashboards": {
+        "primary": "iy-7pykSk2",
+        "secondary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "executorServiceName",
+      "investigation_focus": "Check thread pool queued task count, execution count spike, top accounts driving load"
+    },
+    "JVM_THREADS": {
+      "keywords": ["JVM Threads Count", "JVM thread"],
+      "alert_rule_uids": ["4I2LGdFSz", "QAjeMdFSk"],
+      "dashboards": {
+        "primary": "iy-7pykSk2",
+        "secondary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "P1",
+      "investigation_focus": "Check JVM thread count trend, thread pool saturation, execution spike correlation"
+    },
+    "DW_THREADS": {
+      "keywords": ["DW Threads Count", "DW thread"],
+      "alert_rule_uids": ["gDQIePKIk"],
+      "dashboards": {
+        "primary": "iy-7pykSk2",
+        "panels": []
+      },
+      "criticality": "P3",
+      "investigation_focus": "Check Dropwizard thread count, usually informational"
+    },
+    "POD_RESTART": {
+      "keywords": ["Readiness", "Liveness", "Pod restart", "pod restart", "Restart count", "Container Restart", "PIE - Container Restart", "Container Restarts"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": "iy-7pykSk2",
+        "panels": []
+      },
+      "criticality": "P3",
+      "investigation_focus": "Check restart causes (OOM, liveness probe timeout, dependency timeouts during startup). If liveness probe kill detected, search for RedisTimeoutException/Kafka/MongoDB errors between 'Starting Pipeline Service Application' and 'Shutdown hook' — slow dependency init is the root cause, not the probe. Also check JFR $POD_NAME race condition (Error termination reason). Common restart patterns from Confluence page 23216685217"
+    },
+    "REDIS_MEMORY": {
+      "keywords": ["Redis Memory Usage", "Redis memory", "redis.*memory"],
+      "alert_rule_uids": ["af7vwbe737k00b", "ff7vwhf8p3abkd", "cf7vwxlddpptsa"],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": [111, 112, 72, 80]
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "namespace",
+      "investigation_focus": "Check Redis memory and CPU usage, event queued time, dead letter queue growth"
+    },
+    "PLAN_CREATION": {
+      "keywords": ["Plan Creation Time", "plan creation.*exceeds"],
+      "alert_rule_uids": ["cf6rec4gtd9tse"],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": [47, 82]
+      },
+      "criticality": "P2",
+      "primary_drill_dimension": "module",
+      "investigation_focus": "Check plan creation time P95, failed plan creation per module, downstream service health"
+    },
+    "EVENT_QUEUE": {
+      "keywords": ["Event Queued Time", "Dead letter", "dead letter queue", "event.*queued", "Event Processing", "SPAWN_CHILDREN", "Slowness in Event Processing", "event.*processing"],
+      "alert_rule_uids": ["ef6p3elkt24g0e", "cf6p4led2t0xse"],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": [72, 73, 80, 105]
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "streamName",
+      "investigation_focus": "Check avg event queued time per stream, event processing time, dead letter queue, consumer errors"
+    },
+    "ITERATOR_DELAY": {
+      "keywords": ["Notify Response Iterator", "iterator delay"],
+      "alert_rule_uids": ["eexuqa2l18u80b"],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "P1",
+      "investigation_focus": "Check iterator processing delay and throughput"
+    },
+    "MONGODB": {
+      "keywords": ["MongoDb", "MongoDB", "mongo.*connection", "mongo.*timeout"],
+      "alert_rule_uids": ["gLW7s05Ik"],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": [101]
+      },
+      "criticality": "P0",
+      "investigation_focus": "Check MongoDB cluster health via codepulse db list, MongoDB CPU in Grafana, GCP logs for connection errors"
+    },
+    "DATASOURCE_ERROR": {
+      "keywords": ["DatasourceError", "DatasourceNoData"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "P2",
+      "investigation_focus": "Grafana datasource issue - check if the underlying metric source is healthy"
+    },
+    "REDIS_CONSUMER_LAG": {
+      "keywords": ["Redis Stream Consumer group behind", "consumer group behind", "consumer lag", "pipeline_orchestration", "streams_consumer"],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "P1",
+      "primary_drill_dimension": "streamName",
+      "investigation_focus": "Check Redis stream consumer group lag. IMPORTANT: use label environment= (not namespace=) for Redis stream metrics — e.g. redis_streams_consumer_group_behind_by_count{environment='prod2'}. Primary root cause: JVM stop-the-world GC pause on pipeline-service (10+ min of complete log silence → readiness probes fail → pod removed from Service endpoints → consumer threads stop → backlog builds). Look for a log gap on pipeline-service matching the alert window. Note: cd and iacm consumers often show persistent lag of ~4k-5k on prod — this is a known baseline (dead consumers, pre-existing), not an active incident."
+    },
+    "GCP_LOG_ALERT": {
+      "keywords": [],
+      "alert_rule_uids": [],
+      "dashboards": {
+        "primary": "cen5s9b6dezggc",
+        "panels": []
+      },
+      "criticality": "varies",
+      "source_match": "gcp_monitoring",
+      "investigation_focus": "GCP log-based alert - check GCP logs for the specific error pattern"
+    }
+  },
+  "always_check_dashboards": {
+    "overview": "cen5s9b6dezggc",
+    "execution_metrics": "iy-7pykSk0",
+    "microservice_versions": "ZJD3rKZIz",
+    "http_resources": "B42-bJq4k3"
+  },
+  "confluence_pages": {
+    "metrics_audit": "23279960134",
+    "monitoring_runbook": "22095364521",
+    "incident_handling": "21729837732",
+    "production_playbook": "21224129734",
+    "common_restart_causes": "23216685217",
+    "oncall_runbook": "21143617537"
+  },
+  "_env_note": "For GCP details (namespace, project, cluster), refer to pipeline-service/.claude/config/gcp-environments.json as the source of truth. The promql_namespace below is the Prometheus metric label value; gcp_namespace is for GCP log queries.",
+  "environments": {
+    "prod1": {
+      "gcp_project": "prod-setup-205416",
+      "gcp_namespace": "harness-nextgen",
+      "promql_namespace": "prod1",
+      "cluster": "prod-private-uswest1-primary",
+      "prometheus_datasource_uid": "9073961d-07a4-44b8-8bfd-4b32a4ee7a74"
+    },
+    "prod2": {
+      "gcp_project": "prod-setup-205416",
+      "gcp_namespace": "harness-nextgen-free",
+      "promql_namespace": "prod2",
+      "cluster": "prod-private-uswest1-primary",
+      "prometheus_datasource_uid": "9073961d-07a4-44b8-8bfd-4b32a4ee7a74"
+    },
+    "prod3": {
+      "gcp_project": "prod-setup-205416",
+      "gcp_namespace": "prod3",
+      "promql_namespace": "prod3",
+      "cluster": "prod-private-uswest1-primary",
+      "prometheus_datasource_uid": "9073961d-07a4-44b8-8bfd-4b32a4ee7a74"
+    },
+    "harness0": {
+      "gcp_project": "harness-zero-harness0-1391",
+      "gcp_namespace": "harness",
+      "promql_namespace": "harness",
+      "cluster": "harness0",
+      "prometheus_datasource_uid": "e7cd16b2-aac3-45bd-8084-c2a5c9a6e670"
+    },
+    "qa": {
+      "gcp_project": "qa-setup",
+      "gcp_namespace": "harness-helm-new",
+      "promql_namespace": "harness-helm-new",
+      "cluster": "qa-private",
+      "prometheus_datasource_uid": "fe466549-708a-4d60-873a-fe3de8c48f8f"
+    }
+  },
+  "promql_env_hints": {
+    "non_prod_environments": ["harness0", "qa"],
+    "rules": [
+      "Remove namespace exclusion filters — they are prod-specific",
+      "Replace prod namespace regex with target environment's namespace",
+      "Remove streamName exclusion filters referencing prod-specific streams"
+    ]
+  }
+}

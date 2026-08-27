@@ -1,0 +1,50 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+package io.harness.ngtriggers.beans.source;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.EXTERNAL_PROPERTY;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
+
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.ngtriggers.beans.source.webhook.NGTriggerSpecV2;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.validation.constraints.Pattern;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@JsonTypeName("source")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@OwnedBy(PIPELINE)
+public class NGTriggerSourceV2 {
+  private static final String POLLING_INTERVAL_PATTERN = "(((([1-9])+\\d*[mh])+(\\s/?\\d+[mh])*)|(^$)|(0))$";
+  NGTriggerType type;
+
+  @Pattern(regexp = POLLING_INTERVAL_PATTERN) String pollInterval;
+
+  // WebhookId is created during auto-registration process but in some cases where customer cannot reach harness, user
+  // will manually input it
+  String webhookId;
+  @JsonTypeInfo(use = NAME, property = "type", include = EXTERNAL_PROPERTY, visible = true) NGTriggerSpecV2 spec;
+
+  @Builder
+  public NGTriggerSourceV2(NGTriggerType type, NGTriggerSpecV2 spec, String pollInterval, String webhookId) {
+    this.type = type;
+    this.spec = spec;
+    this.pollInterval = pollInterval;
+    this.webhookId = webhookId;
+  }
+}

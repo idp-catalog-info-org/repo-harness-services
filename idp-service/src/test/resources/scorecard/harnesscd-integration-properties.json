@@ -1,0 +1,13 @@
+{
+  "changeFailureRatePercent": 8.5,
+  "deploymentFrequencyPerSprint": 12.3,
+  "averageDeploymentDurationSeconds": 420,
+  "prod": {
+    "changeFailureRatePercent": 10.2,
+    "deploymentFrequencyPerSprint": 7.5
+  },
+  "pre-prod": {
+    "changeFailureRatePercent": 4.8,
+    "deploymentFrequencyPerSprint": 15.6
+  }
+}

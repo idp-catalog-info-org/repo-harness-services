@@ -1,0 +1,42 @@
+{
+    "title": "Harness Artifact Registry Lifecycle Rule Execution: ${POLICY_NAME} - ${EXECUTION_STATUS}",
+    "description": "A lifecycle rule execution has completed with status: ${EXECUTION_STATUS}.",
+    "fields": [
+        {
+            "label": "Lifecycle Rule",
+            "value": "${POLICY_NAME}"
+        },
+        {
+            "label": "Execution Start Time",
+            "value": "${EXECUTION_START_TIME}"
+        },
+        {
+            "label": "Execution End Time",
+            "value": "${EXECUTION_END_TIME}"
+        },
+        {
+            "label": "Execution Status",
+            "value": "${EXECUTION_STATUS}"
+        },
+        {
+            "label": "Artifacts Protected (Protection Rule)",
+            "value": "${ARTIFACTS_SKIPPED}"
+        },
+        {
+            "label": "Artifacts Soft Deleted",
+            "value": "${ARTIFACTS_DELETED}"
+        },
+        {
+            "label": "Registries Affected",
+            "value": "${REGISTRIES_AFFECTED}"
+        },
+        {
+            "label": "Storage Reclaimed",
+            "value": "${STORAGE_RECLAIMED}"
+        },
+        {
+            "label": "Execution URL",
+            "value": "${EXECUTION_URL}"
+        }
+    ]
+}

@@ -1,0 +1,79 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: GCP connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  project:
+    type: string
+    description: GAR project
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.project}}
+  region:
+    type: string
+    description: GAR region
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.region}}
+  repositoryName:
+    type: string
+    description: GAR repository name
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repositoryName}}
+  package:
+    type: string
+    description: GAR package (JsonProperty name for pkg)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.package}}
+  repositoryType:
+    type: string
+    description: GAR repository type (JsonProperty name for googleArtifactRegistryType)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.repositoryType}}
+  version:
+    type: string
+    description: Package version (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.version}}
+  versionRegex:
+    type: string
+    description: Version regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.versionRegex}}
+  digest:
+    type: string
+    description: Image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/gar-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_REPOSITORY_TYPE: ${{inputs.repositoryType}}
+    PLUGIN_ARTIFACT_PROJECT_ID: ${{inputs.project}}
+    PLUGIN_ARTIFACT_REGION: ${{inputs.region}}
+    PLUGIN_ARTIFACT_PACKAGE_NAME: ${{inputs.package}}
+    PLUGIN_ARTIFACT_REPOSITORY_NAME: ${{inputs.repositoryName}}
+    PLUGIN_ARTIFACT_VERSION: ${{inputs.version}}
+    PLUGIN_ARTIFACT_DIGEST: ${{inputs.digest}}
+    PLUGIN_ARTIFACT_VERSION_REGEX: ${{inputs.versionRegex}}
+    PLUGIN_GCP_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_GCP_SERVICE_ACCOUNT_KEY: ${{inputs.artifactConnector.jsonKey}}
+    PLUGIN_POOL_ID: ${{inputs.artifactConnector.workloadPoolId}}
+    PLUGIN_PROVIDER_ID: ${{inputs.artifactConnector.providerId}}
+    PLUGIN_PROJECT_NUMBER: ${{inputs.artifactConnector.gcpProjectId}}
+    PLUGIN_SERVICE_ACCOUNT_EMAIL: ${{inputs.artifactConnector.serviceAccountEmail}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.artifactConnector.oidcToken}}

@@ -1,0 +1,30 @@
+pipeline:
+  name: Test-Trigger-Child
+  identifier: TestTriggerChild
+  projectIdentifier: projectId
+  orgIdentifier: orgId
+  stages:
+    - stage:
+        name: child
+        identifier: child
+        type: Pipeline
+        spec:
+          org: WIN
+          project: WIN_1384
+          pipeline: childPipeline
+          inputs:
+            stages:
+              - stage:
+                  identifier: grandchild
+                  type: Pipeline
+                  spec:
+                    org: grandchildOrg
+                    project: grandchildProject
+                    pipeline: grandchildPipeline
+                    inputs:
+                      stages:
+                        - stage:
+                            identifier: Deploy
+                            spec:
+                              service:
+                                serviceRef: grandchildSvc

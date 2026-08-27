@@ -1,0 +1,8 @@
+name: Plan Concurrency Counter Mutation Metrics
+identifier: PlanConcurrencyCounterMutationMetrics
+metricGroup: PlanConcurrencyCounterMutationMetricsGroup
+metrics:
+  - metricName: pipeline_plan_concurrency_counter_mutations_total
+    metricDefinition: Redis counter mutations for the per-project plan-concurrency gate. scope in {account, project}; operation in {increment, decrement}; outcome in {success, error}.
+    type: Count
+    unit: "1"

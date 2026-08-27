@@ -1,0 +1,7 @@
+name: IDP Service Mongo Metrics Group
+identifier: IdpServiceMongoMetricsGroup
+labels:
+  - namespace
+  - containerName
+  - serverAddress
+  - clientDescription

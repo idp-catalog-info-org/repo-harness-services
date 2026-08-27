@@ -1,0 +1,53 @@
+# Copyright 2026 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//878-ng-common-utilities/src/main/java/io/harness/gitaware/helper:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//900-git-sync-sdk/src/main/java/io/harness/gitsync/beans:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//959-ng-persistence/src/main/java/io/harness/mongo/iterator/filter:module",
+        "//959-ng-persistence/src/main/java/io/harness/mongo/iterator/provider:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/template:module",
+        "//960-persistence/src/main/java/io/harness/iterator:module",
+        "//960-persistence/src/main/java/io/harness/lock/interfaces:module",
+        "//960-persistence/src/main/java/io/harness/mongo/iterator:module",
+        "//960-persistence/src/main/java/io/harness/mongo/iterator/pojos:module",
+        "//970-api-services-beans/src/main/java/io/harness/git/model:module",
+        "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
+        "//970-ng-commons/src/main/java/io/harness/entities:module",
+        "//970-ng-commons/src/main/java/io/harness/gitsync/interceptor:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/manage:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/go-convert/src/main/java/io/harness/goconvert:module",
+        "//clients/template-service/src/main/java/io/harness/template/remote:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/beans/entity:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/mapper:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion:beans",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion/helper:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/ngpipeline/inputset/beans/entity:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/ngpipeline/inputset/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/repositories/conversion:module",
+        "//template-service/contracts/openapi/v1:template-server-spec-module",
+        "@maven//:com_google_inject_guice",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+    ],
+)

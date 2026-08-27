@@ -1,0 +1,72 @@
+pipeline:
+  name: __PIPELINE_NAME__
+  identifier: __PIPELINE_IDENTIFIER__
+  projectIdentifier: __PROJECT_IDENTIFIER__
+  orgIdentifier: __ORG_IDENTIFIER__
+  tags: {}
+  stages:
+    - stage:
+        name: Salesforce Validate
+        identifier: salesforce_dx_validate
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - stepGroup:
+                  name: Salesforce Validate
+                  identifier: salesforce_dx_validate_sg
+                  steps:
+                    - step:
+                        type: SalesforceDownloadDeployables
+                        name: SalesforceDownloadDeployables
+                        identifier: SalesforceDownloadDeployables
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: <+input>
+                          source1Type: <+input>
+                          source2Type: <+input>
+                          source1Ref: <+input>
+                          source2Ref: <+input>
+                          metadataTypes: <+input>
+                    - step:
+                        type: SalesforceEvaluateDiff
+                        name: SalesforceEvaluateDiff
+                        identifier: SalesforceEvaluateDiff
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: <+input>
+                    - step:
+                        type: SalesforceValidate
+                        name: SalesforceValidate
+                        identifier: SalesforceValidate
+                        spec:
+                          connectorRef: account.harnessImage
+                          image: <+input>
+                          testLevel: <+input>
+                          tests: <+input>
+                        timeout: 10m
+                  stepGroupInfra:
+                    type: KubernetesDirect
+                    spec:
+                      connectorRef: <+input>
+                      namespace: <+input>
+            rollbackSteps: []
+          environment:
+            environmentRef: salesforce_runtime
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: salesforce_runtime
+                inputs:
+                  identifier: salesforce_runtime
+                  type: Salesforce
+                  spec:
+                    connectorRef: <+input>
+          serviceDependencies: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback

@@ -1,0 +1,258 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.gitxwebhook;
+
+import static io.harness.rule.OwnerRule.ADITHYA;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import io.harness.CategoryTest;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.beans.Scope;
+import io.harness.category.element.UnitTests;
+import io.harness.gitsync.gitxwebhooks.dtos.CreateGitXWebhookResponseDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.DeleteGitXWebhookResponseDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.GetGitXWebhookResponseDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.GitXEventDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.GitXEventsListResponseDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.ListGitXWebhookResponseDTO;
+import io.harness.gitsync.gitxwebhooks.dtos.UpdateGitXWebhookResponseDTO;
+import io.harness.gitsync.gitxwebhooks.gitbackedentities.UntrackedFilePathDTO;
+import io.harness.gitsync.gitxwebhooks.gitbackedentities.UntrackedFilePathsPageDTO;
+import io.harness.gitsync.gitxwebhooks.service.gitxwebhook.GitXWebhookEventService;
+import io.harness.rule.Owner;
+import io.harness.spec.server.ng.v1.model.CreateGitXWebhookRequest;
+import io.harness.spec.server.ng.v1.model.CreateGitXWebhookResponse;
+import io.harness.spec.server.ng.v1.model.GitXWebhookEventResponse;
+import io.harness.spec.server.ng.v1.model.GitXWebhookEventResponse.EventStatusEnum;
+import io.harness.spec.server.ng.v1.model.GitXWebhookResponse;
+import io.harness.spec.server.ng.v1.model.ListGitXWebhookStatusResponseDTO;
+import io.harness.spec.server.ng.v1.model.UntrackedFilePath;
+import io.harness.spec.server.ng.v1.model.UpdateGitXWebhookRequest;
+import io.harness.spec.server.ng.v1.model.UpdateGitXWebhookResponse;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import javax.ws.rs.core.Response;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+@OwnedBy(HarnessTeam.PIPELINE)
+public class GitXWebhookApiImplTest extends CategoryTest {
+  private GitXWebhooksApiImpl gitXWebhooksApi;
+  @Mock GitXWebhookEventService gitXWebhookEventService;
+  @Mock GitXWebhooksApiHelper gitXWebhooksApiHelper;
+  @Mock GitXWebhookHealthApiHelper gitXWebhookHealthApiHelper;
+  @Mock GitXRateLimitApiHelper gitXRateLimitApiHelper;
+
+  private static final String ACCOUNT_IDENTIFIER = "accountId";
+  private static final String WEBHOOK_IDENTIFIER = "gitWebhook";
+  private static final String WEBHOOK_IDENTIFIER2 = "gitWebhook2";
+  private static final String CONNECTOR_REF = "connectorRef";
+  private static final String REPO_NAME = "testRepo";
+
+  private List<String> FOLDER_PATHS;
+
+  @Before
+  public void setup() {
+    MockitoAnnotations.openMocks(this);
+    gitXWebhooksApi = new GitXWebhooksApiImpl(
+        gitXWebhookEventService, gitXWebhooksApiHelper, gitXWebhookHealthApiHelper, gitXRateLimitApiHelper);
+    FOLDER_PATHS = new ArrayList<>();
+    FOLDER_PATHS.add("path1");
+    FOLDER_PATHS.add("path2");
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testCreateWebhook() {
+    CreateGitXWebhookRequest createGitXWebhookRequest = new CreateGitXWebhookRequest();
+    createGitXWebhookRequest.connectorRef(CONNECTOR_REF);
+    createGitXWebhookRequest.repoName(REPO_NAME);
+    createGitXWebhookRequest.webhookIdentifier(WEBHOOK_IDENTIFIER);
+    createGitXWebhookRequest.folderPaths(FOLDER_PATHS);
+
+    CreateGitXWebhookResponseDTO createGitXWebhookResponseDTO =
+        CreateGitXWebhookResponseDTO.builder().webhookIdentifier(WEBHOOK_IDENTIFIER).build();
+    when(gitXWebhooksApiHelper.createGitXWebhook(any(), any(), any(), any())).thenReturn(createGitXWebhookResponseDTO);
+    Response response = gitXWebhooksApi.createGitxWebhook(createGitXWebhookRequest, ACCOUNT_IDENTIFIER);
+    assertEquals(201, response.getStatus());
+    CreateGitXWebhookResponse createGitXWebhookResponse = (CreateGitXWebhookResponse) response.getEntity();
+    assertEquals(WEBHOOK_IDENTIFIER, createGitXWebhookResponse.getWebhookIdentifier());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testGetWebhook() {
+    GetGitXWebhookResponseDTO getGitXWebhookResponseDTO = GetGitXWebhookResponseDTO.builder()
+                                                              .webhookIdentifier(WEBHOOK_IDENTIFIER)
+                                                              .accountIdentifier(ACCOUNT_IDENTIFIER)
+                                                              .isEnabled(true)
+                                                              .build();
+    when(gitXWebhooksApiHelper.getGitXWebhook(any(), any(), any(), any()))
+        .thenReturn(Optional.ofNullable(getGitXWebhookResponseDTO));
+    Response response = gitXWebhooksApi.getGitxWebhook(WEBHOOK_IDENTIFIER, ACCOUNT_IDENTIFIER);
+    assertEquals(200, response.getStatus());
+    GitXWebhookResponse getGitXWebhookResponse = (GitXWebhookResponse) response.getEntity();
+    assertEquals(WEBHOOK_IDENTIFIER, getGitXWebhookResponse.getWebhookIdentifier());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testUpdateWebhook() {
+    UpdateGitXWebhookRequest updateGitXWebhookRequest = new UpdateGitXWebhookRequest();
+    updateGitXWebhookRequest.setFolderPaths(FOLDER_PATHS);
+    UpdateGitXWebhookResponseDTO updateGitXWebhookResponseDTO =
+        UpdateGitXWebhookResponseDTO.builder().webhookIdentifier(WEBHOOK_IDENTIFIER).build();
+    when(gitXWebhooksApiHelper.updateGitXWebhook(any(), any(), any(), any(), any()))
+        .thenReturn(updateGitXWebhookResponseDTO);
+    Response response =
+        gitXWebhooksApi.updateGitxWebhook(WEBHOOK_IDENTIFIER, updateGitXWebhookRequest, ACCOUNT_IDENTIFIER);
+    UpdateGitXWebhookResponse updateGitXWebhookResponse = (UpdateGitXWebhookResponse) response.getEntity();
+    assertEquals(WEBHOOK_IDENTIFIER, updateGitXWebhookResponse.getWebhookIdentifier());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testDeleteWebhook() {
+    DeleteGitXWebhookResponseDTO deleteGitXWebhookResponseDTO =
+        DeleteGitXWebhookResponseDTO.builder().successfullyDeleted(true).build();
+    when(gitXWebhooksApiHelper.deleteGitXWebhook(any(), any(), any(), any())).thenReturn(deleteGitXWebhookResponseDTO);
+    Response response = gitXWebhooksApi.deleteGitxWebhook(WEBHOOK_IDENTIFIER, ACCOUNT_IDENTIFIER);
+    assertEquals(204, response.getStatus());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testListWebhook() {
+    GetGitXWebhookResponseDTO getGitXWebhookResponseDTO1 = GetGitXWebhookResponseDTO.builder()
+                                                               .webhookIdentifier(WEBHOOK_IDENTIFIER)
+                                                               .accountIdentifier(ACCOUNT_IDENTIFIER)
+                                                               .isEnabled(true)
+                                                               .build();
+    GetGitXWebhookResponseDTO getGitXWebhookResponseDTO2 = GetGitXWebhookResponseDTO.builder()
+                                                               .webhookIdentifier(WEBHOOK_IDENTIFIER2)
+                                                               .accountIdentifier(ACCOUNT_IDENTIFIER)
+                                                               .isEnabled(false)
+                                                               .build();
+    List<GetGitXWebhookResponseDTO> gitXWebhooksList = new ArrayList<>();
+    gitXWebhooksList.add(getGitXWebhookResponseDTO1);
+    gitXWebhooksList.add(getGitXWebhookResponseDTO2);
+    ListGitXWebhookResponseDTO listGitXWebhookResponseDTO =
+        ListGitXWebhookResponseDTO.builder().gitXWebhooksList(gitXWebhooksList).build();
+    when(gitXWebhooksApiHelper.listGitXWebhooks(any(), any(), any(), any())).thenReturn(listGitXWebhookResponseDTO);
+    Response response = gitXWebhooksApi.listGitxWebhooks(ACCOUNT_IDENTIFIER, 0, 10, "");
+    List<GitXWebhookResponse> listGitXWebhookResponse = (List<GitXWebhookResponse>) response.getEntity();
+    assertEquals(2, listGitXWebhookResponse.size());
+    assertEquals(WEBHOOK_IDENTIFIER, listGitXWebhookResponse.get(0).getWebhookIdentifier());
+    assertTrue(listGitXWebhookResponse.get(0).isIsEnabled());
+    assertEquals(WEBHOOK_IDENTIFIER2, listGitXWebhookResponse.get(1).getWebhookIdentifier());
+    assertFalse(listGitXWebhookResponse.get(1).isIsEnabled());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testListWebhookEvents() {
+    GitXEventDTO gitXEventDTO1 = GitXEventDTO.builder()
+                                     .authorName("author1")
+                                     .webhookIdentifier(WEBHOOK_IDENTIFIER)
+                                     .eventIdentifier("event123")
+                                     .eventStatus("FAILED")
+                                     .build();
+    GitXEventDTO gitXEventDTO2 = GitXEventDTO.builder()
+                                     .authorName("author2")
+                                     .webhookIdentifier(WEBHOOK_IDENTIFIER2)
+                                     .eventIdentifier("event234")
+                                     .eventStatus("SUCCESSFUL")
+                                     .build();
+    List<GitXEventDTO> gitXEventDTOList = new ArrayList<>();
+    gitXEventDTOList.add(gitXEventDTO1);
+    gitXEventDTOList.add(gitXEventDTO2);
+    GitXEventsListResponseDTO gitXEventsListResponseDTO =
+        GitXEventsListResponseDTO.builder().gitXEventDTOS(gitXEventDTOList).build();
+    when(gitXWebhookEventService.listEvents(any())).thenReturn(gitXEventsListResponseDTO);
+    Response response = gitXWebhooksApi.listGitxWebhookEvents(
+        ACCOUNT_IDENTIFIER, 0, 10, "", null, null, null, null, null, null, null, null, null, null);
+    List<GitXWebhookEventResponse> eventResponseList = (List<GitXWebhookEventResponse>) response.getEntity();
+    assertEquals(2, eventResponseList.size());
+    assertEquals(WEBHOOK_IDENTIFIER, eventResponseList.get(0).getWebhookIdentifier());
+    assertEquals("event123", eventResponseList.get(0).getEventIdentifier());
+    assertEquals(EventStatusEnum.FAILED, eventResponseList.get(0).getEventStatus());
+
+    assertEquals(WEBHOOK_IDENTIFIER2, eventResponseList.get(1).getWebhookIdentifier());
+    assertEquals("event234", eventResponseList.get(1).getEventIdentifier());
+    assertEquals(EventStatusEnum.SUCCESSFUL, eventResponseList.get(1).getEventStatus());
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testListWebhookStatusPerRepo() {
+    io.harness.gitsync.gitxwebhooks.gitbackedentities.RepoSyncStatusListResponseDTO stubResponse =
+        io.harness.gitsync.gitxwebhooks.gitbackedentities.RepoSyncStatusListResponseDTO.builder()
+            .totalRepos(0L)
+            .repositories(java.util.Collections.emptyList())
+            .build();
+    when(gitXWebhookHealthApiHelper.listWebhookStatusPerRepo(ACCOUNT_IDENTIFIER, REPO_NAME, "PIPELINES", 0, 20))
+        .thenReturn(stubResponse);
+
+    Response response = gitXWebhooksApi.listWebhookStatusPerRepo("PIPELINES", ACCOUNT_IDENTIFIER, 0, 20, REPO_NAME);
+
+    assertEquals(200, response.getStatus());
+    ListGitXWebhookStatusResponseDTO responseBody = (ListGitXWebhookStatusResponseDTO) response.getEntity();
+    assertNotNull(responseBody);
+    org.mockito.Mockito.verify(gitXWebhookHealthApiHelper)
+        .listWebhookStatusPerRepo(ACCOUNT_IDENTIFIER, REPO_NAME, "PIPELINES", 0, 20);
+  }
+
+  @Test
+  @Owner(developers = ADITHYA)
+  @Category(UnitTests.class)
+  public void testGetGitxHealthForRepo() {
+    UntrackedFilePathDTO entry1 = UntrackedFilePathDTO.builder()
+                                      .filePath(".harness/p1.yaml")
+                                      .scope(Scope.of(ACCOUNT_IDENTIFIER, "org1", null))
+                                      .build();
+    UntrackedFilePathDTO entry2 = UntrackedFilePathDTO.builder()
+                                      .filePath(".harness/p2.yaml")
+                                      .scope(Scope.of(ACCOUNT_IDENTIFIER, "org2", "proj"))
+                                      .build();
+    UntrackedFilePathsPageDTO pageDto =
+        UntrackedFilePathsPageDTO.builder().totalElements(2L).filePaths(Arrays.asList(entry1, entry2)).build();
+    when(gitXWebhookHealthApiHelper.listUntrackedFilePaths(ACCOUNT_IDENTIFIER, REPO_NAME, "PIPELINES", 0, 20))
+        .thenReturn(pageDto);
+
+    Response response = gitXWebhooksApi.getGitxHealthForRepo(REPO_NAME, "PIPELINES", ACCOUNT_IDENTIFIER, 0, 20);
+    assertEquals(200, response.getStatus());
+    List<UntrackedFilePath> body = (List<UntrackedFilePath>) response.getEntity();
+    assertEquals(2, body.size());
+    assertEquals(".harness/p1.yaml", body.get(0).getFilePath());
+    assertEquals("org1", body.get(0).getScope().getOrgIdentifier());
+    assertEquals(".harness/p2.yaml", body.get(1).getFilePath());
+    assertEquals("proj", body.get(1).getScope().getProjectIdentifier());
+    org.mockito.Mockito.verify(gitXWebhookHealthApiHelper)
+        .listUntrackedFilePaths(ACCOUNT_IDENTIFIER, REPO_NAME, "PIPELINES", 0, 20);
+  }
+}

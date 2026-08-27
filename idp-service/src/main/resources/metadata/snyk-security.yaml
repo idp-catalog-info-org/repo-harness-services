@@ -1,0 +1,45 @@
+identifier: snyk-security
+name: Snyk
+description: View Snyk scanned vulnerabilities and license compliance of your components directly in Backstage.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Snyk Tech Services
+category: Security
+source: https://github.com/snyk-tech-services/backstage-plugin-snyk/blob/main/README.md
+iconUrl: https://storage.googleapis.com/snyk-technical-services.appspot.com/snyk-logo-vertical-black.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/snyk/
+config: |-
+  proxy:
+    endpoints:
+      '/snyk':
+        target: https://api.snyk.io/
+        pathRewrite:
+          api/proxy/snyk/?: /
+        headers:
+          User-Agent: tech-services/backstage-plugin/1.x
+          Authorization: token ${SNYK_TOKEN}
+environmentVariables:
+  - SNYK_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: SnykOverview
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: SnykOverview
+        specs:
+          gridProps:
+            md: 6
+    - type: TAB_CONTENT
+      name: EntitySnykContent
+      addByDefault: true
+      defaultRoute: /snyk
+      layoutSchemaSpecs:
+        name: EntitySnykContent
+        title: Snyk
+        contents:
+          - component: EntitySnykContent

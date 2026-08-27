@@ -1,0 +1,36 @@
+identifier: harness-chaos
+name: Harness Chaos Engineering
+description: This plugin lets you view the status of Harness Chaos Engineering Resources and launch Chaos Experiments directly inside Harness IDP Catalog.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: harness.io
+category:
+  Chaos Engineering
+core: true
+source: https://github.com/harness/backstage-plugins/tree/main/plugins/harness-chaos
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/harness-chaos
+config: |-
+  proxy:
+    endpoints:
+      '/harness/prod':
+        target: https://app.harness.io/
+        pathRewrite:
+          '/api/proxy/harness/prod/?': '/'
+        allowedHeaders:
+          - authorization
+          - Harness-Account
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityHarnessChaosContent
+      addByDefault: true
+      defaultRoute: /chaos
+      layoutSchemaSpecs:
+        name: EntityHarnessChaosContent
+        title: Chaos Engineering
+        contents:
+          - component: EntityHarnessChaosContent

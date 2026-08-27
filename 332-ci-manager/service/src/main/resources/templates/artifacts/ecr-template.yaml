@@ -1,0 +1,76 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  artifactId:
+    type: string
+    description: Artifact identifier
+    default: ID_PLACEHOLDER
+  artifactName:
+    type: string
+    description: Artifact name (same as artifactId)
+    default: ID_PLACEHOLDER
+
+  sidecarArtifact:
+    type: boolean
+    description: Whether this is a sidecar artifact (optional)
+    default: false
+
+  artifactConnector:
+    type: connector
+    description: AWS connector reference
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.connectorRef}}
+  region:
+    type: string
+    description: ECR region
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.region}}
+  registryId:
+    type: string
+    description: ECR registry ID (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.registryId}}
+  imagePath:
+    type: string
+    description: ECR image path
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.imagePath}}
+  imageTag:
+    type: string
+    description: Image tag (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tag}}
+  imageTagRegex:
+    type: string
+    description: Image tag regex (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.tagRegex}}
+  imageDigest:
+    type: string
+    description: Image digest (optional)
+    default: ${{ngService.spec.ARTIFACT_YAML_PATH.spec.digest}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/ecr-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{inputs.artifactId}}
+    PLUGIN_ARTIFACT_NAME: ${{inputs.artifactName}}
+    PLUGIN_ARTIFACT_SIDECAR_ARTIFACT: ${{inputs.sidecarArtifact}}
+    PLUGIN_ARTIFACT_REGION: ${{inputs.region}}
+    PLUGIN_ARTIFACT_REGISTRY_ID: ${{inputs.registryId}}
+    PLUGIN_ARTIFACT_IMAGE_PATH: ${{inputs.imagePath}}
+    PLUGIN_ARTIFACT_IMAGE_TAG: ${{inputs.imageTag}}
+    PLUGIN_ARTIFACT_IMAGE_TAG_REGEX: ${{inputs.imageTagRegex}}
+    PLUGIN_ARTIFACT_IMAGE_DIGEST: ${{inputs.imageDigest}}
+    PLUGIN_AWS_NAME: ${{inputs.artifactConnector.name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{inputs.artifactConnector.accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{inputs.artifactConnector.secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{inputs.artifactConnector.sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.artifactConnector.crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{inputs.artifactConnector.externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.artifactConnector.assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{inputs.artifactConnector.iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.artifactConnector.oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{inputs.artifactConnector.sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.artifactConnector.baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.artifactConnector.maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.artifactConnector.retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.artifactConnector.fixedBackoff}}

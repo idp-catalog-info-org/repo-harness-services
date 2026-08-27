@@ -1,0 +1,8 @@
+name: CI Manager Queued Execution Count
+identifier: CIManagerQueuedVMCount
+metricGroup: CIQueuedVmCounter
+metrics:
+  - metricName: ci_queued_vm_execution_count
+    metricDefinition: Queued Execution count for OsType and Arch
+    type: LastValue
+    unit: count

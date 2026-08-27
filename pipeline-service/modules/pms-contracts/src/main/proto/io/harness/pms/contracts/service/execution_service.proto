@@ -1,0 +1,51 @@
+// Copyright 2020 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.plan;
+
+import "io/harness/pms/contracts/plan/plan_node_proto.proto";
+import "io/harness/pms/contracts/plan/execution_metadata.proto";
+
+option java_multiple_files = true;
+
+service ExecutionService {
+  rpc savePlan(PlanSaveRequest) returns (PlanSaveResponse);
+  rpc startExecution(StartExecutionRequest) returns (StartExecutionResponse);
+  rpc appendPlanNodes(AppendPlanNodesRequest) returns (AppendPlanNodesResponse);
+}
+
+message AppendPlanNodesRequest {
+  string planId = 1;
+  repeated io.harness.pms.contracts.plan.PlanNodeProto planNodes = 2;
+  string accountId = 3;
+}
+
+message AppendPlanNodesResponse {
+  string planId = 1;
+}
+
+message PlanSaveRequest {
+  repeated io.harness.pms.contracts.plan.PlanNodeProto planNodes = 1;
+  string startingNodeId = 2;
+  string accountId = 3;
+}
+
+message PlanSaveResponse {
+  string planId = 1;
+}
+
+message StartExecutionRequest {
+  string planId = 1;
+  io.harness.pms.contracts.plan.ExecutionMetadata metadata = 2;
+  // Execution mode for this request
+  io.harness.pms.contracts.plan.ExecutionMode executionMode = 3;
+  map<string, string> setupAbstractions = 4;
+}
+
+message StartExecutionResponse {
+  string executionId = 1;
+}

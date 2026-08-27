@@ -1,0 +1,58 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+# To be used when building in CIE
+FROM harness0.harness.io/oci/docker_artifacts/ubi/cie-agents/java-go-cie-agent:17.0.19_10 as builder
+
+RUN mkdir -p /app
+ARG GCP_KEY
+ENV SERVICE_NAME="ci-manager"
+COPY . /app
+
+WORKDIR /app
+
+ENV BUILD_PURPOSE=DEVELOPMENT
+ENV PLATFORM="jenkins"
+
+ARG WARMEDUP_BUILD=false
+
+# Conditional copy using a RUN command
+RUN if [ "$WARMEDUP_BUILD" = "true" ]; then \
+      mkdir -p /root/.bazel-dirs/bin/332-ci-manager/app && \
+      cp -r /app/.bazel-dirs/bin/332-ci-manager/app/* /root/.bazel-dirs/bin/332-ci-manager/app/; \
+    fi
+
+RUN chmod +x \
+    /app/build/feature_build.sh \
+    /app/build/build_dist.sh \
+    /app/scripts/bazel/generate_credentials.sh \
+    && /app/scripts/bazel/generate_credentials.sh \
+    && /app/build/feature_build.sh $GCP_KEY
+
+FROM harness0.harness.io/oci/docker_artifacts/ubi9/java17:17.0.19_10-fips-rfcurated as base
+
+# Add the capsule JAR and ci-manager-config.yml
+COPY --chown=65534:65534 --from=builder \
+ /app/dist/ci-manager/ci-manager-capsule.jar \
+ /app/dist/ci-manager/keystore.jks \
+ /app/dist/ci-manager/enterprise-redisson-jcache.yaml \
+ /app/dist/ci-manager/classpath_metadata.json \
+ /app/dist/ci-manager/ci-manager-config.yml \
+ /app/dist/ci-manager/redisson-jcache.yaml \
+ /app/dist/ci-manager/ci-manager-protocol.info \
+ /app/dist/ci-manager/scripts \
+ /app/dist/ci-manager/default.jfc \
+ /app/dist/ci-manager/profile.jfc \
+ /app/dockerization/base-images/apm/inject-saas-apm-bins-into-dockerimage.sh \
+ /opt/harness/
+
+ RUN chmod +x /opt/harness/*.sh
+ RUN /opt/harness/inject-saas-apm-bins-into-dockerimage.sh && rm -rf /opt/harness/inject-saas-apm-bins-into-dockerimage.sh
+ USER root
+ RUN microdnf remove unzip gzip \
+       && microdnf clean all \
+       && rm -rf /var/cache/yum
+ USER 65534
+ CMD [ "/opt/harness/run.sh" ]

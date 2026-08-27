@@ -1,0 +1,19 @@
+service:
+  uses: kubernetes
+  with:
+    manifests:
+      sources:
+        - id: custom_manifest_id
+          uses: k8s
+          with:
+            store:
+              uses: custom
+              with:
+                script: echo hello
+                paths: "<+input>.regex(^[1-9]+$)"
+            values:
+              - v1.yaml
+              - v2.yaml
+            skip-version: "<+input>.allowedValues(a,b,c)"
+            declarative-rollback: "<+input>.regex(^[1-9]+$)"
+  inputs: {}

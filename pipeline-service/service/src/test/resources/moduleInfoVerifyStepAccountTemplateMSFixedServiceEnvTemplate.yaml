@@ -1,0 +1,46 @@
+template:
+  name: acc-ms-temp
+  identifier: accmstemp
+  versionLabel: v1
+  type: MonitoredService
+  tags: {}
+  spec:
+    serviceRef: account.acc_service
+    environmentRef: account.acc_env
+    type: Application
+    sources:
+      healthSources:
+        - type: DatadogMetrics
+          identifier: accddghs
+          name: acc-ddg-hs
+          spec:
+            connectorRef: account.accddgconn
+            feature: Datadog Cloud Metrics
+            metricDefinitions:
+              - identifier: avg:container.cpu.usage{*}__5fy-h7v-gy9
+                dashboardName: Shubhendu's Dashboard Single Query
+                dashboardId: 5fy-h7v-gy9
+                metricPath: "5fy-h7v-gy9__Query: avg:container.cpu.usage{*}"
+                metricName: avg:container.cpu.usage{*}__5fy-h7v-gy9
+                metric: container.cpu.usage
+                metricTags: []
+                aggregation: avg
+                isManualQuery: true
+                isCustomCreatedMetric: false
+                groupingQuery: avg:container.cpu.usage{*} by {kube_app_name}.rollup(avg, 60)
+                query: avg:container.cpu.usage{*}.rollup(avg, 60)
+                sli:
+                  enabled: false
+                analysis:
+                  riskProfile:
+                    riskCategory: Performance_Other
+                    thresholdTypes:
+                      - ACT_WHEN_HIGHER
+                  liveMonitoring:
+                    enabled: false
+                  deploymentVerification:
+                    enabled: true
+                    serviceInstanceFieldName: kube_app_name
+            metricPacks:
+              - identifier: Custom
+                metricThresholds: []

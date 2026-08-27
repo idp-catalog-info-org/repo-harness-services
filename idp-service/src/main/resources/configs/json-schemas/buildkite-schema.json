@@ -1,0 +1,91 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/buildkite-schema.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/buildkite/api"
+          ],
+          "properties": {
+            "/buildkite/api": {
+              "$id": "#root/proxy/endpoints/buildkite~1api",
+              "title": "Buildkite API Endpoint",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "headers",
+                "pathRewrite"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints/buildkite~1api/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "https://api.buildkite.com/v2",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "headers": {
+                  "$id": "#root/proxy/endpoints/buildkite~1api/headers",
+                  "title": "Headers",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "Authorization"
+                  ],
+                  "properties": {
+                    "Authorization": {
+                      "$id": "#root/proxy/endpoints/buildkite~1api/headers/Authorization",
+                      "title": "Authorization",
+                      "type": "string",
+                      "default": "Bearer ${BUILDKITE_API_TOKEN}",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints/buildkite~1api/pathrewrite",
+                  "title": "PathRewrite",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "^/api/proxy/buildkite/api"
+                  ],
+                  "properties": {
+                    "^/api/proxy/buildkite/api": {
+                      "$id": "#root/proxy/endpoints/buildkite~1api/pathrewrite/api~1proxy~1buildkite~1api~1?",
+                      "title": "^/api/proxy/buildkite/api",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

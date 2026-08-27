@@ -1,0 +1,8 @@
+name: Execution Retention Metrics
+identifier: ExecutionRetentionMetrics
+metricGroup: PipelineExecutionRetentionMetricsGroup
+metrics:
+  - metricName: execution_retention_iterator_lag
+    metricDefinition: Current backlog for execution retention sync
+    type: LastValue
+    unit: count

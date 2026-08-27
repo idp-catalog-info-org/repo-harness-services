@@ -1,0 +1,114 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.expressions;
+
+import static io.harness.rule.OwnerRule.RAGHAV_GUPTA;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+
+import io.harness.CategoryTest;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.category.element.UnitTests;
+import io.harness.exception.InvalidRequestException;
+import io.harness.expression.ConnectorInputsMapper;
+import io.harness.expression.EngineExpressionEvaluator;
+import io.harness.expression.GithubConnectorInputDTO;
+import io.harness.expression.InputsExpressionEvaluator;
+import io.harness.expression.InputsFunctor;
+import io.harness.expression.common.ExpressionMode;
+import io.harness.pms.yaml.YAMLFieldNameConstants;
+import io.harness.pms.yaml.YamlField;
+import io.harness.pms.yaml.YamlUtils;
+import io.harness.rule.Owner;
+import io.harness.serializer.MapperUtils;
+import io.harness.utils.YamlPipelineUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.io.Resources;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Objects;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+@OwnedBy(HarnessTeam.PIPELINE)
+public class InputsExpressionEvaluatorTest extends CategoryTest {
+  private static String pipelineYaml = "simplified-yaml-v1-pipeline-with-inputs.yaml";
+  @Mock ConnectorInputsMapper connectorInputsMapper;
+  @InjectMocks private InputsFunctor inputsFunctor;
+
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    pipelineYaml = readFile("simplified-yaml-v1-pipeline-with-inputs.yaml");
+  }
+
+  @Test
+  @Owner(developers = RAGHAV_GUPTA)
+  @Category(UnitTests.class)
+  public void testBindYaml() throws IOException {
+    String inputsYaml = readFile("inputSet2V1.yaml");
+
+    GithubConnectorInputDTO connectorInputDTO =
+        GithubConnectorInputDTO.builder().url("https://github.com/random/repo").name("c1").id("c1").build();
+    HashMap<String, Object> connectorInputValueMap = new HashMap<>(MapperUtils.toMapViaJsonString(connectorInputDTO));
+
+    doReturn(connectorInputValueMap)
+        .when(connectorInputsMapper)
+        .fetchConnectorFieldsDetails(anyString(), anyString(), anyString(), anyString(), any(), any());
+    EngineExpressionEvaluator evaluator = new InputsExpressionEvaluator(YamlUtils.readAsJsonNode(inputsYaml),
+        YamlUtils.readAsJsonNode(pipelineYaml), connectorInputsMapper, "accountId", "orgId", "projectId", false);
+    String resolvedPipelineYaml =
+        (String) evaluator.resolve(pipelineYaml, ExpressionMode.RETURN_ORIGINAL_EXPRESSION_IF_UNRESOLVED);
+    YamlField stagesField = YamlUtils.readTree(resolvedPipelineYaml)
+                                .getNode()
+                                .getField(YAMLFieldNameConstants.SPEC)
+                                .getNode()
+                                .getField("stages");
+    JsonNode specNode = stagesField.getNode().getCurrJsonNode().get(0).get("steps").get(0).get("spec");
+    assertEquals(specNode.get("image").asText(), "alpine");
+    assertEquals(specNode.get("settings").get("repo").asText(), "harness-core");
+    assertEquals(specNode.get("settings").get("password").asText(), "<+secrets.getValue('password')>");
+    // Default value provided in pipeline, but input not provided. So default will be returned.
+    assertEquals(specNode.get("settings").get("f1").asText(), "defaultValue");
+    // Default value provided in pipeline, but input provided. So provided value will be returned.
+    assertEquals(specNode.get("settings").get("f2").asText(), "defaultValue2");
+    // Value was provided in the pipeline inputs. So its value will be resolved to this fixed value.
+    assertEquals(specNode.get("settings").get("f3").asText(), "FixedValue");
+    assertEquals(specNode.get("settings").get("f4").asText(), "c1");
+
+    ObjectNode pipelineYamlNodeWithoutSpec = (ObjectNode) YamlUtils.readAsJsonNode(pipelineYaml);
+    pipelineYamlNodeWithoutSpec.remove("spec");
+
+    EngineExpressionEvaluator evaluator1 = new InputsExpressionEvaluator(YamlUtils.readAsJsonNode(inputsYaml),
+        YamlUtils.readAsJsonNode(YamlPipelineUtils.writeYamlString(pipelineYamlNodeWithoutSpec)), connectorInputsMapper,
+        "accountId", "orgId", "projectId", false);
+    assertThatCode(() -> evaluator1.resolve(pipelineYaml, ExpressionMode.RETURN_ORIGINAL_EXPRESSION_IF_UNRESOLVED))
+        .doesNotThrowAnyException();
+  }
+
+  private String readFile(String filename) {
+    ClassLoader classLoader = getClass().getClassLoader();
+    try {
+      return Resources.toString(Objects.requireNonNull(classLoader.getResource(filename)), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new InvalidRequestException("Could not read resource file");
+    }
+  }
+}

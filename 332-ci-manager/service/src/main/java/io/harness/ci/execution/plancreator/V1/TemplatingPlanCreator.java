@@ -1,0 +1,86 @@
+/*
+ * Copyright 2025 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ci.execution.plancreator.V1;
+
+import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.TEMPLATING_NODE_ID;
+import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.TEMPLATING_NODE_NAME;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+
+import io.harness.ci.states.V1.cd.TemplatingStep;
+import io.harness.ci.states.V1.cd.TemplatingStepParameters;
+import io.harness.exception.InvalidYamlException;
+import io.harness.pms.contracts.advisers.AdviserObtainment;
+import io.harness.pms.contracts.advisers.AdviserType;
+import io.harness.pms.contracts.facilitators.FacilitatorObtainment;
+import io.harness.pms.contracts.facilitators.FacilitatorType;
+import io.harness.pms.execution.OrchestrationFacilitatorType;
+import io.harness.pms.sdk.core.adviser.OrchestrationAdviserTypes;
+import io.harness.pms.sdk.core.adviser.success.OnSuccessAdviserParameters;
+import io.harness.pms.sdk.core.plan.PlanNode;
+import io.harness.pms.sdk.core.plan.creation.beans.PlanCreationResponse;
+import io.harness.pms.yaml.ParameterField;
+import io.harness.pms.yaml.YamlField;
+import io.harness.pms.yaml.YamlNode;
+import io.harness.serializer.KryoSerializer;
+import io.harness.when.utils.v1.RunInfoUtilsV1;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.inject.Inject;
+import com.google.protobuf.ByteString;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class TemplatingPlanCreator {
+  @Inject private KryoSerializer kryoSerializer;
+
+  public String addTemplatingNode(LinkedHashMap<String, PlanCreationResponse> responseMap, YamlField curr,
+      String nextId, boolean isStepInsideRollback, ParameterField<Map<String, ParameterField<JsonNode>>> envVars) {
+    TemplatingStepParameters stepParameters = getTemplatingStepParameters(curr, envVars);
+    PlanNode templatingStepNode = getTemplatingStepNode(curr, nextId, stepParameters, isStepInsideRollback);
+    responseMap.put(templatingStepNode.getUuid(), PlanCreationResponse.builder().planNode(templatingStepNode).build());
+    return templatingStepNode.getUuid();
+  }
+
+  private PlanNode getTemplatingStepNode(
+      YamlField curr, String nextId, TemplatingStepParameters stepParameters, boolean isStepInsideRollback) {
+    return PlanNode.builder()
+        .uuid(curr.getUuid())
+        .stepType(TemplatingStep.STEP_TYPE)
+        .name(isNotEmpty(stepParameters.getName()) ? stepParameters.getName() : TEMPLATING_NODE_NAME)
+        .identifier(isNotEmpty(stepParameters.getId()) ? stepParameters.getId() : TEMPLATING_NODE_ID)
+        .stepParameters(stepParameters)
+        .facilitatorObtainment(
+            FacilitatorObtainment.newBuilder()
+                .setType(FacilitatorType.newBuilder().setType(OrchestrationFacilitatorType.ASYNC_CHAIN).build())
+                .build())
+        .adviserObtainment(
+            AdviserObtainment.newBuilder()
+                .setType(AdviserType.newBuilder().setType(OrchestrationAdviserTypes.ON_SUCCESS.name()).build())
+                .setParameters(ByteString.copyFrom(
+                    kryoSerializer.asBytes(OnSuccessAdviserParameters.builder().nextNodeId(nextId).build())))
+                .build())
+        .whenCondition(RunInfoUtilsV1.getStepWhenCondition(null, isStepInsideRollback))
+        .build();
+  }
+
+  private TemplatingStepParameters getTemplatingStepParameters(
+      YamlField curr, ParameterField<Map<String, ParameterField<JsonNode>>> envVars) {
+    YamlNode idNode = curr.getNode().getField(YamlNode.ID_FIELD_NAME).getNode();
+    if (!(idNode.getCurrJsonNode() instanceof TextNode id)) {
+      throw new InvalidYamlException("Templating step node id is not configured");
+    }
+
+    YamlNode nameNode = curr.getNode().getField(YamlNode.NAME_FIELD_NAME).getNode();
+    if (!(nameNode.getCurrJsonNode() instanceof TextNode name)) {
+      throw new InvalidYamlException("Templating step node name is not configured");
+    }
+
+    return TemplatingStepParameters.builder().id(id.asText()).name(name.asText()).envVars(envVars).build();
+  }
+}

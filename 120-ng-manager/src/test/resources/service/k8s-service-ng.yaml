@@ -1,0 +1,393 @@
+service:
+  name: k8s_runtime_test
+  identifier: k8s_runtime_test
+  orgIdentifier: default
+  projectIdentifier: ciproject
+  serviceDefinition:
+    spec:
+      manifests:
+        - manifest:
+            identifier: k8s_code
+            type: K8sManifest
+            spec:
+              store:
+                type: HarnessCode
+                spec:
+                  gitFetchType: Branch
+                  paths: <+input>
+                  repoName: <+input>
+                  branch: <+input>
+              valuesPaths: <+input>
+              skipResourceVersioning: <+input>
+              enableDeclarativeRollback: <+input>
+        - manifest:
+            identifier: gitlab
+            type: Values
+            spec:
+              store:
+                type: GitLab
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>
+                  repoName: <+input>.executionInput()
+                  branch: <+input>
+        - manifest:
+            identifier: openshift_git
+            type: OpenshiftParam
+            spec:
+              store:
+                type: Git
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>.allowedValues(a,b,c)
+                  repoName: <+input>
+                  branch: <+input>
+        - manifest:
+            identifier: kustomize_github
+            type: KustomizePatches
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>
+                  repoName: <+input>.executionInput().regex(some regex)
+                  branch: <+input>
+        - manifest:
+            identifier: mbitbucket
+            type: OpenshiftParam
+            spec:
+              store:
+                type: Bitbucket
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>
+                  repoName: <+input>
+                  branch: <+input>
+        - manifest:
+            identifier: patches_azure
+            type: KustomizePatches
+            spec:
+              store:
+                type: AzureRepo
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>
+                  repoName: <+input>
+                  branch: <+input>
+        - manifest:
+            identifier: inherit_manifest
+            type: Values
+            spec:
+              store:
+                type: InheritFromManifest
+                spec:
+                  paths: <+input>
+        - manifest:
+            identifier: custom_manifest
+            type: Values
+            spec:
+              store:
+                type: CustomRemote
+                spec:
+                  filePath: <+input>
+                  extractionScript: <+input>
+                  delegateSelectors: <+input>
+        - manifest:
+            identifier: values_commit
+            type: Values
+            spec:
+              store:
+                type: Git
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Commit
+                  paths: <+input>
+                  repoName: <+input>
+                  commitId: <+input>
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - identifier: art
+              type: Har
+              spec:
+                registryRef: <+input>
+                type: docker
+                spec:
+                  imagePath: <+input>
+                  tag: <+input>
+                  digest: <+input>
+            - spec:
+                connectorRef: <+input>
+                imagePath: <+input>
+                tag: <+input>
+                digest: <+input>
+              identifier: docker
+              type: DockerRegistry
+        sidecars:
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                imagePath: <+input>
+                tag: <+input>
+                digest: <+input>
+                region: <+input>.executionInput().allowedValues(ap-south-2,ap-south-1,eu-south-1)
+                registryId: <+input>.regex(regex.abc)
+              identifier: ecr
+              type: Ecr
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+input>
+                repositoryFormat: docker
+                tag: <+input>
+                digest: <+input>
+                spec:
+                  artifactPath: <+input>
+                  repositoryUrl: <+input>
+              identifier: nexus
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+input>
+                repositoryFormat: docker
+                tag: <+input>
+                digest: <+input>
+                spec:
+                  artifactPath: <+input>
+                  repositoryPort: <+input>
+              identifier: nexus3dockerport
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+input>
+                repositoryFormat: maven
+                tagRegex: <+input>
+                digest: ""
+                spec:
+                  artifactId: <+input>
+                  groupId: <+input>
+                  extension: <+input>
+                  classifier: <+input>
+              identifier: nexusmaven
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+pipeline.executionId>
+                repositoryFormat: npm
+                tag: <+input>.allowedValues(latest)
+                digest: ""
+                spec:
+                  packageName: <+input>
+              identifier: nexusnpm
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+input>
+                repositoryFormat: nuget
+                tag: <+input>
+                digest: ""
+                spec:
+                  packageName: <+input>
+              identifier: nexusnuget
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                repository: <+input>
+                repositoryFormat: raw
+                tagRegex: <+input>
+                digest: ""
+                spec:
+                  group: <+input>
+              identifier: nexusraw
+              type: Nexus3Registry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                artifactPath: <+input>
+                tagRegex: <+input>
+                repository: <+input>
+                repositoryUrl: <+input>
+                repositoryFormat: docker
+                digest: <+input>
+              identifier: factor
+              type: ArtifactoryRegistry
+          - sidecar:
+              spec:
+                connectorRef: <+input>
+                tag: <+input>
+                digest: <+input>
+                subscriptionId: <+input>
+                registry: <+input>
+                repository: <+input>
+              identifier: acr
+              type: Acr
+          - sidecar:
+              identifier: gar
+              spec:
+                connectorRef: <+input>
+                repositoryType: docker
+                project: <+input>
+                region: <+input>
+                repositoryName: <+input>
+                package: <+input>
+                version: <+input>
+                digest: <+input>
+              type: GoogleArtifactRegistry
+          - sidecar:
+              identifier: github_package
+              spec:
+                connectorRef: <+input>
+                packageName: <+input>
+                packageType: container
+                version: <+input>
+                digest: <+input>
+                org: <+input>
+              type: GithubPackageRegistry
+          - sidecar:
+              identifier: custom_manual
+              spec:
+                version: <+input>
+              type: CustomArtifact
+          - sidecar:
+              identifier: custom_script
+              spec:
+                version: <+input>
+                timeout: <+input>
+                delegateSelectors: <+input>
+                inputs:
+                  - name: input1
+                    type: String
+                    value: <+input>
+                scripts:
+                  fetchAllArtifacts:
+                    artifactsArrayPath: <+input>
+                    attributes:
+                      - name: input2
+                        type: String
+                        value: <+input>
+                      - name: input3
+                        type: Number
+                        value: <+input>
+                    versionPath: <+input>
+                    spec:
+                      shell: Bash
+                      source:
+                        spec:
+                          script: <+input>
+                        type: Inline
+              type: CustomArtifact
+      configFiles:
+        - configFile:
+            identifier: c1
+            spec:
+              store:
+                type: Bitbucket
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths: <+input>.allowedValues(p1,p2,p3)
+                  repoName: <+input>
+                  branch: <+input>
+        - configFile:
+            identifier: c2
+            spec:
+              store:
+                type: Harness
+                spec:
+                  secretFiles: <+input>
+        - configFile:
+            identifier: c3
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: connector
+                  gitFetchType: Commit
+                  paths:
+                    - "test/file1.txt"
+                    - "test/file2.txt"
+                  commitId: testCommitId
+        - configFile:
+            identifier: c4
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: connector
+                  gitFetchType: Branch
+                  paths:
+                    - "test/file1.txt"
+                    - "test/file2.txt"
+                  branch: test
+        - configFile:
+            identifier: c5
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Branch
+                  paths:
+                    - "test/file1.txt"
+                    - "test/file2.txt"
+                  branch: <+input>
+        - configFile:
+            identifier: c6
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: <+input>
+                  gitFetchType: Commit
+                  paths:
+                    - "test/file1.txt"
+                    - "test/file2.txt"
+                  commitId: <+input>
+      variables:
+        - name: stringvarexpresison
+          type: String
+          default: a
+          description: somedescription
+          required: true
+          value: <+input>.executionInput().default(a).allowedValues(a,b,c)
+        - name: numberVar
+          type: Number
+          description: numbervardesc
+          required: true
+          value: 4
+        - name: numbervarruntime
+          type: String
+          default: "5"
+          description: numbervarruntime desc
+          required: true
+          value: <+input>.default(5).regex(^[1-9]+$)
+        - name: stringregex
+          type: String
+          default: ABCD
+          description: ""
+          required: false
+          value: <+input>.executionInput().default(ABCD).regex(^[A-Z]+$)
+        - name: secretvar
+          type: Secret
+          description: secretvar desc
+          required: true
+          value: account.docker_personal
+        - name: runtimesecret
+          type: Secret
+          default: account.cdqasa
+          description: runtimesecret desc
+          required: true
+          value: <+input>.default(account.cdqasa).allowedValues(account.docker_personal,account.cdqasa,account.minikubesa)
+    type: Kubernetes

@@ -1,0 +1,45 @@
+service:
+  uses: ecs
+  with:
+    manifests:
+      sources:
+        - id: ecs_task_definition
+          uses: ecs-task-definition
+          with:
+            id: ecs_task_definition
+            store:
+              uses: github
+              with:
+                connector: "<+input>.allowedValues(github_connector,bitbucket_connector,gitlab_connector)"
+                type: branch
+                branch: "<+input>.allowedValues(main,master,develop)"
+                repo: "<+input>.regex(^[a-zA-Z0-9_/-]+$)"
+                paths: "<+input>.regex(^[a-zA-Z0-9_/.-]+\\\\.(json|yaml|yml)$)"
+        - id: ecs_service_definition
+          uses: ecs-service-definition
+          with:
+            id: ecs_service_definition
+            store:
+              uses: github
+              with:
+                connector: "<+input>.allowedValues(github_connector,bitbucket_connector,gitlab_connector)"
+                type: branch
+                branch: "<+input>.allowedValues(main,master,develop)"
+                repo: "<+input>.regex(^[a-zA-Z0-9_/-]+$)"
+                paths: "<+input>.regex(^[a-zA-Z0-9_/.-]+\\\\.(json|yaml|yml)$)"
+    artifacts:
+      primary: <+input>
+      sources:
+        - id: ecr_artifact
+          uses: ecr
+          with:
+            connector: "<+input>.allowedValues(ecr_connector,docker_connector)"
+            region: "<+input>.allowedValues(us-east-1,us-west-2,eu-west-1,ap-south-1)"
+            image: "<+input>.regex(^[a-zA-Z0-9._/-]+$)"
+            tag: "<+input>.allowedValues(latest,stable)"
+            digest: null
+            regex: null
+            registry: null
+          sidecar: false
+    ecsTaskDefinitionArn: null
+  inputs: {}

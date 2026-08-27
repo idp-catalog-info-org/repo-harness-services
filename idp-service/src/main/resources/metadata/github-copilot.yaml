@@ -1,0 +1,36 @@
+identifier: github-copilot
+name: GitHub Copilot
+description: Integration with GitHub Copilot for AI-powered code generation and assistance
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: harness.io
+category: Development
+source: https://github.com/backstage/community-plugins/tree/main/workspaces/copilot/plugins/copilot
+iconUrl: https://github.githubassets.com/images/modules/site/features/copilot/copilot.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/github-copilot
+config: |-
+  copilot:
+    schedule:
+      frequency:
+        hours: 2
+      timeout:
+        minutes: 2
+      initialDelay:
+        seconds: 15
+    host: <your-github-host>
+exports:
+  defaultEntityTypes: []
+  exportDetails:
+    - type: PAGE
+      name: CopilotIndexPage
+      addByDefault: true
+      defaultRoute: /copilot
+      layoutSchemaSpecs:
+        name: CopilotIndexPage
+        path: /copilot
+        title: GitHub Copilot
+        contents:
+          - component: CopilotIndexPage
+

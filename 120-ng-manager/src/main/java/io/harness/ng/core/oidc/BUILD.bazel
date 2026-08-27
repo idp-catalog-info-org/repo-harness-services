@@ -1,0 +1,61 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/src/main/java/io/harness/ng/config:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/modules/constants:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/accesscontrol:module",
+        "//125-cd-nextgen/modules/common/core/src/main/java/io/harness/cdng/helpers:module",
+        "//126-instance/src/main/java/io/harness/service/instancesyncoidcinfo:module",
+        "//970-ng-commons/src/main/java/io/harness/constants:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/rsa:module",
+        "//970-ng-commons/src/main/java/io/harness/security/annotations:module",
+        "//980-commons/src/main/java/io/harness/security/annotations:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-client/src/main/java/io/harness/pipeline/remote:module",
+        "//oidc-core/src/main/java/io/harness/oidc/accesstoken:module",
+        "//oidc-core/src/main/java/io/harness/oidc/artifactory:module",
+        "//oidc-core/src/main/java/io/harness/oidc/aws/credential:module",
+        "//oidc-core/src/main/java/io/harness/oidc/aws/delegate:module",
+        "//oidc-core/src/main/java/io/harness/oidc/aws/dto:module",
+        "//oidc-core/src/main/java/io/harness/oidc/aws/utility:module",
+        "//oidc-core/src/main/java/io/harness/oidc/azure/credential:module",
+        "//oidc-core/src/main/java/io/harness/oidc/azure/dto:module",
+        "//oidc-core/src/main/java/io/harness/oidc/azure/utility:module",
+        "//oidc-core/src/main/java/io/harness/oidc/config:module",
+        "//oidc-core/src/main/java/io/harness/oidc/dto:module",
+        "//oidc-core/src/main/java/io/harness/oidc/entities:module",
+        "//oidc-core/src/main/java/io/harness/oidc/gcp/constants:module",
+        "//oidc-core/src/main/java/io/harness/oidc/gcp/delegate:module",
+        "//oidc-core/src/main/java/io/harness/oidc/gcp/dto:module",
+        "//oidc-core/src/main/java/io/harness/oidc/gcp/utility:module",
+        "//oidc-core/src/main/java/io/harness/oidc/idtoken:module",
+        "//oidc-core/src/main/java/io/harness/oidc/jwks:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_squareup_retrofit_retrofit",
+        "@maven//:commons_net_commons_net",
+        "@maven//:io_swagger_core_v3_swagger_annotations",
+        "@maven//:io_swagger_swagger_annotations",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:org_apache_commons_commons_lang3",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

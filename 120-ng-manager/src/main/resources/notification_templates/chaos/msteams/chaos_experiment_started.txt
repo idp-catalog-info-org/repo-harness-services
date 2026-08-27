@@ -1,0 +1,82 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#00FF00",
+  "summary": "Chaos Experiment started: ${CHAOS_EXPERIMENT_NAME}",
+  "sections": [
+    {
+      "activityTitle": "Chaos Experiment [${CHAOS_EXPERIMENT_NAME}](${CHAOS_EXPERIMENT_URL}) has been started",
+      "activitySubtitle": "In Project ${PROJECT_ID}",
+      "activityImage": "https://s3.amazonaws.com/wings-assets/slackicons/resumed.png",
+      "facts": [
+        {
+          "name": "Status",
+          "value": "Started"
+        },
+        {
+          "name": "Experiment ID",
+          "value": "${EXPERIMENT_ID}"
+        },
+        {
+          "name": "Run Sequence",
+          "value": "${RUN_SEQUENCE}"
+        },
+        {
+          "name": "Organization",
+          "value": "${ORG_ID}"
+        },
+        {
+          "name": "Account",
+          "value": "${ACCOUNT_ID}"
+        },
+        {
+          "name": "Description",
+          "value": "${CHAOS_EXPERIMENT_DESCRIPTION}"
+        },
+        {
+          "name": "Tags",
+          "value": "${CHAOS_EXPERIMENT_TAGS}"
+        },
+        {
+          "name": "Schedule",
+          "value": "${SCHEDULE_DETAILS}"
+        },
+        {
+          "name": "Experiment Run ID",
+          "value": "${CHAOS_EXPERIMENT_RUN_ID}"
+        },
+        {
+          "name": "Infrastructure",
+          "value": "${CHAOS_INFRASTRUCTURE_ID} (${CHAOS_INFRASTRUCTURE_TYPE})"
+        },
+        {
+          "name": "Environment",
+          "value": "${ENVIRONMENT_ID}"
+        },
+        {
+          "name": "Executed By",
+          "value": "${USER_ID}"
+        },
+        {
+          "name": "Started On",
+          "value": "${EXECUTED_ON}"
+        },
+        {
+          "name": "Faults",
+          "value": "${TOTAL_NUMBER_OF_FAULTS}"
+        },
+        {
+          "name": "Probes",
+          "value": "${TOTAL_NUMBER_OF_PROBES}"
+        },
+        {
+          "name": "Actions",
+          "value": "${TOTAL_NUMBER_OF_ACTIONS}"
+        },
+        {
+          "name": "View Experiment",
+          "value": "[${CHAOS_EXPERIMENT_URL}](${CHAOS_EXPERIMENT_URL})"
+        }
+      ]
+    }
+  ]
+}

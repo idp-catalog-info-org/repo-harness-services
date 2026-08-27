@@ -1,0 +1,34 @@
+{
+    "title": "Harness Artifact Registry Firewall Exemption Created",
+    "description": "A firewall exemption has been created and waiting for your approval.",
+    "fields": [
+        {
+            "label": "Package Name",
+            "value": "${PACKAGE_NAME}"
+        },
+        {
+            "label": "Version List",
+            "value": "${VERSION_LIST}"
+        },
+        {
+            "label": "Registry Name",
+            "value": "${REGISTRY_NAME}"
+        },
+        {
+            "label": "Registry URL",
+            "value": "${REGISTRY_URL}"
+        },
+        {
+            "label": "Reason",
+            "value": "${REASON}"
+        },
+        {
+            "label": "Created By",
+            "value": "${CREATED_BY}"
+        },
+        {
+            "label": "View Details",
+            "value": "${EXCEPTION_URL}"
+        }
+    ]
+}

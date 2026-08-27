@@ -1,0 +1,116 @@
+pipeline:
+  name: spawn-test
+  identifier: spawntest
+  projectIdentifier: Brijesh
+  orgIdentifier: default
+  tags:
+    __uuid: jH-QvDSoSEaQGudpMAT6YA
+  stages:
+    - stage:
+        name: CustomStage
+        identifier: CustomStage
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: ShellScript_1
+                  identifier: ShellScript_1
+                  spec:
+                    shell: Bash
+                    executionTarget:
+                      __uuid: szf-mWSlRC-fcij_-L5pEg
+                    source:
+                      type: Inline
+                      spec:
+                        script: echo HI
+                        __uuid: B0hS7ZalSvW12qnyQDgX8g
+                      __uuid: 8ay9LtzESNCWYjzObqZTBQ
+                    environmentVariables: []
+                    outputVariables: []
+                    __uuid: 7QfOSE5iTz2tuQ0n5LpfUQ
+                  timeout: 10m
+                  __uuid: HI2OfFc8Qj2xcBZEeeDa4w
+                __uuid: ODAmVqvNS_ivoFkQ9TIsDA
+            __uuid: xY26X0OLQb-0McTZCUVDfw
+          __uuid: P1nvh9pyTVKnzYyNpGGPlw
+        tags:
+          __uuid: x1pjbfTBRUqzni3QV3EjgA
+        __uuid: e-DWHYteQBmDGQF8kUiAZA
+      __uuid: mHI2MYg_Rz6rgXygAbzlZA
+    - parallel:
+        - stage:
+            name: cs2333
+            identifier: cs2333
+            description: ""
+            type: Custom
+            spec:
+              execution:
+                steps:
+                  - step:
+                      type: Wait
+                      name: Wait_1
+                      identifier: Wait_1
+                      spec:
+                        duration: 10m
+                        __uuid: 52lsm05ET_WgJ7S_rhL-GA
+                      __uuid: Y4a7KITUQTG2vOvpSo8rzg
+                    __uuid: A2yP-CBsRTiiTNhWgmsxQA
+                __uuid: o4p98JgnR3ODC8SD_60jWA
+              __uuid: 8QLFPMagRjiVGSvwhoydCw
+            tags:
+              __uuid: qavmsJlDQ7OBaT__kqQQWA
+            __uuid: HWfjapqrQK6h00cZZaSaUg
+          __uuid: gCbx4UDjQW2C7KDavxduFA
+        - stage:
+            name: cdsadsa
+            identifier: cdsadsa
+            description: ""
+            type: Custom
+            spec:
+              execution:
+                steps:
+                  - step:
+                      type: Wait
+                      name: Wait_1
+                      identifier: Wait_1
+                      spec:
+                        duration: 10m
+                        __uuid: aUCB2ClBSWeNaKFsAOxu6A
+                      __uuid: Den845gmTW-8-V3qfH87pQ
+                    __uuid: cNcVend-QJ6WI9DzP2UCTA
+                __uuid: G9EE2a3xSZGiJvdo1-HymA
+              __uuid: AIa2aRCoTkSsJAd70yi-zA
+            tags:
+              __uuid: 0TbP88MuSz-fdeVhsps6vw
+            __uuid: 6HyM1n6lTQudKI8nWRGaBw
+          __uuid: yWADcg5YTIKaXzC0TpmogQ
+      __uuid: eeF_oeuOSxOA0RjkdjdjhQ
+    - stage:
+        name: cs3334
+        identifier: cs3334
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Wait
+                  name: Wait_1
+                  identifier: Wait_1
+                  spec:
+                    duration: 10m
+                    __uuid: Izfa_dGZShOsWkXi6grhSg
+                  __uuid: 6uX6O6bnT_KCsubGWEXL0g
+                __uuid: LTGdBPZUQuWiDqCWwmDbjw
+            __uuid: e1mYemu4SIuOklnoL188JA
+          __uuid: rRqr7HAoQo2TbrxfjtrUfw
+        tags:
+          __uuid: 5NkEilauQ-KqlAJDcgvG8A
+        __uuid: tSx4A8RzTiOWGOj4ZY8yoQ
+      __uuid: pWQFCJXpQpyeRBo9WOlXOw
+  timeout: 40m
+  __uuid: b5seh45XT0a49OxsJCtiSA
+__uuid: 8kctH69tTmmRmnD49blj_w

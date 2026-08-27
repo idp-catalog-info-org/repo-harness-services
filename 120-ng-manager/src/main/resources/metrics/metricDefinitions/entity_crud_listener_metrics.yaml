@@ -1,0 +1,9 @@
+name: NG Manager Entity CRUD Listener Metrics
+identifier: EntityCRUDListenerMetrics
+metricGroup: entity_crud_listener_metrics_group
+metrics:
+  - metricName: ng_manager_entity_crud_listener_process_time
+    metricDefinition: Time taken by ProjectEntityCRUDStreamListener to process an entity_crud event, labeled by entityType and action
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 15s, 30s, 1m, 2m ]
+    unit: "ms"

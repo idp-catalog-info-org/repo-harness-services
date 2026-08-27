@@ -1,0 +1,14 @@
+{
+    "title": "Harness Artifact Registry Firewall Exemption Created: ${PACKAGE_NAME}",
+    "text": "A firewall exemption has been created and waiting for your approval. Package: ${PACKAGE_NAME}. Versions: ${VERSION_LIST}. Registry: ${REGISTRY_NAME}. Reason: ${REASON}. Created By: ${CREATED_BY}. View Details: ${EXCEPTION_URL}",
+    "tags": [
+        "package:${PACKAGE_NAME}",
+        "registry:${REGISTRY_NAME}",
+        "event_type:firewall_exemption_created",
+        "exception_url:${EXCEPTION_URL}"
+    ],
+    "aggregation_key": "${PACKAGE_NAME}",
+    "priority": "normal",
+    "alert_type": "info",
+    "source_type_name": "harness_notifications"
+}

@@ -1,0 +1,8 @@
+name: Step Executions Metrics
+identifier: StepExecutionMetrics
+metricGroup: StepExecutionMetricsGroup
+metrics:
+  - metricName: step_execution_end_count
+    metricDefinition: Number of ended step executions
+    type: Count
+    unit: "1"

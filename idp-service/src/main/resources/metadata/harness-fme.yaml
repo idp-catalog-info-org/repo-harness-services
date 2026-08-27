@@ -1,0 +1,36 @@
+identifier: fme
+name: Harness FME
+description: Harness Feature Management & Experimentation (FME) is a feature flag management solution that provides release monitoring and experimentation for data-driven development.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: harness.io
+isDeleted: false
+category: Feature Flags
+iconUrl: https://static.harness.io/ng-static/images/favicon.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/feature-management-experimentation/
+config: |-
+  proxy:
+    endpoints:
+      "/harnessfme":
+        target: 'https://api.split.io/'
+        pathRewrite:
+          '/api/proxy/harnessfme/?': '/'  
+        headers:
+          x-api-key: ${SPLIT_API_TOKEN}
+          
+environmentVariables:
+  - SPLIT_API_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityHarnessFMEFeatureFlagContent
+      addByDefault: true
+      defaultRoute: /harnessfme
+      layoutSchemaSpecs:
+        name: EntityHarnessFMEFeatureFlagContent
+        title: FME
+        contents:
+          - component: EntityHarnessFMEFeatureFlagContent

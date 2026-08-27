@@ -1,0 +1,30 @@
+identifier: github-actions
+name: GitHub Actions
+description: GitHub Actions makes it easy to automate all your software workflows, now with world-class CI/CD. Build, test, and deploy your code right from GitHub.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Spotify
+category: CI/CD
+source: https://github.com/backstage/backstage/tree/master/plugins/github-actions
+iconUrl: https://avatars2.githubusercontent.com/u/44036562?s=400&v=4
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/github-actions/
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityGithubActionsContent
+      addByDefault: true
+      defaultRoute: /ci-cd
+      layoutSchemaSpecs:
+        name: EntityGithubActionsContent
+        title: CI/CD
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isGithubActionsAvailable
+                  content:
+                    component: EntityGithubActionsContent

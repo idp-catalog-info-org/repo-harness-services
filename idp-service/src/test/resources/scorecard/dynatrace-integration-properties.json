@@ -1,0 +1,65 @@
+{
+  "entityId": "SERVICE-7C02710054553619",
+  "displayName": "payments-service",
+  "name": "payments-service",
+  "type": "SERVICE",
+  "firstSeenTms": 1714761600000,
+  "lastSeenTms": 1722124800000,
+  "upstreamServiceIds": ["SERVICE-A1B2C3D4E5F60718", "SERVICE-B2C3D4E5F6071890"],
+  "upstreamServiceNames": ["auth-service", "cart-service"],
+  "downstreamServiceIds": ["SERVICE-C3D4E5F607189012", "SERVICE-D4E5F60718901234"],
+  "downstreamServiceNames": ["ledger", "notifications"],
+  "monitorCount": 4,
+  "sloCount": 3,
+  "problemCount": 2,
+  "monitors_summary_count": {
+    "red": 1,
+    "yellow": 1,
+    "green": 2,
+    "others": 0
+  },
+  "slos_summary_count": {
+    "red": 0,
+    "yellow": 1,
+    "green": 2,
+    "others": 0
+  },
+  "problems_summary_count": {
+    "red": 1,
+    "yellow": 0,
+    "green": 1,
+    "others": 0
+  },
+  "monitors_summary": {
+    "red": ["Checkout latency check"],
+    "yellow": ["Payment API availability"],
+    "green": ["Health endpoint", "Queue depth"],
+    "others": []
+  },
+  "slos_summary": {
+    "red": [],
+    "yellow": ["Payment success rate"],
+    "green": ["Availability 99.9%", "p95 latency"],
+    "others": []
+  },
+  "problems_summary": {
+    "red": [
+      {
+        "name": "High failure rate on /charge",
+        "severityLevel": "ERROR",
+        "displayId": "P-260530",
+        "startTime": 1722000000000
+      }
+    ],
+    "yellow": [],
+    "green": [
+      {
+        "name": "Elevated response time (resolved)",
+        "severityLevel": "PERFORMANCE",
+        "displayId": "P-260401",
+        "startTime": 1721000000000
+      }
+    ],
+    "others": []
+  }
+}

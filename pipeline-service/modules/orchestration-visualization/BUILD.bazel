@@ -1,0 +1,101 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_binary")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    #TODO(archit): Remove CDC access when PipelineExecutionSummaryEntity from CDC is removed.
+    visibility = [
+        "//110-change-data-capture:__subpackages__",
+        "//pipeline-service:__subpackages__",
+    ],
+    exports = [
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/cleanup:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/cleanup/config:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/consumers/graph:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/event:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/event/streams/model:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/event/streams/serde:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/generator:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/graph/consumer:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/graph/service:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/graph/service/impl:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/observers:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/pms/plan/execution:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/pms/plan/execution/service:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/repositories/executions:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/serializer:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/skip/factory:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/skip/service:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/skip/service/impl:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/skip/skipper:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/skip/skipper/impl:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/utils:module",
+    ],
+)
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["src/test/**/*.java"]),
+    resources = ["//pipeline-service/modules/orchestration-visualization/src/test/resources:resource"],
+    visibility = ["//pipeline-service:__subpackages__"],
+    deps = [
+        ":module",
+        "//:lombok",
+        "//910-delegate-service-driver/src/main/java/io/harness/grpc:module",
+        "//930-ng-core-clients/src/main/java/io/harness/user/remote:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/instancesync:module",
+        "//950-wait-engine:module",
+        "//959-timeout-engine:module",
+        "//960-persistence:supporter-test",
+        "//960-persistence/src/main/java/io/harness/objectstore:module",
+        "//980-commons/src/main/java/io/harness/maintenance:module",
+        "//990-commons-test:module",
+        "//clients/pipeline-service/pms-sdk:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/provider/impl:module",
+        "@maven//:dev_morphia_morphia_core",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_awaitility_awaitility",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_mockito_mockito_inline",
+        "@maven//:org_powermock_powermock_api_mockito2",
+        "@maven//:org_powermock_powermock_module_junit4",
+    ],
+)
+
+run_tests()
+
+java_test(
+    name = "OrchestrationVisualizationComponentTest",
+    srcs = ["src/test/java/io/harness/OrchestrationVisualizationComponentTest.java"],
+    resources = ["//pipeline-service/modules/orchestration-visualization/src/test/resources:resource"],
+    tags = ["component_test"],
+    test_class = "io.harness.OrchestrationVisualizationComponentTest",
+    visibility = ["//pipeline-service:__subpackages__"],
+    deps = [
+        ":module",
+        ":tests",
+        "//:lombok",
+        "@maven//:dev_morphia_morphia_core",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_awaitility_awaitility",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_mockito_mockito_inline",
+        "@maven//:org_powermock_powermock_api_mockito2",
+        "@maven//:org_powermock_powermock_module_junit4",
+    ],
+)
+
+# run static analysis macro for pmd/checkstyle/sonarqube checks
+run_analysis(
+    run_pmd = False,
+)

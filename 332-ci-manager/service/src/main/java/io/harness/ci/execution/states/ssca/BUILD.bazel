@@ -1,0 +1,41 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//332-ssca/ci/src/main/java/io/harness/ssca/beans/stepinfo:module",
+        "//332-ssca/commons/src/main/java/io/harness/ssca/beans:module",
+        "//332-ssca/commons/src/main/java/io/harness/ssca/client:module",
+        "//877-pipeline-ci-cd-commons/src/java/io/harness/ci/execution/states:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/execution/artifact:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/provenance:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/beans/steps/outcome:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ssca/execution/orchestration/outcome:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/serializer/spring/converters/ambiance:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/beans/ci/vm:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/stepstatus:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/stepstatus/artifact:module",
+        "//950-delegate-tasks-beans/src/main/java/io/harness/delegate/task/stepstatus/artifact/ssca:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/sdk/core/steps/io/v1:module",
+        "//970-api-services-beans/src/main/java/io/harness/logging:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/serializer:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

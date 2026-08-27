@@ -1,0 +1,61 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.inputmetadata;
+import "980-commons/src/main/proto/io/harness/security/principal.proto";
+option java_multiple_files = true;
+
+service InputsMetadataService {
+  rpc generateInputsMetadata(InputsMetadataRequestBatch) returns (InputsMetadataResponseBatch);
+}
+
+message InputsMetadataRequestBatch {
+  repeated InputsMetadataRequestProto inputsMetadataRequestProto = 1;
+  InputsMetadataRequestMetadata inputsMetadataRequestMetadata = 2;
+}
+
+message InputsMetadataRequestProto {
+  string fqn = 1;
+  string entityType = 2;
+  string entityId = 3;
+  string entityIdentifierKey = 4;
+  bytes inputFormYaml = 5;
+}
+
+message InputsMetadataRequestMetadata {
+  string accountIdentifier = 1;
+  string projectIdentifier = 2;
+  string orgIdentifier = 3;
+  bytes gitContext = 4;
+  io.harness.security.Principal principal = 5;
+}
+
+message InputsMetadataResponseBatch {
+  repeated InputsMetadataResponse inputsMetadataResponse = 1;
+}
+
+message InputsMetadataResponse {
+  /* The `result` field below is a map of stringified FQN (of a runtime input in a YAML input form) to the metadata
+     pertaining to this runtime input. This metadata, as of now, contains `required` and `description` fields of the
+     runtime input (if they are present). We can later add more metadata as we deem necessary. */
+  map<string, InputsMetadata> result = 1;
+  string fqn = 2;
+  string entityIdentifierKey = 3;
+  bool success = 4;
+  ErrorDetails error = 5;
+}
+
+message InputsMetadata {
+  bool required = 1;
+  string description = 2;
+}
+
+message ErrorDetails {
+  string errorMessage = 1;
+  string explanationMessage = 2;
+  string hintMessage = 3;
+}

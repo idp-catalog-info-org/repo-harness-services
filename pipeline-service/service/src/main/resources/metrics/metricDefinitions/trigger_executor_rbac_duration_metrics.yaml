@@ -1,0 +1,9 @@
+name: Trigger Executor RBAC Duration Metrics
+identifier: TriggerExecutorRbacDuration
+metricGroup: trigger_executor_rbac_duration_group
+metrics:
+  - metricName: trigger_executor_rbac_validation_duration
+    metricDefinition: Time taken to validate executor pipeline permissions via ACL at trigger execution time.
+    type: Duration
+    distribution: [ 0ms, 10ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s ]
+    unit: "ms"

@@ -1,0 +1,372 @@
+/*
+ * Copyright 2023 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.pms.plugin;
+
+import static io.harness.data.structure.EmptyPredicate.isEmpty;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+
+import io.harness.ModuleType;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.FeatureName;
+import io.harness.beans.yaml.extended.infrastrucutre.OSType;
+import io.harness.plancreator.execution.ExecutionWrapperConfig;
+import io.harness.plancreator.execution.StepsExecutionConfig;
+import io.harness.plancreator.inject.InjectUtils;
+import io.harness.plancreator.steps.ExecutionWrapperConfigUtils;
+import io.harness.plancreator.steps.InjectStepNode;
+import io.harness.plancreator.steps.ParallelStepElementConfig;
+import io.harness.plancreator.steps.pluginstep.ContainerStepV2PluginProvider;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.plan.ConnectorDetails;
+import io.harness.pms.contracts.plan.ImageDetails;
+import io.harness.pms.contracts.plan.PluginCreationBatchRequest;
+import io.harness.pms.contracts.plan.PluginCreationBatchResponse;
+import io.harness.pms.contracts.plan.PluginCreationRequest;
+import io.harness.pms.contracts.plan.PluginCreationResponse;
+import io.harness.pms.contracts.plan.PluginCreationResponseList;
+import io.harness.pms.contracts.plan.PluginCreationResponseWrapper;
+import io.harness.pms.contracts.plan.PluginInfoProviderServiceGrpc;
+import io.harness.pms.contracts.plan.PortDetails;
+import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.pms.yaml.ParameterField;
+import io.harness.pms.yaml.YamlNode;
+import io.harness.pms.yaml.YamlUtils;
+import io.harness.steps.container.exception.ContainerStepExecutionException;
+import io.harness.steps.container.execution.ContainerExecutionConfig;
+import io.harness.steps.container.utils.ConnectorUtils;
+import io.harness.steps.container.utils.K8sPodInitUtils;
+import io.harness.steps.plugin.InitContainerV2StepInfo;
+import io.harness.steps.plugin.StepInfo;
+import io.harness.steps.plugin.infrastructure.ContainerK8sInfra;
+import io.harness.utils.PmsFeatureFlagHelper;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_ECS})
+@Slf4j
+@Singleton
+public class ContainerStepV2PluginProviderImpl implements ContainerStepV2PluginProvider {
+  @Inject
+  Map<ModuleType, PluginInfoProviderServiceGrpc.PluginInfoProviderServiceBlockingStub>
+      pluginInfoProviderServiceBlockingStubMap;
+  @Inject K8sPodInitUtils k8sPodInitUtils;
+  @Inject ContainerExecutionConfig containerExecutionConfig;
+
+  @Inject private ConnectorUtils connectorUtils;
+  @Inject private PmsFeatureFlagHelper pmsFeatureFlagHelper;
+
+  /**
+   * Does the following:
+   * - Extracts the step information out of the init container step in form of stepInfos.
+   * -
+   * @param initContainerV2StepInfo
+   * @param ambiance
+   * @return
+   */
+  @Override
+  public Map<StepInfo, PluginCreationResponseList> getPluginsDataV2(
+      InitContainerV2StepInfo initContainerV2StepInfo, Ambiance ambiance) {
+    boolean flexibleTemplatesEnabled = InjectUtils.IsFlexibleTemplatesEnabled(ambiance);
+    Set<StepInfo> stepInfos =
+        getStepInfos(initContainerV2StepInfo.getStepsExecutionConfig(), flexibleTemplatesEnabled, ambiance);
+    Set<Integer> usedPorts = new HashSet<>();
+    OSType os = k8sPodInitUtils.getOS(initContainerV2StepInfo.getInfrastructure());
+
+    // Inorder to batch the requests per module, we have created a map of moduleType to map of stepInfo and
+    // PluginCreationRequest.
+    // StepInfo is required because all the calculation of resources for parallel and strategy depends on the yaml
+    // provided.
+    Map<String, Map<StepInfo, PluginCreationRequest>> moduleToBatchRequest =
+        getModuleToBatchRequest(stepInfos, ambiance, usedPorts, os);
+
+    Map<StepInfo, PluginCreationResponseList> stepInfoPluginCreationResponseListMap = new HashMap<>();
+    for (Map.Entry<String, Map<StepInfo, PluginCreationRequest>> entry : moduleToBatchRequest.entrySet()) {
+      PluginCreationBatchRequest pluginCreationBatchRequest =
+          PluginCreationBatchRequest.newBuilder()
+              .addAllPluginCreationRequest(entry.getValue().values())
+              .setUsedPortDetails(PortDetails.newBuilder().addAllUsedPorts(usedPorts).build())
+              .setAmbiance(ambiance)
+              .build();
+      Map<String, StepInfo> requestIdToStepInfo = entry.getValue().keySet().stream().collect(
+          Collectors.toMap(this::getRequestIdForPluginCreation, stepInfo -> stepInfo));
+      PluginCreationBatchResponse pluginCreationBatchResponse =
+          pluginInfoProviderServiceBlockingStubMap.get(ModuleType.fromString(entry.getKey()))
+              .getPluginInfosList(pluginCreationBatchRequest);
+      for (Map.Entry<String, PluginCreationResponseList> response :
+          pluginCreationBatchResponse.getRequestIdToResponseMap().entrySet()) {
+        stepInfoPluginCreationResponseListMap.put(requestIdToStepInfo.get(response.getKey()),
+            postProcessResponseList(initContainerV2StepInfo, response.getValue(), usedPorts, ambiance));
+      }
+    }
+    return stepInfoPluginCreationResponseListMap;
+  }
+
+  /**
+   * Iterates over all the passed stepInfos and club all the stepInfos belonging to the same module in one map.
+   * @param stepInfos
+   * @param ambiance
+   * @param usedPorts
+   * @param os
+   * @return
+   */
+  private Map<String, Map<StepInfo, PluginCreationRequest>> getModuleToBatchRequest(
+      Set<StepInfo> stepInfos, Ambiance ambiance, Set<Integer> usedPorts, OSType os) {
+    Multimap<String, StepInfo> moduleToStepInfo = HashMultimap.create();
+    for (StepInfo stepInfo : stepInfos) {
+      moduleToStepInfo.put(stepInfo.getModuleType(), stepInfo);
+    }
+    Map<String, Map<StepInfo, PluginCreationRequest>> map = new HashMap<>();
+    for (Map.Entry<String, Collection<StepInfo>> entry : moduleToStepInfo.asMap().entrySet()) {
+      Map<StepInfo, PluginCreationRequest> stepInfoToPluginCreationRequest = new HashMap<>();
+      for (StepInfo stepInfo : entry.getValue()) {
+        stepInfoToPluginCreationRequest.put(stepInfo,
+            PluginCreationRequest.newBuilder()
+                .setType(stepInfo.getStepType())
+                .setStepJsonNode(stepInfo.getExecutionWrapperConfig().getStep().toString())
+                .setAccountId(AmbianceUtils.getAccountId(ambiance))
+                .setOsType(os.getYamlName())
+                .setUsedPortDetails(PortDetails.newBuilder().addAllUsedPorts(usedPorts).build())
+                .setRequestId(getRequestIdForPluginCreation(stepInfo))
+                .build());
+      }
+      map.put(entry.getKey(), stepInfoToPluginCreationRequest);
+    }
+    return map;
+  }
+
+  private String getConnectorRef(
+      InitContainerV2StepInfo initContainerV2StepInfo, String stepIdentifier, Ambiance ambiance) {
+    if (initContainerV2StepInfo.getInfrastructure() instanceof ContainerK8sInfra) {
+      ParameterField<String> harnessImageConnectorRef =
+          ((ContainerK8sInfra) initContainerV2StepInfo.getInfrastructure()).getSpec().getHarnessImageConnectorRef();
+      if (!ParameterField.isBlank(harnessImageConnectorRef)) {
+        return harnessImageConnectorRef.getValue();
+      } else if (isNotEmpty(containerExecutionConfig.getDefaultInternalImageConnector())
+          && connectorUtils.getDefaultInternalConnector(AmbianceUtils.getNgAccess(ambiance)) != null) {
+        log.info("Checking connectivity to default connector for step {}", stepIdentifier);
+        return containerExecutionConfig.getDefaultInternalImageConnector();
+      }
+    }
+    return null;
+  }
+
+  private ParallelStepElementConfig getParallelStepElementConfig(ExecutionWrapperConfig executionWrapperConfig) {
+    try {
+      return YamlUtils.read(executionWrapperConfig.getParallel().toString(), ParallelStepElementConfig.class);
+    } catch (Exception ex) {
+      throw new ContainerStepExecutionException("Failed to deserialize ExecutionWrapperConfig parallel node", ex);
+    }
+  }
+
+  @VisibleForTesting
+  Set<StepInfo> getStepInfos(
+      StepsExecutionConfig stepExecutionConfig, boolean flexibleTemplateEnabled, Ambiance ambiance) {
+    List<ExecutionWrapperConfig> executionWrappers = stepExecutionConfig.getSteps();
+    Set<StepInfo> stepInfos = new HashSet<>();
+    for (ExecutionWrapperConfig executionWrapper : executionWrappers) {
+      getStepType(executionWrapper, stepInfos, flexibleTemplateEnabled, "", ambiance);
+    }
+    return stepInfos;
+  }
+
+  private void getStepType(ExecutionWrapperConfig executionWrapperConfig, Set<StepInfo> stepInfos,
+      boolean flexibleTemplateEnabled, String stepGroupIdOfParent, Ambiance ambiance) {
+    if (executionWrapperConfig.getStep() != null && !executionWrapperConfig.getStep().isNull()) {
+      if (isNotEmpty(stepGroupIdOfParent)) {
+        modifyStepIdentifierInPlace(executionWrapperConfig.getStep(), stepGroupIdOfParent);
+      }
+      YamlNode yamlNode = new YamlNode(executionWrapperConfig.getStep());
+      Optional<String> moduleForStep = getModuleForStep(yamlNode.getType(), ambiance);
+      if (moduleForStep.isEmpty()) {
+        throw new ContainerStepExecutionException(String.format("No module found for step %s", yamlNode.getType()));
+      }
+      stepInfos.add(StepInfo.builder()
+                        .stepType(yamlNode.getType())
+                        .moduleType(moduleForStep.get())
+                        .executionWrapperConfig(executionWrapperConfig)
+                        .stepUuid(yamlNode.getUuid())
+                        .stepIdentifier(yamlNode.getIdentifier())
+                        .build());
+
+    } else if (executionWrapperConfig.getParallel() != null && !executionWrapperConfig.getParallel().isNull()) {
+      ParallelStepElementConfig parallelStepElement = getParallelStepElementConfig(executionWrapperConfig);
+      if (isNotEmpty(parallelStepElement.getSections())) {
+        for (ExecutionWrapperConfig wrapper : parallelStepElement.getSections()) {
+          getStepType(wrapper, stepInfos, flexibleTemplateEnabled, stepGroupIdOfParent, ambiance);
+        }
+      }
+    } else if (flexibleTemplateEnabled && executionWrapperConfig.getInsert() != null
+        && !executionWrapperConfig.getInsert().isNull()) {
+      InjectStepNode injectStepNode = ExecutionWrapperConfigUtils.getInjectStepNode(executionWrapperConfig);
+      if (isNotEmpty(injectStepNode.getSteps())) {
+        for (ExecutionWrapperConfig wrapper : injectStepNode.getSteps()) {
+          var identifier = isNotEmpty(stepGroupIdOfParent) ? stepGroupIdOfParent + "_" + injectStepNode.getIdentifier()
+                                                           : injectStepNode.getIdentifier();
+          getStepType(wrapper, stepInfos, flexibleTemplateEnabled, identifier, ambiance);
+        }
+      }
+    }
+  }
+
+  @VisibleForTesting
+  void modifyStepIdentifierInPlace(JsonNode jsonNode, String prefix) {
+    try {
+      if (jsonNode instanceof ObjectNode objectNode) {
+        if (objectNode.has(YamlNode.IDENTIFIER_FIELD_NAME)) {
+          JsonNode identifierNode = objectNode.get(YamlNode.IDENTIFIER_FIELD_NAME);
+
+          if (identifierNode == null || !identifierNode.isTextual()) {
+            log.warn("Identifier node is null or value is not a text [node={}]", identifierNode);
+          } else {
+            objectNode.put(YamlNode.IDENTIFIER_FIELD_NAME, prefix + "_" + identifierNode.asText());
+          }
+        }
+      }
+    } catch (RuntimeException ex) {
+      log.error("Failed to modify step identifier in place for prefix {} and node [{}]", prefix, jsonNode, ex);
+    }
+  }
+
+  private Optional<String> getModuleForStep(String type, Ambiance ambiance) {
+    if (isEmpty(type)) {
+      return Optional.empty();
+    }
+    String accountId = AmbianceUtils.getAccountId(ambiance);
+    boolean useFixedModuleResolution = pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.OPA_RUN_ON_CUSTOMER_INFRA)
+        || pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.CDS_CONTAINER_STEP_GROUP_FIX_MODULE_RESOLUTION);
+
+    if (useFixedModuleResolution) {
+      return getModuleForStepWithFilter(type);
+    } else {
+      return getModuleForStepOriginal(type);
+    }
+  }
+
+  /**
+   * Original implementation: Maps every entry and returns first result (which could be "ci" from first entry).
+   * This has a bug where it returns "ci" even when the step is found in a later entry.
+   * Kept for backward compatibility when feature flag is disabled.
+   */
+  private Optional<String> getModuleForStepOriginal(String type) {
+    if (isEmpty(type)) {
+      return Optional.empty();
+    }
+    Map<String, List<String>> sdkSteps = containerExecutionConfig.getModuleToSupportedSteps();
+    return sdkSteps.entrySet()
+        .stream()
+        .map(moduleSdkStepMap -> {
+          Optional<String> step =
+              moduleSdkStepMap.getValue().stream().filter(sdkStep -> sdkStep.equals(type)).findFirst();
+          if (step.isPresent()) {
+            return moduleSdkStepMap.getKey();
+          }
+          // If not present in the config, assume it to be ci service
+          return "ci";
+        })
+        .filter(Objects::nonNull)
+        .findFirst();
+  }
+
+  /**
+   * Fixed implementation: Filters first to only keep entries where step is found, then maps to module key.
+   * This correctly returns the module where the step is found.
+   */
+  private Optional<String> getModuleForStepWithFilter(String type) {
+    if (isEmpty(type)) {
+      return Optional.empty();
+    }
+    Map<String, List<String>> sdkSteps = containerExecutionConfig.getModuleToSupportedSteps();
+    Optional<String> module = sdkSteps.entrySet()
+                                  .stream()
+                                  .filter(moduleSdkStepMap -> {
+                                    List<String> steps = moduleSdkStepMap.getValue();
+                                    return steps != null && steps.contains(type);
+                                  })
+                                  .map(Map.Entry::getKey)
+                                  .findFirst();
+    // If not present in the config, assume it to be ci service
+    String moduleName = module.isPresent() ? module.get() : "ci";
+    return Optional.of(moduleName);
+  }
+
+  /**
+   * UsedPorts are being modified by reference in this function.
+   *
+   * @param initContainerV2StepInfo
+   * @param responseList
+   * @param usedPorts
+   */
+  private PluginCreationResponseList postProcessResponseList(InitContainerV2StepInfo initContainerV2StepInfo,
+      PluginCreationResponseList responseList, Set<Integer> usedPorts, Ambiance ambiance) {
+    PluginCreationResponseList.Builder updatedResponseList = PluginCreationResponseList.newBuilder();
+    for (PluginCreationResponseWrapper responseV2 : responseList.getResponseList()) {
+      PluginCreationResponse pluginInfo = responseV2.getResponse();
+
+      if (pluginInfo.hasError()) {
+        log.error("Encountered error in plugin info collection {}", pluginInfo.getError());
+        throw new ContainerStepExecutionException(pluginInfo.getError().getMessagesList().toString());
+      }
+      if (isEmpty(pluginInfo.getPluginDetails().getImageDetails().getConnectorDetails().getConnectorRef())) {
+        ConnectorDetails.Builder connectorDetailsBuilder =
+            pluginInfo.getPluginDetails().getImageDetails().getConnectorDetails().toBuilder();
+
+        String connectorRef =
+            getConnectorRef(initContainerV2StepInfo, responseV2.getStepInfo().getIdentifier(), ambiance);
+        if (isNotEmpty(connectorRef)) {
+          connectorDetailsBuilder.setConnectorRef(connectorRef);
+        }
+
+        ImageDetails imageDetails = pluginInfo.toBuilder()
+                                        .getPluginDetails()
+                                        .getImageDetails()
+                                        .toBuilder()
+                                        .setConnectorDetails(connectorDetailsBuilder.build())
+                                        .build();
+        pluginInfo =
+            pluginInfo.toBuilder()
+                .setPluginDetails(pluginInfo.getPluginDetails().toBuilder().setImageDetails(imageDetails).build())
+                .build();
+      }
+      updatedResponseList.addResponse(PluginCreationResponseWrapper.newBuilder()
+                                          .setStepInfo(responseV2.getStepInfo())
+                                          .setShouldSkip(responseV2.getShouldSkip())
+                                          .setResponse(pluginInfo)
+                                          .build());
+      usedPorts.addAll(pluginInfo.getPluginDetails().getTotalPortUsedDetails().getUsedPortsList());
+    }
+
+    return updatedResponseList.build();
+  }
+
+  private String getRequestIdForPluginCreation(StepInfo stepInfo) {
+    String requestId = stepInfo.getStepUuid();
+    if (StringUtils.isNotBlank(stepInfo.getStepIdentifier())) {
+      requestId += stepInfo.getStepIdentifier();
+    }
+    return requestId;
+  }
+}

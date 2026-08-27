@@ -1,0 +1,277 @@
+- name: "docker-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/docker-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "ecr-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/ecr-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "s3-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/s3-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "nexus3-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/nexus3-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "artifactory-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/artifactory-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gcp-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gcp-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "bamboo-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/bamboo-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "http-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/http-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "ami-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/ami-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gar-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gar-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gcp"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gcp/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "rancher"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/rancher/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "aws"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/aws/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "azure"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/azure/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "servicenow"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/servicenow/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "tas"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/tas/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+- name: "acr-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/acr-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "azure-artifacts-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/azure-artifacts-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "github-packages-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/github-packages-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+- name: "custom-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/custom-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "oci-helm-chart-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/oci-helm-chart-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+- name: "jenkins-artifact"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/jenkins-artifact/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "nexus-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/nexus-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "azure-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/azure-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "artifactory-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/artifactory-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "jenkins-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/jenkins-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "jdbc-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/jdbc-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "jira-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/jira-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "azureartifacts-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/azureartifacts-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "spot-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/spot-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "httphelm-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/httphelm-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "ocihelm-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/ocihelm-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "servicenow-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/servicenow-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "bamboo-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/bamboo-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "rancher-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/rancher-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "azurerepo-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/azurerepo-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gitlab-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gitlab-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "tanzu-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/tanzu-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "docker-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/docker-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "git-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/git-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "github-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/github-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "bitbucket-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/bitbucket-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "aws-connector-validator"
+  version: "0.0.2"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/aws-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gcp-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gcp-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "kubernetes-connector-validator"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/kubernetes-connector-validator/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-k8s"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-k8s/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-aws-sam"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-aws-sam/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-aws-lambda"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-aws-lambda/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-serverless"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-serverless/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-helm"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-helm/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "instance-sync-cloudrun"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/instance-sync-cloudrun/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "ecr-docker-auth-token"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/ecr-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "gar-docker-auth-token"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/gar-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "acr-docker-auth-token"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/acr-docker-auth-token/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "jira"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/jira/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false
+- name: "ssh"
+  version: "0.0.1"
+  source:
+    - "https://storage.googleapis.com/unified-plugins/ssh/v{{ release }}/plugin-{{ os }}-{{ arch }}"
+  compressed: false

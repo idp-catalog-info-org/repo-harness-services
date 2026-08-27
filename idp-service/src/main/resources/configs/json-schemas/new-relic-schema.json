@@ -1,0 +1,100 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1707813580.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "proxy"
+  ],
+  "properties": {
+    "proxy": {
+      "$id": "#root/proxy",
+      "title": "Proxy",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoints"
+      ],
+      "properties": {
+        "endpoints": {
+          "$id": "#root/proxy/endpoints",
+          "title": "Endpoints",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "/newrelic/apm/api"
+          ],
+          "properties": {
+            "/newrelic/apm/api": {
+              "$id": "#root/proxy/endpoints//newrelic/apm/api",
+              "title": "/newrelic/apm/api",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "target",
+                "pathRewrite",
+                "headers",
+                "allowedHeaders"
+              ],
+              "properties": {
+                "target": {
+                  "$id": "#root/proxy/endpoints//newrelic/apm/api/target",
+                  "title": "Target",
+                  "type": "string",
+                  "default": "https://api.newrelic.com/v2",
+                  "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+                },
+                "pathRewrite": {
+                  "$id": "#root/proxy/endpoints//newrelic/apm/api/pathRewrite",
+                  "title": "PathRewrite",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "api/proxy/newrelic/apm/api?"
+                  ],
+                  "properties": {
+                    "api/proxy/newrelic/apm/api?": {
+                      "$id": "#root/proxy/endpoints//newrelic/apm/api/pathRewrite/api/proxy/newrelic/apm/api?",
+                      "title": "Api/proxy/newrelic/apm/api?",
+                      "type": "string",
+                      "default": "/",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "headers": {
+                  "$id": "#root/proxy/endpoints//newrelic/apm/api/headers",
+                  "title": "Headers",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "X-Api-Key"
+                  ],
+                  "properties": {
+                    "X-Api-Key": {
+                      "$id": "#root/proxy/endpoints//newrelic/apm/api/headers/X-Api-Key",
+                      "title": "X-Api-Key",
+                      "type": "string",
+                      "default": "${NEW_RELIC_REST_API_KEY}",
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "allowedHeaders": {
+                  "$id": "#root/proxy/endpoints//newrelic/apm/api/allowedHeaders",
+                  "title": "AllowedHeaders",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

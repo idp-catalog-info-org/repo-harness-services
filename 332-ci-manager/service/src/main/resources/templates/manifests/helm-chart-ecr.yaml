@@ -1,0 +1,32 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+run:
+  type: run
+  container:
+    image: harnessdev/ecr-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_REGION: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.region}}
+    PLUGIN_ARTIFACT_REGISTRY_ID: ${{serviceOutput.artifacts.ID_PLACEHOLDER.store.registry}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_CHART_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartName}}
+    PLUGIN_ARTIFACT_CHART_VERSION: ${{serviceOutput.manifests.ID_PLACEHOLDER.chartVersion}}
+    PLUGIN_ARTIFACT_CHART_PATH: ${{serviceOutput.manifests.ID_PLACEHOLDER.store.path}}
+    PLUGIN_AWS_NAME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{connectorInputs.get(${{serviceOutput.manifests.ID_PLACEHOLDER.store.connector}}).fixedBackoff}}

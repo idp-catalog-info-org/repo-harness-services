@@ -1,0 +1,5 @@
+integrations:
+  gitlab:
+    - host: ${HOST}
+      apiBaseUrl: https://${HOST}/api/v4
+      token: ${GITLAB_TOKEN}

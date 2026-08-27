@@ -1,0 +1,70 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "Harness Security Test Exemption Requested"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "A Harness security test exemption has been requested, and is awaiting approval:"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*Issue Title:*\n${ISSUE_TITLE}\n\n*Severity:* ${SEVERITY_CODE}\n\n*Scan Tool:* ${SCAN_TOOL}"
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Org:* ${ORG}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Project:* ${PROJECT}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Scope:* ${SCOPE}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Requester:* ${REQUESTER}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Expiration:* ${EXPIRATION}"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*Reason:*\n${REASON}"
+			}
+		},
+		{
+			"type": "actions",
+			"elements": [
+				{
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Exemption in Harness"
+					},
+					"url": "${EXEMPTION_URL}"
+				}
+			]
+		}
+	]
+}

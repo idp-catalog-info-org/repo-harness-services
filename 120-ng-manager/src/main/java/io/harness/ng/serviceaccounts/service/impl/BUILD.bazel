@@ -1,0 +1,71 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//120-ng-manager/src/main/java/io/harness/ng/core:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/api:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/core/events:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/opa/entities/serviceaccount:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/serviceaccounts/dto:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/serviceaccounts/entities:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/serviceaccounts/service:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/serviceaccounts/service/api:module",
+        "//120-ng-manager/src/main/java/io/harness/repositories/ng/serviceaccounts:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/accesscontrol:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/accesscontrol/scopes:module",
+        "//123-ng-core-user/src/main/java/io/harness/ng/core/dto:module",
+        "//942-enforcement-sdk/src/main/java/io/harness/enforcement/client/annotation:module",
+        "//943-enforcement-beans/src/main/java/io/harness/enforcement/constants:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/entities:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/events:module",
+        "//950-ng-project-n-orgs/src/main/java/io/harness/ng/core/services:module",
+        "//950-opa-client/src/main/java/io/harness/opaclient/model:module",
+        "//955-outbox-sdk/src/main/java/io/harness/outbox:module",
+        "//955-outbox-sdk/src/main/java/io/harness/outbox/api:module",
+        "//959-ng-persistence/src/main/java/io/harness/springdata:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/dto:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/role/dto:module",
+        "//960-persistence/src/main/java/io/harness/utils:module",
+        "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/common/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/utils:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//970-ng-commons/src/main/java/io/harness/serviceaccount:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/acl/api:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/principals:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/resourcegroups/api:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/roleassignments/api:module",
+        "//access-control/contracts/api/src/main/java/io/harness/accesscontrol/roles/api:module",
+        "//clients/access-control/admin-client/src/main/java/io/harness/accesscontrol:module",
+        "//clients/access-control/sdk/src/main/java/io/harness/accesscontrol:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:net_jodah_failsafe",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_springframework_data_spring_data_commons",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+        "@maven//:org_springframework_spring_tx",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

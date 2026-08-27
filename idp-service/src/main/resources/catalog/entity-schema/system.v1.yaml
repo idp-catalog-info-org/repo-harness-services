@@ -1,0 +1,6 @@
+apiVersion: "harness.io/v1"
+kind: system
+identifier: <identifier>
+name: <name>
+owner: unknown
+spec: {}

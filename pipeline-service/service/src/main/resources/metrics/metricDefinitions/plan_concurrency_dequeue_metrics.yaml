@@ -1,0 +1,17 @@
+name: Plan Concurrency Dequeue Metrics
+identifier: PlanConcurrencyDequeueMetrics
+metricGroup: PlanConcurrencyDequeueMetricsGroup
+metrics:
+  - metricName: pipeline_plan_concurrency_dequeue_total
+    metricDefinition: Outcome of each per-project plan-concurrency FIFO skip-ahead drain cycle. outcome in {claimed, walk_exhausted}.
+    type: Count
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_dequeue_walk_length
+    metricDefinition: Number of queued candidates inspected during a plan-concurrency skip-ahead drain cycle.
+    type: Distribution
+    distribution: ["1", "5", "10", "25", "50", "100"]
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_dequeue_skips_total
+    metricDefinition: Candidates skipped during a plan-concurrency skip-ahead drain cycle. skip_reason in {already_started_in_project, cap_reached}.
+    type: Count
+    unit: "1"

@@ -1,0 +1,18 @@
+[
+    {
+      "name": "3scale.yaml",
+      "path": "microsite/data/plugins/3scale.yaml",
+      "sha": "fa568c17bf0967881d122ff11209d552f60ce2eb",
+      "size": 354,
+      "url": "https://api.github.com/repos/backstage/backstage/contents/microsite/data/plugins/3scale.yaml?ref=master",
+      "html_url": "https://github.com/backstage/backstage/blob/master/microsite/data/plugins/3scale.yaml",
+      "git_url": "https://api.github.com/repos/backstage/backstage/git/blobs/fa568c17bf0967881d122ff11209d552f60ce2eb",
+      "download_url": "https://raw.githubusercontent.com/backstage/backstage/master/microsite/data/plugins/3scale.yaml",
+      "type": "file",
+      "_links": {
+        "self": "https://api.github.com/repos/backstage/backstage/contents/microsite/data/plugins/3scale.yaml?ref=master",
+        "git": "https://api.github.com/repos/backstage/backstage/git/blobs/fa568c17bf0967881d122ff11209d552f60ce2eb",
+        "html": "https://github.com/backstage/backstage/blob/master/microsite/data/plugins/3scale.yaml"
+      }
+    }
+]

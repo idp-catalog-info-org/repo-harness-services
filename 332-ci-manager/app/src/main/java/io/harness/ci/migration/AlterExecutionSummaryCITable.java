@@ -1,0 +1,22 @@
+/*
+ * Copyright 2025 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.app.migration;
+
+import io.harness.migration.timescale.NGAbstractTimeScaleMigration;
+
+public class AlterExecutionSummaryCITable extends NGAbstractTimeScaleMigration {
+  @Override
+  public String getFileName() {
+    return "timescale/add_createdat_updatedat_columns_to_ci_stage_summary_tables.sql";
+  }
+
+  @Override
+  public boolean executeFullScript() {
+    return true;
+  }
+}

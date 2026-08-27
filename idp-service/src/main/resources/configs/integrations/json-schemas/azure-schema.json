@@ -1,0 +1,73 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/object1709719755.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "integrations"
+  ],
+  "properties": {
+    "integrations": {
+      "$id": "#root/integrations",
+      "title": "Integrations",
+      "type": "object",
+      "required": [
+        "azure"
+      ],
+      "properties": {
+        "azure": {
+          "$id": "#root/integrations/azure",
+          "title": "Azure",
+          "type": "array",
+          "default": [],
+          "items":{
+            "$id": "#root/integrations/azure/items",
+            "title": "Items",
+            "type": "object",
+            "required": [
+              "host",
+              "credentials"
+            ],
+            "properties": {
+              "host": {
+                "$id": "#root/integrations/azure/items/host",
+                "title": "Host",
+                "type": "string",
+                "default": "",
+                "pattern": "^.*$"
+              },
+              "credentials": {
+                "$id": "#root/integrations/azure/items/credentials",
+                "title": "Credentials",
+                "type": "array",
+                "default": [],
+                "items":{
+                  "$id": "#root/integrations/azure/items/credentials/items",
+                  "title": "Items",
+                  "type": "object",
+                  "required": [
+                    "personalAccessToken"
+                  ],
+                  "properties": {
+                    "personalAccessToken": {
+                      "$id": "#root/integrations/azure/items/credentials/items/personalAccessToken",
+                      "title": "Personalaccesstoken",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    }
+                  }
+                }
+
+              }
+            }
+          }
+
+        }
+      }
+    }
+
+  }
+}

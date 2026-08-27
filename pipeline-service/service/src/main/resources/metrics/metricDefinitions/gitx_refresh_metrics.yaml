@@ -1,0 +1,13 @@
+name: GitX Refresh Metrics
+identifier: GitxRefreshMetrics
+metricGroup: gitx_refresh_metrics_group
+metrics:
+  - metricName: gitx_refresh_requests_total
+    metricDefinition: Count of GitX refresh API requests, labelled by accountId and statusClass (2xx/4xx/5xx).
+    type: Count
+    unit: "1"
+  - metricName: gitx_refresh_process_time
+    metricDefinition: Time taken to serve a GitX refresh API request, labelled by accountId and statusClass (2xx/4xx/5xx).
+    type: Duration
+    distribution: [ 0ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s ]
+    unit: "ms"

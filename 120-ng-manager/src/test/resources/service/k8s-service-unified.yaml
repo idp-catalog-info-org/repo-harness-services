@@ -1,0 +1,373 @@
+service:
+  uses: kubernetes
+  with:
+    manifests:
+      sources:
+        - id: k8s_code
+          uses: k8s
+          with:
+            store:
+              uses: code
+              with:
+                type: branch
+                branch: <+input>
+                repo: <+input>
+                paths: <+input>
+            values: <+input>
+            skip-version: <+input>
+            declarative-rollback: <+input>
+        - id: gitlab
+          uses: values
+          with:
+            store:
+              uses: gitlab
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>.executionInput()
+            values: <+input>
+        - id: openshift_git
+          uses: params
+          with:
+            store:
+              uses: git
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>
+            params: "<+input>.allowedValues(a,b,c)"
+        - id: kustomize_github
+          uses: patches
+          with:
+            store:
+              uses: github
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>.regex(some regex).executionInput()
+            patches: <+input>
+        - id: mbitbucket
+          uses: params
+          with:
+            store:
+              uses: bitbucket
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>
+            params: <+input>
+        - id: patches_azure
+          uses: patches
+          with:
+            store:
+              uses: azure
+              with:
+                connector: <+input>
+                type: branch
+                branch: <+input>
+                repo: <+input>
+            patches: <+input>
+        - id: inherit_manifest
+          uses: values
+          with:
+            store:
+              uses: inherit
+            values: <+input>
+        - id: custom_manifest
+          uses: values
+          with:
+            store:
+              uses: custom
+              with:
+                script: <+input>
+            values: <+input>
+        - id: values_commit
+          uses: values
+          with:
+            store:
+              uses: git
+              with:
+                connector: <+input>
+                type: commit
+                commit: <+input>
+                repo: <+input>
+            values: <+input>
+    artifacts:
+      primary: <+input>
+      sources:
+        - id: art
+          uses: har
+          with:
+            registry: <+input>
+            uses: docker
+            with:
+              image: <+input>
+              tag: <+input>
+              digest: <+input>
+          sidecar: false
+        - id: docker
+          uses: docker-registry
+          with:
+            connector: <+input>
+            image: <+input>
+            tag: <+input>
+            digest: <+input>
+            regex: null
+          sidecar: false
+        - id: ecr
+          uses: ecr
+          with:
+            connector: <+input>
+            region: "<+input>.allowedValues(ap-south-2,ap-south-1,eu-south-1).executionInput()"
+            image: <+input>
+            tag: <+input>
+            digest: <+input>
+            regex: null
+            registry: <+input>.regex(regex.abc)
+          sidecar: true
+        - id: nexus
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+input>
+            uses: docker
+            with:
+              path: <+input>
+              repo-port: null
+              repo-url: <+input>
+              tag: <+input>
+              digest: <+input>
+              regex: null
+          sidecar: true
+        - id: nexus3dockerport
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+input>
+            uses: docker
+            with:
+              path: <+input>
+              repo-port: <+input>
+              repo-url: null
+              tag: <+input>
+              digest: <+input>
+              regex: null
+          sidecar: true
+        - id: nexusmaven
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+input>
+            uses: maven2
+            with:
+              group: <+input>
+              artifact: <+input>
+              version: null
+              regex: <+input>
+              extension: <+input>
+              classifier: <+input>
+          sidecar: true
+        - id: nexusnpm
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+pipeline.executionId>
+            uses: npm
+            with:
+              package: <+input>
+              version: <+input>.allowedValues(latest)
+              regex: null
+          sidecar: true
+        - id: nexusnuget
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+input>
+            uses: nuget
+            with:
+              package: <+input>
+              version: <+input>
+              regex: null
+          sidecar: true
+        - id: nexusraw
+          uses: nexus3
+          with:
+            connector: <+input>
+            repo: <+input>
+            uses: raw
+            with:
+              group: <+input>
+              file: null
+              regex: <+input>
+          sidecar: true
+        - id: factor
+          uses: artifactory
+          with:
+            connector: <+input>
+            repo-format: docker
+            repo: <+input>
+            directory: null
+            path: <+input>
+            path-filter: null
+            artifact-filter: null
+            repo-url: <+input>
+            image: <+input>
+            tag: null
+            digest: <+input>
+            regex: <+input>
+          sidecar: true
+        - id: acr
+          uses: acr
+          with:
+            connector: <+input>
+            subscription-id: <+input>
+            registry: <+input>
+            repo: <+input>
+            tag: <+input>
+            digest: <+input>
+            regex: null
+          sidecar: true
+        - id: gar
+          uses: google-artifact-registry
+          with:
+            connector: <+input>
+            type: docker
+            region: <+input>
+            project: <+input>
+            repo: <+input>
+            package: <+input>
+            digest: <+input>
+            regex: null
+            version: <+input>
+          sidecar: true
+        - id: github_package
+          uses: github-package
+          with:
+            connector: <+input>
+            uses: container
+            with:
+              org: <+input>
+              version: <+input>
+              digest: <+input>
+              regex: null
+          sidecar: true
+        - id: custom_manual
+          uses: custom
+          with:
+            version: <+input>
+            version-regex: null
+          sidecar: true
+        - id: custom_script
+          uses: custom
+          with:
+            script: <+input>
+            path: <+input>
+            version-path: <+input>
+            version: <+input>
+            version-regex: null
+            attributes:
+              input3: <+input>
+              input2: <+input>
+          sidecar: true
+    config-files:
+      - id: c1
+        store:
+          uses: bitbucket
+          with:
+            connector: <+input>
+            type: branch
+            branch: <+input>
+            repo: <+input>
+            paths: "<+input>.allowedValues(p1,p2,p3)"
+      - id: c2
+        store:
+          uses: harness
+          with: {}
+      - id: c3
+        store:
+          uses: github
+          with:
+            connector: connector
+            type: commit
+            commit: testCommitId
+            repo: null
+            paths:
+              - test/file1.txt
+              - test/file2.txt
+      - id: c4
+        store:
+          uses: github
+          with:
+            connector: connector
+            type: branch
+            branch: test
+            repo: null
+            paths:
+              - test/file1.txt
+              - test/file2.txt
+      - id: c5
+        store:
+          uses: github
+          with:
+            connector: <+input>
+            type: branch
+            branch: <+input>
+            repo: null
+            paths:
+              - test/file1.txt
+              - test/file2.txt
+      - id: c6
+        store:
+          uses: github
+          with:
+            connector: <+input>
+            type: commit
+            commit: <+input>
+            repo: null
+            paths:
+              - test/file1.txt
+              - test/file2.txt
+  inputs:
+    numbervarruntime:
+      default: "5"
+      pattern: "^[1-9]+$"
+      description: numbervarruntime desc
+      type: string
+      required: true
+    stringvarexpresison:
+      default: a
+      description: somedescription
+      type: string
+      required: true
+      enum:
+        - a
+        - b
+        - c
+    stringregex:
+      default: ABCD
+      pattern: "^[A-Z]+$"
+      type: string
+      required: false
+    numberVar:
+      description: numbervardesc
+      type: number
+      value: 4.0
+      required: true
+    secretvar:
+      description: secretvar desc
+      type: secret
+      value: account.docker_personal
+      required: true
+    runtimesecret:
+      default: account.cdqasa
+      description: runtimesecret desc
+      type: secret
+      required: true
+      enum:
+        - account.docker_personal
+        - account.cdqasa
+        - account.minikubesa

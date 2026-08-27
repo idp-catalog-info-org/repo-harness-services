@@ -1,0 +1,6 @@
+name: CI Manager VM Execution Count Group
+identifier: CIManagerVMExecutionCountGroup
+labels:
+  - accountId
+  - osType
+  - arch

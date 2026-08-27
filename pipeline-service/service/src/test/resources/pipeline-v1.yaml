@@ -1,0 +1,56 @@
+pipeline:
+  inputs:
+    image:
+      type: string
+      description: image name
+      default: golang
+      pattern: "^[a-z0-9]+$"
+    repo:
+      type: string
+      description: repository name
+      required: true
+    count:
+      type: number
+      default: 5
+    password:
+      type: secret
+      description: docker password
+      enum: [secret1, secret2]
+      required: true
+    enableLogging:
+      type: boolean
+      description: enable debug logging
+      default: false
+    tags:
+      type: array
+      description: list of tags for the build
+      items:
+        - dev
+        - staging
+        - production
+      default:
+        - dev
+    dockerConnector:
+      type: connector
+      description: docker registry connector
+      required: true
+      options:
+        - connector1
+        - connector2
+        - connector3
+    buildConfig:
+      type: object
+      description: build configuration options
+      ui:
+        tooltip: Advanced build configuration
+        hidden: false
+    kubeconfigPath:
+      type: string
+      default: /path/to/kubeconfig
+      ui:
+        tooltip: Enter the path to the kubeconfig file
+stages:
+  - clone:
+      disabled: true
+    steps:
+      - run: export foo=bar

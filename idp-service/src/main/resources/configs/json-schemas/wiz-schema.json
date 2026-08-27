@@ -1,0 +1,60 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/wiz-schema.json",
+  "title": "Root",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "wiz"
+  ],
+  "properties": {
+    "wiz": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clientId",
+        "clientSecret",
+        "tokenUrl",
+        "wizAPIUrl"
+      ],
+      "properties": {
+        "clientId": {
+          "$id": "#root/wiz/clientId",
+          "title": "clientId",
+          "type": "string",
+          "default": "${WIZ_CLIENT_ID}",
+          "pattern": "^.*$"
+        },
+        "clientSecret": {
+          "$id": "#root/wiz/clientSecret",
+          "title": "clientSecret",
+          "type": "string",
+          "pattern": "^.*$",
+          "default": "${WIZ_CLIENT_SECRET}"
+        },
+        "tokenUrl": {
+          "$id": "#root/wiz/tokenUrl",
+          "title": "tokenUrl",
+          "default": "https://auth.wiz.io/token",
+          "type": "string",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        },
+        "wizAPIUrl": {
+          "$id": "#root/wiz/wizAPIUrl",
+          "title": "wizAPIUrl",
+          "default": "https://api.wiz.io/v1",
+          "type": "string",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        },
+        "dashboardLink": {
+          "$id": "#root/wiz/dashboardLink",
+          "title": "dashboardLink",
+          "default": "https://dashboard.wiz.io/home",
+          "type": "string",
+          "pattern": "((http|https)://)(www.)?[a-zA-Z0-9-@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,63}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+name: CI Manager Queue VM Execution Limit
+identifier: CIManagerQueueVMLimit
+labels:
+  - accountId

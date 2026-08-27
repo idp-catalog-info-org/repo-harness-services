@@ -1,0 +1,27 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.repositories.pipeline;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.gitsync.persistance.GitSyncableHarnessRepo;
+import io.harness.pms.mongo.PipelineBucket;
+import io.harness.pms.pipeline.PipelineEntity;
+import io.harness.springdata.QueryBudget;
+
+import org.springframework.data.repository.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+// PIPE-35957: FAST is the interactive default; heavy ops override to SLOW via BudgetedQuery.withBudget (higher
+// precedence).
+@QueryBudget(PipelineBucket.Keys.FAST)
+@GitSyncableHarnessRepo
+@Transactional
+@OwnedBy(PIPELINE)
+public interface PMSPipelineRepository extends Repository<PipelineEntity, String>, PMSPipelineRepositoryCustom {}

@@ -1,0 +1,42 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+# Harness File Store Kustomize manifest. Kustomize content (files) and patches (patchesPaths) are
+# fetched from the Harness File Store and written to the runner workspace by the manifest step.
+inputs:
+  storeType:
+    type: string
+    description: Unified store discriminator
+    default: harness
+  files:
+    type: list
+    description: Kustomize file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.files}}
+  patchesPaths:
+    type: list
+    description: Kustomize patches file/folder references from the Harness File Store
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.patchesPaths}}
+  overlayConfiguration:
+    type: object
+    description: Kustomize overlay configuration
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.overlayConfiguration}}
+  pluginPath:
+    type: string
+    description: Kustomize plugin path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.pluginPath}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+
+run:
+  type: run
+  container:
+    image: alpine:3.20
+    connector: account.harnessImage
+  script: |-
+    echo "Prepared Harness File Store Kustomize manifest 'ID_PLACEHOLDER' on the runner"

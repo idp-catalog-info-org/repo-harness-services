@@ -1,0 +1,65 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.engine.events;
+
+import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
+import static io.harness.beans.steps.CIStepInfoType.RENDERING_STEP;
+import static io.harness.beans.steps.CIStepInfoType.TEMPLATING_STEP;
+
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.engine.executions.node.service.NodeExecutionService;
+import io.harness.engine.observers.NodeStatusUpdateObserver;
+import io.harness.engine.observers.NodeUpdateInfo;
+import io.harness.execution.NodeExecution;
+import io.harness.execution.NodeExecution.NodeExecutionKeys;
+import io.harness.execution.NodeExecutionContextUtils;
+import io.harness.observer.AsyncInformObserver;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.steps.SkipType;
+import io.harness.pms.yaml.HarnessYamlVersion;
+import io.harness.timeout.engine.TimeoutEngine;
+import io.harness.timeout.trackers.events.StatusUpdateTimeoutEvent;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+
+@OwnedBy(PIPELINE)
+public class NodeExecutionStatusUpdateEventHandler implements AsyncInformObserver, NodeStatusUpdateObserver {
+  @Inject @Named("ObserverExecutorService") ExecutorService executorService;
+  @Inject private TimeoutEngine timeoutEngine;
+  @Inject private NodeExecutionService nodeExecutionService;
+
+  @Override
+  public void onNodeStatusUpdate(NodeUpdateInfo nodeUpdateInfo) {
+    NodeExecution nodeExecution = nodeUpdateInfo.getNodeExecution();
+    List<String> timeoutInstanceIds = nodeExecution.getTimeoutInstanceIds();
+    if (EmptyPredicate.isNotEmpty(timeoutInstanceIds)) {
+      timeoutEngine.onEvent(timeoutInstanceIds, new StatusUpdateTimeoutEvent(nodeExecution.getStatus()));
+    }
+    if (HarnessYamlVersion.isV1(NodeExecutionContextUtils.getHarnessYamlVersion(nodeExecution))) {
+      markNodeHiddenFromGraph(nodeExecution);
+    }
+  }
+
+  @Override
+  public ExecutorService getInformExecutorService() {
+    return executorService;
+  }
+
+  private void markNodeHiddenFromGraph(NodeExecution nodeExecution) {
+    if (nodeExecution.getStatus().equals(Status.SKIPPED)
+        && (TEMPLATING_STEP.getDisplayName().equals(nodeExecution.getStepType().getType())
+            || RENDERING_STEP.getDisplayName().equals(nodeExecution.getStepType().getType()))) {
+      nodeExecutionService.updateV2(
+          nodeExecution.getUuid(), ops -> ops.set(NodeExecutionKeys.skipGraphType, SkipType.SKIP_TREE));
+    }
+  }
+}

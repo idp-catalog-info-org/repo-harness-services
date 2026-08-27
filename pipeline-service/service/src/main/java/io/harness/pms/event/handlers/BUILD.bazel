@@ -1,0 +1,42 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/events:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-visualization/src/main/java/io/harness/pms/plan/execution/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/constants:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/events:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/executions/node/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/executions/plan/service:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/expressions/usages:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/pms/data/outcome:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/engine/pms/data/sweepingoutput:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/execution/expansion:module",
+        "//pipeline-service/modules/orchestration/src/main/java/io/harness/graph/stepDetail/service:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/helpers:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/service:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

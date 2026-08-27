@@ -1,0 +1,193 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+package io.harness.plan;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.pms.contracts.advisers.AdviserObtainment;
+import io.harness.pms.contracts.plan.ExecutionMode;
+import io.harness.pms.contracts.steps.SkipType;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.contracts.template.TemplateReferenceSummary;
+import io.harness.pms.data.stepparameters.PmsStepParameters;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
+import lombok.experimental.FieldNameConstants;
+import lombok.experimental.NonFinal;
+import org.springframework.data.annotation.TypeAlias;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
+@OwnedBy(HarnessTeam.PIPELINE)
+@Value
+@Builder
+@FieldNameConstants(innerTypeName = "IdentityPlanNodeKeys")
+@TypeAlias("identityPlanNode")
+public class IdentityPlanNode implements Node {
+  @NotNull String uuid;
+  @NotNull String name;
+  @NotNull String identifier;
+  String group;
+  boolean isSkipExpressionChain;
+  String whenCondition;
+  String skipCondition;
+  @With @Builder.Default SkipType skipGraphType = SkipType.NOOP;
+  String stageFqn;
+  StepType stepType;
+  // todo: use list of execution IDs in retry failed pipeline as well
+  @NonFinal String originalNodeExecutionId;
+  // one plan node can map to multiple node executions because of introduction of strategy. Hence, it is better to take
+  // a list instead of a single node if multiple node executions for a plan node are found
+  @NonFinal List<String> allOriginalNodeExecutionIds;
+  String serviceName;
+  String executionInputTemplate;
+  // Saving the advisorObtainmentsForExecutionMode so that when the postProdRollback is triggered 2nd time for other
+  // stages, the advisorObtainment info is available for transforming the plan even when the planNode was converted into
+  // IdentityNode is 1st postProdRollback.
+  Map<ExecutionMode, List<AdviserObtainment>> advisorObtainmentsForExecutionMode;
+
+  // if true, the advisor response from the previous execution will be ignored and adviserObtainments will be used
+  @With @Builder.Default Boolean useAdviserObtainments = false;
+  @With List<AdviserObtainment> adviserObtainments;
+  String accountIdentifier;
+
+  TemplateReferenceSummary templateReferenceSummary;
+
+  @Override
+  public String getStageFqn() {
+    return this.stageFqn;
+  }
+
+  @Override
+  public NodeType getNodeType() {
+    return NodeType.IDENTITY_PLAN_NODE;
+  }
+
+  @Override
+  public PmsStepParameters getStepParameters() {
+    PmsStepParameters stepParameters = new PmsStepParameters();
+    stepParameters.put(IdentityPlanNodeKeys.originalNodeExecutionId, originalNodeExecutionId);
+    return stepParameters;
+  }
+
+  @Override
+  public boolean isSkipExpressionChain() {
+    return this.isSkipExpressionChain;
+  }
+
+  @Override
+  public String getWhenCondition() {
+    return this.whenCondition;
+  }
+
+  @Override
+  public String getSkipCondition() {
+    return this.skipCondition;
+  }
+
+  @Override
+  public SkipType getSkipGraphType() {
+    return this.skipGraphType;
+  }
+
+  @Override
+  public boolean isSkipUnresolvedExpressionsCheck() {
+    return true;
+  }
+
+  public static IdentityPlanNode mapPlanNodeToIdentityNode(
+      Node node, StepType stepType, String originalNodeExecutionUuid) {
+    return mapPlanNodeToIdentityNode(node, stepType, originalNodeExecutionUuid, false);
+  }
+
+  public static IdentityPlanNode mapPlanNodeToIdentityNode(
+      Node node, StepType stepType, String originalNodeExecutionUuid, boolean alwaysSkipGraph) {
+    boolean useAdviserObtainments = false;
+    if (node.getNodeType() == NodeType.IDENTITY_PLAN_NODE
+        && ((IdentityPlanNode) node).getUseAdviserObtainments() != null) {
+      useAdviserObtainments = ((IdentityPlanNode) node).getUseAdviserObtainments();
+    }
+    return IdentityPlanNode.builder()
+        .uuid(node.getUuid())
+        .name(node.getName())
+        .identifier(node.getIdentifier())
+        .group(node.getGroup())
+        .skipGraphType(alwaysSkipGraph ? SkipType.SKIP_NODE : node.getSkipGraphType())
+        .stepType(stepType)
+        .advisorObtainmentsForExecutionMode(node.getAdvisorObtainmentsForExecutionMode())
+        .adviserObtainments(node.getAdviserObtainments())
+        .useAdviserObtainments(useAdviserObtainments)
+        .isSkipExpressionChain(node.isSkipExpressionChain())
+        .serviceName(node.getServiceName())
+        .stageFqn(node.getStageFqn())
+        .advisorObtainmentsForExecutionMode(node.getAdvisorObtainmentsForExecutionMode())
+        .adviserObtainments(node.getAdviserObtainments())
+        .whenCondition(node.getWhenCondition())
+        .originalNodeExecutionId(originalNodeExecutionUuid)
+        .accountIdentifier(node.getAccountIdentifier())
+        .build();
+  }
+
+  public static IdentityPlanNode mapPlanNodeToIdentityNode(String newUuid, Node node, String nodeIdentifier,
+      String nodeName, StepType stepType, String originalNodeExecutionUuid) {
+    boolean useAdviserObtainments = false;
+    if (node.getNodeType() == NodeType.IDENTITY_PLAN_NODE
+        && ((IdentityPlanNode) node).getUseAdviserObtainments() != null) {
+      useAdviserObtainments = ((IdentityPlanNode) node).getUseAdviserObtainments();
+    }
+    return IdentityPlanNode.builder()
+        .uuid(newUuid != null ? newUuid : node.getUuid())
+        .name(nodeName)
+        .identifier(nodeIdentifier)
+        .group(node.getGroup())
+        .advisorObtainmentsForExecutionMode(node.getAdvisorObtainmentsForExecutionMode())
+        .useAdviserObtainments(useAdviserObtainments)
+        .adviserObtainments(node.getAdviserObtainments())
+
+        .skipGraphType(node.getSkipGraphType())
+        .stepType(stepType)
+        .isSkipExpressionChain(node.isSkipExpressionChain())
+        .serviceName(node.getServiceName())
+        .stageFqn(node.getStageFqn())
+        .whenCondition(node.getWhenCondition())
+        .originalNodeExecutionId(originalNodeExecutionUuid)
+        .accountIdentifier(node.getAccountIdentifier())
+        .build();
+  }
+
+  public static IdentityPlanNode mapPlanNodeToIdentityNodeWithSkipAsTrue(String newUuid, Node node,
+      String nodeIdentifier, String nodeName, StepType stepType, String originalNodeExecutionUuid) {
+    IdentityPlanNode identityPlanNode =
+        mapPlanNodeToIdentityNode(newUuid, node, nodeIdentifier, nodeName, stepType, originalNodeExecutionUuid);
+
+    // Todo: Remove this if condition and check if there is a better way to handle this.
+    if (node.getStepType() != null
+        && (node.getStepCategory() == StepCategory.STRATEGY || node.getStepCategory() == StepCategory.FORK)) {
+      return identityPlanNode.withSkipGraphType(SkipType.SKIP_TREE);
+    }
+    return identityPlanNode.withSkipGraphType(SkipType.SKIP_NODE);
+  }
+
+  public void convertToListOfOGNodeExecIds(String nodeExecId) {
+    if (EmptyPredicate.isEmpty(allOriginalNodeExecutionIds)) {
+      allOriginalNodeExecutionIds = new ArrayList<>();
+      allOriginalNodeExecutionIds.add(originalNodeExecutionId);
+      originalNodeExecutionId = null;
+    }
+    allOriginalNodeExecutionIds.add(nodeExecId);
+  }
+}

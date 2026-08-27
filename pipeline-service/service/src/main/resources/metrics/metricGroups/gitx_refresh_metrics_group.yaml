@@ -1,0 +1,5 @@
+name: GitX Refresh Metrics Group
+identifier: gitx_refresh_metrics_group
+labels:
+  - accountId
+  - statusClass

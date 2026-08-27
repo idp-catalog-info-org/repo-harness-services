@@ -1,0 +1,97 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.engine.interrupts.handlers.publisher;
+
+import static io.harness.data.structure.UUIDGenerator.generateUuid;
+import static io.harness.rule.OwnerRule.ALEXEI;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.harness.OrchestrationTestBase;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.category.element.UnitTests;
+import io.harness.engine.executions.node.service.NodeExecutionService;
+import io.harness.engine.pms.commons.events.PmsEventSender;
+import io.harness.engine.utils.PmsLevelUtils;
+import io.harness.execution.NodeExecution;
+import io.harness.interrupts.Interrupt;
+import io.harness.plan.PlanNode;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.interrupts.InterruptConfig;
+import io.harness.pms.contracts.interrupts.InterruptEvent;
+import io.harness.pms.contracts.interrupts.InterruptType;
+import io.harness.pms.contracts.steps.StepCategory;
+import io.harness.pms.contracts.steps.StepType;
+import io.harness.pms.data.stepparameters.PmsStepParameters;
+import io.harness.pms.events.base.PmsEventCategory;
+import io.harness.rule.Owner;
+
+import com.google.inject.Inject;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+@OwnedBy(HarnessTeam.PIPELINE)
+public class InterruptEventPublisherImplTest extends OrchestrationTestBase {
+  @Mock private NodeExecutionService nodeExecutionService;
+  @Mock private PmsEventSender eventSender;
+
+  @Inject @InjectMocks private InterruptEventPublisherImpl publisher;
+
+  @Test
+  @Owner(developers = ALEXEI)
+  @Category(UnitTests.class)
+  public void publishEvent() throws InvalidProtocolBufferException {
+    String nodeExecutionId = generateUuid();
+    String planExecutionId = generateUuid();
+    Interrupt interrupt = Interrupt.builder()
+                              .planExecutionId(planExecutionId)
+                              .type(InterruptType.ABORT)
+                              .interruptConfig(InterruptConfig.newBuilder().build())
+                              .uuid(generateUuid())
+                              .build();
+    PlanNode planNode = PlanNode.builder()
+                            .uuid(generateUuid())
+                            .identifier("DUMMY")
+                            .stepType(StepType.newBuilder().setType("STEP").setStepCategory(StepCategory.STEP).build())
+                            .serviceName("CD")
+                            .build();
+    Ambiance ambiance = Ambiance.newBuilder()
+                            .setPlanExecutionId(planExecutionId)
+                            .addLevels(PmsLevelUtils.buildLevelFromNode(nodeExecutionId, planNode))
+                            .build();
+    NodeExecution nodeExecution = NodeExecution.builder()
+                                      .uuid(nodeExecutionId)
+                                      .ambiance(ambiance)
+                                      .resolvedParams(PmsStepParameters.parse("{}"))
+                                      .module("CD")
+                                      .build();
+
+    when(nodeExecutionService.getWithFieldsIncluded(any(), any())).thenReturn(nodeExecution);
+    when(nodeExecutionService.getAmbiance(any())).thenReturn(ambiance);
+
+    String notifyId = publisher.publishEvent(nodeExecutionId, interrupt, InterruptType.ABORT);
+
+    ArgumentCaptor<InterruptEvent> eventArgumentCaptor = ArgumentCaptor.forClass(InterruptEvent.class);
+    verify(eventSender)
+        .sendEvent(eq(ambiance), eventArgumentCaptor.capture(), eq(PmsEventCategory.INTERRUPT_EVENT), eq("CD"),
+            eq(false), eq(false));
+
+    InterruptEvent actualInterruptEvent = eventArgumentCaptor.getValue();
+
+    assertThat(actualInterruptEvent.getNotifyId()).isEqualTo(notifyId);
+  }
+}

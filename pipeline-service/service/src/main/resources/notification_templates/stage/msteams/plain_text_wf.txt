@@ -1,0 +1,69 @@
+{
+   "type": "message",
+   "attachments": [
+      {
+         "contentType": "application/vnd.microsoft.card.adaptive",
+         "content": {
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
+               {
+                  "type": "Image",
+                  "url": "https://s3.amazonaws.com/wings-assets/slackicons/${IMAGE_STATUS}.png",
+                  "size": "Small"
+               },
+               {
+                  "type": "TextBlock",
+                  "size": "Medium",
+                  "weight": "Bolder",
+                  "text": "Stage ${PIPELINE_STEP} ${NODE_STATUS} for pipeline [${PIPELINE}](${URL})",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "In Project ${PROJECT_IDENTIFIER}",
+                  "isSubtle": true,
+                  "wrap": true
+               },
+               {
+                  "type": "FactSet",
+                  "facts": [
+                     {
+                        "title": "Stage:",
+                        "value": "${PIPELINE_STEP}"
+                     },
+                     {
+                        "title": "Pipeline:",
+                        "value": "${PIPELINE}"
+                     },
+                     {
+                        "title": "Project:",
+                        "value": "${PROJECT_IDENTIFIER}"
+                     },
+                     {
+                        "title": "Triggered By:",
+                        "value": "${USER_NAME}"
+                     },
+                     {
+                        "title": "Events:",
+                        "value": "Started on ${START_DATE}, ${NODE_STATUS} at ${END_DATE}. Took ${DURATION}s"
+                     },
+                     {
+                        "title": "Execution:",
+                        "value": "[View Execution](${URL})"
+                     }
+                  ]
+               }
+            ],
+            "actions": [
+               {
+                  "type": "Action.OpenUrl",
+                  "title": "View Details",
+                  "url": "${URL}"
+               }
+            ]
+         }
+      }
+   ]
+}

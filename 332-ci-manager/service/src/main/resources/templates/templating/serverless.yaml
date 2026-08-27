@@ -1,0 +1,13 @@
+name: ID_PLACEHOLDER
+id: ID_PLACEHOLDER
+
+run:
+  type: run
+  container:
+    image: harnessdev/serverless-template:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_MANIFEST_PATH: ${{runtime.manifestPath}}
+    PLUGIN_VALUES_PATH: ${{serviceOutput.manifests.overrides}}
+    PLUGIN_FILES: serverless.yml,serverless.yaml,serverless.json,<+serviceOutput.manifests.primary.inputs.configOverridePath>
+    PLUGIN_RENDER_IN_PLACE: true

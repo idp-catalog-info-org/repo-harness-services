@@ -1,0 +1,28 @@
+name: Plan Concurrency Rebuild Metrics
+identifier: PlanConcurrencyRebuildMetrics
+metricGroup: PlanConcurrencyRebuildMetricsGroup
+metrics:
+  - metricName: pipeline_plan_concurrency_counter_drift
+    metricDefinition: Signed drift (mongoCount - redisCountBeforeRecompute) observed during a plan-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_rebuild_run_total
+    metricDefinition: Outcome of each plan-concurrency counter rebuild run. outcome in {success, leader_lock_held_by_other, error}.
+    type: Count
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_rebuild_accounts_recomputed
+    metricDefinition: Number of accounts recomputed during the last plan-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_rebuild_projects_recomputed
+    metricDefinition: Number of projects recomputed during the last plan-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_rebuild_stale_accounts_zeroed
+    metricDefinition: Number of accounts with a stale non-zero Redis counter zeroed during the last plan-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"
+  - metricName: pipeline_plan_concurrency_rebuild_stale_projects_zeroed
+    metricDefinition: Number of projects with a stale non-zero Redis counter zeroed during the last plan-concurrency counter rebuild.
+    type: LastValue
+    unit: "1"

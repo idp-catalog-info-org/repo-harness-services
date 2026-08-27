@@ -1,0 +1,6 @@
+name: Trigger Executor Validation Metrics Group
+identifier: trigger_executor_validation_group
+labels:
+  - accountId
+  - executorType
+  - result

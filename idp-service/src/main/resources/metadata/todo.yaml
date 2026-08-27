@@ -1,0 +1,25 @@
+identifier: todo
+name: TODO
+description: Browse TODO comments in your project's source code.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: true
+type: DEFAULT
+creator: Spotify
+category: Discovery
+source: https://github.com/backstage/backstage/tree/master/plugins/todo
+iconUrl: https://backstage.io/img/todo-logo.png
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/todo/
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityTodoContent
+      addByDefault: true
+      defaultRoute: /todo
+      layoutSchemaSpecs:
+        name: EntityTodoContent
+        title: Todo
+        contents:
+          - component: EntityTodoContent

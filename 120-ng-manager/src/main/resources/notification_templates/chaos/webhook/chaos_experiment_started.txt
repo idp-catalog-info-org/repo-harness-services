@@ -1,0 +1,98 @@
+{
+    "title": "Harness Chaos Experiment Started Alert",
+    "description": "Harness Chaos Experiment ${CHAOS_EXPERIMENT_NAME} has been started for the project - ${PROJECT_ID} under the organization - ${ORG_ID} for the account - ${ACCOUNT_ID}.",
+    "fields": [
+        {
+             "label": "Run Sequence",
+             "value": "${RUN_SEQUENCE}"
+        },
+        {
+             "label": "Report Created On",
+             "value": "${REPORT_CREATED_ON}"
+        },
+        {
+             "label": "Resilience Score",
+             "value": "${RESILIENCE_SCORE}"
+        },
+        {
+             "label": "Account ID",
+             "value": "${ACCOUNT_ID}"
+        },
+        {
+             "label": "Organization ID",
+             "value": "${ORG_ID}"
+        },
+        {
+             "label": "Project ID",
+             "value": "${PROJECT_ID}"
+        },
+        {
+             "label": "Experiment ID",
+             "value": "${EXPERIMENT_ID}"
+        },
+        {
+             "label": "Description",
+             "value": "${CHAOS_EXPERIMENT_DESCRIPTION}"
+        },
+        {
+             "label": "Tags",
+             "value": "${CHAOS_EXPERIMENT_TAGS}"
+        },
+        {
+             "label": "Schedule Details",
+             "value": "${SCHEDULE_DETAILS}"
+        },
+        {
+             "label": "Experiment Run ID",
+             "value": "${CHAOS_EXPERIMENT_RUN_ID}"
+        },
+        {
+             "label": "Chaos Infrastructure",
+             "value": "${CHAOS_INFRASTRUCTURE_ID}"
+        },
+        {
+             "label": "Chaos Infrastructure Type",
+             "value": "${CHAOS_INFRASTRUCTURE_TYPE}"
+        },
+        {
+            "label": "Notify ID",
+            "value": "${NOTIFY_ID}"
+        },
+        {
+             "label": "Environment",
+             "value": "${ENVIRONMENT_ID}"
+        },
+        {
+             "label": "Executed By",
+             "value": "${USER_ID}"
+        },
+        {
+             "label": "Executed On",
+             "value": "${EXECUTED_ON}"
+        },
+        {
+             "label": "Executed Till",
+             "value": "${EXECUTED_TILL}"
+        },
+        {
+             "label": "Duration",
+             "value": "${DURATION}"
+        },
+        {
+             "label": "Number of Faults",
+             "value": "${TOTAL_NUMBER_OF_FAULTS}"
+        },
+        {
+             "label": "Number of Probes",
+             "value": "${TOTAL_NUMBER_OF_PROBES}"
+        },
+        {
+           "label": "Number of Actions",
+           "value": "${TOTAL_NUMBER_OF_ACTIONS}"
+        },
+        {
+             "label": "Chaos Experiment URL",
+             "value": "${CHAOS_EXPERIMENT_URL}"
+        }
+     ]
+}

@@ -1,0 +1,4 @@
+name: License Usage Metrics Group
+identifier: license_usage_metrics_group
+labels:
+  - accountId

@@ -1,0 +1,24 @@
+/*
+ * Copyright 2022 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.event;
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class OrchestrationLogConfiguration {
+  @Builder.Default int orchestrationLogBatchSize = 5;
+  boolean shouldUseExpiredListener;
+  @Builder.Default int cacheExpiryTimeMinutes = 2;
+  /**
+   * When false, expired-listener registration is attempted once (pre-retry behavior).
+   * Use env SHOULD_RETRY_ORCHESTRATION_LOG_CACHE_LISTENER_REGISTRATION=false to roll back.
+   */
+  @Builder.Default boolean shouldRetryExpiredListenerRegistration = true;
+}

@@ -1,0 +1,6 @@
+name: Pipeline Service DW Metrics Group per Http Method
+identifier: PipelineServiceDwMetricsHttpMethodGroup
+labels:
+  - method
+  - namespace
+  - serviceName

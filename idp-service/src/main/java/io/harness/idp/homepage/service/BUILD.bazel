@@ -1,0 +1,32 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/harness.bzl", "java_library")
+
+java_library(
+    name = "module",
+    srcs = glob(["**/*.java"]),
+    resources = [],
+    visibility = ["//idp-service:__subpackages__"],
+    deps = [
+        "//:lombok",
+        "//877-pipeline-ci-cd-commons:module",
+        "//955-outbox-sdk/src/main/java/io/harness/outbox/api:module",
+        "//980-commons/src/main/java/io/harness/annotations:module",
+        "//idp-service/src/main/java/io/harness/idp/common:module",
+        "//idp-service/src/main/java/io/harness/idp/configmanager/utils:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/config:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/entities:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/events:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/mappers:module",
+        "//idp-service/src/main/java/io/harness/idp/homepage/repositories:module",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_inject_guice",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:javax_ws_rs_javax_ws_rs_api",
+        "@maven//:org_apache_commons_commons_math3",
+        "@maven//:org_mongodb_morphia_morphia",
+    ],
+)

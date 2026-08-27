@@ -1,0 +1,7 @@
+name: Pipeline Execution Metrics Group
+identifier: PipelineExecutionMetricsGroup
+labels:
+  - accountId
+  - status
+  - edition
+  - errorCode

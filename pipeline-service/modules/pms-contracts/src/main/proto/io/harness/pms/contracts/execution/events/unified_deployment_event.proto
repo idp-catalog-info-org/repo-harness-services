@@ -1,0 +1,20 @@
+// Copyright 2025 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.execution.events;
+
+import "io/harness/pms/contracts/ambiance/ambiance.proto";
+import "io/harness/pms/contracts/execution/status.proto";
+
+option java_multiple_files = true;
+
+// Event sent from CI-manager to NG-manager containing deployment output variables
+message UnifiedDeploymentEvent {
+  io.harness.pms.contracts.ambiance.Ambiance ambiance = 1;
+  map<string, string> outputVariables = 2;
+  io.harness.pms.contracts.execution.Status stepStatus = 3;
+}

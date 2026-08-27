@@ -1,0 +1,28 @@
+name: License Usage Metrics
+identifier: license_usage_metrics
+metricGroup: license_usage_metrics_group
+metrics:
+  - metricName: license_usage_hourly_daily_job_failure
+    metricDefinition: count of license usage hourly to daily rollup job failures per account
+    type: Count
+    unit: "1"
+  - metricName: license_usage_unprocessed_account_count
+    metricDefinition: number of accounts with unprocessed license usage data per job run
+    type: LastValue
+    unit: "1"
+  - metricName: license_usage_monthly_yearly_job_failure
+    metricDefinition: count of license usage monthly to yearly rollup job failures per account
+    type: Count
+    unit: "1"
+  - metricName: license_usage_event_processing_failure
+    metricDefinition: count of failures while processing license usage events from the event stream
+    type: Count
+    unit: "1"
+  - metricName: license_usage_hourly_daily_processed_count
+    metricDefinition: number of license usage documents processed per account in the hourly to daily rollup
+    type: LastValue
+    unit: "1"
+  - metricName: license_usage_monthly_yearly_processed_count
+    metricDefinition: number of daily license usage records processed per account in the monthly to yearly rollup
+    type: LastValue
+    unit: "1"

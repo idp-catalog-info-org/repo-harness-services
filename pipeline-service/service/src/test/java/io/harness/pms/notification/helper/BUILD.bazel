@@ -1,0 +1,81 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//878-ng-common-utilities/src/main/java/io/harness/logstreaming:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/plan/creation:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/plan/execution:module",
+        "//930-ng-core-clients/src/main/java/io/harness/organization/remote:module",
+        "//930-ng-core-clients/src/main/java/io/harness/project/remote:module",
+        "//930-ng-core-clients/src/main/java/io/harness/usergroups:module",
+        "//953-yaml-commons/src/main/java/io/harness/notification:module",
+        "//953-yaml-commons/src/main/java/io/harness/notification/channelDetails:module",
+        "//953-yaml-commons/src/main/java/io/harness/serializer/recaster:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/dto:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/notification:module",
+        "//970-ng-commons/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/common/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/remote/client:module",
+        "//970-ng-commons/src/main/java/io/harness/utils/identifierref:module",
+        "//980-commons/src/main/java/io/harness/beans/user:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/encryption:module",
+        "//980-commons/src/main/java/io/harness/expression/common:module",
+        "//980-commons/src/main/java/io/harness/logging:module",
+        "//980-commons/src/main/java/io/harness/sanitizer:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/notification/src/main/java/io/harness/notification/channeldetails:module",
+        "//clients/notification/src/main/java/io/harness/notification/notificationclient:module",
+        "//clients/notification/src/main/java/io/harness/notification/templates:module",
+        "//pipeline-service/modules/orchestration:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/plan:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/notification/bean:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/steps/approval/step/beans:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/steps/approval/step/harness/beans:module",
+        "//pipeline-service/modules/orchestration-steps/src/main/java/io/harness/steps/approval/step/entities:module",
+        "//pipeline-service/modules/orchestration-visualization/contracts/src/main/java/io/harness/dto:module",
+        "//pipeline-service/modules/orchestration-visualization/contracts/src/main/java/io/harness/pms/plan/execution/beans:module",
+        "//pipeline-service/modules/orchestration-visualization/contracts/src/main/java/io/harness/pms/plan/execution/beans/dto:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/execution:module",
+        "//pipeline-service/service/src/main/java/io/harness/pipeline/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/approval/notification/stagemetadata:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/approval/notification/stagemetadata/summary:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/approval/notification/summary:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/helpers:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/notification:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/notification/helper:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/mappers:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/service/intfc:module",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_json_json",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

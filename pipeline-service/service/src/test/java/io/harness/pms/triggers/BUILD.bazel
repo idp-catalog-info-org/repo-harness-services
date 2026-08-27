@@ -1,0 +1,88 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/macros.bzl", "run_analysis_for_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    resources = [
+        "//pipeline-service/service/src/main/resources:static_resource",
+        "//pipeline-service/service/src/test/resources:resource",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//123-ng-core-user/src/main/java/io/harness/ng/accesscontrol:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/gitaware/helper:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/gitsync:module",
+        "//900-git-sync-sdk/src/main/java/io/harness/gitsync/helpers:module",
+        "//900-git-sync-sdk/src/main/java/io/harness/gitsync/scm/beans:module",
+        "//952-scm-java-client/src/main/java/io/harness/beans:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/gitsync:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/gitsync/beans:module",
+        "//970-ng-commons/src/main/java/io/harness/gitsync/interceptor:module",
+        "//970-ng-commons/src/main/java/io/harness/metrics/service/api:module",
+        "//970-ng-commons/src/main/java/io/harness/ng/core/dto:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//980-commons/src/main/java/io/harness/authorization:module",
+        "//980-commons/src/main/java/io/harness/data/structure:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//980-commons/src/main/java/io/harness/security:module",
+        "//980-commons/src/main/java/io/harness/security/dto:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/ngsettings/src/main/java/io/harness/ngsettings/client/remote:module",
+        "//clients/pipeline-service/pms-client/src/main/java/io/harness/pipeline/remote:module",
+        "//ng-settings/contracts/src/main/java/io/harness/ngsettings/dto:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/plan/execution:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/plan/execution/beans/dto:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/config:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/source:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/source/artifact:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/source/webhook:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/source/webhook/v2/github/event:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/source/webhook/v2/spec:module",
+        "//pipeline-service/modules/ng-triggers/contracts/src/main/java/io/harness/ngtriggers/beans/target:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/beans/dto:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/beans/entity:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/beans/scm:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/mapper:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/utils:module",
+        "//pipeline-service/modules/orchestration:module",
+        "//pipeline-service/modules/orchestration-beans/contracts/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration-beans/src/main/java/io/harness/execution:module",
+        "//pipeline-service/modules/orchestration/contracts/src/main/java/io/harness/engine/executions/retry:module",
+        "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/inputset:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/beans:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/helper:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/plan/execution/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/triggers:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_google_inject_guice",
+        "@maven//:com_google_protobuf_protobuf_java",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:junit_junit",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_codehaus_groovy_groovy",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)
+
+run_analysis_for_tests(
+    checkstyle_srcs = glob(["*"]),
+)
+
+run_tests("*Test.java")

@@ -1,0 +1,110 @@
+pipeline:
+  name: ContainerStepGroupPipeline
+  identifier: ContainerStepGroupPipeline
+  projectIdentifier: projectIdentifier
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: dep1
+        identifier: dep1
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: <+matrix.service.name>
+          environment:
+            environmentRef: <+matrix.env.name>
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: <+matrix.env.infra>
+          execution:
+            steps:
+              - step:
+                  type: Container
+                  name: Container_1
+                  identifier: Container_1
+                  spec:
+                    connectorRef: org.GCRConnectorForAutomationTest
+                    image: "image"
+                    command: echo <+matrix.service.name>_<+matrix.env.infra>
+                    shell: Sh
+                    infrastructure:
+                      type: KubernetesDirect
+                      spec:
+                        connectorRef: org.KubernetesConnectorWithInclusterDelegatePIEForAutomationTest
+                        namespace: default
+                        resources:
+                          limits:
+                            cpu: "0.5"
+                            memory: 50Mi
+                        annotations: {}
+                        labels: {}
+                        containerSecurityContext:
+                          capabilities:
+                            drop: []
+                            add: []
+                        nodeSelector: {}
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths: []
+                    outputVariables: []
+                    envVariables: {}
+                  timeout: 15m
+                  when:
+                    stageStatus: Success
+                    condition: "true"
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - AllErrors
+                        action:
+                          type: Ignore
+                  strategy:
+                    matrix:
+                      service: <+json.list("service",<+pipeline.variables.serv>)>
+                      nodeName: stage_<+matrix.service.name>_<+matrix.env.infra>
+                      env: <+json.list("env",<+pipeline.variables.env>)>
+            rollbackSteps: []
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+        variables:
+          - name: resourceNamePrefix
+            type: String
+            description: ""
+            required: false
+            value: qwerandom
+          - name: env
+            type: String
+            description: ""
+            required: false
+            value: "{\"env\":[{\"name\":\"env\",\"infra\":\"infra1\"},{\"name\":\"env\",\"infra\":\"infra2\"}]}"
+          - name: SERV
+            type: String
+            description: ""
+            required: false
+            value: K8sroll1
+        strategy:
+          matrix:
+            service: <+json.list("service",<+pipeline.variables.serv>)>
+            nodeName: stage_<+matrix.service.name>_<+matrix.env.infra>
+            env: <+json.list("env",<+pipeline.variables.env>)>
+  variables:
+    - name: serv
+      type: String
+      description: ""
+      required: false
+      value: "{\"service\":[{\"name\":\"zack\",\"deleted\":false},{\"name\":\"Kubernetes Service\",\"deleted\":false}]}"
+    - name: env
+      type: String
+      description: ""
+      required: false
+      value: "{\"env\":[{\"name\":\"dev\",\"infra\":\"sqlmidev\"},{\"name\":\"Env\",\"infra\":\"Kubernetes\"}]}"
+  allowStageExecutions: true

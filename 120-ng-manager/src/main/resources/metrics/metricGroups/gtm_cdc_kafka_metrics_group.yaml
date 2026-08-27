@@ -1,0 +1,5 @@
+name: GTM CDC Kafka Metrics Group
+identifier: gtm_cdc_kafka_metrics_group
+labels:
+  - namespace
+  - serviceName

@@ -1,0 +1,8 @@
+name: Step Concurrency Counter Mutation Metrics
+identifier: StepConcurrencyCounterMutationMetrics
+metricGroup: StepConcurrencyCounterMutationMetricsGroup
+metrics:
+  - metricName: pipeline_step_concurrency_counter_mutations_total
+    metricDefinition: Redis counter mutations for the step-concurrency gate. scope in {account, cluster}; operation in {increment, decrement, bulk_entry, bulk_exit}; outcome in {success, error}.
+    type: Count
+    unit: "1"

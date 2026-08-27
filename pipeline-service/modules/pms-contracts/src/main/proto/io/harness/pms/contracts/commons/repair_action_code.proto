@@ -1,0 +1,26 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.commons;
+
+option java_multiple_files = true;
+
+enum RepairActionCode {
+  UNKNOWN = 0;
+  RETRY = 1;
+  MANUAL_INTERVENTION = 2;
+  IGNORE = 3;
+  END_EXECUTION = 4;
+  MARK_AS_SUCCESS = 5;
+  ON_FAIL = 6;
+  STAGE_ROLLBACK = 7;
+  STEP_GROUP_ROLLBACK = 8;
+  CUSTOM_FAILURE = 9;
+  MARK_AS_FAILURE = 10;
+  PIPELINE_ROLLBACK = 11;
+  RETRY_STEP_GROUP = 12;
+}

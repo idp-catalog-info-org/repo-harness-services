@@ -1,0 +1,6 @@
+name: CI AIT Bypass Metrics Group
+identifier: CIAitBypassMetricsGroup
+labels:
+  - accountId
+  - decision
+  - reason

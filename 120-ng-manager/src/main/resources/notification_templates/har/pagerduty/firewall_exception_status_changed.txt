@@ -1,0 +1,4 @@
+summary: "Harness Artifact Registry Firewall Exemption Status Changed: ${PACKAGE_NAME}. Version List: ${VERSION_LIST} - Registry: ${REGISTRY_NAME} - Status: ${STATUS}. Changed By: ${CHANGED_BY}"
+link:
+    href: ${EXCEPTION_URL}
+    text: View Exemption in Harness

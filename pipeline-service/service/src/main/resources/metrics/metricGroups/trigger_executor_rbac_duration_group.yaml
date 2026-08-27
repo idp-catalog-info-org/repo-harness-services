@@ -1,0 +1,5 @@
+name: Trigger Executor RBAC Duration Metrics Group
+identifier: trigger_executor_rbac_duration_group
+labels:
+  - accountId
+  - executorType

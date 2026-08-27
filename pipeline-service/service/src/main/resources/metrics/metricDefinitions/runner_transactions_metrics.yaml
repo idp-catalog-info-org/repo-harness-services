@@ -1,0 +1,22 @@
+name: Runner Transactions Service Metrics
+identifier: RunnerTransactionsServiceMetrics
+metricGroup: runner_transactions_service_group
+metrics:
+  - metricName: runner_transactions_list_request_count
+    metricDefinition: Total number of list runner transactions gRPC requests with status (success/failure)
+    type: Count
+    unit: "1"
+  - metricName: runner_transactions_list_duration
+    metricDefinition: Time taken for list runner transactions gRPC call
+    type: Duration
+    distribution: [ 0ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m ]
+    unit: "ms"
+  - metricName: runner_transactions_update_priority_request_count
+    metricDefinition: Total number of update priority gRPC requests with status (success/failure)
+    type: Count
+    unit: "1"
+  - metricName: runner_transactions_update_priority_duration
+    metricDefinition: Time taken for update priority gRPC call
+    type: Duration
+    distribution: [ 0ms, 200ms, 500ms, 1s, 2s, 5s, 10s, 30s, 1m ]
+    unit: "ms"

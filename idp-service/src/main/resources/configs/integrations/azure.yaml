@@ -1,0 +1,5 @@
+integrations:
+  azure:
+    - host: HOST_VALUE
+      credentials:
+        - personalAccessToken: ${HARNESS_AZURE_REPO_TOKEN}

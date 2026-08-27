@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "64d4f2792a05b207f0ee598f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_mean_time_to_merge_pr",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"query {\\n    repository(owner: \\\"{REPOSITORY_OWNER}\\\", name: \\\"{REPOSITORY_NAME}\\\") {\\n    pullRequests(states: MERGED, last: 100{REPOSITORY_BRANCH_NAME_REPLACER}) {\\n      edges {\\n        node {\\n          number\\n          createdAt\\n          mergedAt\\n        }\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "64d5c5ed0646ac1d149d0da2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "catalog",
+    "dataSourceIdentifier": "catalog",
+    "type": "Noop"
+  },
+  {
+    "id": "66e145051734ddeb2c06b8f2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "catalogSystem",
+    "dataSourceIdentifier": "catalog",
+    "type": "Noop"
+  },
+  {
+    "id": "64d5f2f51bf2020f1cc713bd",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_is_branch_protection_set",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"query {\\n    repository(owner: \\\"{REPOSITORY_OWNER}\\\", name: \\\"{REPOSITORY_NAME}\\\") {\\n    {REPOSITORY_BRANCH_NAME_REPLACER} {\\n      name\\n      branchProtectionRule{\\n          allowsDeletions\\n          allowsForcePushes\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "64edb326148f531a384f0107",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_is_file_exists",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"{\\n  repository(owner: \\\"{REPOSITORY_OWNER}\\\", name: \\\"{REPOSITORY_NAME}\\\") {\\n    defaultBranchRef {\\n      repository {\\n        object(expression : \\\"{GITHUB_FILE_EXISTS_REPLACER}\\\") {\\n          ... on Tree {\\n            id\\n            entries {\\n              name\\n              path\\n              type\\n            }\\n          }\\n        }\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "64ef7856f616c89330020df1",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_sto_scan_dsl",
+    "dataSourceIdentifier": "harness",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/harness/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "64ef7872f616c89330020df2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_policy_evaluation_dsl",
+    "dataSourceIdentifier": "harness",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/harness/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "64ef78b7f616c89330020df3",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_ci_success_percent_in_seven_days",
+    "dataSourceIdentifier": "harness",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/harness/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "64ef78e1f616c89330020df4",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_test_passing_on_ci_is_zero",
+    "dataSourceIdentifier": "harness",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/harness/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "65006535c28a1a3f5607e84e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_service_directory",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/service_directory/{SERVICE_ID}",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "6500a8c6c28a1a3f5607f80e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_incidents",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/incidents?service_ids[]={SERVICE_ID}&limit=105&sort_by=created_at:desc&until={CURRENT_TIME_IN_UTC}",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "64fec18f2f002fcdd9031763",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "kubernetes",
+    "dataSourceIdentifier": "kubernetes",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/v1/data-sources/kubernetes/data-point/values",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "650ae5f5047ed6bddfdeee81",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_mean_time_to_merge_pr",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/2.0/repositories/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/pullrequests?q=state%3D%22MERGED%22",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "650ae614f618a0c0a125440d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_is_branch_protection_set",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/2.0/repositories/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/branch-restrictions?pattern={BRANCH_NAME_REPLACER}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "650c086a9fc07a1b94f76e1a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_resolved_incidents",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/incidents?service_ids[]={SERVICE_ID}&statuses[]=resolved&limit=10&sort_by=created_at:desc",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "65143c9d1c555805963ef470",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "jira_mean_time_to_resolve",
+    "dataSourceIdentifier": "jira",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/rest/api/3/search/jql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"jql\" : \"project = {PROJECT_COMPONENT_REPLACER} AND {JQL_EXPRESSION}\",\n    \"fields\": [\"created\", \"resolutiondate\"],\n    \"maxResults\": 100}"
+    }
+  },
+  {
+    "id": "65143d88580ef9b417b6484b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "jira_issues_count",
+    "dataSourceIdentifier": "jira",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/rest/api/3/search/jql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"jql\" : \"project = {PROJECT_COMPONENT_REPLACER} AND {JQL_EXPRESSION}\",\n    \"fields\": [\"created\", \"resolutiondate\"],\n    \"maxResults\": 100}"
+    }
+  },
+  {
+    "id": "65155f9a60b2ca23e5123fd5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "jira_issues_open_close_ratio",
+    "dataSourceIdentifier": "jira",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/rest/api/3/search/jql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"jql\" : \"project = {PROJECT_COMPONENT_REPLACER} AND {JQL_EXPRESSION}\",\n    \"fields\": [\"status\"],\n    \"maxResults\": 100}"
+    }
+  },
+  {
+    "id": "651c0fc2381555cde1290f9f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gitlab_mean_time_to_merge_pr",
+    "dataSourceIdentifier": "gitlab",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/api/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"{\\n  project(fullPath: \\\"{REPOSITORY_OWNER}/{REPOSITORY_NAME}\\\") {\\n    mergeRequests(state: merged, last: 100{REPOSITORY_BRANCH_NAME_REPLACER}) {\\n      nodes {\\n        title\\n        createdAt\\n        mergedAt\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "651c0fcadf7e3948a05eb5d6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gitlab_is_branch_protection_set",
+    "dataSourceIdentifier": "gitlab",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/api/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"{\\n  project(fullPath: \\\"{REPOSITORY_OWNER}/{REPOSITORY_NAME}\\\") {\\n    branchRules {\\n      nodes {\\n        name\\n        branchProtection {\\n          allowForcePush\\n        }\\n        approvalRules {\\n          nodes {\\n            approvalsRequired\\n          }\\n        }\\n        isDefault\\n        isProtected\\n      }\\n    }\\n  }\\n}\\n\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "651c0fd0da000b6007577bc2",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gitlab_is_file_exists",
+    "dataSourceIdentifier": "gitlab",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/api/graphql",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"{\\n  project(fullPath: \\\"{REPOSITORY_OWNER}/{REPOSITORY_NAME}\\\") {\\n    repository {\\n      tree(ref: \\\"HEAD\\\", path: \\\"{FILE_PATH_REPLACER}\\\") {\\n        blobs {\\n          nodes {\\n            name\\n            path\\n          }\\n        }\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "6523d9755284ab11055761ea",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_workflows_count",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/actions/workflows",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "6523d97ada3444298db8964a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_workflow_success_rate",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/actions/workflows/{WORKFLOW_ID}/runs?status=completed&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "6524098b0e61b22bb32ec25c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_mean_time_to_complete_workflow_runs",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/actions/workflows/{WORKFLOW_ID}/runs?status=completed&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "6524089b1f61b22bb32fc34d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_mean_time_to_complete_success_workflow_runs",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/actions/workflows/{WORKFLOW_ID}/runs?status=success&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "652d0aff299e6ea7ffe52784",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_open_dependabot_alerts",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/dependabot/alerts?state=open&severity={SEVERITY_REPLACER}&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "652d12d8bec122fa440c56e5",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_open_code_scanning_alerts",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/code-scanning/alerts?state=open&severity={SEVERITY_REPLACER}&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "652d12dda3188184f6e0e553",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_open_secret_scanning_alerts",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/repos/{REPOSITORY_OWNER}/{REPOSITORY_NAME}/secret-scanning/alerts?state=open&per_page=100",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "652d155ea0d3cf3d54903551",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_open_pull_requests_by_account",
+    "dataSourceIdentifier": "github",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "/graphql",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "requestBody": "{\"query\":\"{\\n  search(query: \\\"repo:{REPOSITORY_OWNER}/{REPOSITORY_NAME} is:pr is:open author:{AUTHOR_NAME}\\\", type: ISSUE, last: 100) {\\n    edges {\\n      node {\\n        ... on PullRequest {\\n          url\\n          title\\n          createdAt\\n        }\\n      }\\n    }\\n  }\\n}\",\"variables\":{}}"
+    }
+  },
+  {
+    "id": "653783106d639d0b1de18fdf",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_file_contents",
+    "dataSourceIdentifier": "github",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/scm/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "6562addf80634fccaacfd852",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gitlab_file_contents",
+    "dataSourceIdentifier": "gitlab",
+    "type": "CustomHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/scm/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "6565714a131ebd82a2ba0962",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_file_contents",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/scm/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "6565714a131ebd82a2ba0963",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_is_file_exists",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/scm/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "66cf38b74ec59c0403a77e12",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_code_is_file_exists",
+    "dataSourceIdentifier": "harness",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "GET",
+      "url": "/api/v1/repos/{REPOSITORY_NAME}/content/{REPOSITORY_SUB_FOLDER}{FILE_PATH_REPLACER}?accountIdentifier={ACCOUNT_IDENTIFIER}&orgIdentifier={ORG_IDENTIFIER}&projectIdentifier={PROJECT_IDENTIFIER}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "id": "66cf38bce44b527e0558ec26",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_code_file_contents",
+    "dataSourceIdentifier": "harness",
+    "type": "DirectHttp",
+    "apiRequestDetails": {
+      "method": "POST",
+      "url": "{HOST}/v1/data-sources/scm/data-point/values",
+      "headers": {
+        "Authorization": "{SERVICE_TO_SERVICE_AUTH}",
+        "Harness-Account": "{ACCOUNT_IDENTIFIER}",
+        "X-Source-Principal": "{X_SOURCE_PRINCIPAL}"
+      },
+      "requestBody": "{BODY}"
+    }
+  },
+  {
+    "id": "6877e509bf22935e59217313",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_sto_active_vulnerabilities",
+    "dataSourceIdentifier": "harness",
+    "type": "Noop"
+  },
+  {
+    "id": "6877e509bf22935e59217314",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hql_traceable_risk_score",
+    "dataSourceIdentifier": "traceable",
+    "type": "HQL",
+    "hqlTemplate": "with filtered_matches as ( find view idp:traceable_api_matches | filter idp_api_identifier = <+catalog.identifier> and parent_unique_id = <+catalog.parentUniqueId> | select { count() as match_count, avg(risk_score) as risk_score } ) find filtered_matches | select { case when match_count > 0 then risk_score else 'NO_MATCHING_ROWS' end as value }"
+  },
+  {
+    "id": "6a5a09ea82fc8d4071d6c81b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hql_traceable_tot_issues",
+    "dataSourceIdentifier": "traceable",
+    "type": "HQL",
+    "hqlTemplate": "with issue_summary as ( find view idp:traceable_api_matches m | inner join entity traceable:issues i on m.traceable_api_id = i.affected_entity_id | filter m.idp_api_identifier = <+catalog.identifier> and m.parent_unique_id = <+catalog.parentUniqueId> and i.status in ['VULNERABILITY_STATUS_OPEN', 'VULNERABILITY_STATUS_REOPENED'] | select { count() as issue_count } ) find issue_summary | select { case when issue_count > 0 then issue_count else 'NO_MATCHING_ROWS' end as value }"
+  },
+  {
+    "id": "6a5a098582fc8d4071d6c819",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hql_traceable_max_issues",
+    "dataSourceIdentifier": "traceable",
+    "type": "HQL",
+    "hqlTemplate": "with issue_counts as ( find view idp:traceable_api_matches m | inner join entity traceable:issues i on m.traceable_api_id = i.affected_entity_id | filter m.idp_api_identifier = <+catalog.identifier> and m.parent_unique_id = <+catalog.parentUniqueId> and i.status in ['VULNERABILITY_STATUS_OPEN', 'VULNERABILITY_STATUS_REOPENED'] | select { m.traceable_api_id, count() as issue_count } | group_by m.traceable_api_id ), issue_summary as ( find issue_counts | aggregate { count() as match_count, max(issue_count) as issue_count } ) find issue_summary | select { case when match_count > 0 then issue_count else 'NO_MATCHING_ROWS' end as value }"
+  },
+  {
+    "id": "6a5a098582fc8d4071d6c81a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hql_traceable_min_issues",
+    "dataSourceIdentifier": "traceable",
+    "type": "HQL",
+    "hqlTemplate": "with issue_counts as ( find view idp:traceable_api_matches m | inner join entity traceable:issues i on m.traceable_api_id = i.affected_entity_id | filter m.idp_api_identifier = <+catalog.identifier> and m.parent_unique_id = <+catalog.parentUniqueId> and i.status in ['VULNERABILITY_STATUS_OPEN', 'VULNERABILITY_STATUS_REOPENED'] | select { m.traceable_api_id, count() as issue_count } | group_by m.traceable_api_id ), issue_summary as ( find issue_counts | aggregate { count() as match_count, min(issue_count) as issue_count } ) find issue_summary | select { case when match_count > 0 then issue_count else 'NO_MATCHING_ROWS' end as value }"
+  },
+  {
+    "id": "6a5a098582fc8d4071d6c81c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "hql_traceable_owasp_endpoint_count",
+    "dataSourceIdentifier": "traceable",
+    "type": "HQL",
+    "hqlTemplate": "with matching_issue_endpoints as ( find entity traceable:issues | unnest owasp_values as owasp_value | filter status in ['VULNERABILITY_STATUS_OPEN', 'VULNERABILITY_STATUS_REOPENED'] and owasp_value in <+inputs.owasp> | select { affected_entity_id } ), issue_summary as ( find view idp:traceable_api_matches m | left join matching_issue_endpoints i on m.traceable_api_id = i.affected_entity_id | filter m.idp_api_identifier = <+catalog.identifier> and m.parent_unique_id = <+catalog.parentUniqueId> | select { count() as mapping_count, distinct_count(i.affected_entity_id) as endpoint_count } ) find issue_summary | select { case when mapping_count > 0 then endpoint_count else 'NO_MATCHING_ROWS' end as value }"
+  },
+  {
+    "id": "6a7025614165cc7818a744f0",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_description",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.description"
+  },
+  {
+    "id": "6a7025614165cc7818a744f1",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_monitor_count",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.monitorCount"
+  },
+  {
+    "id": "6a7025614165cc7818a744f4",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_monitors_summary_count_red",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.monitors_summary_count.red"
+  },
+  {
+    "id": "6a7025614165cc7818a744f6",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_contacts_size",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.contacts.size()"
+  },
+  {
+    "id": "6a7025614165cc7818a744f8",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_docs_size",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.docs.size()"
+  },
+  {
+    "id": "6a7025614165cc7818a744fa",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_github_html_url",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.githubHtmlUrl"
+  },
+  {
+    "id": "6a7025614165cc7818a744fb",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "datadog_github_html_url_present",
+    "dataSourceIdentifier": "datadog",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.Datadog.githubHtmlUrl != null && catalog.metadata.integration_properties.Datadog.githubHtmlUrl != \"\""
+  },
+  {
+    "id": "6a7025614165cc7818a744fe",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_monitor_count",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.monitorCount"
+  },
+  {
+    "id": "6a7025614165cc7818a744ff",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_slo_count",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.sloCount"
+  },
+  {
+    "id": "6a7025614165cc7818a74500",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_problem_count",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.problemCount"
+  },
+  {
+    "id": "6a7025614165cc7818a74501",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_monitor_count_gt_0",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.monitorCount > 0"
+  },
+  {
+    "id": "6a7025614165cc7818a74502",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_slo_count_gt_0",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.sloCount > 0"
+  },
+  {
+    "id": "6a7025614165cc7818a74503",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "dynatrace_problem_count_eq_0",
+    "dataSourceIdentifier": "dynatrace",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.DynaTrace.problemCount == 0"
+  },
+  {
+    "id": "6a7025614165cc7818a74504",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_integration_url",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.url"
+  },
+  {
+    "id": "6a7025614165cc7818a74505",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_primary_language_name",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.primaryLanguageName"
+  },
+  {
+    "id": "6a7025614165cc7818a74506",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_has_agents_file",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.hasAgentsFile"
+  },
+  {
+    "id": "6a7025614165cc7818a74508",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_latest_release_published_at",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.latestRelease.publishedAt"
+  },
+  {
+    "id": "6a7025614165cc7818a7450b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_latest_release_published_at_present",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.latestRelease.publishedAt != null && catalog.metadata.integration_properties.GitHub.latestRelease.publishedAt != \"\""
+  },
+  {
+    "id": "6a7025614165cc7818a7450c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_primary_language_name_present",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.primaryLanguageName != null && catalog.metadata.integration_properties.GitHub.primaryLanguageName != \"\""
+  },
+  {
+    "id": "6a7025614165cc7818a7450d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "github_has_agents_file_is_true",
+    "dataSourceIdentifier": "github",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GitHub.hasAgentsFile == true"
+  },
+  {
+    "id": "6a7025614165cc7818a7450e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_description",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.description"
+  },
+  {
+    "id": "6a7025614165cc7818a7450f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_default_branch",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.default_branch"
+  },
+  {
+    "id": "6a7025614165cc7818a74511",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_project_key",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.project.key"
+  },
+  {
+    "id": "6a7025614165cc7818a74512",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_is_private",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.is_private"
+  },
+  {
+    "id": "6a7025614165cc7818a74514",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_description_present",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.description != null && catalog.metadata.integration_properties.BitbucketCloud.description != \"\""
+  },
+  {
+    "id": "6a7025614165cc7818a74515",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_default_branch_eq_main",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.default_branch == \"main\""
+  },
+  {
+    "id": "6a7025614165cc7818a74516",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_project_key_present",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.project.key != null && catalog.metadata.integration_properties.BitbucketCloud.project.key != \"\""
+  },
+  {
+    "id": "6a7025614165cc7818a74517",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "bitbucket_is_private_is_true",
+    "dataSourceIdentifier": "bitbucket",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.BitbucketCloud.is_private == true"
+  },
+  {
+    "id": "6a7025614165cc7818a74518",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_quality_gate_status",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.qualityGateStatus"
+  },
+  {
+    "id": "6a7025614165cc7818a74519",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_reliability_rating",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.reliabilityRating"
+  },
+  {
+    "id": "6a7025614165cc7818a7451a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_security_rating",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.securityRating"
+  },
+  {
+    "id": "6a7025614165cc7818a7451b",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_sqale_rating",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.sqaleRating"
+  },
+  {
+    "id": "6a7025614165cc7818a7451c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_line_coverage",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.lineCoverage"
+  },
+  {
+    "id": "6a7025614165cc7818a7451d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_branch_coverage",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.branchCoverage"
+  },
+  {
+    "id": "6a7025614165cc7818a7451e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_duplicated_lines_density",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.duplicatedLinesDensity"
+  },
+  {
+    "id": "6a7025614165cc7818a7451f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_bugs",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.bugs"
+  },
+  {
+    "id": "6a7025614165cc7818a74520",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_vulnerabilities",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.vulnerabilities"
+  },
+  {
+    "id": "6a7025614165cc7818a74521",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_security_hotspots",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.securityHotspots"
+  },
+  {
+    "id": "6a7025614165cc7818a74522",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_code_smells",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.codeSmells"
+  },
+  {
+    "id": "6a7025614165cc7818a74523",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "sonarqube_measures_ncloc",
+    "dataSourceIdentifier": "sonarqube",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.SonarQube.measures.ncloc"
+  },
+  {
+    "id": "6a7025614165cc7818a74524",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_identifier",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.identifier"
+  },
+  {
+    "id": "6a7025614165cc7818a74525",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_name",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.name"
+  },
+  {
+    "id": "6a7025614165cc7818a74526",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_status",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.pagerdutyStatus"
+  },
+  {
+    "id": "6a7025614165cc7818a74527",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_on_call_name",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.onCallName"
+  },
+  {
+    "id": "6a7025614165cc7818a74528",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_analytics_mean_seconds_to_first_ack",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToFirstAck"
+  },
+  {
+    "id": "6a7025614165cc7818a74529",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_analytics_mean_seconds_to_resolve",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.analyticsMeanSecondsToResolve"
+  },
+  {
+    "id": "6a7025614165cc7818a7452a",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_analytics_total_incidents",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.analyticsTotalIncidents"
+  },
+  {
+    "id": "6a7025614165cc7818a7452c",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "pagerduty_default_role",
+    "dataSourceIdentifier": "pagerduty",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.PagerDuty.defaultRole"
+  },
+  {
+    "id": "6a7025614165cc7818a7452d",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_cd_deployment_frequency_per_sprint",
+    "dataSourceIdentifier": "harness_cd",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.HarnessCD.deploymentFrequencyPerSprint"
+  },
+  {
+    "id": "6a7025614165cc7818a7452e",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_cd_change_failure_rate_percent",
+    "dataSourceIdentifier": "harness_cd",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.HarnessCD.changeFailureRatePercent"
+  },
+  {
+    "id": "6a7025614165cc7818a7452f",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "harness_cd_average_deployment_duration_seconds",
+    "dataSourceIdentifier": "harness_cd",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.HarnessCD.averageDeploymentDurationSeconds"
+  },
+  {
+    "id": "6a7025614165cc7818a74530",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_asset_type",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.assetType"
+  },
+  {
+    "id": "6a7025614165cc7818a74531",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_display_name",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.displayName"
+  },
+  {
+    "id": "6a7025614165cc7818a74532",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_resource_name",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.resourceName"
+  },
+  {
+    "id": "6a7025614165cc7818a74533",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_state",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.state"
+  },
+  {
+    "id": "6a7025614165cc7818a74534",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_location",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.location"
+  },
+  {
+    "id": "6a7025614165cc7818a74535",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_organization",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.organization"
+  },
+  {
+    "id": "6a7025614165cc7818a74536",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_create_time",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.createTime"
+  },
+  {
+    "id": "6a7025614165cc7818a74537",
+    "accountIdentifier": "__GLOBAL_ACCOUNT_ID__",
+    "identifier": "gcp_project",
+    "dataSourceIdentifier": "gcp",
+    "type": "Catalog",
+    "jexl": "catalog.metadata.integration_properties.GCP.project"
+  }
+]

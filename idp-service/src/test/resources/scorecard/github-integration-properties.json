@@ -1,0 +1,41 @@
+{
+  "id": "R_kgDOHarnessCode",
+  "name": "harness-code",
+  "nameWithOwner": "harness/harness-code",
+  "url": "https://github.com/harness/harness-code",
+  "primaryLanguageName": "Go",
+  "hasAgentsFile": true,
+  "latestRelease": {
+    "name": "v1.2.0",
+    "tagName": "v1.2.0",
+    "publishedAt": "2026-07-15T10:30:00Z"
+  },
+  "languages": [
+    {
+      "name": "Go",
+      "size": 8421500
+    },
+    {
+      "name": "TypeScript",
+      "size": 1250400
+    }
+  ],
+  "releases": [
+    {
+      "name": "v1.2.0",
+      "tagName": "v1.2.0",
+      "isPrerelease": false,
+      "isDraft": false,
+      "publishedAt": "2026-07-15T10:30:00Z",
+      "url": "https://github.com/harness/harness-code/releases/tag/v1.2.0"
+    },
+    {
+      "name": "v1.1.0",
+      "tagName": "v1.1.0",
+      "isPrerelease": false,
+      "isDraft": false,
+      "publishedAt": "2026-06-10T09:00:00Z",
+      "url": "https://github.com/harness/harness-code/releases/tag/v1.1.0"
+    }
+  ]
+}

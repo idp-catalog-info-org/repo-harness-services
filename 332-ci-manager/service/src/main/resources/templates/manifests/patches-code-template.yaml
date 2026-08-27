@@ -1,0 +1,45 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  repoName:
+    type: string
+    description: Harness Code repository name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.repoName}}
+  branch:
+    type: string
+    description: Branch name (optional, mutually exclusive with commitId)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.branch}}
+  commitId:
+    type: string
+    description: Commit SHA (optional, mutually exclusive with branch)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.commitId}}
+  paths:
+    type: list
+    description: List of file paths to fetch from the repository (Kustomize patch files)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths}}
+  patchesPaths:
+    type: list
+    description: List of file paths to fetch from the repository (Kustomize patch files)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths}}
+
+run:
+  type: run
+  container:
+    image: harness/drone-git:1.6.4
+    connector: account.harnessImage
+  env:
+    DRONE_BRANCH: ${{inputs.branch}}
+    DRONE_COMMIT_BRANCH: ${{inputs.branch}}
+    DRONE_GIT_HTTP_URL: ${{runtime.code.get(${{inputs.repoName}}).url}}
+    DRONE_NETRC_PASSWORD: ${{runtime.code.get(${{inputs.repoName}}).token}}
+    HARNESS_PASSWORD_API: ${{runtime.code.get(${{inputs.repoName}}).token}}
+    DRONE_NETRC_USERNAME: ${{runtime.code.get(${{inputs.repoName}}).username}}
+    DRONE_REMOTE_URL: ${{runtime.code.get(${{inputs.repoName}}).url}}
+    DRONE_REPO_BRANCH: ${{inputs.branch}}
+    DRONE_WORKSPACE: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    DRONE_NETRC_MACHINE: ${{runtime.code.get(${{inputs.repoName}}).domain}}
+    DRONE_REPO_SCM: ${{runtime.code.get(${{inputs.repoName}}).type}}
+    DRONE_COMMIT: ${{inputs.commitId}}
+    DRONE_COMMIT_SHA: ${{inputs.commitId}}
+    PLUGIN_OUTPUT_FILE_PATHS_CONTENT: ${{serviceOutput.manifests.ID_PLACEHOLDER.overrides}}

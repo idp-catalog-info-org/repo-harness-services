@@ -1,0 +1,38 @@
+{
+    "title": "Token updated — ${TOKEN_IDENTIFIER}",
+    "description": "The token ${TOKEN_IDENTIFIER} for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME} was updated. New expiry: ${EXPIRY_DATE}.",
+    "fields": [
+        {
+            "label": "Token Identifier",
+            "value": "${TOKEN_IDENTIFIER}"
+        },
+        {
+            "label": "API Key Identifier",
+            "value": "${API_KEY_IDENTIFIER}"
+        },
+        {
+            "label": "Service Account Name",
+            "value": "${SERVICE_ACCOUNT_NAME}"
+        },
+        {
+            "label": "Expiry Date",
+            "value": "${EXPIRY_DATE}"
+        },
+        {
+            "label": "Account Name",
+            "value": "${ACCOUNT_NAME}"
+        },
+        {
+            "label": "Account Identifier",
+            "value": "${ACCOUNT_IDENTIFIER}"
+        },
+        {
+            "label": "Organization Identifier",
+            "value": "${ORG_IDENTIFIER}"
+        },
+        {
+            "label": "Project Identifier",
+            "value": "${PROJECT_IDENTIFIER}"
+        }
+    ]
+}

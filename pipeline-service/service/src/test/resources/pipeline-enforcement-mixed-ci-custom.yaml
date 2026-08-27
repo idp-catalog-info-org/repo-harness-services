@@ -1,0 +1,33 @@
+pipeline:
+  name: MixedPipeline
+  identifier: MixedPipeline
+  projectIdentifier: testProject
+  orgIdentifier: testOrg
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: RunBuild
+                  identifier: RunBuild
+                  spec:
+                    command: echo "build"
+    - stage:
+        name: Custom1
+        identifier: Custom1
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: RunScript
+                  identifier: RunScript
+                  spec:
+                    command: echo "custom"

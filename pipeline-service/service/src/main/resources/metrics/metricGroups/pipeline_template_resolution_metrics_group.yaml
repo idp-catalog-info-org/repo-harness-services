@@ -1,0 +1,5 @@
+name: Pipeline Template Resolution Metrics Group
+identifier: pipeline_template_resolution_group
+labels:
+  - accountId
+  - status

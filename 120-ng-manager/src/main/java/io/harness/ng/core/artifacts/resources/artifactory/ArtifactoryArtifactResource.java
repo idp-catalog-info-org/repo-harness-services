@@ -1,0 +1,550 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+ */
+
+package io.harness.ng.core.artifacts.resources.artifactory;
+import static io.harness.cdng.service.steps.constants.ServiceStepV3Constants.SERVICE_GIT_BRANCH;
+import static io.harness.data.structure.EmptyPredicate.isEmpty;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+
+import io.harness.NGCommonEntityConstants;
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.HarnessTeam;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.FeatureName;
+import io.harness.beans.IdentifierRef;
+import io.harness.beans.ScopeInfo;
+import io.harness.cdng.artifact.NGArtifactConstants;
+import io.harness.cdng.artifact.bean.ArtifactConfig;
+import io.harness.cdng.artifact.bean.yaml.ArtifactoryRegistryArtifactConfig;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryArtifactBuildDetailsDTO;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryBuildDetailsDTO;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryImagePathsDTO;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryRepoDetailsDTO;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryRequestDTO;
+import io.harness.cdng.artifact.resources.artifactory.dtos.ArtifactoryResponseDTO;
+import io.harness.cdng.artifact.resources.artifactory.service.ArtifactoryResourceService;
+import io.harness.common.NGExpressionUtils;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.evaluators.CDYamlExpressionEvaluator;
+import io.harness.exception.InvalidIdentifierRefException;
+import io.harness.gitsync.interceptor.GitEntityFindInfoDTO;
+import io.harness.ng.core.artifacts.resources.util.ArtifactResourceUtils;
+import io.harness.ng.core.artifacts.resources.util.YamlExpressionEvaluatorWithContext;
+import io.harness.ng.core.dto.ErrorDTO;
+import io.harness.ng.core.dto.FailureDTO;
+import io.harness.ng.core.dto.ResponseDTO;
+import io.harness.ng.core.services.ScopeInfoService;
+import io.harness.pms.yaml.ParameterField;
+import io.harness.pms.yaml.validation.RuntimeInputValuesValidator;
+import io.harness.utils.IdentifierRefHelper;
+import io.harness.utils.PmsFeatureFlagHelper;
+
+import software.wings.utils.RepositoryType;
+
+import com.codahale.metrics.annotation.ResponseMetered;
+import com.codahale.metrics.annotation.Timed;
+import com.google.inject.Inject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+@CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_ARTIFACTS})
+@OwnedBy(HarnessTeam.CDC)
+@Api("artifacts")
+@Path("/artifacts/artifactory")
+@Produces({"application/json", "application/yaml"})
+@Consumes({"application/json", "application/yaml"})
+@ApiResponses(value =
+    {
+      @ApiResponse(code = 400, response = FailureDTO.class, message = "Bad Request")
+      , @ApiResponse(code = 500, response = ErrorDTO.class, message = "Internal server error")
+    })
+@AllArgsConstructor(access = AccessLevel.PACKAGE, onConstructor = @__({ @Inject }))
+@Slf4j
+public class ArtifactoryArtifactResource {
+  private final ArtifactoryResourceService artifactoryResourceService;
+  private final ArtifactResourceUtils artifactResourceUtils;
+  private final PmsFeatureFlagHelper pmsFeatureFlagHelper;
+  private final ScopeInfoService scopeInfoService;
+
+  /* Note:
+    This API is used for both Artifactory Docker and Artifactory Generic.
+    For Artifactory Generic this artfactPath Parameter will be artifactDirectory
+  */
+
+  @GET
+  @Path("getBuildDetails")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets artifactory artifact build details", nickname = "getBuildDetailsForArtifactoryArtifact")
+  public ResponseDTO<ArtifactoryResponseDTO> getBuildDetails(@QueryParam("repository") String repository,
+      @QueryParam("artifactPath") String artifactPath, @QueryParam("repositoryFormat") String repositoryFormat,
+      @QueryParam("repositoryUrl") String artifactRepositoryUrl,
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGArtifactConstants.ARTIFACT_FILTER) String artifactFilter,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo) {
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+    ArtifactoryResponseDTO buildDetails =
+        artifactoryResourceService.getBuildDetails(connectorRef, repository, artifactPath, repositoryFormat,
+            artifactRepositoryUrl, orgIdentifier, projectIdentifier, null, artifactFilter, scopeInfo);
+    return ResponseDTO.newResponse(buildDetails);
+  }
+
+  /* Note:
+  This API is used for both Artifactory Docker and Artifactory Generic.
+  For Artifactory Generic this artfactPath Parameter will be artifactDirectory
+*/
+
+  @POST
+  @Path("getBuildDetailsV2")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets artifactory artifact build details with yaml input for expression resolution",
+      nickname = "getBuildDetailsForArtifactoryArtifactWithYaml")
+  public ResponseDTO<ArtifactoryResponseDTO>
+  getBuildDetailsV2(@QueryParam("repository") String repository, @QueryParam("artifactPath") String artifactPath,
+      @QueryParam("repositoryFormat") String repositoryFormat,
+      @QueryParam("repositoryUrl") String artifactRepositoryUrl,
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @QueryParam(NGArtifactConstants.ARTIFACT_FILTER) String artifactFilter,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @QueryParam(NGCommonEntityConstants.PIPELINE_KEY) String pipelineIdentifier,
+      @QueryParam(NGArtifactConstants.TAG_INPUT) String tagInput, @NotNull @QueryParam("fqnPath") String fqnPath,
+      @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo, @NotNull String runtimeInputYaml,
+      @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef) {
+    String tagRegex = null;
+
+    YamlExpressionEvaluatorWithContext baseEvaluatorWithContext = null;
+
+    // remote services can be linked with a specific branch, so we parse the YAML in one go and store the context data
+    //  has env git branch and service git branch
+    if (isNotEmpty(serviceRef)
+        && artifactResourceUtils.isRemoteService(accountId, orgIdentifier, projectIdentifier, serviceRef)) {
+      baseEvaluatorWithContext = artifactResourceUtils.getYamlExpressionEvaluatorWithContext(accountId, orgIdentifier,
+          projectIdentifier, pipelineIdentifier, runtimeInputYaml, fqnPath, gitEntityBasicInfo, serviceRef);
+    }
+
+    if (isNotEmpty(serviceRef)) {
+      final ArtifactConfig artifactSpecFromService = artifactResourceUtils.locateArtifactInService(accountId,
+          orgIdentifier, projectIdentifier, serviceRef, fqnPath,
+          baseEvaluatorWithContext == null ? null : baseEvaluatorWithContext.getContextMap().get(SERVICE_GIT_BRANCH));
+
+      ArtifactoryRegistryArtifactConfig artifactoryRegistryArtifactConfig =
+          (ArtifactoryRegistryArtifactConfig) artifactSpecFromService;
+      if (isEmpty(repository)) {
+        repository = (String) artifactoryRegistryArtifactConfig.getRepository().fetchFinalValue();
+      }
+      // There is an overload in this endpoint so to make things clearer:
+      // artifactPath is the artifactDirectory for Artifactory Generic
+      // artifactPath is the artifactPath for Artifactory Docker
+      if (isEmpty(artifactPath)) {
+        if (artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue().equals("docker")) {
+          artifactPath = (String) artifactoryRegistryArtifactConfig.getArtifactPath().fetchFinalValue();
+        } else {
+          artifactPath = (String) artifactoryRegistryArtifactConfig.getArtifactDirectory().fetchFinalValue();
+        }
+      }
+
+      if (isEmpty(artifactFilter) && ParameterField.isNotNull(artifactoryRegistryArtifactConfig.getArtifactFilter())) {
+        if (RepositoryType.generic.name().equals(
+                artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue())) {
+          artifactFilter = (String) artifactoryRegistryArtifactConfig.getArtifactFilter().fetchFinalValue();
+        }
+      }
+      if (isEmpty(repositoryFormat)) {
+        repositoryFormat = (String) artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue();
+      }
+
+      if (isEmpty(artifactRepositoryUrl)) {
+        artifactRepositoryUrl = (String) artifactoryRegistryArtifactConfig.getRepositoryUrl().fetchFinalValue();
+      }
+
+      if (isEmpty(artifactoryConnectorIdentifier)) {
+        artifactoryConnectorIdentifier = (String) artifactoryRegistryArtifactConfig.getConnectorRef().fetchFinalValue();
+      }
+
+      if (EmptyPredicate.isNotEmpty(tagInput)) {
+        final ParameterField<String> tagRegexParameterField =
+            RuntimeInputValuesValidator.getInputSetParameterField(tagInput);
+        if (tagRegexParameterField != null && artifactResourceUtils.checkValidRegexType(tagRegexParameterField)) {
+          tagRegex = tagRegexParameterField.getInputSetValidator().getParameters();
+        }
+      }
+
+      if (EmptyPredicate.isEmpty(tagRegex)
+          && artifactResourceUtils.checkValidRegexType(artifactoryRegistryArtifactConfig.getArtifactPath())) {
+        tagRegex = artifactoryRegistryArtifactConfig.getArtifactPath().getInputSetValidator().getParameters();
+      }
+    }
+
+    CDYamlExpressionEvaluator yamlExpressionEvaluator =
+        baseEvaluatorWithContext == null ? null : baseEvaluatorWithContext.getYamlExpressionEvaluator();
+
+    artifactoryConnectorIdentifier =
+        artifactResourceUtils
+            .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier, projectIdentifier,
+                pipelineIdentifier, runtimeInputYaml, artifactoryConnectorIdentifier, fqnPath, gitEntityBasicInfo,
+                serviceRef, yamlExpressionEvaluator)
+            .getValue();
+
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    // todo(hinger): resolve other expressions here
+    artifactPath = artifactResourceUtils
+                       .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier, projectIdentifier,
+                           pipelineIdentifier, runtimeInputYaml, artifactPath, fqnPath, gitEntityBasicInfo, serviceRef,
+                           yamlExpressionEvaluator)
+                       .getValue();
+
+    artifactFilter = artifactResourceUtils
+                         .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier, projectIdentifier,
+                             pipelineIdentifier, runtimeInputYaml, artifactFilter, fqnPath, gitEntityBasicInfo,
+                             serviceRef, yamlExpressionEvaluator)
+                         .getValue();
+
+    repository = artifactResourceUtils
+                     .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier, projectIdentifier,
+                         pipelineIdentifier, runtimeInputYaml, repository, fqnPath, gitEntityBasicInfo, serviceRef,
+                         yamlExpressionEvaluator)
+                     .getValue();
+
+    artifactRepositoryUrl = artifactResourceUtils
+                                .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier,
+                                    projectIdentifier, pipelineIdentifier, runtimeInputYaml, artifactRepositoryUrl,
+                                    fqnPath, gitEntityBasicInfo, serviceRef, yamlExpressionEvaluator)
+                                .getValue();
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    ArtifactoryResponseDTO buildDetails =
+        artifactoryResourceService.getBuildDetails(connectorRef, repository, artifactPath, repositoryFormat,
+            artifactRepositoryUrl, orgIdentifier, projectIdentifier, tagRegex, artifactFilter, scopeInfo);
+    return ResponseDTO.newResponse(buildDetails);
+  }
+
+  @POST
+  @Path("getLastSuccessfulBuild")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets artifactory artifact last successful build",
+      nickname = "getLastSuccessfulBuildForArtifactoryArtifact")
+  public ResponseDTO<ArtifactoryBuildDetailsDTO>
+  getLastSuccessfulBuild(@QueryParam(NGArtifactConstants.REPOSITORY) String repository,
+      @QueryParam(NGCommonEntityConstants.ARTIFACT_PATH) String artifactPath,
+      @QueryParam(NGArtifactConstants.REPOSITORY_FORMAT) String repositoryFormat,
+      @QueryParam(NGArtifactConstants.REPOSITORY_URL) String artifactRepositoryUrl,
+      @QueryParam(NGArtifactConstants.CONNECTOR_REF) String dockerConnectorIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier, ArtifactoryRequestDTO requestDTO) {
+    IdentifierRef connectorRef =
+        IdentifierRefHelper.getIdentifierRef(dockerConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    ArtifactoryBuildDetailsDTO buildDetails = artifactoryResourceService.getSuccessfulBuild(connectorRef, repository,
+        artifactPath, repositoryFormat, artifactRepositoryUrl, requestDTO, orgIdentifier, projectIdentifier, scopeInfo);
+    return ResponseDTO.newResponse(buildDetails);
+  }
+
+  @POST
+  @Path("getLastSuccessfulBuildV2")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets artifactory artifact last successful build with yaml input for expression resolution",
+      nickname = "getLastSuccessfulBuildArtifactoryArtifactWithYaml")
+  public ResponseDTO<ArtifactoryBuildDetailsDTO>
+  getLastSuccessfulBuildV2(@QueryParam(NGArtifactConstants.REPOSITORY) String repository,
+      @QueryParam(NGCommonEntityConstants.ARTIFACT_PATH) String artifactPath,
+      @QueryParam(NGArtifactConstants.REPOSITORY_FORMAT) String repositoryFormat,
+      @QueryParam(NGArtifactConstants.REPOSITORY_URL) String artifactRepositoryUrl,
+      @QueryParam(NGArtifactConstants.CONNECTOR_REF) String artifactoryConnectorIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @QueryParam(NGCommonEntityConstants.PIPELINE_KEY) String pipelineIdentifier,
+      @NotNull @QueryParam("fqnPath") String fqnPath, @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo,
+      @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef, ArtifactoryRequestDTO artifactoryRequestDTO) {
+    ArtifactoryBuildDetailsDTO buildDetails = artifactResourceUtils.getLastSuccessfulBuildV2Artifactory(repository,
+        artifactPath, repositoryFormat, artifactRepositoryUrl, artifactoryConnectorIdentifier, accountId, orgIdentifier,
+        projectIdentifier, pipelineIdentifier, fqnPath, gitEntityBasicInfo, serviceRef, artifactoryRequestDTO);
+    return ResponseDTO.newResponse(buildDetails);
+  }
+
+  @GET
+  @Path("validateArtifactServer")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Validate artifactory artifact server", nickname = "validateArtifactServerForArtifactory")
+  public ResponseDTO<Boolean> validateArtifactServer(@QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier) {
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    boolean isValidArtifactServer =
+        artifactoryResourceService.validateArtifactServer(connectorRef, orgIdentifier, projectIdentifier, scopeInfo);
+    return ResponseDTO.newResponse(isValidArtifactServer);
+  }
+
+  @GET
+  @Path("repositoriesDetails")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets repository details", nickname = "getRepositoriesDetailsForArtifactory")
+  public ResponseDTO<ArtifactoryRepoDetailsDTO> getRepositoriesDetails(
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @QueryParam("repositoryType") @DefaultValue("any") String repositoryType,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier, @QueryParam("fqnPath") String fqnPath,
+      @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef) {
+    // If UI is not passing repository type as param,then we are assuming repositoryType as any
+
+    if (isNotEmpty(serviceRef)) {
+      final ArtifactConfig artifactSpecFromService = artifactResourceUtils.locateArtifactInService(
+          accountId, orgIdentifier, projectIdentifier, serviceRef, fqnPath);
+      ArtifactoryRegistryArtifactConfig artifactoryRegistryArtifactConfig =
+          (ArtifactoryRegistryArtifactConfig) artifactSpecFromService;
+
+      if (isEmpty(artifactoryConnectorIdentifier)) {
+        artifactoryConnectorIdentifier =
+            artifactoryRegistryArtifactConfig.getConnectorRef().fetchFinalValue().toString();
+      }
+
+      if (isEmpty(repositoryType) || "any".equals(repositoryType)) {
+        if (!StringUtils.isBlank(
+                artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue().toString())) {
+          repositoryType = artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue().toString();
+        }
+      }
+    }
+    if (artifactoryConnectorIdentifier != null && NGExpressionUtils.isRuntimeField(artifactoryConnectorIdentifier)) {
+      throw new InvalidIdentifierRefException(
+          "Artifactory Connector is required to fetch repositories. You can make this field Runtime input otherwise.");
+    }
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    ArtifactoryRepoDetailsDTO repoDetailsDTO = artifactoryResourceService.getRepositories(
+        repositoryType, connectorRef, orgIdentifier, projectIdentifier, scopeInfo);
+    return ResponseDTO.newResponse(repoDetailsDTO);
+  }
+
+  @POST
+  @Path("repositoriesDetailsV2")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets repository details", nickname = "getRepositoriesDetailsV2ForArtifactory")
+  public ResponseDTO<ArtifactoryRepoDetailsDTO> getRepositoriesDetailsV2(
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @QueryParam("repositoryType") @DefaultValue("any") String repositoryType,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @QueryParam(NGCommonEntityConstants.PIPELINE_KEY) String pipelineIdentifier,
+      @QueryParam("fqnPath") String fqnPath, @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef,
+      @NotNull String runtimeInputYaml, @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo) {
+    // If UI is not passing repository type as param,then we are assuming repositoryType as any
+
+    YamlExpressionEvaluatorWithContext baseEvaluatorWithContext = null;
+
+    // remote services can be linked with a specific branch, so we parse the YAML in one go and store the context data
+    //  has env git branch and service git branch
+    if (isNotEmpty(serviceRef)
+        && artifactResourceUtils.isRemoteService(accountId, orgIdentifier, projectIdentifier, serviceRef)) {
+      baseEvaluatorWithContext = artifactResourceUtils.getYamlExpressionEvaluatorWithContext(accountId, orgIdentifier,
+          projectIdentifier, pipelineIdentifier, runtimeInputYaml, fqnPath, gitEntityBasicInfo, serviceRef);
+    }
+
+    if (isNotEmpty(serviceRef)) {
+      final ArtifactConfig artifactSpecFromService = artifactResourceUtils.locateArtifactInService(accountId,
+          orgIdentifier, projectIdentifier, serviceRef, fqnPath,
+          baseEvaluatorWithContext == null ? null : baseEvaluatorWithContext.getContextMap().get(SERVICE_GIT_BRANCH));
+
+      ArtifactoryRegistryArtifactConfig artifactoryRegistryArtifactConfig =
+          (ArtifactoryRegistryArtifactConfig) artifactSpecFromService;
+
+      if (isEmpty(artifactoryConnectorIdentifier)) {
+        artifactoryConnectorIdentifier =
+            artifactoryRegistryArtifactConfig.getConnectorRef().fetchFinalValue().toString();
+      }
+
+      if (isEmpty(repositoryType) || "any".equals(repositoryType)) {
+        if (!StringUtils.isBlank(
+                artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue().toString())) {
+          repositoryType = artifactoryRegistryArtifactConfig.getRepositoryFormat().fetchFinalValue().toString();
+        }
+      }
+    }
+
+    CDYamlExpressionEvaluator yamlExpressionEvaluator =
+        baseEvaluatorWithContext == null ? null : baseEvaluatorWithContext.getYamlExpressionEvaluator();
+
+    artifactoryConnectorIdentifier =
+        artifactResourceUtils
+            .getResolvedFieldValueWithYamlExpressionEvaluator(accountId, orgIdentifier, projectIdentifier,
+                pipelineIdentifier, runtimeInputYaml, artifactoryConnectorIdentifier, fqnPath, gitEntityBasicInfo,
+                serviceRef, yamlExpressionEvaluator)
+            .getValue();
+
+    if (artifactoryConnectorIdentifier != null && NGExpressionUtils.isRuntimeField(artifactoryConnectorIdentifier)) {
+      throw new InvalidIdentifierRefException(
+          "Artifactory Connector is required to fetch repositories. You can make this field Runtime input otherwise.");
+    }
+
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    ArtifactoryRepoDetailsDTO repoDetailsDTO = artifactoryResourceService.getRepositories(
+        repositoryType, connectorRef, orgIdentifier, projectIdentifier, scopeInfo);
+    return ResponseDTO.newResponse(repoDetailsDTO);
+  }
+
+  @GET
+  @Path("imagePaths")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets Image Paths details", nickname = "getImagePathsForArtifactory")
+  public ResponseDTO<ArtifactoryImagePathsDTO> getImagePaths(
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @QueryParam("repositoryType") @DefaultValue("any") String repositoryType,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @NotNull @QueryParam("repository") String repository, @QueryParam("fqnPath") String fqnPath,
+      @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef) {
+    if (isNotEmpty(serviceRef)) {
+      final ArtifactConfig artifactSpecFromService = artifactResourceUtils.locateArtifactInService(
+          accountId, orgIdentifier, projectIdentifier, serviceRef, fqnPath);
+      ArtifactoryRegistryArtifactConfig artifactoryRegistryArtifactConfig =
+          (ArtifactoryRegistryArtifactConfig) artifactSpecFromService;
+
+      if (isEmpty(artifactoryConnectorIdentifier)) {
+        artifactoryConnectorIdentifier = artifactoryRegistryArtifactConfig.getConnectorRef().getValue();
+      }
+    }
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    ArtifactoryImagePathsDTO artifactoryImagePathsDTO = artifactoryResourceService.getImagePaths(
+        repositoryType, connectorRef, orgIdentifier, projectIdentifier, repository, scopeInfo);
+    return ResponseDTO.newResponse(artifactoryImagePathsDTO);
+  }
+
+  @POST
+  @Path("imagePathsV2")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets Image Paths details", nickname = "getImagePathsForArtifactoryV2")
+  public ResponseDTO<ArtifactoryImagePathsDTO> getImagePathsV2(
+      @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @QueryParam("repositoryType") @DefaultValue("any") String repositoryType,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier,
+      @QueryParam(NGCommonEntityConstants.PIPELINE_KEY) String pipelineIdentifier,
+      @QueryParam("repository") String repository, @QueryParam("fqnPath") String fqnPath,
+      @QueryParam(NGCommonEntityConstants.SERVICE_KEY) String serviceRef, @NotNull String runtimeInputYaml,
+      @BeanParam GitEntityFindInfoDTO gitEntityBasicInfo) {
+    // Resolving parameters for service v2 compatibility
+    ArtifactoryImagePathsDTO artifactoryImagePathsDTO = artifactResourceUtils.getArtifactoryImagePath(repositoryType,
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier, repository, fqnPath,
+        runtimeInputYaml, pipelineIdentifier, serviceRef, gitEntityBasicInfo);
+
+    return ResponseDTO.newResponse(artifactoryImagePathsDTO);
+  }
+
+  @GET
+  @Path("artifactBuildsDetails")
+  @Timed
+  @ResponseMetered
+  @ApiOperation(value = "Gets artifacts builds details", nickname = "getArtifactsBuildsDetailsForArtifactory")
+  public ResponseDTO<List<ArtifactoryArtifactBuildDetailsDTO>> getBuildsDetails(
+      @NotNull @QueryParam("connectorRef") String artifactoryConnectorIdentifier,
+      @NotNull @QueryParam("repositoryName") String repositoryName, @QueryParam("filePath") String filePath,
+      @NotNull @QueryParam("maxVersions") int maxVersions,
+      @NotNull @QueryParam(NGCommonEntityConstants.ACCOUNT_KEY) String accountId,
+      @QueryParam(NGCommonEntityConstants.ORG_KEY) String orgIdentifier,
+      @QueryParam(NGCommonEntityConstants.PROJECT_KEY) String projectIdentifier) {
+    IdentifierRef connectorRef = IdentifierRefHelper.getIdentifierRef(
+        artifactoryConnectorIdentifier, accountId, orgIdentifier, projectIdentifier);
+    artifactResourceUtils.checkConnectorAccess(connectorRef);
+    ScopeInfo scopeInfo =
+        pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.PL_USE_SCOPE_INFO_FOR_CONNECTOR_ENTITY_V2)
+        ? scopeInfoService.getScopeInfo(
+              connectorRef.getAccountIdentifier(), connectorRef.getOrgIdentifier(), connectorRef.getProjectIdentifier())
+        : null;
+
+    List<ArtifactoryArtifactBuildDetailsDTO> buildDetails = artifactoryResourceService.getBuildDetails(
+        repositoryName, filePath, maxVersions, connectorRef, orgIdentifier, projectIdentifier, scopeInfo);
+    return ResponseDTO.newResponse(buildDetails);
+  }
+}

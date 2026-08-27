@@ -1,0 +1,32 @@
+identifier: wiz
+name: Wiz Plugin
+description: View Wiz security issues and insights for your projects in Harness IDP.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: roadie.io
+category: Security
+source: https://github.com/RoadieHQ/roadie-backstage-plugins/tree/main/plugins/backend/wiz-backend
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/wiz/
+config: |-
+  wiz:
+    clientId: <your-client-identifier>
+    clientSecret: ${WIZ_CLIENT_SECRET}
+    tokenUrl: https://wiz.com/oauth/token
+    wizAPIUrl: https://wiz.com
+    dashboardLink: https://app.wiz.io #optional
+environmentVariables:
+  - WIZ_CLIENT_SECRET
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: EntityWizIssues
+      addByDefault: true
+      layoutSchemaSpecs:
+        component: EntityWizIssues
+        specs:
+          gridProps:
+            md: 6

@@ -1,0 +1,44 @@
+pipeline:
+  clone: false
+  stages:
+    - template-metadata:
+        uses: rishi_stage_temp
+        storeType: INLINE
+        name: stage_1
+      runtime: shell
+      steps:
+        - run:
+            script: echo Rishikesh
+          id: run_1
+          name: run_1
+        - template-metadata:
+            uses: run_step_temp
+            storeType: INLINE
+            name: injected_template_1
+          run:
+            script: echo HI
+          parent-template-type: template
+          id: injected_template_1
+          name: injected_template_1
+      id: stage_1
+      name: stage_1
+    - runtime: shell
+      steps:
+        - template-metadata:
+            uses: rishiTestTemp@1.0.0
+            storeType: REMOTE
+            icon-name: rishi-custom-icon
+            description: simple template for testing
+            name: injected_template_2
+          group:
+            steps:
+              - name: echo inputs
+                id: run_1
+                run:
+                  script: echo "hello"
+          parent-template-type: template
+          id: injected_template_2
+          name: injected_template_2
+      id: stage_2
+      name: stage_2
+

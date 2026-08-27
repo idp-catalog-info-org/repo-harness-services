@@ -1,0 +1,9 @@
+pipeline:
+  name: test-pipeline-with-pipeline-template
+  identifier: testpipelinewithpipelinetemplate
+  tags: {}
+  template:
+    templateRef: testpipelinetemplate
+    versionLabel: v1
+  projectIdentifier: RishiTest
+  orgIdentifier: default

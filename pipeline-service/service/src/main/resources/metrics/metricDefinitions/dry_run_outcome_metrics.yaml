@@ -1,0 +1,8 @@
+name: Dry Run Outcome Metrics
+identifier: DryRunOutcomeMetrics
+metricGroup: DryRunMetricsGroup
+metrics:
+  - metricName: pms_dry_run_outcome
+    metricDefinition: Count of dry run outcomes by status (SUCCESS, ERROR) by account, org, and project
+    type: Count
+    unit: "1"

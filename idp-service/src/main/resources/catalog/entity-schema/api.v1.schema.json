@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "An API describes an interface that can be exposed by a component. The API can be defined in different formats, like OpenAPI, AsyncAPI, GraphQL, gRPC, or other formats.",
+  "allOf": [
+    {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "kind",
+        "identifier",
+        "type",
+        "owner",
+        "spec"
+      ],
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "harness.io/v1"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "API",
+            "Api",
+            "api"
+          ]
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of api.",
+          "examples": [
+            "service",
+            "website",
+            "library"
+          ],
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "An entity reference to the owner of the api.",
+          "examples": [
+            "artist-relations-team",
+            "user:john.johnson"
+          ],
+          "minLength": 1
+        },
+        "spec": {
+          "type": "object",
+          "required": [
+            "lifecycle",
+            "definition"
+          ],
+          "properties": {
+            "lifecycle": {
+              "type": "string",
+              "description": "The lifecycle state of the api.",
+              "examples": [
+                "experimental",
+                "production",
+                "deprecated"
+              ],
+              "minLength": 1
+            },
+            "sourceCode": {
+              "type": "object",
+              "description": "Information about the source code repository.",
+              "required": [ "provider", "repoName"],
+              "properties": {
+                "connectorRef": {
+                  "type": "string",
+                  "description": "Reference to the connector used to access the source code repository."
+                },
+                "url": {
+                  "type": "string",
+                  "description": "URL of the source code repository.",
+                  "format": "uri",
+                  "minLength": 1
+                },
+                "provider": {
+                  "type": "string",
+                  "description": "provider of the connector used to access the source code repository.",
+                  "minLength": 1
+                },
+                "harnessCodeRepoProjectIdentifier": {
+                  "type": "string",
+                  "description": "harnessCodeRepoProjectIdentifier of the harness code repository.",
+                  "minLength": 1
+                },
+                "harnessCodeRepoOrgIdentifier": {
+                  "type": "string",
+                  "description": "harnessCodeRepoOrgIdentifier of the harness code repository.",
+                  "minLength": 1
+                },
+                "branch": {
+                  "type": "string",
+                  "description": "branch of the repository.",
+                  "minLength": 1
+                },
+                "repoName": {
+                  "type": "string",
+                  "description": "repoName of the repository.",
+                  "minLength": 1
+                },
+                "monoRepo": {
+                  "type": "boolean",
+                  "description": "Indicates whether the repository is a monorepo.",
+                  "default": false
+                },
+                "monoRepoSubDirectoryPath": {
+                  "type": "string",
+                  "description": "Path to the sub-directory inside the monorepo containing the relevant code.",
+                  "minLength": 1
+                }
+              }
+            }
+          ,
+            "definition": {
+              "description": "The definition of the API, based on the format defined by the type.",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "minProperties": 1,
+                  "maxProperties": 1,
+                  "additionalProperties": false,
+                  "properties": {
+                    "$text": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "$json": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "$yaml": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/metadata"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "metadata": {
+      "description": "Metadata fields common to all versions/kinds of entity.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A short (typically relatively few words, on one line) description of the entity."
+        },
+        "labels": {
+          "type": "object",
+          "description": "Key/value pairs of identifying information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string"
+            }
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Key/value pairs of non-identifying auxiliary information attached to the entity.",
+          "additionalProperties": true,
+          "patternProperties": {
+            "^.+$": {
+              "type": ["array", "object", "string"]
+            }
+          }
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of single-valued strings, to for example classify catalog entities in various ways.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "links": {
+          "type": "array",
+          "description": "A list of external hyperlinks related to the entity. Links can provide additional contextual information that may be located outside of Backstage itself. For example, an admin dashboard or external CMS page.",
+          "items": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "A url in a standard uri format.",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "description": "A user friendly display name for the link.",
+                "minLength": 1
+              },
+              "icon": {
+                "type": "string",
+                "description": "A key representing a visual icon to be displayed in the UI.",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "description": "An optional value to categorize links into specific groups.",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

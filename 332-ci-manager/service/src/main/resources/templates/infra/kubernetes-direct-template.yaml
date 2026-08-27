@@ -1,0 +1,39 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  infraConnector:
+    type: connector
+    description: Kubernetes cluster connector reference
+    default: ${{ngInfra.spec.connectorRef}}
+  namespace:
+    type: string
+    description: Kubernetes namespace
+    default: ${{ngInfra.spec.namespace}}
+  releaseName:
+    type: string
+    description: Helm release name
+    default: ${{ngInfra.spec.releaseName}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/kubeconfig:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_INFRA_TYPE: kubernetes-direct
+    PLUGIN_NAMESPACE: ${{inputs.namespace}}
+    PLUGIN_K8S_NAME: ${{inputs.infraConnector.name}}
+    PLUGIN_K8S_MASTER_URL: ${{inputs.infraConnector.masterUrl}}
+    PLUGIN_K8S_USERNAME: ${{inputs.infraConnector.username}}
+    PLUGIN_K8S_PASSWORD: ${{inputs.infraConnector.password}}
+    PLUGIN_K8S_SERVICE_ACCOUNT_TOKEN: ${{inputs.infraConnector.serviceAccountToken}}
+    PLUGIN_K8S_CA_CERTIFICATE: ${{inputs.infraConnector.caCert}}
+    PLUGIN_K8S_ISSUER_URL: ${{inputs.infraConnector.oidcIssuerUrl}}
+    PLUGIN_K8S_CLIENT_ID: ${{inputs.infraConnector.oidcClientId}}
+    PLUGIN_K8S_CLIENT_SECRET: ${{inputs.infraConnector.oidcSecret}}
+    PLUGIN_K8S_SCOPES: ${{inputs.infraConnector.oidcScopes}}
+    PLUGIN_K8S_CLIENT_KEY: ${{inputs.infraConnector.clientKey}}
+    PLUGIN_K8S_CLIENT_KEY_PASSPHRASE: ${{inputs.infraConnector.clientKeyPassphrase}}
+    PLUGIN_K8S_CLIENT_KEY_ALGORITHM: ${{inputs.infraConnector.clientKeyAlgo}}
+    PLUGIN_K8S_CLIENT_CERTIFICATE: ${{inputs.infraConnector.clientCert}}

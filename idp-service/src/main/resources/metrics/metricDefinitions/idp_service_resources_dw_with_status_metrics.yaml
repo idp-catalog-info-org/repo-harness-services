@@ -1,0 +1,8 @@
+name: IDP Service Dropwizard Metrics
+identifier: IdpServiceDwResourcesMetrics
+metricGroup: IdpServiceDwResourcesWithStatusMetricsGroup
+metrics:
+  - metricName: io_harness_spec_server_idp_v1_responses_count
+    metricDefinition: Total number of 1xx, 2xx, 3xx, 4xx, 5xx responses per resource method for IDP Service Api calls
+    type: LastValue
+    unit: count

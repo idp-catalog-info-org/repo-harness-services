@@ -1,0 +1,8 @@
+name: Core Pipeline Metrics
+identifier: PipelineCoreMetrics
+metricGroup: PipelineModuleAndStepTypeMetricsGroup
+metrics:
+  - metricName: node_execution_active_count_per_module_and_stepType
+    metricDefinition: Number of active node executions at a given instant for each module and stepType
+    type: LastValue
+    unit: "1"

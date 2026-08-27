@@ -1,0 +1,67 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  connector:
+    type: connector
+    description: OCI connector (resolved from connectorRef)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.config.spec.connectorRef}}
+  basePath:
+    type: string
+    description: OCI base path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.basePath}}
+  chartName:
+    type: string
+    description: Helm chart name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartName}}
+  chartVersion:
+    type: string
+    description: Helm chart version
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.chartVersion}}
+  valuesPaths:
+    type: list
+    description: Paths to values YAML files
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.valuesPaths}}
+  subChartPath:
+    type: string
+    description: Sub-chart path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.subChartPath}}
+  fetchHelmChartMetadata:
+    type: boolean
+    description: Whether to fetch Helm chart metadata
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.fetchHelmChartMetadata}}
+  skipResourceVersioning:
+    type: boolean
+    description: Skip resource versioning
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.skipResourceVersioning}}
+  enableDeclarativeRollback:
+    type: boolean
+    description: Enable declarative rollback
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.enableDeclarativeRollback}}
+  optionalValuesYaml:
+    type: boolean
+    description: Optional values YAML
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.optionalValuesYaml}}
+  flags:
+    type: string
+    description: Command flags
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.commandFlags}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/oci-artifact-metadata:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_ID: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_NAME: ${{serviceOutput.manifests.ID_PLACEHOLDER.id}}
+    PLUGIN_ARTIFACT_FORMAT: helm
+    PLUGIN_DOWNLOAD_HELM_ARTIFACT: true
+    PLUGIN_DOWNLOAD_ARTIFACT: true
+    PLUGIN_ARTIFACT_CHART_NAME: ${{inputs.chartName}}
+    PLUGIN_ARTIFACT_CHART_VERSION: ${{inputs.chartVersion}}
+    PLUGIN_ARTIFACT_CHART_PATH: ${{inputs.basePath}}
+    PLUGIN_OCI_NAME: ${{inputs.connector.name}}
+    PLUGIN_OCI_URL: ${{inputs.connector.url}}
+    PLUGIN_OCI_USERNAME: ${{inputs.connector.username}}
+    PLUGIN_OCI_PASSWORD: ${{inputs.connector.password}}

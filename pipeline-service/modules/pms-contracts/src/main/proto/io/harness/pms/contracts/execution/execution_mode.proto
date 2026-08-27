@@ -1,0 +1,42 @@
+// Copyright 2021 Harness Inc. All rights reserved.
+// Use of this source code is governed by the PolyForm Shield 1.0.0 license
+// that can be found in the licenses directory at the root of this repository, also available at
+// https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+
+syntax = "proto3";
+
+package io.harness.pms.contracts.execution;
+
+option java_multiple_files = true;
+
+enum ExecutionMode {
+  UNKNOWN = 0;
+  // activity execution is done in sync way by SDK, usually for short running steps
+  SYNC = 1;
+  // activity execution is done in an async way by SDK, usually for long running steps
+  ASYNC = 2;
+
+  // multiple tasks are executed one after another in an async manner
+  TASK_CHAIN = 3;
+  // task is created by pipeline service on behalf of the respective manager
+  TASK = 4;
+
+  // child nodes are executed one after another in an async manner
+  CHILD_CHAIN = 5;
+  // multiple child nodes are spawned in parallel at once
+  CHILDREN = 6;
+  // spawns a child node and executes it
+  CHILD = 7;
+
+  SKIP = 8;
+
+  APPROVAL = 9;
+
+  CONSTRAINT = 10;
+  WAIT_STEP = 11;
+  // multiple async activities are executed one after another
+  ASYNC_CHAIN = 12;
+
+  // this is secondary execution mode and used in facilitator for pre step check
+  PRE_STEP_CHECK = 13;
+}

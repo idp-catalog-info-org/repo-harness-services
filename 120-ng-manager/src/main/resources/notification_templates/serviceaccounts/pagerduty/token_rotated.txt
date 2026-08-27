@@ -1,0 +1,4 @@
+summary: "Token rotated — ${TOKEN_IDENTIFIER} | Service Account: ${SERVICE_ACCOUNT_NAME} | API Key: ${API_KEY_IDENTIFIER} | The old token will remain valid until ${EXPIRY_DATE}. Update any pipelines or integrations to use the new token."
+link:
+    href: harness.io
+    text: Harness

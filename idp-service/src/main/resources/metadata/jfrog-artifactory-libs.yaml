@@ -1,0 +1,60 @@
+identifier: jfrog-artifactory-libs
+name: JFrog Artifactory Libs plugin
+description: frontend plugin provides a simple way to display generated artifact (library) details like - group, artifact, repository, what is the latest version, and it simply allows to copy library definition for the package managers.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+type: DEFAULT
+creator: Vity
+category: Discovery
+source: https://github.com/Vity01/backstage-jfrog-artifactory-libs
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/jfrog
+config: |-
+  proxy:
+    endpoints:
+      '/artifactory-proxy/':
+        target: 'https://your-jfrog-artifactory-instance.com'
+        pathRewrite:
+            api/proxy/artifactory-proxy/?: /
+        headers:
+          # if you use Jfrog instance for anonymous user token is not required, but it is also required for Docker package type
+          Authorization: Bearer ${ARTIFACTORY_TOKEN}
+          X-Result-Detail: 'properties'
+          Accept: '*'
+  jfrog:
+    artifactory:
+      url: 'https://your-jfrog-artifactory-instance.com'
+      proxyPath: '/artifactory-proxy/' # /artifactory-proxy/ is default value
+environmentVariables:
+  - ARTIFACTORY_TOKEN
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: CARD
+      name: JFrogLibArtifactCard
+      addByDefault: true
+      layoutSchemaSpecs:
+        - component: EntitySwitch
+          specs:
+            cases:
+              - if: isJfrogArtifactAvailable
+                content:
+                  component: JFrogLibArtifactCard
+                  specs:
+                    gridProps:
+                      md: 6
+    - type: TAB_CONTENT
+      name: JFrogLibVerPageContent
+      addByDefault: true
+      defaultRoute: /libver
+      layoutSchemaSpecs:
+        name: JFrogLibVerPageContent
+        title: Jfrog Artifacts
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isJfrogArtifactAvailable
+                  content:
+                    component: JFrogLibVerPageContent

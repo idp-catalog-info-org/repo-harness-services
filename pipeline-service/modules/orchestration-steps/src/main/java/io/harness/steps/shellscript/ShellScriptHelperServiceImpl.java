@@ -1,0 +1,671 @@
+/*
+ * Copyright 2021 Harness Inc. All rights reserved.
+ * Use of this source code is governed by the PolyForm Shield 1.0.0 license
+ * that can be found in the licenses directory at the root of this repository, also available at
+ * https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt.
+ */
+
+package io.harness.steps.shellscript;
+
+import static io.harness.annotations.dev.HarnessTeam.CDC;
+import static io.harness.authorization.AuthorizationServiceHeader.NG_MANAGER;
+import static io.harness.data.structure.EmptyPredicate.isEmpty;
+import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
+import static io.harness.delegate.task.shell.winrm.WinRmCommandConstants.SESSION_TIMEOUT;
+import static io.harness.steps.shellscript.ShellScriptBaseSource.HARNESS;
+import static io.harness.steps.shellscript.ShellScriptBaseSource.INLINE;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
+
+import io.harness.annotations.dev.CodePulse;
+import io.harness.annotations.dev.HarnessModuleComponent;
+import io.harness.annotations.dev.OwnedBy;
+import io.harness.annotations.dev.ProductModule;
+import io.harness.beans.FeatureName;
+import io.harness.beans.FileReference;
+import io.harness.beans.IdentifierRef;
+import io.harness.beans.common.VariablesSweepingOutput;
+import io.harness.ci.utils.CIAnnotationsServiceUtils;
+import io.harness.common.NGTimeConversionHelper;
+import io.harness.data.structure.EmptyPredicate;
+import io.harness.delegate.task.TaskParameters;
+import io.harness.delegate.task.k8s.K8sInfraDelegateConfig;
+import io.harness.delegate.task.shell.ShellScriptConstants;
+import io.harness.delegate.task.shell.ShellScriptTaskNG;
+import io.harness.delegate.task.shell.ShellScriptTaskParametersNG;
+import io.harness.delegate.task.shell.ShellScriptTaskParametersNG.ShellScriptTaskParametersNGBuilder;
+import io.harness.delegate.task.shell.WinRmShellScriptTaskParametersNG;
+import io.harness.delegate.task.shell.WinRmShellScriptTaskParametersNG.WinRmShellScriptTaskParametersNGBuilder;
+import io.harness.exception.ExceptionUtils;
+import io.harness.exception.InternalServerErrorException;
+import io.harness.exception.InvalidRequestException;
+import io.harness.expression.EngineExpressionEvaluator;
+import io.harness.expression.EngineExpressionService;
+import io.harness.expression.EngineExpressionServiceResolver;
+import io.harness.expression.ExpressionEvaluatorUtils;
+import io.harness.expression.common.ExpressionMode;
+import io.harness.filestore.remote.FileStoreClient;
+import io.harness.harnessid.client.HarnessIdClientService;
+import io.harness.k8s.K8sConstants;
+import io.harness.network.SafeHttpCall;
+import io.harness.ng.core.NGAccess;
+import io.harness.ng.core.dto.ResponseDTO;
+import io.harness.ng.core.dto.secrets.SSHKeySpecDTO;
+import io.harness.ng.core.dto.secrets.SecretResponseWrapper;
+import io.harness.ng.core.dto.secrets.SecretSpecDTO;
+import io.harness.ng.core.dto.secrets.WinRmCredentialsSpecDTO;
+import io.harness.ng.core.utils.URLDecoderUtility;
+import io.harness.ngsettings.SettingIdentifiers;
+import io.harness.ngsettings.client.remote.NGSettingsClient;
+import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.pms.expression.parameterfield.ParameterFieldResolverFunctor;
+import io.harness.pms.sdk.core.data.OptionalSweepingOutput;
+import io.harness.pms.sdk.core.resolver.RefObjectUtils;
+import io.harness.pms.sdk.core.resolver.outputs.ExecutionSweepingOutputService;
+import io.harness.pms.yaml.HarnessYamlVersion;
+import io.harness.pms.yaml.ParameterField;
+import io.harness.pms.yaml.YAMLFieldNameConstants;
+import io.harness.pms.yaml.validation.InputSetValidatorFactory;
+import io.harness.remote.client.NGRestUtils;
+import io.harness.secretmanagerclient.services.SshKeySpecDTOHelper;
+import io.harness.secretmanagerclient.services.WinRmCredentialsSpecDTOHelper;
+import io.harness.secrets.remote.SecretNGManagerClient;
+import io.harness.security.SecurityContextBuilder;
+import io.harness.security.dto.ServicePrincipal;
+import io.harness.security.encryption.EncryptedDataDetail;
+import io.harness.shell.ScriptType;
+import io.harness.steps.OutputExpressionConstants;
+import io.harness.utils.IdentifierRefHelper;
+import io.harness.utils.PmsFeatureFlagHelper;
+import io.harness.utils.PmsFeatureFlagService;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import java.net.SocketTimeoutException;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
+@CodePulse(
+    module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_COMMON_STEPS})
+@OwnedBy(CDC)
+@Slf4j
+public class ShellScriptHelperServiceImpl implements ShellScriptHelperService {
+  static final String FILE_STORE_SCRIPT_ERROR_MSG = "Script from Harness File Store cannot be empty, file: %s";
+  static final String NULL_STRING = "null";
+
+  @Inject private ExecutionSweepingOutputService executionSweepingOutputService;
+  @Inject @Named("PRIVILEGED") private SecretNGManagerClient secretManagerClient;
+  @Inject private SshKeySpecDTOHelper sshKeySpecDTOHelper;
+  @Inject private WinRmCredentialsSpecDTOHelper winRmCredentialsSpecDTOHelper;
+  @Inject private ShellScriptHelperService shellScriptHelperService;
+  @Inject private HarnessIdClientService workloadIdentityService;
+  @Inject private PmsFeatureFlagService pmsFeatureFlagService;
+  @Inject private NGSettingsClient settingsClient;
+
+  @Inject private EngineExpressionService engineExpressionService;
+  @Inject private InputSetValidatorFactory inputSetValidatorFactory;
+
+  @Inject private PmsFeatureFlagHelper pmsFeatureFlagHelper;
+
+  @Inject private FileStoreClient fileStoreClient;
+
+  @Inject(optional = true) private CIAnnotationsServiceUtils annotationsServiceUtils;
+
+  @Override
+  public Map<String, String> getEnvironmentVariables(Map<String, Object> inputVariables, Ambiance ambiance) {
+    Map<String, String> res = new LinkedHashMap<>();
+    Map<String, Object> copiedInputVariables = new HashMap<>();
+
+    if (isExportServiceVarsAsEnvVarsEnabled(AmbianceUtils.getAccountId(ambiance),
+            AmbianceUtils.getOrgIdentifier(ambiance), AmbianceUtils.getProjectIdentifier(ambiance))) {
+      copiedInputVariables.putAll(getEnvironmentVariablesFromServiceVars(ambiance));
+    }
+    if (EmptyPredicate.isNotEmpty(inputVariables)) {
+      copiedInputVariables.putAll(inputVariables);
+    }
+
+    copiedInputVariables.forEach((key, value) -> {
+      if (value instanceof ParameterField) {
+        ParameterField<?> parameterFieldValue = (ParameterField<?>) value;
+        if (parameterFieldValue.fetchFinalValue() == null) {
+          throw new InvalidRequestException(String.format("Env. variable [%s] value found to be null", key));
+        }
+        res.put(key, parameterFieldValue.fetchFinalValue().toString());
+      } else if (value instanceof String) {
+        res.put(key, (String) value);
+      } else {
+        log.error(String.format(
+            "Value other than String or ParameterField found for env. variable [%s]. value: [%s]", key, value));
+      }
+    });
+
+    engineExpressionService.resolve(
+        ambiance, res, ExpressionMode.RETURN_ORIGINAL_EXPRESSION_IF_UNRESOLVED, new HashMap<>());
+
+    // check for unresolved harness expressions
+    StringBuilder unresolvedInputVariables = new StringBuilder();
+    res.forEach((key, value) -> {
+      if (EngineExpressionEvaluator.hasExpressions(value)) {
+        unresolvedInputVariables.append(key).append(", ");
+      }
+    });
+
+    // Remove the trailing comma and whitespace, if any
+    if (unresolvedInputVariables.length() > 0) {
+      unresolvedInputVariables.setLength(unresolvedInputVariables.length() - 2);
+      throw new InvalidRequestException(
+          String.format("Env. variables: [%s] found to be unresolved", unresolvedInputVariables));
+    }
+
+    return res;
+  }
+
+  private Map<String, Object> getEnvironmentVariablesFromServiceVars(Ambiance ambiance) {
+    Map<String, Object> variables = new LinkedHashMap<>();
+
+    OptionalSweepingOutput optionalSweepingOutput = executionSweepingOutputService.resolveOptional(
+        ambiance, RefObjectUtils.getSweepingOutputRefObject(YAMLFieldNameConstants.SERVICE_VARIABLES));
+
+    if (optionalSweepingOutput.isFound()) {
+      VariablesSweepingOutput variablesSweepingOutput = (VariablesSweepingOutput) optionalSweepingOutput.getOutput();
+
+      if (EmptyPredicate.isNotEmpty(variablesSweepingOutput)) {
+        variables.putAll(variablesSweepingOutput);
+      }
+    }
+    return variables;
+  }
+
+  @Override
+  public List<String> getOutputVars(Map<String, Object> outputVariables, Set<String> secretOutputVariables) {
+    if (EmptyPredicate.isEmpty(outputVariables)) {
+      return emptyList();
+    }
+    // secret variables are stored separately so ignoring them
+    List<String> outputVars = new ArrayList<>();
+    outputVariables.forEach((key, val) -> {
+      if (EmptyPredicate.isEmpty(secretOutputVariables) || !secretOutputVariables.contains(key)) {
+        if (val instanceof ParameterField) {
+          ParameterField<?> parameterFieldValue = (ParameterField<?>) val;
+          if (parameterFieldValue.getValue() == null) {
+            throw new InvalidRequestException(String.format("Output variable [%s] value found to be empty", key));
+          }
+          outputVars.add(((ParameterField<?>) val).getValue().toString());
+        } else if (val instanceof String) {
+          outputVars.add((String) val);
+        } else {
+          log.error(String.format(
+              "Value other than String or ParameterField found for output variable [%s]. value: [%s]", key, val));
+        }
+      }
+    });
+    return outputVars;
+  }
+
+  @Override
+  public K8sInfraDelegateConfig getK8sInfraDelegateConfig(
+      @Nonnull Ambiance ambiance, @Nonnull String shellScript, Boolean includeInfraSelectors) {
+    if (BooleanUtils.isTrue(includeInfraSelectors) || shellScript.contains(K8sConstants.HARNESS_KUBE_CONFIG_PATH)) {
+      OptionalSweepingOutput optionalSweepingOutput = executionSweepingOutputService.resolveOptional(ambiance,
+          RefObjectUtils.getSweepingOutputRefObject(OutputExpressionConstants.K8S_INFRA_DELEGATE_CONFIG_OUTPUT_NAME));
+      if (optionalSweepingOutput.isFound()) {
+        K8sInfraDelegateConfigOutput k8sInfraDelegateConfigOutput =
+            (K8sInfraDelegateConfigOutput) optionalSweepingOutput.getOutput();
+        return k8sInfraDelegateConfigOutput.getK8sInfraDelegateConfig();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void prepareTaskParametersForExecutionTarget(@Nonnull Ambiance ambiance,
+      @Nonnull ShellScriptStepParametersV0 shellScriptStepParameters,
+      @Nonnull ShellScriptTaskParametersNGBuilder taskParametersNGBuilder, boolean executeOnDelegate) {
+    if (!executeOnDelegate) {
+      ParameterField<ExecutionTarget> executionTarget = shellScriptStepParameters.getExecutionTarget();
+      validateExecutionTarget(executionTarget.getValue());
+      SSHKeySpecDTO secretSpec = (SSHKeySpecDTO) getSshKeySpec(ambiance, executionTarget.getValue());
+      NGAccess ngAccess = AmbianceUtils.getNgAccess(ambiance);
+      List<EncryptedDataDetail> sshKeyEncryptionDetails =
+          sshKeySpecDTOHelper.getSSHKeyEncryptionDetails(secretSpec, ngAccess);
+
+      taskParametersNGBuilder.sshKeySpecDTO(secretSpec)
+          .encryptionDetails(sshKeyEncryptionDetails)
+          .host(executionTarget.getValue().getHost().getValue());
+    }
+  }
+
+  @Override
+  public boolean toExecuteOnDelegate(ParameterField<ExecutionTarget> executionTargetParameterField) {
+    if (ParameterField.isBlank(executionTargetParameterField)
+        || ParameterField.isBlank(executionTargetParameterField.getValue().getHost())) {
+      return true;
+    }
+    return false;
+  }
+
+  private void validateExecutionTarget(ExecutionTarget executionTarget) {
+    if (ParameterField.isBlank(executionTarget.getConnectorRef())) {
+      throw new InvalidRequestException("Connector Ref in Execution Target can't be empty");
+    }
+    if (ParameterField.isBlank(executionTarget.getHost())) {
+      throw new InvalidRequestException("Host in Execution Target can't be empty");
+    }
+  }
+
+  @Override
+  public String getShellScript(@Nonnull ShellScriptStepParametersV0 stepParameters, Ambiance ambiance) {
+    ShellScriptSourceWrapper shellScriptSourceWrapper = stepParameters.getSource();
+
+    if (INLINE.equals(shellScriptSourceWrapper.getType())) {
+      ShellScriptInlineSource shellScriptInlineSource = (ShellScriptInlineSource) shellScriptSourceWrapper.getSpec();
+      return (String) shellScriptInlineSource.getScript().fetchFinalValue();
+    } else if (HARNESS.equals(shellScriptSourceWrapper.getType())) {
+      return getShellFileScript(shellScriptSourceWrapper, ambiance);
+    } else {
+      throw new InvalidRequestException("Unsupported source type: " + shellScriptSourceWrapper.getType());
+    }
+  }
+
+  private String getShellFileScript(ShellScriptSourceWrapper shellScriptSourceWrapper, Ambiance ambiance) {
+    HarnessFileStoreSource spec =
+        (HarnessFileStoreSource) updateExpressions(ambiance, shellScriptSourceWrapper.getSpec());
+    String scopedFilePath = spec.getFile().getValue();
+    String script =
+        getContent(FileReference.of(scopedFilePath, AmbianceUtils.getAccountId(ambiance),
+                       AmbianceUtils.getOrgIdentifier(ambiance), AmbianceUtils.getProjectIdentifier(ambiance)),
+            scopedFilePath);
+
+    if (isEmpty(script)) {
+      throw new InvalidRequestException(format(FILE_STORE_SCRIPT_ERROR_MSG, scopedFilePath));
+    }
+
+    return engineExpressionService.renderExpression(ambiance, script);
+  }
+
+  public String getContent(FileReference fileReference, String sfp) {
+    RetryPolicy<ResponseDTO<String>> retryPolicy = createRetryPolicyToFetchContent(sfp);
+    final String scopedFilePath = URLDecoderUtility.getEncodedString(sfp);
+    try {
+      ResponseDTO<String> ret =
+          Failsafe.with(retryPolicy)
+              .get(()
+                       -> SafeHttpCall.executeWithExceptions(
+                           fileStoreClient.getContent(scopedFilePath, fileReference.getAccountIdentifier(),
+                               fileReference.getOrgIdentifier(), fileReference.getProjectIdentifier())));
+      return ret.getData();
+    } catch (Exception exception) {
+      String msg = format("Failed to get File content from `%s`, error: %s", scopedFilePath, exception);
+      log.error(msg);
+      throw new InvalidRequestException(msg);
+    }
+  }
+
+  public Object updateExpressions(Ambiance ambiance, Object obj) {
+    return ExpressionEvaluatorUtils.updateExpressions(obj,
+        new ParameterFieldResolverFunctor(new EngineExpressionServiceResolver(engineExpressionService, ambiance),
+            inputSetValidatorFactory, ExpressionMode.RETURN_ORIGINAL_EXPRESSION_IF_UNRESOLVED));
+  }
+
+  @Override
+  public String getWorkingDirectory(
+      ParameterField<ExecutionTarget> executionTarget, @Nonnull ScriptType scriptType, boolean onDelegate) {
+    if (ParameterField.isNotBlank(executionTarget)
+        && ParameterField.isNotBlank(executionTarget.getValue().getWorkingDirectory())) {
+      return executionTarget.getValue().getWorkingDirectory().getValue();
+    }
+    String commandPath = null;
+    if (scriptType == ScriptType.BASH) {
+      commandPath = "/tmp";
+    } else if (scriptType == ScriptType.POWERSHELL) {
+      commandPath = "%TEMP%";
+      if (onDelegate) {
+        commandPath = "/tmp";
+      }
+    }
+    return commandPath;
+  }
+
+  private boolean isExportServiceVarsAsEnvVarsEnabled(
+      String accountIdentifier, String orgIdentifier, String projectIdentifier) {
+    return parseBoolean(NGRestUtils
+                            .getResponse(settingsClient.getSetting(SettingIdentifiers.EXPORT_SERVICE_VARS_AS_ENV_VARS,
+                                accountIdentifier, orgIdentifier, projectIdentifier))
+                            .getValue());
+  }
+
+  @Override
+  public TaskParameters buildShellScriptTaskParametersNG(@Nonnull Ambiance ambiance,
+      @Nonnull ShellScriptStepParametersV0 shellScriptStepParameters, String sessionTimeout, String commandUnit) {
+    return buildShellScriptTaskParametersNG(ambiance, shellScriptStepParameters, sessionTimeout, commandUnit, null);
+  }
+
+  @Override
+  public TaskParameters buildShellScriptTaskParametersNG(@Nonnull Ambiance ambiance,
+      @Nonnull ShellScriptStepParametersV0 shellScriptStepParameters, String sessionTimeout, String commandUnit,
+      Map<String, String> identityTokens) {
+    SecurityContextBuilder.setContext(new ServicePrincipal(NG_MANAGER.getServiceId()));
+    ScriptType scriptType = shellScriptStepParameters.getShell().getScriptType();
+    String shellScript = shellScriptHelperService.getShellScript(shellScriptStepParameters, ambiance);
+    validateExportVariables(shellScriptStepParameters.getOutputAlias());
+
+    if (ScriptType.BASH.equals(scriptType)) {
+      return buildBashTaskParametersNG(ambiance, shellScriptStepParameters, scriptType, shellScript, identityTokens);
+    } else {
+      return getWinRmTaskParametersNG(
+          ambiance, shellScriptStepParameters, scriptType, shellScript, sessionTimeout, commandUnit, identityTokens);
+    }
+  }
+
+  private void validateExportVariables(OutputAlias exportVariables) {
+    if (isNull(exportVariables)) {
+      return;
+    }
+
+    ParameterField<String> alias = exportVariables.getKey();
+    if (ParameterField.isBlank(alias)) {
+      throw new InvalidRequestException("Empty value for key is not allowed in output alias configuration");
+    }
+    if (NULL_STRING.equals(alias.fetchFinalValue())) {
+      throw new InvalidRequestException("Expression provided for key in output alias configuration was not resolved");
+    }
+  }
+
+  @Override
+  public TaskParameters buildShellScriptTaskParametersNG(
+      @NotNull Ambiance ambiance, @NotNull ShellScriptStepParametersV0 shellScriptStepParameters) {
+    return buildShellScriptTaskParametersNG(ambiance, shellScriptStepParameters, null, ShellScriptTaskNG.COMMAND_UNIT);
+  }
+
+  private WinRmShellScriptTaskParametersNG getWinRmTaskParametersNG(@NotNull Ambiance ambiance,
+      @NotNull ShellScriptStepParametersV0 shellScriptStepParameters, ScriptType scriptType, String shellScript,
+      String sessionTimeout, String commandUnit, Map<String, String> identityTokens) {
+    WinRmShellScriptTaskParametersNGBuilder taskParametersNGBuilder = WinRmShellScriptTaskParametersNG.builder();
+
+    Boolean includeInfraSelectors = shellScriptStepParameters.includeInfraSelectors != null
+        && BooleanUtils.isTrue(shellScriptStepParameters.includeInfraSelectors.getValue());
+
+    taskParametersNGBuilder.k8sInfraDelegateConfig(
+        shellScriptHelperService.getK8sInfraDelegateConfig(ambiance, shellScript, includeInfraSelectors));
+
+    boolean executeOnDelegate =
+        shellScriptHelperService.toExecuteOnDelegate(shellScriptStepParameters.getExecutionTarget());
+
+    if (!executeOnDelegate) {
+      ParameterField<ExecutionTarget> executionTarget = shellScriptStepParameters.getExecutionTarget();
+      validateExecutionTarget(executionTarget.getValue());
+      SecretSpecDTO secretSpec = getSshKeySpec(ambiance, executionTarget.getValue());
+      final List<EncryptedDataDetail> encryptionDetails = winRmCredentialsSpecDTOHelper.getWinRmEncryptionDetails(
+          (WinRmCredentialsSpecDTO) secretSpec, AmbianceUtils.getNgAccess(ambiance));
+
+      taskParametersNGBuilder.sshKeySpecDTO(secretSpec)
+          .encryptionDetails(encryptionDetails)
+          .host(executionTarget.getValue().getHost().getValue());
+    }
+
+    taskParametersNGBuilder
+        .useWinRMKerberosUniqueCacheFile(pmsFeatureFlagService.isEnabled(
+            AmbianceUtils.getAccountId(ambiance), FeatureName.WINRM_KERBEROS_CACHE_UNIQUE_FILE))
+        .disableCommandEncoding(pmsFeatureFlagService.isEnabled(
+            AmbianceUtils.getAccountId(ambiance), FeatureName.DISABLE_WINRM_COMMAND_ENCODING_NG))
+        .winrmScriptCommandSplit(pmsFeatureFlagService.isEnabled(
+            AmbianceUtils.getAccountId(ambiance), FeatureName.WINRM_SCRIPT_COMMAND_SPLIT_NG));
+
+    String accountId = AmbianceUtils.getAccountId(ambiance);
+    Map<String, String> environmentVariables =
+        shellScriptHelperService.getEnvironmentVariables(shellScriptStepParameters.getEnvironmentVariables(), ambiance);
+    environmentVariables =
+        injectAnnotationsEnvironmentVariables(environmentVariables, ambiance, accountId, executeOnDelegate);
+    injectIdentityTokenEnvironmentVariables(environmentVariables, identityTokens);
+    return taskParametersNGBuilder.accountId(accountId)
+        .executeOnDelegate(executeOnDelegate)
+        .environmentVariables(environmentVariables)
+        .executionId(AmbianceUtils.obtainCurrentRuntimeId(ambiance))
+        .outputVars(shellScriptHelperService.getOutputVars(
+            shellScriptStepParameters.getOutputVariables(), shellScriptStepParameters.getSecretOutputVariables()))
+        .secretOutputVars(shellScriptHelperService.getSecretOutputVars(
+            shellScriptStepParameters.getOutputVariables(), shellScriptStepParameters.getSecretOutputVariables()))
+        .script(shellScript)
+        .scriptType(scriptType)
+        .workingDirectory(shellScriptHelperService.getWorkingDirectory(
+            shellScriptStepParameters.getExecutionTarget(), scriptType, executeOnDelegate))
+        .sessionTimeout(EmptyPredicate.isNotEmpty(sessionTimeout)
+                ? Math.max(NGTimeConversionHelper.convertTimeStringToMilliseconds(sessionTimeout), SESSION_TIMEOUT)
+                : SESSION_TIMEOUT)
+        .performShellScriptHostCapabilityCheck(
+            pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.CDS_PERFORM_SHELL_SCRIPT_HOST_CAPABILITY_CHECK))
+        .commandUnit(commandUnit)
+        .build();
+  }
+
+  private ShellScriptTaskParametersNG buildBashTaskParametersNG(@NotNull Ambiance ambiance,
+      @NotNull ShellScriptStepParametersV0 shellScriptStepParameters, ScriptType scriptType, String shellScript,
+      Map<String, String> identityTokens) {
+    ShellScriptTaskParametersNGBuilder taskParametersNGBuilder = ShellScriptTaskParametersNG.builder();
+
+    Boolean includeInfraSelectors = shellScriptStepParameters.includeInfraSelectors != null
+        && BooleanUtils.isTrue(shellScriptStepParameters.includeInfraSelectors.getValue());
+
+    taskParametersNGBuilder.k8sInfraDelegateConfig(
+        shellScriptHelperService.getK8sInfraDelegateConfig(ambiance, shellScript, includeInfraSelectors));
+    boolean executeOnDelegate = toExecuteOnDelegate(shellScriptStepParameters.getExecutionTarget());
+    String accountId = AmbianceUtils.getAccountId(ambiance);
+    shellScriptHelperService.prepareTaskParametersForExecutionTarget(
+        ambiance, shellScriptStepParameters, taskParametersNGBuilder, executeOnDelegate);
+
+    Map<String, String> environmentVariables =
+        shellScriptHelperService.getEnvironmentVariables(shellScriptStepParameters.getEnvironmentVariables(), ambiance);
+    environmentVariables =
+        injectAnnotationsEnvironmentVariables(environmentVariables, ambiance, accountId, executeOnDelegate);
+    injectIdentityTokenEnvironmentVariables(environmentVariables, identityTokens);
+
+    return taskParametersNGBuilder.accountId(accountId)
+        .executeOnDelegate(executeOnDelegate)
+        .environmentVariables(environmentVariables)
+        .executionId(AmbianceUtils.obtainCurrentRuntimeId(ambiance))
+        .outputVars(shellScriptHelperService.getOutputVars(
+            shellScriptStepParameters.getOutputVariables(), shellScriptStepParameters.getSecretOutputVariables()))
+        .secretOutputVars(shellScriptHelperService.getSecretOutputVars(
+            shellScriptStepParameters.getOutputVariables(), shellScriptStepParameters.getSecretOutputVariables()))
+        .script(shellScript)
+        .scriptType(scriptType)
+        .workingDirectory(shellScriptHelperService.getWorkingDirectory(
+            shellScriptStepParameters.getExecutionTarget(), scriptType, executeOnDelegate))
+        .performShellScriptHostCapabilityCheck(
+            pmsFeatureFlagHelper.isEnabled(accountId, FeatureName.CDS_PERFORM_SHELL_SCRIPT_HOST_CAPABILITY_CHECK))
+        .build();
+  }
+
+  // Injects each named identity's OIDC ID_TOKEN as its own env var (env var name == identity name).
+  private void injectIdentityTokenEnvironmentVariables(
+      Map<String, String> environmentVariables, Map<String, String> identityTokens) {
+    if (isEmpty(identityTokens)) {
+      return;
+    }
+    identityTokens.forEach((identityName, idToken) -> {
+      if (StringUtils.isNotBlank(idToken)) {
+        if (environmentVariables.containsKey(identityName)) {
+          log.warn(
+              "Skipping identity token injection for '{}': env var already exists and takes precedence.", identityName);
+          return;
+        }
+        environmentVariables.put(identityName, idToken);
+      }
+    });
+  }
+
+  private SecretSpecDTO getSshKeySpec(Ambiance ambiance, ExecutionTarget executionTarget) {
+    String sshKeyRef = executionTarget.getConnectorRef().getValue();
+
+    IdentifierRef identifierRef = IdentifierRefHelper.getIdentifierRef(sshKeyRef, AmbianceUtils.getAccountId(ambiance),
+        AmbianceUtils.getOrgIdentifier(ambiance), AmbianceUtils.getProjectIdentifier(ambiance));
+    String errorMSg = "No secret configured with identifier: " + sshKeyRef;
+    SecretResponseWrapper secretResponseWrapper = NGRestUtils.getResponse(
+        secretManagerClient.getSecret(identifierRef.getIdentifier(), identifierRef.getAccountIdentifier(),
+            identifierRef.getOrgIdentifier(), identifierRef.getProjectIdentifier()),
+        errorMSg);
+    if (secretResponseWrapper == null) {
+      throw new InvalidRequestException(errorMSg);
+    }
+
+    return secretResponseWrapper.getSecret().getSpec();
+  }
+
+  @Override
+  public ShellScriptBaseOutcome prepareShellScriptOutcome(
+      Map<String, String> sweepingOutputEnvVariables, Map<String, Object> outputVariables) {
+    if (outputVariables == null || sweepingOutputEnvVariables == null) {
+      return null;
+    }
+    Map<String, String> resolvedOutputVariables = new HashMap<>();
+    outputVariables.keySet().forEach(name -> {
+      Object value = ((ParameterField<?>) outputVariables.get(name)).getValue();
+      resolvedOutputVariables.put(name, sweepingOutputEnvVariables.get(value));
+    });
+    return ShellScriptHelperService.getShellScriptOutcome(resolvedOutputVariables, HarnessYamlVersion.V0);
+  }
+
+  @Override
+  public List<String> getSecretOutputVars(Map<String, Object> outputVariables, Set<String> secretOutputVariables) {
+    if (EmptyPredicate.isEmpty(outputVariables)) {
+      return emptyList();
+    }
+    // secret variables are stored separately so ignoring them
+    List<String> outputVars = new ArrayList<>();
+    outputVariables.forEach((key, val) -> {
+      if (secretOutputVariables.contains(key)) {
+        if (val instanceof ParameterField) {
+          ParameterField<?> parameterFieldValue = (ParameterField<?>) val;
+          if (parameterFieldValue.getValue() == null) {
+            throw new InvalidRequestException(String.format("Output variable [%s] value found to be empty", key));
+          }
+          outputVars.add(((ParameterField<?>) val).getValue().toString());
+        } else if (val instanceof String) {
+          outputVars.add((String) val);
+        } else {
+          log.error(String.format(
+              "Value other than String or ParameterField found for output variable [%s]. value: [%s]", key, val));
+        }
+      }
+    });
+    return outputVars;
+  }
+
+  @Override
+  public void exportOutputVariablesUsingAlias(@Nonnull Ambiance ambiance,
+      @Nonnull ShellScriptStepParametersV0 shellScriptStepParameters,
+      @Nonnull ShellScriptBaseOutcome shellScriptOutcome) {
+    if (isNull(shellScriptStepParameters.getOutputAlias())
+        || EmptyPredicate.isEmpty(shellScriptOutcome.getOutputVariables())) {
+      log.debug("Skipping exporting output variables as output alias not present or output variables are empty");
+      return;
+    }
+    String userAlias = (String) shellScriptStepParameters.getOutputAlias().getKey().fetchFinalValue();
+    String uuid = OutputAliasUtils.generateSweepingOutputKeyUsingUserAlias(userAlias, ambiance);
+    try {
+      executionSweepingOutputService.consume(ambiance, uuid,
+          OutputAliasSweepingOutput.builder().outputVariables(shellScriptOutcome.getOutputVariables()).build(),
+          shellScriptStepParameters.getOutputAlias().getScope().toStepOutcomeGroup());
+    } catch (Exception ex) {
+      if (OutputAliasUtils.isDuplicateKeyException(ex, uuid)) {
+        log.warn("Error while publishing outputAlias due to the output already saved for the key [{}:{}] for scope {}",
+            userAlias, uuid, shellScriptStepParameters.getOutputAlias().getScope(), ex);
+        throw new InvalidRequestException(
+            String.format("Output alias with key %s, already saved in %s scope. Please ensure that there are no "
+                    + "duplicate output alias keys within the same scope",
+                userAlias, shellScriptStepParameters.getOutputAlias().getScope()));
+      }
+      log.warn("Error while publishing outputAlias for the key [{}:{}] for scope {}", userAlias, uuid,
+          shellScriptStepParameters.getOutputAlias().getScope(), ex);
+      throw new InternalServerErrorException(
+          String.format("Error while publishing outputAlias for the key %s for scope %s: %s", userAlias,
+              shellScriptStepParameters.getOutputAlias().getScope(), ExceptionUtils.getMessage(ex)));
+    }
+  }
+
+  private RetryPolicy<ResponseDTO<String>> createRetryPolicyToFetchContent(String scopedFilePath) {
+    // Create retry policy for SocketTimeoutException
+    return new RetryPolicy<ResponseDTO<String>>()
+        .handle(SocketTimeoutException.class)
+        .withBackoff(1, 10, ChronoUnit.SECONDS)
+        .withMaxAttempts(3)
+        .onFailedAttempt(event
+            -> log.warn("Failed attempt {} to get file content from '{}' due to: {}", event.getAttemptCount(),
+                scopedFilePath, event.getLastFailure().getMessage()))
+        .onFailure(event
+            -> log.error("All {} attempts failed to get file content from '{}'. Last error: {}",
+                event.getAttemptCount(), scopedFilePath, event.getFailure().getMessage()));
+  }
+
+  private Map<String, String> injectAnnotationsEnvironmentVariables(
+      Map<String, String> environmentVariables, Ambiance ambiance, String accountId, boolean executeOnDelegate) {
+    // Only inject annotations when executing on delegate, not on target host (SSH/WinRM)
+    if (!executeOnDelegate) {
+      log.debug("Skipping annotations injection: Script is executing on target host, not on delegate");
+      return environmentVariables;
+    }
+    boolean featureFlagEnabled = pmsFeatureFlagService.isEnabled(accountId, FeatureName.PIPE_HARNESS_ANNOTATIONS);
+    if (!featureFlagEnabled) {
+      log.debug("Skipping annotations injection: Feature flag PIPE_HARNESS_ANNOTATIONS is disabled for account {}",
+          accountId);
+      return environmentVariables;
+    }
+    if (annotationsServiceUtils == null) {
+      log.warn("Skipping annotations injection: annotationsServiceUtils is not configured");
+      return environmentVariables;
+    }
+
+    try {
+      Map<String, String> updatedEnvVars = new HashMap<>(environmentVariables);
+      String annotationsUrl = annotationsServiceUtils.getAnnotationsConfig().getBaseUrl();
+      String planExecutionId = ambiance.getPlanExecutionId();
+      String annotationsToken = annotationsServiceUtils.getAnnotationsServiceToken(accountId, planExecutionId);
+
+      if (isEmpty(annotationsUrl) || isEmpty(annotationsToken)) {
+        log.warn("Annotations service URL or token is empty for shell script step. URL present: {}, Token present: {}",
+            isNotEmpty(annotationsUrl), isNotEmpty(annotationsToken));
+        return environmentVariables;
+      }
+
+      String orgId = AmbianceUtils.getOrgIdentifier(ambiance);
+      String projectId = AmbianceUtils.getProjectIdentifier(ambiance);
+      String pipelineId = ambiance.getMetadata().getPipelineIdentifier();
+      String stageExecutionId = ambiance.getStageExecutionId();
+      String stepIdentifier = AmbianceUtils.obtainStepIdentifier(ambiance);
+
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_ACCOUNT_ID, accountId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_ORG_ID, isEmpty(orgId) ? "" : orgId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_PROJECT_ID, isEmpty(projectId) ? "" : projectId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_PIPELINE_ID, isEmpty(pipelineId) ? "" : pipelineId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_STAGE_ID, isEmpty(stageExecutionId) ? "" : stageExecutionId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_STEP_ID, isEmpty(stepIdentifier) ? "" : stepIdentifier);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_EXECUTION_ID, planExecutionId);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_ANNOTATIONS_SERVICE_ENDPOINT, annotationsUrl);
+      updatedEnvVars.put(ShellScriptConstants.HARNESS_ANNOTATIONS_SERVICE_TOKEN, annotationsToken);
+      updatedEnvVars.put(ShellScriptConstants.ANNOTATIONS_FEATURE_FLAG, "true");
+
+      log.debug("Successfully injected annotations environment variables for step: {}", stepIdentifier);
+      return updatedEnvVars;
+    } catch (Exception e) {
+      log.error("Error injecting annotations environment variables: {}. Continuing without annotations support.",
+          e.getMessage(), e);
+      return environmentVariables;
+    }
+  }
+}

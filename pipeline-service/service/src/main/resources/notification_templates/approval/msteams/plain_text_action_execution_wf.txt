@@ -1,0 +1,68 @@
+{
+   "type": "message",
+   "attachments": [
+      {
+         "contentType": "application/vnd.microsoft.card.adaptive",
+         "content": {
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "type": "AdaptiveCard",
+            "version": "1.2",
+            "body": [
+               {
+                  "type": "TextBlock",
+                  "size": "Medium",
+                  "weight": "Bolder",
+                  "text": "Pipeline [${pipelineName}](${PIPELINE_EXECUTION_URL}) ${status} for stage: ${currentStageName}",
+                  "wrap": true
+               },
+               {
+                  "type": "TextBlock",
+                  "text": "In Project ${projectName}",
+                  "isSubtle": true,
+                  "wrap": true
+               },
+               {
+                  "type": "FactSet",
+                  "facts": [
+                     {
+                        "title": "Actions:",
+                        "value": "${action}"
+                     },
+                     {
+                        "title": "Org:",
+                        "value": "${orgName}"
+                     },
+                     {
+                        "title": "Triggered By:",
+                        "value": "${triggeredBy}"
+                     },
+                     {
+                        "title": "Timeline:",
+                        "value": "Pipeline started on ${startedAt}"
+                     },
+                     {
+                        "title": "Next Stages:",
+                        "value": "${upcomingStages}"
+                     },
+                     {
+                        "title": "Completed:",
+                        "value": "${finishedStages}"
+                     },
+                     {
+                        "title": "Running:",
+                        "value": "${runningStages}"
+                     }
+                  ]
+               }
+            ],
+            "actions": [
+               {
+                  "type": "Action.OpenUrl",
+                  "title": "View Details",
+                  "url": "${PIPELINE_EXECUTION_URL}"
+               }
+            ]
+         }
+      }
+   ]
+}

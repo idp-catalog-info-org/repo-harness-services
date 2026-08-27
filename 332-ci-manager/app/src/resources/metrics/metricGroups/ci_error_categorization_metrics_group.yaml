@@ -1,0 +1,7 @@
+name: CI Error Categorization Metrics Group
+identifier: CIErrorCategorizationMetricsGroup
+labels:
+  - accountId
+  - matched
+  - infraType
+  - source

@@ -1,0 +1,37 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  infraConnector:
+    type: connector
+    description: GCP connector reference
+    default: ${{ngInfra.spec.connectorRef}}
+  cluster:
+    type: string
+    description: GKE cluster name
+    default: ${{ngInfra.spec.cluster}}
+  namespace:
+    type: string
+    description: Kubernetes namespace
+    default: ${{ngInfra.spec.namespace}}
+  releaseName:
+    type: string
+    description: Helm release name
+    default: ${{ngInfra.spec.releaseName}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/kubeconfig:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_INFRA_TYPE: kubernetes-gcp
+    PLUGIN_INFRA_GCP_CLUSTER: ${{inputs.cluster}}
+    PLUGIN_NAMESPACE: ${{inputs.namespace}}
+    PLUGIN_GCP_NAME: ${{inputs.infraConnector.name}}
+    PLUGIN_GCP_SERVICE_ACCOUNT_KEY: ${{inputs.infraConnector.jsonKey}}
+    PLUGIN_POOL_ID: ${{inputs.infraConnector.workloadPoolId}}
+    PLUGIN_PROVIDER_ID: ${{inputs.infraConnector.providerId}}
+    PLUGIN_PROJECT_NUMBER: ${{inputs.infraConnector.gcpProjectId}}
+    PLUGIN_SERVICE_ACCOUNT_EMAIL: ${{inputs.infraConnector.serviceAccountEmail}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.infraConnector.oidcToken}}

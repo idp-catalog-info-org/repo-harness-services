@@ -1,0 +1,52 @@
+# Copyright 2024 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//120-ng-manager/modules/branding/src/main/java/io/harness/branding/serializer:module",
+        "//120-ng-manager/modules/eula/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ip-allowlist/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ldap/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ng-subscriptions/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/modules/ng-variables/src/main/java/io/harness/serializer:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/serializer/kryo:module",
+        "//120-ng-manager/src/main/java/io/harness/serializer/morphia:module",
+        "//120-ng-manager/src/main/java/io/harness/serializer/spring/convertors:module",
+        "//123-ng-core-user/src/main/java/io/harness/serializer/morphia:module",
+        "//125-cd-nextgen/modules/common/core/src/main/java/io/harness/cdng/envGroup/beans:module",
+        "//125-cd-nextgen/src/main/java/io/harness/serializer:module",
+        "//126-instance/src/main/java/io/harness/serializer:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/cdng/deployable/bean/yaml:module",
+        "//136-git-sync-manager/src/main/java/io/harness/serializer:module",
+        "//440-connector-nextgen/src/main/java/io/harness/connector/serializer/spring:module",
+        "//445-gitops/src/main/java/io/harness/serializer:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/transientData:module",
+        "//920-ng-signup/src/main/java/io/harness/serializer:module",
+        "//940-primary-version-manager/src/main/java/io/harness/serializer:module",
+        "//960-ng-core-beans/src/main/java/io/harness/ng/core/filestore/dto:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema/beans:module",
+        "//970-ng-commons/src/main/java/io/serializer/registrars:module",
+        "//980-commons/src/main/java/io/harness/morphia:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//ng-banners/src/main/java/io/harness/serializer:module",
+        "//ng-settings/src/main/java/io/harness/serializer:module",
+        "//oidc-core/src/main/java/io/harness/oidc/entities:module",
+        "@maven//:com_google_guava_guava",
+        "@maven//:dev_morphia_morphia_core",
+        "@maven//:org_springframework_spring_core",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

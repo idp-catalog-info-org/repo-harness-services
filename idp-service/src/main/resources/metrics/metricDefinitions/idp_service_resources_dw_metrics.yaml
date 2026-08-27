@@ -1,0 +1,24 @@
+name: IDP Service Dropwizard Metrics
+identifier: IdpServiceDwResourcesWithStatusMetrics
+metricGroup: IdpServiceDwResourcesMetricsGroup
+metrics:
+  - metricName: io_harness_spec_server_idp_v1_total_count
+    metricDefinition: Total number of IDP Service Api calls
+    type: LastValue
+    unit: count
+  - metricName: io_harness_spec_server_idp_v1_total_snapshot_mean
+    metricDefinition: Mean Response Time for IDP Service Api calls
+    type: LastValue
+    unit: count
+  - metricName: io_harness_spec_server_idp_v1_total_snapshot_95thPercentile
+    metricDefinition: P95 Response Time for IDP Service Api calls
+    type: LastValue
+    unit: count
+  - metricName: io_harness_spec_server_idp_v1_total_snapshot_99thPercentile
+    metricDefinition: P99 Response Time for IDP Service Api calls
+    type: LastValue
+    unit: count
+  - metricName: io_harness_spec_server_idp_v1_total_snapshot_999thPercentile
+    metricDefinition: P99.9 Response Time for IDP Service Api calls
+    type: LastValue
+    unit: count

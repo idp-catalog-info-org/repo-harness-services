@@ -1,0 +1,4 @@
+{
+  "index.lifecycle.name": "pms-execution-alias-6-month-policy",
+  "index.lifecycle.rollover_alias": "pms-execution-alias-6-month"
+}

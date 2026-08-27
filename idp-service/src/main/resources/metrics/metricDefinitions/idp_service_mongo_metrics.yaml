@@ -1,0 +1,16 @@
+name: IDP Service Mongo Metrics
+identifier: IdpServiceMongoMetrics
+metricGroup: IdpServiceMongoMetricsGroup
+metrics:
+  - metricName: idp_mongo_pool_max_size
+    metricDefinition: IDP Service Mongo Connection Pool Max Size
+    type: LastValue
+    unit: count
+  - metricName: idp_mongo_pool_size
+    metricDefinition: IDP Service Mongo Connection Pool Size
+    type: LastValue
+    unit: count
+  - metricName: idp_mongo_pool_checked_out
+    metricDefinition: IDP Service Mongo Connections Checked Out
+    type: LastValue
+    unit: count

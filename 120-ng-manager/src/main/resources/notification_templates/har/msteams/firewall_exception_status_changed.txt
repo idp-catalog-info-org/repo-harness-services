@@ -1,0 +1,24 @@
+{
+  "@type": "MessageCard",
+  "themeColor": "#FFFFFF",
+  "title": "Harness Artifact Registry Firewall Exemption Status Changed",
+  "summary": "Harness Artifact Registry Firewall Exemption Status Changed",
+  "sections": [
+    {
+      "title": "Firewall Exemption Status Changed",
+      "text": "Package Name: ${PACKAGE_NAME}<br>Version List: ${VERSION_LIST}<br>Registry: ${REGISTRY_NAME} - ${REGISTRY_URL}<br>Status: ${STATUS}<br>Changed By: ${CHANGED_BY}",
+      "potentialAction": [
+        {
+            "@type": "OpenUri",
+            "name": "View Exemption in Harness",
+            "targets": [
+                {
+                "os": "default",
+                "uri": "${EXCEPTION_URL}"
+                }
+            ]
+        }
+      ]
+    }
+  ]
+}

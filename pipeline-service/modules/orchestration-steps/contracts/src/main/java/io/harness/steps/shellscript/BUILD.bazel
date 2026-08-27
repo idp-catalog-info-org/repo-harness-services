@@ -1,0 +1,59 @@
+# Copyright 2025 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis_per_module")
+
+java_library(
+    name = "module",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//:lombok",
+        "//878-ng-common-utilities/src/main/java/io/harness/steps:module",
+        "//878-ng-common-utilities/src/main/java/io/harness/steps/workloadidentity:module",
+        "//880-pipeline-cd-commons/src/main/java/io/harness/steps/shellscript:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution:module",
+        "//884-pms-commons/src/main/java/io/harness/pms/execution/utils:module",
+        "//930-delegate-tasks/src/main/java/io/harness/delegate/task/shell:module",
+        "//930-delegate-tasks/src/main/java/io/harness/delegate/task/shell/winrm:module",
+        "//953-yaml-commons/src/main/java/io/harness/plancreator/steps/common:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/sdk/core/steps/io:module",
+        "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/core:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/core/variables:module",
+        "//953-yaml-commons/src/main/java/io/harness/yaml/utils:module",
+        "//960-ng-core-beans/src/main/java/io/harness/steps/shellscript:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema:module",
+        "//960-yaml-sdk/src/main/java/io/harness/yaml/schema/beans:module",
+        "//967-walktree-visitor/src/main/java/io/harness/walktree/visitor/helper:module",
+        "//967-walktree-visitor/src/main/java/io/harness/walktree/visitor/validation:module",
+        "//970-ng-commons/src/main/java/io/harness/common:module",
+        "//970-ng-commons/src/main/java/io/harness/plancreator/steps:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//979-recaster/src/main/java/io/harness/annotation:module",
+        "//980-commons/src/main/java/io/harness/exception:module",
+        "//999-annotations/src/main/java/io/harness/annotations/dev:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/advisers/rollback:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/filters:module",
+        "//clients/pipeline-service/pms-sdk-core/src/main/java/io/harness/pms/sdk/core/plan/creation/beans:module",
+        "//pipeline-service/modules/orchestration-steps/contracts/src/main/java/io/harness/plancreator/steps/internal:module",
+        "//pipeline-service/modules/orchestration/contracts/src/main/java/io/harness/steps:module",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_google_guava_guava",
+        "@maven//:io_swagger_swagger_annotations",
+        "@maven//:javax_validation_validation_api",
+        "@maven//:org_apache_commons_commons_lang3",
+        "@maven//:org_hibernate_validator_hibernate_validator",
+        "@maven//:org_springframework_data_spring_data_commons",
+    ],
+)
+
+run_analysis_per_module(
+    checkstyle_srcs = glob(["*"]),
+    pmd_srcs = glob(["*"]),
+    sonarqube_srcs = glob(["*"]),
+)

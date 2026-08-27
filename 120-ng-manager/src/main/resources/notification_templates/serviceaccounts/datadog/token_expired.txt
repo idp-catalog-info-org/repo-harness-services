@@ -1,0 +1,19 @@
+{
+    "title": "Token expired — ${TOKEN_IDENTIFIER}",
+    "text": "The token ${TOKEN_IDENTIFIER} for API Key ${API_KEY_IDENTIFIER} in Service Account ${SERVICE_ACCOUNT_NAME} expired on ${EXPIRY_DATE}.\n\nAny pipelines or integrations using this token will fail. Create a new token to avoid failures.\n\nAccount: ${ACCOUNT_NAME} | Account ID: ${ACCOUNT_IDENTIFIER} | Org: ${ORG_IDENTIFIER} | Project: ${PROJECT_IDENTIFIER}",
+    "tags": [
+        "event_type:token_expired",
+        "token_identifier:${TOKEN_IDENTIFIER}",
+        "api_key_identifier:${API_KEY_IDENTIFIER}",
+        "service_account_name:${SERVICE_ACCOUNT_NAME}",
+        "expiry_date:${EXPIRY_DATE}",
+        "account_name:${ACCOUNT_NAME}",
+        "account_identifier:${ACCOUNT_IDENTIFIER}",
+        "org_identifier:${ORG_IDENTIFIER}",
+        "project_identifier:${PROJECT_IDENTIFIER}"
+    ],
+    "aggregation_key": "${TOKEN_IDENTIFIER}",
+    "priority": "normal",
+    "alert_type": "error",
+    "source_type_name": "harness_notifications"
+}

@@ -1,0 +1,30 @@
+identifier: adr
+name: Architecture Decision Records
+description: Browse your project's ADRs.
+accountIdentifier: __GLOBAL_ACCOUNT_ID__
+isDeleted: false
+type: DEFAULT
+creator: Phil Kuang
+category: Discovery
+source: https://github.com/backstage/backstage/tree/master/plugins/adr
+iconUrl: ''
+imageUrl: ''
+documentation: https://developer.harness.io/docs/internal-developer-portal/plugins/available-plugins/adr
+exports:
+  defaultEntityTypes:
+    - service
+  exportDetails:
+    - type: TAB_CONTENT
+      name: EntityAdrContent
+      addByDefault: true
+      defaultRoute: /adrs
+      layoutSchemaSpecs:
+        name: EntityAdrContent
+        title: ADRs
+        contents:
+          - component: EntitySwitch
+            specs:
+              cases:
+                - if: isAdrAvailable
+                  content:
+                    component: EntityAdrContent

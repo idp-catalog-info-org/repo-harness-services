@@ -1,0 +1,38 @@
+# Copyright 2026 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("@rules_java//java:defs.bzl", "java_library")
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+
+java_library(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//878-ng-common-utilities/src/main/java/io/harness/utils:module",
+        "//956-feature-flag-beans/src/main/java/io/harness/beans:module",
+        "//960-persistence/src/main/java/io/harness/lock/interfaces:module",
+        "//970-ng-commons/src/main/java/io/harness/pms/yaml:module",
+        "//990-commons-test/src/main/java/io/harness:module",
+        "//990-commons-test/src/main/java/io/harness/category/element:module",
+        "//990-commons-test/src/main/java/io/harness/rule:module",
+        "//clients/go-convert/src/main/java/io/harness/goconvert:module",
+        "//pipeline-service/modules/ng-triggers/src/main/java/io/harness/ngtriggers/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion:beans",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion/iterator:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/conversion/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/ngpipeline/inputset/service:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/service/src/main/java/io/harness/pms/pipeline/service/intfc:module",
+        "//pipeline-service/service/src/main/java/io/harness/repositories/conversion:module",
+        "@maven//:junit_junit",
+        "@maven//:org_assertj_assertj_core",
+        "@maven//:org_mockito_mockito_core",
+        "@maven//:org_springframework_data_spring_data_mongodb",
+    ],
+)
+
+run_tests("*Test.java")

@@ -1,0 +1,12 @@
+name: Trigger Executor Validation Metrics
+identifier: TriggerExecutorValidation
+metricGroup: trigger_executor_validation_group
+metrics:
+  - metricName: trigger_executor_validation_create_update_count
+    metricDefinition: Number of executor validation attempts at trigger create/update, tagged by result.
+    type: Count
+    unit: "1"
+  - metricName: trigger_executor_validation_execution_count
+    metricDefinition: Number of executor RBAC validation attempts at trigger execution time, tagged by result.
+    type: Count
+    unit: "1"

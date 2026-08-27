@@ -1,0 +1,55 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  connector:
+    type: connector
+    description: AWS connector (resolved from connectorRef)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.connectorRef}}
+  bucket:
+    type: string
+    description: S3 bucket name
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.bucketName}}
+  region:
+    type: string
+    description: AWS region
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.region}}
+  paths:
+    type: list
+    description: List of paths in the bucket
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths}}
+  path:
+    type: string
+    description: S3 folder prefix to download (first path entry)
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.store.spec.paths[0]}}
+  configOverridePath:
+    type: string
+    description: Serverless config override path
+    default: ${{ngService.spec.manifests.ID_PLACEHOLDER.manifest.spec.configOverridePath}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/s3-download:0.0.3
+    connector: account.harnessImage
+  env:
+    PLUGIN_ARTIFACT_BUCKET_NAME: ${{inputs.bucket}}
+    PLUGIN_ARTIFACT_REGION: ${{inputs.region}}
+    PLUGIN_ARTIFACT_FILE_PATH: ${{inputs.path}}
+    PLUGIN_ARTIFACT_DOWNLOAD_PATH: ${{runtime.workspace}}/${{serviceOutput.manifests.ID_PLACEHOLDER.id}}/${{inputs.path}}
+    PLUGIN_ARTIFACT_FORMAT: generic
+    PLUGIN_UNPACK_ARTIFACT: true
+    PLUGIN_AWS_NAME: ${{inputs.connector.name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{inputs.connector.accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{inputs.connector.secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{inputs.connector.sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.connector.crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{inputs.connector.externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.connector.assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{inputs.connector.iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.connector.oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{inputs.connector.sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.connector.baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.connector.maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.connector.retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.connector.fixedBackoff}}

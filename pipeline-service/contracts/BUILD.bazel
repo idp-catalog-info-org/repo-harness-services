@@ -1,0 +1,48 @@
+# Copyright 2022 Harness Inc. All rights reserved.
+# Use of this source code is governed by the PolyForm Free Trial 1.0.0 license
+# that can be found in the licenses directory at the root of this repository, also available at
+# https://polyformproject.org/wp-content/uploads/2020/05/PolyForm-Free-Trial-1.0.0.txt.
+
+load("//:tools/bazel/GenTestRules.bzl", "run_tests")
+load("//:tools/bazel/harness.bzl", "java_library")
+load("//:tools/bazel/macros.bzl", "run_analysis")
+
+java_library(
+    name = "module",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = [],
+    visibility = ["//visibility:public"],
+    exports = [
+        "//pipeline-service/contracts/openapi/v1:pipeline-server-spec-module",
+        "//pipeline-service/contracts/src/main/java/io/harness/apiexamples:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/notify:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/approval/resources:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/barriers/resources:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/barriers/response:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/dashboard:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/dataretention:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/goverance:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/health:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/inputfile:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/ngpipeline/inputs/beans/entity:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/ngpipeline/inputset/beans/resource:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/ngpipeline/inputset/resources:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/ngpipeline/overlayinputset/beans/resource:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/pipeline:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/plan/execution:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/plan/execution/beans/dto:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/plan/execution/resources:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight/connector:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight/connector/handler:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight/dto:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight/inputset:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/preflight/utils:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/resourceconstraints/resources:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/resourceconstraints/response:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/schema:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/stagequeue/beans:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/stages:module",
+        "//pipeline-service/contracts/src/main/java/io/harness/pms/wait:module",
+    ],
+)

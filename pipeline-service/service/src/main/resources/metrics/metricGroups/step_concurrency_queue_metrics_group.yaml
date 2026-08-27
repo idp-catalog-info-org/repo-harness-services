@@ -1,0 +1,5 @@
+name: Step Concurrency Queue Store Metrics Group
+identifier: StepConcurrencyQueueMetricsGroup
+labels:
+  - operation
+  - outcome

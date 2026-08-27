@@ -1,0 +1,49 @@
+id: ID_PLACEHOLDER
+name: ID_PLACEHOLDER
+
+inputs:
+  infraConnector:
+    type: connector
+    description: AWS connector reference
+    default: ${{ngInfra.spec.connectorRef}}
+  region:
+    type: string
+    description: AWS region
+    default: ${{ngInfra.spec.region}}
+  cluster:
+    type: string
+    description: EKS cluster name
+    default: ${{ngInfra.spec.cluster}}
+  namespace:
+    type: string
+    description: Kubernetes namespace
+    default: ${{ngInfra.spec.namespace}}
+  releaseName:
+    type: string
+    description: Helm release name
+    default: ${{ngInfra.spec.releaseName}}
+
+run:
+  type: run
+  container:
+    image: harnessdev/kubeconfig:0.0.1
+    connector: account.harnessImage
+  env:
+    PLUGIN_INFRA_TYPE: kubernetes-aws
+    PLUGIN_INFRA_AWS_REGION: ${{inputs.region}}
+    PLUGIN_INFRA_AWS_CLUSTER: ${{inputs.cluster}}
+    PLUGIN_NAMESPACE: ${{inputs.namespace}}
+    PLUGIN_AWS_NAME: ${{inputs.infraConnector.name}}
+    PLUGIN_AWS_ACCESS_KEY: ${{inputs.infraConnector.accessKey}}
+    PLUGIN_AWS_SECRET_KEY: ${{inputs.infraConnector.secretKey}}
+    PLUGIN_AWS_SESSION_TOKEN: ${{inputs.infraConnector.sessionToken}}
+    PLUGIN_AWS_CROSS_ACCOUNT_ROLE_ARN: ${{inputs.infraConnector.crossAccountRoleArn}}
+    PLUGIN_AWS_EXTERNAL_ID: ${{inputs.infraConnector.externalId}}
+    PLUGIN_AWS_ASSUME_ROLE_SESSION_DURATION: ${{inputs.infraConnector.assumeRoleSessionDuration}}
+    PLUGIN_AWS_IAM_ROLE_ARN: ${{inputs.infraConnector.iamRoleArn}}
+    PLUGIN_OIDC_TOKEN_ID: ${{inputs.infraConnector.oidcToken}}
+    PLUGIN_AWS_BACKOFF_STRATEGY: ${{inputs.infraConnector.sdkClientBackoffStrategyType}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_BASE_DELAY: ${{inputs.infraConnector.baseDelay}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_MAX_BACKOFF_TIME: ${{inputs.infraConnector.maxBackoffTime}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_RETRY_COUNT: ${{inputs.infraConnector.retryCount}}
+    PLUGIN_AWS_BACKOFF_STRATEGY_FIXED_BACKOFF: ${{inputs.infraConnector.fixedBackoff}}

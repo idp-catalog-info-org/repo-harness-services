@@ -1,0 +1,9 @@
+name: Filter Creation Metrics
+identifier: FilterCreationMetrics
+metricGroup: PipelineAccountIdMetricsGroup
+metrics:
+  - metricName: filter_creation_time
+    metricDefinition: Time taken to complete filter creation for a pipeline
+    type: Duration
+    distribution: [ 0m, 5s, 10s, 30s, 1m, 2m, 4m, 8m ]
+    unit: "ms"

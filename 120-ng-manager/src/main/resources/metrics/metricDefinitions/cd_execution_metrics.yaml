@@ -1,0 +1,28 @@
+name: CD Execution Metrics
+identifier: cd_execution_metrics
+metricGroup: cd_execution_metrics_group
+metrics:
+  - metricName: cd_k8s_override_files_size_bytes
+    metricDefinition: total override files size in bytes
+    type: LastValue
+    unit: "1"
+  - metricName: cd_k8s_final_manifest_size_bytes
+    metricDefinition: rendered manifest size in bytes
+    type: LastValue
+    unit: "1"
+  - metricName: cd_k8s_max_override_file_size_bytes
+    metricDefinition: max override file size in bytes
+    type: LastValue
+    unit: "1"
+  - metricName: cd_k8s_manifest_files_count
+    metricDefinition: number of manifest files
+    type: LastValue
+    unit: "1"
+  - metricName: cd_k8s_max_manifest_file_size_bytes
+    metricDefinition: max manifest file size in bytes
+    type: LastValue
+    unit: "1"
+  - metricName: cd_k8s_manifest_files_size_bytes
+    metricDefinition: size of all manifest files in bytes before rendering
+    type: LastValue
+    unit: "1"

@@ -1,0 +1,14 @@
+{
+  "identifier": "harness.debug.log",
+  "name": "Debug Log",
+  "description": "No-op step that logs its inputs. Useful for testing translation and execution end to end.",
+  "version": "1.0.0",
+  "handler": "harness.debug.log",
+  "category": "harness",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "message": { "type": "string" }
+    }
+  }
+}
