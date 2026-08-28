@@ -1263,8 +1263,7 @@ public class InitializeTaskStepV2 extends CiAsyncExecutable {
       if (liteEnginePodDetailsOutcome == null) {
         throw new CIStageExecutionException("Failed to get pod local ipAddress details");
       }
-      if (!isFromRunner) {
-        // only response coming from delegate contains IP address of the pod
+      if (k8sTaskExecutionResponse.getK8sTaskResponse() != null) {
         log.info("ip address for pod {} is {}", k8sTaskExecutionResponse.getK8sTaskResponse().getPodName(),
             liteEnginePodDetailsOutcome.getIpAddress());
       }
@@ -1537,17 +1536,12 @@ public class InitializeTaskStepV2 extends CiAsyncExecutable {
   }
 
   private LiteEnginePodDetailsOutcome getPodDetailsOutcome(CiK8sTaskResponse ciK8sTaskResponse, boolean isFromRunner) {
-    if (isFromRunner) {
-      // Runner response doesn't contain any pod details
-      return LiteEnginePodDetailsOutcome.builder().build();
-    }
     if (ciK8sTaskResponse != null && ciK8sTaskResponse.getPodStatus() != null) {
-      // Only response coming from delegate contains pod details
       String ip = ciK8sTaskResponse.getPodStatus().getIp();
       String namespace = ciK8sTaskResponse.getPodNamespace();
       return LiteEnginePodDetailsOutcome.builder().ipAddress(ip).namespace(namespace).build();
     }
-    return null;
+    return isFromRunner ? LiteEnginePodDetailsOutcome.builder().build() : null;
   }
 
   private List<EntityDetail> getConnectorIdentifiers(InitializeStepInfo initializeStepInfo, String accountIdentifier,
