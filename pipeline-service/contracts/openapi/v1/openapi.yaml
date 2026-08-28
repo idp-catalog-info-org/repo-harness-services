@@ -2316,8 +2316,7 @@ components:
           type: string
           description: Status of the Pipeline Validation Event
         policy_eval:
-          type: object
-          description: Result of Policy Evaluations on the Pipeline
+          $ref: '#/components/schemas/PipelineGovernanceMetadata'
         start_ts:
           type: integer
           format: int64
@@ -4127,81 +4126,105 @@ components:
       x-stoplight:
         id: cky1k4ixgk4qc
       type: object
+      description: Policy evaluation details. Field names match PolicyMetadata proto.
       properties:
-        identifier:
+        policy_id:
           type: string
-          description: Policy Identifier
-        name:
+        policy_name:
           type: string
-          description: Policy Name
-        org:
+        severity:
           type: string
-          description: Organization identifier where the Policy is defined
-        project:
-          type: string
-          description: Project Identifier where the Policy is defined
-        evaluation_error:
-          type: string
-          description: Error message in Policy Evaluation
         deny_messages:
           type: array
-          description: Deny messages
           items:
             type: string
         status:
           $ref: '#/components/schemas/GovernanceStatus'
-      description: Contains Details about Policy
+        identifier:
+          type: string
+        account_id:
+          type: string
+        org_id:
+          type: string
+        project_id:
+          type: string
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+        error:
+          type: string
     PipelineGovernancePolicySet:
       title: Pipeline Governance PolicySet
       x-stoplight:
         id: cmfnsyb1kml0s
       type: object
+      description: Policy set evaluation details. Field names match PolicySetMetadata proto.
       properties:
-        identifier:
+        policy_set_id:
           type: string
-          description: Identifer of the Policy Set
-        name:
-          type: string
-          description: Name of the Policy Set
-        org:
-          type: string
-          description: Organization Identifier where the Policy Set is defined
-        project:
-          type: string
-          description: Project Identifier where the Policy Set is defined
-        deny_messages:
+        deny:
+          type: boolean
+        policy_metadata:
           type: array
-          description: Deny messages
-          items:
-            type: string
-        status:
-          $ref: '#/components/schemas/GovernanceStatus'
-        policies:
-          type: array
-          description: List of policies defined inside Policy Set
           items:
             $ref: '#/components/schemas/PipelineGovernancePolicy'
-      description: Contains Policy Set Detail
+        policy_set_name:
+          type: string
+        status:
+          $ref: '#/components/schemas/GovernanceStatus'
+        identifier:
+          type: string
+        created:
+          type: integer
+          format: int64
+        account_id:
+          type: string
+        org_id:
+          type: string
+        project_id:
+          type: string
+        description:
+          type: string
     PipelineGovernanceMetadata:
       title: Pipeline Governance Metadata
       x-stoplight:
         id: h338p27isjaxe
       type: object
-      description: Governance Error Details for Pipeline Operations
+      description: Governance evaluation details for pipeline operations. Field names match GovernanceMetadata proto.
       properties:
+        id:
+          type: string
         deny:
           type: boolean
-          description: Indicate whether the action is denied or not based on Governance rules
-        message:
-          type: string
-          description: Governance Message
-        status:
-          $ref: '#/components/schemas/GovernanceStatus'
-        policy_sets:
+        details:
           type: array
-          description: List of Policy Sets
           items:
             $ref: '#/components/schemas/PipelineGovernancePolicySet'
+        message:
+          type: string
+        timestamp:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/GovernanceStatus'
+        account_id:
+          type: string
+        org_id:
+          type: string
+        project_id:
+          type: string
+        entity:
+          type: string
+        type:
+          type: string
+        action:
+          type: string
+        created:
+          type: integer
+          format: int64
     GovernanceMetadata:
       title: Governance Metadata (Execution)
       x-stoplight:

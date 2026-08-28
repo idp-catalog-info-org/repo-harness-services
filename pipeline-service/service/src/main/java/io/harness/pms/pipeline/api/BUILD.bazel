@@ -26,7 +26,6 @@ java_library(
         "//960-yaml-sdk/src/main/java/io/harness/yaml/validator:module",
         "//970-api-services-beans/src/main/java/io/harness/filter:module",
         "//970-api-services-beans/src/main/java/io/harness/git/model:module",
-        "//970-ng-commons/contracts/openapi/v1:commons-server-spec-module",
         "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
         "//970-ng-commons/src/main/java/io/harness/gitsync/beans:module",
         "//970-ng-commons/src/main/java/io/harness/gitsync/interceptor:module",
