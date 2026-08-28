@@ -732,8 +732,8 @@ public class PMSPipelineServiceHelper {
     // V1 pipeline metadata (name/description/tags) lives outside the YAML, so V1 PATCH flows
     // can legitimately omit the YAML body. Filters/stage info and pipeline references are
     // derived from the YAML; if the YAML didn't change, nothing here needs to be recomputed and
-    // the existing values in DB should be left untouched. getUpdateOperationsForPatch already
-    // only writes non-null/non-empty fields, so returning the entity unchanged is safe.
+    // the existing derived values in DB should be left untouched. getUpdateOperationsForPatch
+    // only writes eligible patch fields, including explicit description/tags clear operations.
     // V0 callers always carry the metadata inside the YAML and therefore never reach here with
     // an empty YAML in normal flows; V0 behavior is preserved.
     if (HarnessYamlVersion.isV1(pipelineEntity.getHarnessVersion()) && isEmpty(pipelineEntity.getYaml())) {

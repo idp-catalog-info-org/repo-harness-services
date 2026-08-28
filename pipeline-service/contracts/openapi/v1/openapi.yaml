@@ -6290,7 +6290,7 @@ components:
             connector_ref: git_connector
             store_type: REMOTE
             repo_name: example_repository
-      description: Pipeline Patch Request body (All the non empty values in this request body will be updated).
+      description: Pipeline merge patch request body. Omitted properties remain unchanged; desc and tags accept null to clear.
       properties:
         pipeline_yaml:
           type: string
@@ -6300,13 +6300,15 @@ components:
           description: Pipeline Name.
         desc:
           type: string
-          description: Pipeline Description.
+          nullable: true
+          description: Pipeline Description. Omit to leave unchanged; send null or an empty string to clear it.
         tags:
           type: object
           additionalProperties:
             type: string
           maxProperties: 128
-          description: Pipeline Tags.
+          nullable: true
+          description: Pipeline Tags. Omit to leave unchanged; send null or an empty object to clear them.
         allowDynamicExecutions:
           type: boolean
           description: Allow dynamic executions of Pipeline
@@ -8840,6 +8842,9 @@ components:
             $ref: '#/components/schemas/PipelineInputsSchemaRequestBody'
     PipelinePatchRequestBody:
       content:
+        application/merge-patch+json:
+          schema:
+            $ref: '#/components/schemas/PipelinePatchRequestBody'
         application/json:
           schema:
             $ref: '#/components/schemas/PipelinePatchRequestBody'
