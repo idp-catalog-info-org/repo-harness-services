@@ -280,7 +280,7 @@ ci_images:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.7.25"
+      tag: "1.7.29"
       repository: harness/harness-cache-server
       imagePullSecrets: []
   git_clone:

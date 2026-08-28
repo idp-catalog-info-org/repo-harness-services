@@ -734,7 +734,7 @@ ciExecutionServiceConfig:
       windowsEntrypoint:
         - "C:\\drone-cache.exe"
     cacheProxyConfig:
-      image: harness/harness-cache-server:1.7.23
+      image: harness/harness-cache-server:1.7.29
       entrypoint:
         - /app/cache-proxy
         - server
@@ -918,7 +918,7 @@ ciExecutionServiceConfig:
       cacheGCS: plugins/cache:1.10.10
       cacheS3: plugins/cache:1.10.10
       cacheAzure: plugins/cache:1.10.10
-      cacheProxy: harness/harness-cache-server:1.7.23
+      cacheProxy: harness/harness-cache-server:1.7.29
       sscaOrchestration: harness/ssca-plugin:0.17.3
       sscaEnforcement: harness/ssca-plugin:0.17.3
       sscaArtifactSigning: harness/ssca-artifact-signing-plugin:latest
