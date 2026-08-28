@@ -573,6 +573,7 @@ public class CIPipelineEndEventHandlerTest extends CategoryTest {
                                                           .isBuildIntelEnabled(true)
                                                           .isBuildIntelOptimized(true)
                                                           .isMavenBIUsed(true)
+                                                          .isGoBIUsed(true)
                                                           .stepTypes(Arrays.asList("Run", "Plugin"))
                                                           .errors(Arrays.asList("error1"))
                                                           .build();
@@ -591,6 +592,7 @@ public class CIPipelineEndEventHandlerTest extends CategoryTest {
     assertThat(result.get("bi_total_tasks_restored")).as("Tasks restored should reflect aggregated count").isEqualTo(5);
     assertThat(result.get("bi_is_build_intel_enabled")).as("Build intel should be enabled").isEqualTo(true);
     assertThat(result.get("bi_is_maven_used")).as("Maven should be reported as used").isEqualTo(true);
+    assertThat(result.get("bi_is_go_used")).as("Go should be reported as used").isEqualTo(true);
     assertThat(result.get("total_time_saved")).as("Total time saved should be sum of savings").isEqualTo(500L);
     assertThat((List<String>) result.get("ci_step_types"))
         .as("CI step types should include all unique types")
