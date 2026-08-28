@@ -31,6 +31,7 @@ import static io.harness.ng.core.service.v1.ManifestStepConstants.PLUGIN_POOL_ID
 import static io.harness.ng.core.service.v1.ManifestStepConstants.PLUGIN_PROJECT_NUMBER;
 import static io.harness.ng.core.service.v1.ManifestStepConstants.PLUGIN_PROVIDER_ID;
 import static io.harness.ng.core.service.v1.ManifestStepConstants.PLUGIN_SERVICE_ACCOUNT_EMAIL;
+import static io.harness.rule.OwnerRule.ABHAY;
 import static io.harness.rule.OwnerRule.ANURAG_MADNAWAT;
 import static io.harness.rule.OwnerRule.DEVANSH;
 import static io.harness.rule.OwnerRule.DEV_MITTAL;
@@ -516,6 +517,43 @@ public class SerializerUtilsTest {
   @Owner(developers = TAPAN)
   @Category(UnitTests.class)
   public void testCheckAndPopulateEnvironmentVariablesForOIDCPlugins_AZURE() throws IOException {
+    Ambiance ambiance = Ambiance.newBuilder().putSetupAbstractions("accountId", "acc").build();
+    Map<String, String> envVars = new HashMap<>();
+
+    when(azureOidcAuthenticator.fetchOidcIdToken(any())).thenReturn("azure-oidc-token");
+
+    String image = "plugins/azure-oidc:latest";
+    OidcIdTokenCustomAttributesStructure customAttrs =
+        OidcIdTokenCustomAttributesStructure.builder().accountId("acc").build();
+
+    serializerUtils.checkAndPopulateEnvironmentVariablesForOIDCPlugins(image, ambiance, envVars, customAttrs);
+
+    assertThat(envVars).containsEntry(PLUGIN_OIDC_TOKEN_ID, "azure-oidc-token");
+  }
+
+  @Test
+  @Owner(developers = ABHAY)
+  @Category(UnitTests.class)
+  public void testCheckAndPopulateEnvironmentVariablesForOIDCPlugins_AZURE_WithSubject() throws IOException {
+    Ambiance ambiance = Ambiance.newBuilder().putSetupAbstractions("accountId", "acc").build();
+    Map<String, String> envVars = new HashMap<>();
+    envVars.put("PLUGIN_SUBJECT", "account:acc:org:myorg:env:prod:stage:deploy");
+
+    when(azureOidcAuthenticator.fetchOidcIdToken(any())).thenReturn("azure-oidc-token");
+
+    String image = "plugins/azure-oidc:latest";
+    OidcIdTokenCustomAttributesStructure customAttrs =
+        OidcIdTokenCustomAttributesStructure.builder().accountId("acc").build();
+
+    serializerUtils.checkAndPopulateEnvironmentVariablesForOIDCPlugins(image, ambiance, envVars, customAttrs);
+
+    assertThat(envVars).containsEntry(PLUGIN_OIDC_TOKEN_ID, "azure-oidc-token");
+  }
+
+  @Test
+  @Owner(developers = ABHAY)
+  @Category(UnitTests.class)
+  public void testCheckAndPopulateEnvironmentVariablesForOIDCPlugins_AZURE_NoSubject() throws IOException {
     Ambiance ambiance = Ambiance.newBuilder().putSetupAbstractions("accountId", "acc").build();
     Map<String, String> envVars = new HashMap<>();
 
