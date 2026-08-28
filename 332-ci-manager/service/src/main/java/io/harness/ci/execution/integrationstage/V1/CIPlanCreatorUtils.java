@@ -160,8 +160,10 @@ public class CIPlanCreatorUtils {
         CodeBase.builder()
             .uuid(stageClone.getUuid() != null ? stageClone.getUuid() : generateUuid())
             .depth(stageClone.getDepth() != null ? stageClone.getDepth() : ParameterField.createValueField(50))
-            .sslVerify(
-                stageClone.getInsecure() != null ? stageClone.getInsecure() : ParameterField.createValueField(false))
+            // sslVerify is the inverse of insecure. insecure=true means skip TLS verification.
+            .sslVerify(stageClone.getInsecure() != null && stageClone.getInsecure().getValue() != null
+                    ? ParameterField.createValueField(!stageClone.getInsecure().getValue())
+                    : ParameterField.createValueField(true))
             .prCloneStrategy(prCloneStrategyParameterField)
             .lfs(stageClone.getLfs())
             .debug(stageClone.getTrace())

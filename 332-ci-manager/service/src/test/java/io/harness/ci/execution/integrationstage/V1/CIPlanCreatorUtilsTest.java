@@ -130,6 +130,7 @@ public class CIPlanCreatorUtilsTest extends CategoryTest {
     assertThat(codeBase.getRepoName().getValue()).isEqualTo("stage-repo");
     assertThat(codeBase.getDepth().getValue()).isEqualTo(100);
     assertThat(codeBase.getBuild().getValue().getType()).isEqualTo(BuildType.BRANCH);
+    assertThat(codeBase.getSslVerify().getValue()).isTrue();
   }
 
   @Test
@@ -155,6 +156,7 @@ public class CIPlanCreatorUtilsTest extends CategoryTest {
             .persistCredentials(ParameterField.createValueField(true))
             .resources(resources)
             .user(ParameterField.createValueField(1005))
+            .insecure(ParameterField.createValueField(true))
             .build();
 
     PlanCreationContext ctx = createPlanCreationContext(TriggerType.MANUAL, PipelineStoreType.INLINE);
@@ -173,6 +175,7 @@ public class CIPlanCreatorUtilsTest extends CategoryTest {
     assertThat(codeBase.getPersistCredentials().getValue()).isTrue();
     assertThat(codeBase.getResources()).isEqualTo(resources);
     assertThat(codeBase.getRunAsUser().getValue()).isEqualTo(1005);
+    assertThat(codeBase.getSslVerify().getValue()).isFalse();
   }
 
   @Test
@@ -225,6 +228,7 @@ public class CIPlanCreatorUtilsTest extends CategoryTest {
     assertThat(codeBase.getRepoName().getValue()).isEqualTo("pipeline-repo");
     assertThat(codeBase.getDepth().getValue()).isEqualTo(50);
     assertThat(codeBase.getBuild().getValue().getType()).isEqualTo(BuildType.TAG);
+    assertThat(codeBase.getSslVerify().getValue()).isFalse();
   }
 
   @Test
