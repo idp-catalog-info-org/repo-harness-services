@@ -7,8 +7,10 @@
 
 package io.harness.ci.states.V1.cd;
 
+import io.harness.cd.beans.outcomes.ServiceHookMetadata;
 import io.harness.pms.sdk.core.steps.io.PassThroughData;
 
+import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
@@ -22,6 +24,10 @@ public class TemplatingStepPassThroughData implements PassThroughData {
   // logKey for each post-hook stepId; computed once in startChainLinkAfterRbac so the correct
   // ambiance-based key is used both for UI registration and for K8 task submission.
   Map<String, String> postHookLogKeys;
+  /** Pre-hooks not yet submitted; consumed one-by-one across chain links. */
+  List<ServiceHookMetadata> pendingPreHooks;
+  /** Post-hooks not yet submitted; consumed one-by-one across chain links. */
+  List<ServiceHookMetadata> pendingPostHooks;
 
   public enum ChainLink { PRE_HOOKS, TEMPLATING, POST_HOOKS }
 }

@@ -26,26 +26,31 @@ import io.harness.delegate.beans.ErrorNotifyResponseData;
 import io.harness.delegate.beans.ci.vm.VmTaskExecutionResponse;
 import io.harness.delegate.task.stepstatus.StepExecutionStatus;
 import io.harness.delegate.task.stepstatus.StepStatusTaskResponseData;
+import io.harness.exception.InvalidRequestException;
 import io.harness.helper.SerializedResponseDataHelper;
 import io.harness.logging.CommandExecutionStatus;
 import io.harness.plancreator.stages.v1.EmptyStepParameters;
 import io.harness.pms.contracts.ambiance.Ambiance;
-import io.harness.pms.contracts.execution.AsyncExecutableResponse;
+import io.harness.pms.contracts.execution.AsyncChainExecutableResponse;
 import io.harness.pms.contracts.execution.Status;
 import io.harness.pms.contracts.steps.StepCategory;
 import io.harness.pms.contracts.steps.StepType;
 import io.harness.pms.execution.utils.AmbianceUtils;
 import io.harness.pms.sdk.core.data.OptionalSweepingOutput;
+import io.harness.pms.sdk.core.steps.io.PassThroughData;
 import io.harness.pms.sdk.core.steps.io.StepInputPackage;
 import io.harness.pms.sdk.core.steps.io.StepResponse;
 import io.harness.pms.yaml.ParameterField;
 import io.harness.runner.request.helpers.infra.InfraBasedHelper;
-import io.harness.steps.executable.AsyncExecutableWithRbac;
+import io.harness.serializer.recaster.RecastOrchestrationUtils;
+import io.harness.steps.executable.AsyncChainExecutableWithRbac;
+import io.harness.supplier.ThrowingSupplier;
 import io.harness.tasks.ResponseData;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.protobuf.ByteString;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -57,7 +62,7 @@ import lombok.extern.slf4j.Slf4j;
 @OwnedBy(HarnessTeam.CDP)
 @Slf4j
 @Singleton
-public class ServiceHooksStep implements AsyncExecutableWithRbac<EmptyStepParameters> {
+public class ServiceHooksStep implements AsyncChainExecutableWithRbac<EmptyStepParameters> {
   @Inject private ServiceStepSweepingOutputHelper serviceStepSweepingOutputHelper;
   @Inject private SerializedResponseDataHelper serializedResponseDataHelper;
   @Inject private ResponseHandlerUtils responseHandlerUtils;
@@ -80,39 +85,27 @@ public class ServiceHooksStep implements AsyncExecutableWithRbac<EmptyStepParame
   public void validateResources(Ambiance ambiance, EmptyStepParameters stepParameters) {}
 
   @Override
-  public AsyncExecutableResponse executeAsyncAfterRbac(
+  public AsyncChainExecutableResponse startChainLinkAfterRbac(
       Ambiance ambiance, EmptyStepParameters stepParameters, StepInputPackage inputPackage) {
-    List<String> callbackIds = new ArrayList<>();
-    List<String> logKeys = new ArrayList<>();
-    List<String> commandUnits = new ArrayList<>();
+    String nodeIdentifier = AmbianceUtils.obtainStepIdentifier(ambiance);
 
     OptionalSweepingOutput optionalOutput = fetchHooksSweepingOutputForPhase(ambiance);
     if (!optionalOutput.isFound()) {
-      return AsyncExecutableResponse.newBuilder()
-          .addAllLogKeys(logKeys)
-          .addAllUnits(commandUnits)
-          .addAllCallbackIds(callbackIds)
-          .build();
+      return AsyncChainExecutableResponse.newBuilder().setChainEnd(true).build();
     }
 
     ServiceHooksSweepingOutput hooksSweepingOutput = (ServiceHooksSweepingOutput) optionalOutput.getOutput();
     if (isEmpty(hooksSweepingOutput.getHookMetadataMap())) {
-      return AsyncExecutableResponse.newBuilder()
-          .addAllLogKeys(logKeys)
-          .addAllUnits(commandUnits)
-          .addAllCallbackIds(callbackIds)
-          .build();
+      return AsyncChainExecutableResponse.newBuilder().setChainEnd(true).build();
     }
 
-    ParameterField<Map<String, ParameterField<JsonNode>>> envVars = hooksSweepingOutput.getEnvVars();
-
-    String nodeIdentifier = AmbianceUtils.obtainStepIdentifier(ambiance);
+    boolean isPostPhase = POST_FETCH_FILES_HOOKS_NODE_ID.equals(nodeIdentifier);
     Map<String, String> runnerFiles = new HashMap<>();
-    List<String> materializedOverridePaths = new ArrayList<>();
-    if (POST_FETCH_FILES_HOOKS_NODE_ID.equals(nodeIdentifier)) {
+
+    if (isPostPhase) {
       String serviceType = resolveServiceType(ambiance);
       if (serviceHookTaskHelper.isNativeHelmWithSopsEnabled(ambiance, serviceType)) {
-        materializedOverridePaths = buildValuesOverrideRunnerFiles(ambiance, runnerFiles);
+        List<String> materializedOverridePaths = buildValuesOverrideRunnerFiles(ambiance, runnerFiles);
         if (isNotEmpty(materializedOverridePaths)) {
           serviceStepSweepingOutputHelper.saveServiceHooksOutputVarsSweepingOutput(ambiance,
               ServiceHooksOutputVarsSweepingOutput.builder()
@@ -122,21 +115,160 @@ public class ServiceHooksStep implements AsyncExecutableWithRbac<EmptyStepParame
       }
     }
 
-    for (Map.Entry<String, ServiceHookMetadata> entry : hooksSweepingOutput.getHookMetadataMap().entrySet()) {
-      ServiceHookMetadata hookMetadata = entry.getValue();
-      String callbackId = serviceHookTaskHelper.submitHookTask(ambiance, hookMetadata, envVars, runnerFiles);
-      if (isNotEmpty(callbackId)) {
-        callbackIds.add(callbackId);
-        logKeys.add(hookMetadata.getLogKey());
-        commandUnits.add(hookMetadata.getStepId());
+    List<ServiceHookMetadata> orderedHooks = new ArrayList<>(hooksSweepingOutput.getHookMetadataMap().values());
+    ParameterField<Map<String, ParameterField<JsonNode>>> envVars = hooksSweepingOutput.getEnvVars();
+
+    // Collect log keys and command units for all hooks upfront so all UI tabs register immediately
+    List<String> allLogKeys = new ArrayList<>();
+    List<String> allCommandUnits = new ArrayList<>();
+    for (ServiceHookMetadata hookMetadata : orderedHooks) {
+      allLogKeys.add(hookMetadata.getLogKey());
+      allCommandUnits.add(hookMetadata.getStepId());
+    }
+
+    ServiceHookMetadata firstHook = orderedHooks.get(0);
+    List<ServiceHookMetadata> remaining = new ArrayList<>(orderedHooks.subList(1, orderedHooks.size()));
+
+    String callbackId = serviceHookTaskHelper.submitHookTask(ambiance, firstHook, envVars, runnerFiles);
+
+    ServiceHooksStepPassThroughData ptd = ServiceHooksStepPassThroughData.builder()
+                                              .pendingHooks(remaining)
+                                              .postFetchFilesPhase(isPostPhase)
+                                              .runnerFiles(runnerFiles)
+                                              .capturedOverrideFiles(null)
+                                              .envVars(envVars)
+                                              .build();
+
+    AsyncChainExecutableResponse.Builder responseBuilder =
+        AsyncChainExecutableResponse.newBuilder()
+            .setChainEnd(false)
+            .addAllLogKeys(allLogKeys)
+            .addAllUnits(allCommandUnits)
+            .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)));
+    if (isNotEmpty(callbackId)) {
+      responseBuilder.addCallbackIds(callbackId);
+    }
+    return responseBuilder.build();
+  }
+
+  @Override
+  public AsyncChainExecutableResponse executeNextLinkWithSecurityContext(Ambiance ambiance,
+      EmptyStepParameters stepParameters, StepInputPackage inputPackage, PassThroughData passThroughData,
+      ThrowingSupplier<Map<String, ResponseData>> responseSupplier) throws Exception {
+    ServiceHooksStepPassThroughData ptd = (ServiceHooksStepPassThroughData) passThroughData;
+
+    Map<String, ResponseData> responseDataMap = responseSupplier.get();
+    String stepIdentifier = AmbianceUtils.obtainStepIdentifier(ambiance);
+    String updatedCapturedOverrideFiles = ptd.getCapturedOverrideFiles();
+
+    if (isNotEmpty(responseDataMap)) {
+      for (Map.Entry<String, ResponseData> entry : responseDataMap.entrySet()) {
+        ResponseData responseData = serializedResponseDataHelper.deserialize(entry.getValue());
+
+        if (responseData instanceof ErrorNotifyResponseData errorData) {
+          log.error("Received error response for hook step {}, error: {}", stepIdentifier, errorData.getErrorMessage());
+          throw new InvalidRequestException("Service hook execution failed: " + errorData.getErrorMessage());
+        }
+
+        if (responseData instanceof StepStatusTaskResponseData stepStatusData) {
+          if (stepStatusData.getStepStatus() != null
+              && !StepExecutionStatus.SUCCESS.equals(stepStatusData.getStepStatus().getStepExecutionStatus())) {
+            throw new InvalidRequestException("Service hook execution failed for step " + stepIdentifier);
+          }
+
+          if (ptd.isPostFetchFilesPhase() && stepStatusData.getStepStatus() != null
+              && isNotEmpty(stepStatusData.getStepStatus().getOutputV2())) {
+            String overrideValue = stepStatusData.getStepStatus()
+                                       .getOutputV2()
+                                       .stream()
+                                       .filter(o -> OVERRIDE_FILES_VAR.equals(o.getKey()))
+                                       .map(o -> o.getValue())
+                                       .filter(v -> isNotEmpty(v))
+                                       .findFirst()
+                                       .orElse(null);
+            if (isNotEmpty(overrideValue)) {
+              updatedCapturedOverrideFiles = overrideValue;
+            }
+          }
+        } else if (responseData instanceof VmTaskExecutionResponse vmResponse) {
+          if (CommandExecutionStatus.FAILURE.equals(vmResponse.getCommandExecutionStatus())) {
+            log.error(
+                "Service hook execution failed for step {}, error: {}", stepIdentifier, vmResponse.getErrorMessage());
+            throw new InvalidRequestException("Service hook execution failed: " + vmResponse.getErrorMessage());
+          }
+          if (ptd.isPostFetchFilesPhase() && isNotEmpty(vmResponse.getOutputVars())) {
+            String overrideValue = vmResponse.getOutputVars().get(OVERRIDE_FILES_VAR);
+            if (isNotEmpty(overrideValue)) {
+              updatedCapturedOverrideFiles = overrideValue;
+            }
+          }
+        }
       }
     }
 
-    return AsyncExecutableResponse.newBuilder()
-        .addAllLogKeys(logKeys)
-        .addAllUnits(commandUnits)
-        .addAllCallbackIds(callbackIds)
-        .build();
+    if (isEmpty(ptd.getPendingHooks())) {
+      ServiceHooksStepPassThroughData finalPtd = ServiceHooksStepPassThroughData.builder()
+                                                     .pendingHooks(new ArrayList<>())
+                                                     .postFetchFilesPhase(ptd.isPostFetchFilesPhase())
+                                                     .runnerFiles(ptd.getRunnerFiles())
+                                                     .capturedOverrideFiles(updatedCapturedOverrideFiles)
+                                                     .envVars(ptd.getEnvVars())
+                                                     .build();
+      return AsyncChainExecutableResponse.newBuilder()
+          .setChainEnd(true)
+          .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(finalPtd)))
+          .build();
+    }
+
+    ServiceHookMetadata nextHook = ptd.getPendingHooks().get(0);
+    List<ServiceHookMetadata> rest = new ArrayList<>(ptd.getPendingHooks().subList(1, ptd.getPendingHooks().size()));
+
+    String callbackId =
+        serviceHookTaskHelper.submitHookTask(ambiance, nextHook, ptd.getEnvVars(), ptd.getRunnerFiles());
+
+    ServiceHooksStepPassThroughData nextPtd = ServiceHooksStepPassThroughData.builder()
+                                                  .pendingHooks(rest)
+                                                  .postFetchFilesPhase(ptd.isPostFetchFilesPhase())
+                                                  .runnerFiles(ptd.getRunnerFiles())
+                                                  .capturedOverrideFiles(updatedCapturedOverrideFiles)
+                                                  .envVars(ptd.getEnvVars())
+                                                  .build();
+
+    AsyncChainExecutableResponse.Builder responseBuilder =
+        AsyncChainExecutableResponse.newBuilder().setChainEnd(false).setPassThroughData(
+            ByteString.copyFrom(RecastOrchestrationUtils.toBytes(nextPtd)));
+
+    if (isNotEmpty(callbackId)) {
+      responseBuilder.addCallbackIds(callbackId);
+    }
+    return responseBuilder.build();
+  }
+
+  @Override
+  public StepResponse finalizeExecutionWithSecurityContext(Ambiance ambiance, EmptyStepParameters stepParameters,
+      PassThroughData passThroughData, ThrowingSupplier<ResponseData> responseDataSupplier) throws Exception {
+    if (passThroughData == null) {
+      return StepResponse.builder().status(Status.SUCCEEDED).build();
+    }
+
+    ServiceHooksStepPassThroughData ptd = (ServiceHooksStepPassThroughData) passThroughData;
+
+    if (ptd.isPostFetchFilesPhase() && isNotEmpty(ptd.getCapturedOverrideFiles())) {
+      OptionalSweepingOutput existingOutput =
+          serviceStepSweepingOutputHelper.fetchServiceHooksOutputVarsSweepingOutput(ambiance);
+      List<String> existingMaterializedPaths = null;
+      if (existingOutput.isFound()) {
+        existingMaterializedPaths =
+            ((ServiceHooksOutputVarsSweepingOutput) existingOutput.getOutput()).getMaterializedOverridePaths();
+      }
+      serviceStepSweepingOutputHelper.saveServiceHooksOutputVarsSweepingOutput(ambiance,
+          ServiceHooksOutputVarsSweepingOutput.builder()
+              .overrideFiles(ptd.getCapturedOverrideFiles())
+              .materializedOverridePaths(existingMaterializedPaths)
+              .build());
+    }
+
+    return StepResponse.builder().status(Status.SUCCEEDED).build();
   }
 
   private OptionalSweepingOutput fetchHooksSweepingOutputForPhase(Ambiance ambiance) {
@@ -153,85 +285,6 @@ public class ServiceHooksStep implements AsyncExecutableWithRbac<EmptyStepParame
       return null;
     }
     return ((UnifiedServiceOutcome) serviceMetadataOpt.getOutput()).getType();
-  }
-
-  @Override
-  public StepResponse handleAsyncResponse(
-      Ambiance ambiance, EmptyStepParameters stepParameters, Map<String, ResponseData> responseDataMap) {
-    if (isEmpty(responseDataMap)) {
-      return StepResponse.builder().status(Status.SUCCEEDED).build();
-    }
-
-    for (Map.Entry<String, ResponseData> entry : responseDataMap.entrySet()) {
-      entry.setValue(serializedResponseDataHelper.deserialize(entry.getValue()));
-    }
-
-    String stepIdentifier = AmbianceUtils.obtainStepIdentifier(ambiance);
-    String capturedOverrideFiles = null;
-
-    for (Map.Entry<String, ResponseData> entry : responseDataMap.entrySet()) {
-      ResponseData responseData = entry.getValue();
-      if (responseData instanceof ErrorNotifyResponseData) {
-        log.error("Received error response for hook step {}, error: {}", stepIdentifier,
-            ((ErrorNotifyResponseData) responseData).getErrorMessage());
-        return responseHandlerUtils.getGenericFailedStepResponse(
-            ambiance, "Service hook execution failed", "Service hook execution failed");
-      }
-
-      if (responseData instanceof StepStatusTaskResponseData stepStatusTaskResponseData) {
-        if (stepStatusTaskResponseData.getStepStatus() != null
-            && !StepExecutionStatus.SUCCESS.equals(
-                stepStatusTaskResponseData.getStepStatus().getStepExecutionStatus())) {
-          return responseHandlerUtils.getGenericFailedStepResponse(
-              ambiance, "Service hook execution failed", "Service hook execution failed");
-        }
-
-        if (stepStatusTaskResponseData.getStepStatus() != null
-            && isNotEmpty(stepStatusTaskResponseData.getStepStatus().getOutputV2())) {
-          String overrideValue = stepStatusTaskResponseData.getStepStatus()
-                                     .getOutputV2()
-                                     .stream()
-                                     .filter(o -> OVERRIDE_FILES_VAR.equals(o.getKey()))
-                                     .map(o -> o.getValue())
-                                     .filter(v -> isNotEmpty(v))
-                                     .findFirst()
-                                     .orElse(null);
-          if (isNotEmpty(overrideValue)) {
-            capturedOverrideFiles = overrideValue;
-          }
-        }
-      } else if (responseData instanceof VmTaskExecutionResponse vmResponse) {
-        if (CommandExecutionStatus.FAILURE.equals(vmResponse.getCommandExecutionStatus())) {
-          log.error(
-              "Service hook execution failed for step {}, error: {}", stepIdentifier, vmResponse.getErrorMessage());
-          return responseHandlerUtils.getGenericFailedStepResponse(
-              ambiance, "Service hook execution failed", "Service hook execution failed");
-        }
-        if (isNotEmpty(vmResponse.getOutputVars())) {
-          String overrideValue = vmResponse.getOutputVars().get(OVERRIDE_FILES_VAR);
-          if (isNotEmpty(overrideValue)) {
-            capturedOverrideFiles = overrideValue;
-          }
-        }
-      }
-    }
-
-    if (isNotEmpty(capturedOverrideFiles)) {
-      OptionalSweepingOutput existingOutput =
-          serviceStepSweepingOutputHelper.fetchServiceHooksOutputVarsSweepingOutput(ambiance);
-      List<String> existingMaterializedPaths = null;
-      if (existingOutput.isFound()) {
-        existingMaterializedPaths =
-            ((ServiceHooksOutputVarsSweepingOutput) existingOutput.getOutput()).getMaterializedOverridePaths();
-      }
-      serviceStepSweepingOutputHelper.saveServiceHooksOutputVarsSweepingOutput(ambiance,
-          ServiceHooksOutputVarsSweepingOutput.builder()
-              .overrideFiles(capturedOverrideFiles)
-              .materializedOverridePaths(existingMaterializedPaths)
-              .build());
-    }
-
-    return StepResponse.builder().status(Status.SUCCEEDED).build();
   }
 
   @SuppressWarnings("unchecked")
