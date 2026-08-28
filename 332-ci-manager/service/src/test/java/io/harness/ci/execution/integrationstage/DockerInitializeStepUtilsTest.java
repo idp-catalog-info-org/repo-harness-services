@@ -97,7 +97,7 @@ public class DockerInitializeStepUtilsTest {
             .build();
     Ambiance ambiance = Ambiance.newBuilder().build();
     boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, false);
     assertThat(shouldEnableDockerSetup).isTrue();
   }
 
@@ -113,7 +113,7 @@ public class DockerInitializeStepUtilsTest {
             .build();
     Ambiance ambiance = Ambiance.newBuilder().build();
     boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, false);
     assertThat(shouldEnableDockerSetup).isFalse();
   }
 
@@ -131,7 +131,7 @@ public class DockerInitializeStepUtilsTest {
     when(ciExecutionConfigService.getContainerlessPluginNameForVM(eq(CIStepInfoType.GIT_CLONE), any()))
         .thenReturn(ContainerlessPluginConfig.builder().name("drone-git").build());
     boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, false);
     assertThat(shouldEnableDockerSetup).isFalse();
   }
 
@@ -149,7 +149,7 @@ public class DockerInitializeStepUtilsTest {
     when(ciExecutionConfigService.getContainerlessPluginNameForVM(eq(CIStepInfoType.GIT_CLONE), any()))
         .thenReturn(ContainerlessPluginConfig.builder().name("drone-git").build());
     boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, false);
     assertThat(shouldEnableDockerSetup).isFalse();
   }
 
@@ -167,7 +167,7 @@ public class DockerInitializeStepUtilsTest {
     when(featureFlagService.isEnabled(eq(FeatureName.PIPE_OPTIONAL_DOCKER_WITH_RUNNER_V1_STAGES), any()))
         .thenReturn(false);
     boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+        initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
     assertThat(shouldEnableDockerSetup).isTrue();
   }
 
@@ -191,7 +191,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isTrue();
     }
   }
@@ -214,7 +214,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isFalse();
     }
   }
@@ -237,7 +237,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isFalse();
     }
   }
@@ -263,7 +263,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isTrue();
     }
   }
@@ -286,7 +286,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isFalse();
     }
   }
@@ -312,7 +312,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isTrue();
     }
   }
@@ -335,7 +335,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isFalse();
     }
   }
@@ -358,7 +358,7 @@ public class DockerInitializeStepUtilsTest {
     try (MockedStatic<IntegrationStageUtils> mockedStatic = mockStatic(IntegrationStageUtils.class)) {
       mockedStatic.when(() -> IntegrationStageUtils.getStepNodeV1(any())).thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isTrue();
     }
   }
@@ -391,7 +391,7 @@ public class DockerInitializeStepUtilsTest {
           .thenReturn(mainStepNodeV1)
           .thenReturn(stepNodeV1);
       boolean shouldEnableDockerSetup = dockerInitializeStepUtils.shouldEnableDockerSetupOnUnifiedRunner(
-          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure);
+          initializeStepInfo, ambiance, ACCOUNT_ID, stageInfraDetails, infrastructure, true);
       assertThat(shouldEnableDockerSetup).isTrue();
     }
   }
