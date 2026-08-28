@@ -383,6 +383,18 @@ public class K8InitializeTaskParamsBuilder {
 
     ConnectorDetails harnessInternalImageConnector =
         harnessImageUtils.getHarnessImageConnectorDetailsForK8(ngAccess, infrastructure);
+    boolean isV1Yaml = HarnessYamlVersion.isV1(AmbianceUtils.getPipelineVersion(ambiance));
+
+    // Phase 1: stash the expression-valued (whose value is raw expression) env vars (currently PLUGIN_OVERRIDE_IMAGE,
+    // which holds a serverlessImageConfig expression) BEFORE resolveGitAppFunctor where "resolveGitAppFunctor" mutates
+    // initializeStepInfo with a gitApp-only containing RETURN_NULL_IF_UNRESOLVED evaluator which clobbers an unresolved
+    // JEXL <+serverlessImageConfig.get(...)> to "null". We cannot render yet: serviceOutput (which the functor needs)
+    // is only produced later by setModuleImplicitStepsConfigToInitInfo. Capturing the raw expression here lets it
+    // survive the clobber; Phase 2 (below) resolves it once serviceOutput exists.
+    List<EnvironmentVariablesResolver.EnvironmentVariableRef> envVarsToResolve = isV1Yaml
+        ? EnvironmentVariablesResolver.getEnvVarsToResolve(initializeStepInfo.getExecutionElementConfig())
+        : Collections.emptyList();
+
     Map<String, ConnectorDetails> githubApiTokenFunctorConnectors =
         k8InitializeTaskUtils.resolveGitAppFunctor(ngAccess, initializeStepInfo, ambiance);
 
@@ -394,7 +406,6 @@ public class K8InitializeTaskParamsBuilder {
             .executorService(executorService)
             .build();
 
-    boolean isV1Yaml = HarnessYamlVersion.isV1(AmbianceUtils.getPipelineVersion(ambiance));
     if (isV1Yaml) {
       setModuleImplicitStepsConfigToInitInfo(
           initializeStepInfo, ambiance, accountId, initializeStepInfo.getModulesMetadata());
@@ -402,6 +413,12 @@ public class K8InitializeTaskParamsBuilder {
       // V1: nullify unresolved template inputs before container env is built
       UnresolvedExpressionNullifier.processInitializeStepInfo(
           initializeStepInfo.getExecutionElementConfig(), initializeStepInfo.getModuleImplicitStepsConfig());
+
+      // Phase 2: serviceOutput is now saved, so the stashed env var expressions can finally resolve to a concrete
+      // value. This writes the resolved value back onto the same env node, repairing any JEXL value that
+      // resolveGitAppFunctor clobbered to "null".
+      EnvironmentVariablesResolver.resolveEnvVars(
+          envVarsToResolve, raw -> cdStepsExpressionResolver.renderValue(ambiance, raw, true));
     }
 
     List<SecretVariableDetails> resolveSecretVariableDetails =

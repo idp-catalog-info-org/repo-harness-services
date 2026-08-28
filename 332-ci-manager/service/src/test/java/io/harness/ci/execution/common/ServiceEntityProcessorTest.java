@@ -1851,6 +1851,60 @@ public class ServiceEntityProcessorTest {
     }
   }
 
+  // ========== processServicePluginInfo: exposes pluginInfo under serviceOutput root ==========
+
+  @Test
+  @Owner(developers = SHOBHIT_SINGH)
+  @Category(UnitTests.class)
+  public void testProcessServicePluginInfo_nullSpecMap_returnsEmpty() {
+    Map<String, Object> result = serviceEntityProcessor.processServicePluginInfo(null);
+
+    assertThat(result).isNotNull();
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = SHOBHIT_SINGH)
+  @Category(UnitTests.class)
+  public void testProcessServicePluginInfo_noPluginInfoKey_returnsEmpty() {
+    Map<String, Object> specMap = new HashMap<>();
+    specMap.put("artifacts", new HashMap<>());
+
+    Map<String, Object> result = serviceEntityProcessor.processServicePluginInfo(specMap);
+
+    assertThat(result).isNotNull();
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  @Owner(developers = SHOBHIT_SINGH)
+  @Category(UnitTests.class)
+  public void testProcessServicePluginInfo_withPluginInfo_returnsValues() {
+    Map<String, Object> pluginInfo = new HashMap<>();
+    pluginInfo.put("runtimeLanguage", "python3.12");
+    pluginInfo.put("serverlessVersion", "3.39.0");
+    Map<String, Object> specMap = new HashMap<>();
+    specMap.put("pluginInfo", pluginInfo);
+
+    Map<String, Object> result = serviceEntityProcessor.processServicePluginInfo(specMap);
+
+    assertThat(result).containsEntry("runtimeLanguage", "python3.12");
+    assertThat(result).containsEntry("serverlessVersion", "3.39.0");
+  }
+
+  @Test
+  @Owner(developers = SHOBHIT_SINGH)
+  @Category(UnitTests.class)
+  public void testProcessServicePluginInfo_pluginInfoNotMap_returnsEmpty() {
+    Map<String, Object> specMap = new HashMap<>();
+    specMap.put("pluginInfo", "python3.12");
+
+    Map<String, Object> result = serviceEntityProcessor.processServicePluginInfo(specMap);
+
+    assertThat(result).isNotNull();
+    assertThat(result).isEmpty();
+  }
+
   private ServiceConfig toServiceConfig(String serviceYaml) {
     try {
       return YamlUtils.read(serviceYaml, ServiceConfig.class);
