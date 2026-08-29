@@ -10,6 +10,7 @@ package io.harness.engine.interrupts.handlers;
 import static io.harness.data.structure.UUIDGenerator.generateUuid;
 import static io.harness.pms.contracts.execution.Status.DISCONTINUING;
 import static io.harness.pms.contracts.execution.Status.RUNNING;
+import static io.harness.rule.OwnerRule.DHEERAJ;
 import static io.harness.rule.OwnerRule.SHIVAM;
 import static io.harness.rule.OwnerRule.UTKARSH_CHOUBEY;
 
@@ -20,6 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.harness.OrchestrationTestBase;
@@ -38,9 +41,14 @@ import io.harness.execution.PlanExecution.PlanExecutionKeys;
 import io.harness.interrupts.Interrupt;
 import io.harness.interrupts.Interrupt.State;
 import io.harness.plan.PlanNode;
+import io.harness.pms.contracts.advisers.AdviseType;
 import io.harness.pms.contracts.ambiance.Ambiance;
+import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.interrupts.AdviserIssuer;
 import io.harness.pms.contracts.interrupts.InterruptConfig;
 import io.harness.pms.contracts.interrupts.InterruptType;
+import io.harness.pms.contracts.interrupts.IssuedBy;
+import io.harness.pms.contracts.interrupts.ManualIssuer;
 import io.harness.pms.contracts.steps.StepCategory;
 import io.harness.pms.contracts.steps.StepType;
 import io.harness.pms.execution.utils.NodeProjectionUtils;
@@ -96,6 +104,80 @@ public class UserMarkedFailAllInterruptHandlerTest extends OrchestrationTestBase
     assertThat(handledInterrupt).isNotNull();
     assertThat(handledInterrupt.getUuid()).isEqualTo(interruptUuid);
     assertThat(handledInterrupt.getState()).isEqualTo(State.PROCESSED_SUCCESSFULLY);
+  }
+
+  @Test
+  @Owner(developers = DHEERAJ)
+  @Category(UnitTests.class)
+  public void shouldNotForceFailPlanWhenAdviserIssuedInterruptFindsNoLeaves() {
+    // An adviser-issued failAll interrupt (markAsSuccess/markAsFailure with failAll) runs while the strategy is
+    // still in flight, so no interruptible leaves is expected. The plan must NOT be force-stamped FAILED here,
+    // otherwise the node the strategy queues next is blocked forever by the pre-node-start interrupt check.
+    String planExecutionId = generateUuid();
+    String interruptUuid = generateUuid();
+    Interrupt interrupt =
+        Interrupt.builder()
+            .uuid(interruptUuid)
+            .type(InterruptType.USER_MARKED_FAIL_ALL)
+            .interruptConfig(
+                InterruptConfig.newBuilder()
+                    .setIssuedBy(IssuedBy.newBuilder()
+                                     .setAdviserIssuer(
+                                         AdviserIssuer.newBuilder().setAdviserType(AdviseType.MARK_SUCCESS).build())
+                                     .build())
+                    .build())
+            .planExecutionId(planExecutionId)
+            .state(State.REGISTERED)
+            .build();
+
+    mongoTemplate.save(interrupt);
+    when(nodeExecutionService.markAllLeavesAndQueuedNodesDiscontinuing(
+             planExecutionId, StatusUtils.userMarkedFailureStatuses()))
+        .thenReturn(0L);
+    when(planExecutionService.getWithFieldsIncluded(
+             planExecutionId, Set.of(PlanExecutionKeys.uuid, PlanExecutionKeys.status)))
+        .thenReturn(PlanExecution.builder().uuid(planExecutionId).status(RUNNING).build());
+
+    Interrupt handledInterrupt = userMarkedFailAllInterruptHandler.handleInterrupt(interrupt);
+    assertThat(handledInterrupt).isNotNull();
+    assertThat(handledInterrupt.getState()).isEqualTo(State.PROCESSED_SUCCESSFULLY);
+    verify(planExecutionService, never()).updateStatus(anyString(), any(Status.class));
+  }
+
+  @Test
+  @Owner(developers = DHEERAJ)
+  @Category(UnitTests.class)
+  public void shouldForceFailPlanWhenManuallyIssuedInterruptFindsNoLeaves() {
+    // A user manually marking a stuck execution as failed keeps the existing behaviour: with no running leaf
+    // node the plan is stamped FAILED directly. See PIPE-31334.
+    String planExecutionId = generateUuid();
+    String interruptUuid = generateUuid();
+    Interrupt interrupt =
+        Interrupt.builder()
+            .uuid(interruptUuid)
+            .type(InterruptType.USER_MARKED_FAIL_ALL)
+            .interruptConfig(
+                InterruptConfig.newBuilder()
+                    .setIssuedBy(IssuedBy.newBuilder()
+                                     .setManualIssuer(ManualIssuer.newBuilder().setEmailId("test@harness.io").build())
+                                     .build())
+                    .build())
+            .planExecutionId(planExecutionId)
+            .state(State.REGISTERED)
+            .build();
+
+    mongoTemplate.save(interrupt);
+    when(nodeExecutionService.markAllLeavesAndQueuedNodesDiscontinuing(
+             planExecutionId, StatusUtils.userMarkedFailureStatuses()))
+        .thenReturn(0L);
+    when(planExecutionService.getWithFieldsIncluded(
+             planExecutionId, Set.of(PlanExecutionKeys.uuid, PlanExecutionKeys.status)))
+        .thenReturn(PlanExecution.builder().uuid(planExecutionId).status(RUNNING).build());
+
+    Interrupt handledInterrupt = userMarkedFailAllInterruptHandler.handleInterrupt(interrupt);
+    assertThat(handledInterrupt).isNotNull();
+    assertThat(handledInterrupt.getState()).isEqualTo(State.PROCESSED_SUCCESSFULLY);
+    verify(planExecutionService).updateStatus(planExecutionId, Status.FAILED);
   }
 
   @Test
