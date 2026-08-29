@@ -282,10 +282,10 @@ ciExecutionServiceConfig:
       - "kmpySmUISimoRrJL6NL73w:1:1"
   pvcDefaultStorageSize: 25600
   delegateServiceEndpointVariableValue: "delegate-service:8080"
-  addonImage: harness/ci-addon:1.18.31
-  liteEngineImage: harness/ci-lite-engine:1.18.31
-  addonImageRootless: harness/ci-addon:rootless-1.18.31
-  liteEngineImageRootless: harness/ci-lite-engine:rootless-1.18.31
+  addonImage: harness/ci-addon:1.18.32
+  liteEngineImage: harness/ci-lite-engine:1.18.32
+  addonImageRootless: harness/ci-addon:rootless-1.18.32
+  liteEngineImageRootless: harness/ci-lite-engine:rootless-1.18.32
   isLocal: ${CI_IS_LOCAL_DEVELOPMENT:-false}
   remoteDebugTimeout: 3600
   tmateEndpoint: ${TMATE_ENDPOINT:-"ssh.harness.io"}
