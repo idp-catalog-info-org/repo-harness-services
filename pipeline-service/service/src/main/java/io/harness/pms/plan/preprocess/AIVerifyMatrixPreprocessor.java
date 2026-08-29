@@ -40,6 +40,7 @@ public class AIVerifyMatrixPreprocessor implements PlanCreationYamlPreprocessor 
    * dropped. ng-manager resolves the active slice via {@code healthSourceInputsByRef[activeRef]}.
    */
   static final String HEALTH_SOURCE_INPUTS_BY_REF = "healthSourceInputsByRef";
+  static final String HEALTH_SOURCE_FANOUT_SIZE = "healthSourceFanoutSize";
   static final String HEALTH_SOURCE_INPUTS = "healthSourceInputs";
 
   @Override
@@ -183,6 +184,7 @@ public class AIVerifyMatrixPreprocessor implements PlanCreationYamlPreprocessor 
     stepNode.set("strategy", strategyNode);
 
     preserveHealthSourceInputsByRef((ObjectNode) specNode, specNode.path("healthSources"));
+    ((ObjectNode) specNode).put(HEALTH_SOURCE_FANOUT_SIZE, hsAxisNode.size());
 
     ObjectNode matrixCarrierEntry = YamlUtils.getMapper().createObjectNode();
     matrixCarrierEntry.put(HEALTH_SOURCE_REF, MATRIX_EXPRESSION);
