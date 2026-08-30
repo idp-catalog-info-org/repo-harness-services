@@ -55,6 +55,7 @@ import io.harness.idp.configmanager.repositories.AppConfigRepository;
 import io.harness.idp.configmanager.repositories.PluginInfoRepository;
 import io.harness.idp.configmanager.utils.ConfigManagerUtils;
 import io.harness.idp.configmanager.utils.ConfigType;
+import io.harness.idp.configmanager.utils.ProxyTargetValidator;
 import io.harness.idp.envvariable.service.BackstageEnvVariableService;
 import io.harness.idp.gitintegration.utils.GitIntegrationUtils;
 import io.harness.idp.k8s.client.K8sClient;
@@ -499,6 +500,8 @@ public class ConfigManagerServiceImpl implements ConfigManagerService {
 
   @Override
   public void validateProxyEndpointsForPlugin(AppConfig appConfig, String accountIdentifier, ConfigType configType) {
+    // Applies to every config type: any plugin that declares proxy.endpoints reaches the same Backstage egress.
+    ProxyTargetValidator.validateProxyTargets(appConfig.getConfigs());
     if (ConfigType.PLUGIN.equals(configType) && appConfig.getConfigs() != null) {
       Set<String> appConfigProxyEndpoints = getProxyEndpoints(appConfig.getConfigs());
       if (!appConfigProxyEndpoints.isEmpty()) {
