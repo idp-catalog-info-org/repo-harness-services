@@ -1436,6 +1436,93 @@
                 "assertion" : {
                   "type" : "string"
                 },
+                "authentication" : {
+                  "type" : "object",
+                  "properties" : {
+                    "type" : {
+                      "type" : "string",
+                      "enum" : [ "None", "Basic", "BearerToken", "ApiKey" ],
+                      "default" : "None"
+                    },
+                    "spec" : {
+                      "type" : "object",
+                      "properties" : {
+                        "username" : {
+                          "type" : "string"
+                        },
+                        "password" : {
+                          "type" : "string"
+                        },
+                        "token" : {
+                          "type" : "string"
+                        },
+                        "keyName" : {
+                          "type" : "string"
+                        },
+                        "keyValue" : {
+                          "type" : "string"
+                        },
+                        "addTo" : {
+                          "type" : "string",
+                          "enum" : [ "Header", "QueryParameter" ],
+                          "default" : "Header"
+                        }
+                      }
+                    }
+                  },
+                  "allOf" : [ {
+                    "if" : {
+                      "properties" : {
+                        "type" : {
+                          "const" : "Basic"
+                        }
+                      },
+                      "required" : [ "type" ]
+                    },
+                    "then" : {
+                      "required" : [ "spec" ],
+                      "properties" : {
+                        "spec" : {
+                          "required" : [ "username", "password" ]
+                        }
+                      }
+                    }
+                  }, {
+                    "if" : {
+                      "properties" : {
+                        "type" : {
+                          "const" : "BearerToken"
+                        }
+                      },
+                      "required" : [ "type" ]
+                    },
+                    "then" : {
+                      "required" : [ "spec" ],
+                      "properties" : {
+                        "spec" : {
+                          "required" : [ "token" ]
+                        }
+                      }
+                    }
+                  }, {
+                    "if" : {
+                      "properties" : {
+                        "type" : {
+                          "const" : "ApiKey"
+                        }
+                      },
+                      "required" : [ "type" ]
+                    },
+                    "then" : {
+                      "required" : [ "spec" ],
+                      "properties" : {
+                        "spec" : {
+                          "required" : [ "keyName", "keyValue" ]
+                        }
+                      }
+                    }
+                  } ]
+                },
                 "delegateSelectors" : {
                   "oneOf" : [ {
                     "type" : "array",
@@ -1501,6 +1588,93 @@
             "properties" : {
               "assertion" : {
                 "type" : "string"
+              },
+              "authentication" : {
+                "type" : "object",
+                "properties" : {
+                  "type" : {
+                    "type" : "string",
+                    "enum" : [ "None", "Basic", "BearerToken", "ApiKey" ],
+                    "default" : "None"
+                  },
+                  "spec" : {
+                    "type" : "object",
+                    "properties" : {
+                      "username" : {
+                        "type" : "string"
+                      },
+                      "password" : {
+                        "type" : "string"
+                      },
+                      "token" : {
+                        "type" : "string"
+                      },
+                      "keyName" : {
+                        "type" : "string"
+                      },
+                      "keyValue" : {
+                        "type" : "string"
+                      },
+                      "addTo" : {
+                        "type" : "string",
+                        "enum" : [ "Header", "QueryParameter" ],
+                        "default" : "Header"
+                      }
+                    }
+                  }
+                },
+                "allOf" : [ {
+                  "if" : {
+                    "properties" : {
+                      "type" : {
+                        "const" : "Basic"
+                      }
+                    },
+                    "required" : [ "type" ]
+                  },
+                  "then" : {
+                    "required" : [ "spec" ],
+                    "properties" : {
+                      "spec" : {
+                        "required" : [ "username", "password" ]
+                      }
+                    }
+                  }
+                }, {
+                  "if" : {
+                    "properties" : {
+                      "type" : {
+                        "const" : "BearerToken"
+                      }
+                    },
+                    "required" : [ "type" ]
+                  },
+                  "then" : {
+                    "required" : [ "spec" ],
+                    "properties" : {
+                      "spec" : {
+                        "required" : [ "token" ]
+                      }
+                    }
+                  }
+                }, {
+                  "if" : {
+                    "properties" : {
+                      "type" : {
+                        "const" : "ApiKey"
+                      }
+                    },
+                    "required" : [ "type" ]
+                  },
+                  "then" : {
+                    "required" : [ "spec" ],
+                    "properties" : {
+                      "spec" : {
+                        "required" : [ "keyName", "keyValue" ]
+                      }
+                    }
+                  }
+                } ]
               },
               "delegateSelectors" : {
                 "oneOf" : [ {
@@ -12658,6 +12832,21 @@
                   }
                 }
               }
+            }, {
+              "if" : {
+                "properties" : {
+                  "type" : {
+                    "const" : "ClaudeCodeSecurity"
+                  }
+                }
+              },
+              "then" : {
+                "properties" : {
+                  "spec" : {
+                    "$ref" : "#/definitions/pipeline/steps/common/ClaudeCodeSecurityStepInfo"
+                  }
+                }
+              }
             } ]
           },
           "AnchoreStepInfo" : {
@@ -22216,6 +22405,14 @@
                 "connectorRef" : {
                   "type" : "string"
                 },
+                "llmConnectorRef" : {
+                  "description" : "Harness LLM connector reference for Codex authentication (OpenAI or Anthropic)",
+                  "oneOf" : [ {
+                    "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                  }, {
+                    "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                  } ]
+                },
                 "imageTag" : {
                   "type" : "string"
                 },
@@ -22283,6 +22480,9 @@
                 },
                 "target" : {
                   "$ref" : "#/definitions/pipeline/steps/common/STOYamlTarget"
+                },
+                "tool" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlOpenAiToolData"
                 }
               }
             } ],
@@ -22311,6 +22511,14 @@
               },
               "connectorRef" : {
                 "type" : "string"
+              },
+              "llmConnectorRef" : {
+                "description" : "Harness LLM connector reference for Codex authentication (OpenAI or Anthropic)",
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                }, {
+                  "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                } ]
               },
               "imageTag" : {
                 "type" : "string"
@@ -22380,10 +22588,26 @@
               "target" : {
                 "$ref" : "#/definitions/pipeline/steps/common/STOYamlTarget"
               },
+              "tool" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlOpenAiToolData"
+              },
               "description" : {
                 "desc" : "This is the description for OpenAiStepInfo"
               }
             }
+          },
+          "STOYamlOpenAiToolData" : {
+            "title" : "STOYamlOpenAiToolData",
+            "type" : "object",
+            "properties" : {
+              "model" : {
+                "type" : "string"
+              },
+              "description" : {
+                "desc" : "This is the description for STOYamlOpenAiToolData"
+              }
+            },
+            "$schema" : "http://json-schema.org/draft-07/schema#"
           },
           "MythosAgentStepInfo" : {
             "title" : "MythosAgentStepInfo",
@@ -22408,6 +22632,14 @@
                 },
                 "connectorRef" : {
                   "type" : "string"
+                },
+                "llmConnectorRef" : {
+                  "description" : "Harness LLM connector reference for Mythos Agent authentication (OpenAI or Anthropic)",
+                  "oneOf" : [ {
+                    "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                  }, {
+                    "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                  } ]
                 },
                 "imageTag" : {
                   "type" : "string"
@@ -22502,6 +22734,14 @@
               "connectorRef" : {
                 "type" : "string"
               },
+              "llmConnectorRef" : {
+                "description" : "Harness LLM connector reference for Mythos Agent authentication (OpenAI or Anthropic)",
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                }, {
+                  "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                } ]
+              },
               "imageTag" : {
                 "type" : "string"
               },
@@ -22590,6 +22830,240 @@
               },
               "description" : {
                 "desc" : "This is the description for STOYamlMythosAgentToolData"
+              }
+            },
+            "$schema" : "http://json-schema.org/draft-07/schema#"
+          },
+          "ClaudeCodeSecurityStepInfo" : {
+            "title" : "ClaudeCodeSecurityStepInfo",
+            "allOf" : [ {
+              "$ref" : "#/definitions/pipeline/common/StepSpecType"
+            }, {
+              "type" : "object",
+              "required" : [ "config", "mode", "target" ],
+              "properties" : {
+                "advanced" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlAdvancedSettings"
+                },
+                "auth" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlAuth"
+                },
+                "baseImageConnectorRefs" : {
+                  "$ref" : "#/definitions/pipeline/steps/ci/ParameterFieldListString"
+                },
+                "config" : {
+                  "oneOf" : [ {
+                    "type" : "string",
+                    "enum" : [ "pr_scan" ]
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
+                "connectorRef" : {
+                  "type" : "string"
+                },
+                "llmConnectorRef" : {
+                  "description" : "Harness LLM connector reference for Claude Code Security authentication (Anthropic)",
+                  "oneOf" : [ {
+                    "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                  }, {
+                    "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                  } ]
+                },
+                "imageTag" : {
+                  "type" : "string"
+                },
+                "imagePullPolicy" : {
+                  "oneOf" : [ {
+                    "type" : "string",
+                    "enum" : [ "Always", "Never", "IfNotPresent" ]
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
+                "ingestion" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlIngestion"
+                },
+                "mode" : {
+                  "oneOf" : [ {
+                    "type" : "string",
+                    "enum" : [ "ingestion", "orchestration" ]
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
+                "outputVariables" : {
+                  "oneOf" : [ {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/definitions/pipeline/common/OutputNGVariable"
+                    }
+                  }, {
+                    "type" : "string",
+                    "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
+                    "minLength" : 1
+                  } ]
+                },
+                "privileged" : {
+                  "oneOf" : [ {
+                    "type" : "boolean"
+                  }, {
+                    "type" : "string",
+                    "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
+                    "minLength" : 1
+                  } ]
+                },
+                "resources" : {
+                  "$ref" : "#/definitions/pipeline/common/ContainerResource"
+                },
+                "runAsUser" : {
+                  "oneOf" : [ {
+                    "type" : "integer",
+                    "format" : "int32"
+                  }, {
+                    "type" : "string"
+                  } ]
+                },
+                "settings" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/definitions/pipeline/common/ParameterFieldMapStringJsonNode"
+                  }, {
+                    "type" : "string"
+                  } ]
+                },
+                "target" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlTarget"
+                },
+                "tool" : {
+                  "$ref" : "#/definitions/pipeline/steps/common/STOYamlClaudeCodeSecurityToolData"
+                }
+              }
+            } ],
+            "$schema" : "http://json-schema.org/draft-07/schema#",
+            "type" : "object",
+            "required" : [ "config", "mode", "target" ],
+            "properties" : {
+              "advanced" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlAdvancedSettings"
+              },
+              "auth" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlAuth"
+              },
+              "baseImageConnectorRefs" : {
+                "$ref" : "#/definitions/pipeline/steps/ci/ParameterFieldListString"
+              },
+              "config" : {
+                "oneOf" : [ {
+                  "type" : "string",
+                  "enum" : [ "pr_scan" ]
+                }, {
+                  "type" : "string",
+                  "pattern" : "(<\\+.+>.*)",
+                  "minLength" : 1
+                } ]
+              },
+              "connectorRef" : {
+                "type" : "string"
+              },
+              "llmConnectorRef" : {
+                "description" : "Harness LLM connector reference for Claude Code Security authentication (Anthropic)",
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/steps/common/string-without-jexl"
+                }, {
+                  "$ref" : "#/definitions/pipeline/steps/common/common-jexl"
+                } ]
+              },
+              "imageTag" : {
+                "type" : "string"
+              },
+              "imagePullPolicy" : {
+                "oneOf" : [ {
+                  "type" : "string",
+                  "enum" : [ "Always", "Never", "IfNotPresent" ]
+                }, {
+                  "type" : "string",
+                  "pattern" : "(<\\+.+>.*)",
+                  "minLength" : 1
+                } ]
+              },
+              "ingestion" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlIngestion"
+              },
+              "mode" : {
+                "oneOf" : [ {
+                  "type" : "string",
+                  "enum" : [ "ingestion", "orchestration" ]
+                }, {
+                  "type" : "string",
+                  "pattern" : "(<\\+.+>.*)",
+                  "minLength" : 1
+                } ]
+              },
+              "outputVariables" : {
+                "oneOf" : [ {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/definitions/pipeline/common/OutputNGVariable"
+                  }
+                }, {
+                  "type" : "string",
+                  "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
+                  "minLength" : 1
+                } ]
+              },
+              "privileged" : {
+                "oneOf" : [ {
+                  "type" : "boolean"
+                }, {
+                  "type" : "string",
+                  "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
+                  "minLength" : 1
+                } ]
+              },
+              "resources" : {
+                "$ref" : "#/definitions/pipeline/common/ContainerResource"
+              },
+              "runAsUser" : {
+                "oneOf" : [ {
+                  "type" : "integer",
+                  "format" : "int32"
+                }, {
+                  "type" : "string"
+                } ]
+              },
+              "settings" : {
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/common/ParameterFieldMapStringJsonNode"
+                }, {
+                  "type" : "string"
+                } ]
+              },
+              "target" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlTarget"
+              },
+              "tool" : {
+                "$ref" : "#/definitions/pipeline/steps/common/STOYamlClaudeCodeSecurityToolData"
+              },
+              "description" : {
+                "desc" : "This is the description for ClaudeCodeSecurityStepInfo"
+              }
+            }
+          },
+          "STOYamlClaudeCodeSecurityToolData" : {
+            "title" : "STOYamlClaudeCodeSecurityToolData",
+            "type" : "object",
+            "properties" : {
+              "model" : {
+                "type" : "string"
+              },
+              "description" : {
+                "desc" : "This is the description for STOYamlClaudeCodeSecurityToolData"
               }
             },
             "$schema" : "http://json-schema.org/draft-07/schema#"
@@ -33602,6 +34076,83 @@
                 "properties" : {
                   "spec" : {
                     "$ref" : "#/definitions/pipeline/steps/common/MythosAgentStepInfo"
+                  }
+                }
+              }
+            } ]
+          },
+          "ClaudeCodeSecurityNode" : {
+            "title" : "ClaudeCodeSecurityNode",
+            "type" : "object",
+            "required" : [ "identifier", "name", "spec", "type" ],
+            "properties" : {
+              "description" : {
+                "type" : "string",
+                "desc" : "This is the description for ClaudeCodeSecurityNode"
+              },
+              "enforce" : {
+                "$ref" : "#/definitions/pipeline/common/PolicyConfig"
+              },
+              "failureStrategies" : {
+                "oneOf" : [ {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/definitions/pipeline/common/FailureStrategyConfig"
+                  }
+                }, {
+                  "type" : "string",
+                  "pattern" : "^<\\+input>$",
+                  "minLength" : 1
+                } ]
+              },
+              "identifier" : {
+                "type" : "string",
+                "pattern" : "^[a-zA-Z_][0-9a-zA-Z_]{0,127}$"
+              },
+              "name" : {
+                "type" : "string",
+                "pattern" : "^[a-zA-Z_0-9-.][-0-9a-zA-Z_\\s.]{0,127}$"
+              },
+              "strategy" : {
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/common/StrategyConfig"
+                }, {
+                  "type" : "string",
+                  "pattern" : "^<\\+input>$",
+                  "minLength" : 1
+                } ]
+              },
+              "timeout" : {
+                "type" : "string",
+                "pattern" : "^(([1-9])+\\d+[s])|(((([1-9])+\\d*[mhwd])+([\\s]?\\d+[smhwd])*)|(.*<\\+.*>(?!.*\\.executionInput\\(\\)).*)|(^$))$"
+              },
+              "type" : {
+                "type" : "string",
+                "enum" : [ "ClaudeCodeSecurity" ]
+              },
+              "when" : {
+                "oneOf" : [ {
+                  "$ref" : "#/definitions/pipeline/common/StepWhenCondition"
+                }, {
+                  "type" : "string",
+                  "pattern" : "^<\\+input>$",
+                  "minLength" : 1
+                } ]
+              }
+            },
+            "$schema" : "http://json-schema.org/draft-07/schema#",
+            "allOf" : [ {
+              "if" : {
+                "properties" : {
+                  "type" : {
+                    "const" : "ClaudeCodeSecurity"
+                  }
+                }
+              },
+              "then" : {
+                "properties" : {
+                  "spec" : {
+                    "$ref" : "#/definitions/pipeline/steps/common/ClaudeCodeSecurityStepInfo"
                   }
                 }
               }
@@ -51396,28 +51947,13 @@
             "properties" : {
               "provider" : {
                 "type" : "string",
-                "enum" : [ "smi", "istio" ]
+                "enum" : [ "istio" ]
               },
               "spec" : {
                 "type" : "object"
               }
             },
             "allOf" : [ {
-              "if" : {
-                "properties" : {
-                  "provider" : {
-                    "const" : "smi"
-                  }
-                }
-              },
-              "then" : {
-                "properties" : {
-                  "spec" : {
-                    "$ref" : "#/definitions/pipeline/steps/cd/SMIProviderSpec"
-                  }
-                }
-              }
-            }, {
               "if" : {
                 "properties" : {
                   "provider" : {
@@ -51434,15 +51970,49 @@
               }
             } ]
           },
-          "SMIProviderSpec" : {
-            "title" : "SMIProviderSpec",
+          "IstioProviderSpec" : {
+            "title" : "IstioProviderSpec",
             "allOf" : [ {
               "$ref" : "#/definitions/pipeline/steps/cd/K8sTrafficRoutingProviderBaseSpec"
             }, {
               "type" : "object",
               "properties" : {
-                "rootService" : {
-                  "type" : "string"
+                "gateways" : {
+                  "oneOf" : [ {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string",
+                      "minLength" : 1
+                    },
+                    "minItems" : 1
+                  }, {
+                    "type" : "string",
+                    "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
+                    "minLength" : 1
+                  } ]
+                },
+                "hosts" : {
+                  "oneOf" : [ {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string",
+                      "minLength" : 1
+                    },
+                    "minItems" : 1
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
+                "delegateService" : {
+                  "oneOf" : [ {
+                    "type" : "boolean"
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
                 }
               }
             } ],
@@ -51837,54 +52407,6 @@
               "$schema" : "http://json-schema.org/draft-07/schema#"
             } ]
           },
-          "IstioProviderSpec" : {
-            "title" : "IstioProviderSpec",
-            "allOf" : [ {
-              "$ref" : "#/definitions/pipeline/steps/cd/K8sTrafficRoutingProviderBaseSpec"
-            }, {
-              "type" : "object",
-              "properties" : {
-                "gateways" : {
-                  "oneOf" : [ {
-                    "type" : "array",
-                    "items" : {
-                      "type" : "string",
-                      "minLength" : 1
-                    },
-                    "minItems" : 1
-                  }, {
-                    "type" : "string",
-                    "pattern" : "^<\\+input>((\\.)((executionInput\\(\\))|(allowedValues|selectOneFrom|selectManyFrom|default|regex)\\(.+?\\)))*$",
-                    "minLength" : 1
-                  } ]
-                },
-                "hosts" : {
-                  "oneOf" : [ {
-                    "type" : "array",
-                    "items" : {
-                      "type" : "string",
-                      "minLength" : 1
-                    },
-                    "minItems" : 1
-                  }, {
-                    "type" : "string",
-                    "pattern" : "(<\\+.+>.*)",
-                    "minLength" : 1
-                  } ]
-                },
-                "delegateService" : {
-                  "oneOf" : [ {
-                    "type" : "boolean"
-                  }, {
-                    "type" : "string",
-                    "pattern" : "(<\\+.+>.*)",
-                    "minLength" : 1
-                  } ]
-                }
-              }
-            } ],
-            "$schema" : "http://json-schema.org/draft-07/schema#"
-          },
           "TerraformRollbackStepNode" : {
             "title" : "TerraformRollbackStepNode",
             "type" : "object",
@@ -52152,6 +52674,18 @@
                 "prodListenerRuleArn" : {
                   "type" : "string"
                 },
+                "prodListenerRuleConfigs" : {
+                  "oneOf" : [ {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/definitions/pipeline/steps/cd/ProdListenerRuleConfig"
+                    }
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
                 "sameAsAlreadyRunningInstances" : {
                   "oneOf" : [ {
                     "type" : "boolean"
@@ -52218,6 +52752,18 @@
               "prodListenerRuleArn" : {
                 "type" : "string"
               },
+              "prodListenerRuleConfigs" : {
+                "oneOf" : [ {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/definitions/pipeline/steps/cd/ProdListenerRuleConfig"
+                  }
+                }, {
+                  "type" : "string",
+                  "pattern" : "(<\\+.+>.*)",
+                  "minLength" : 1
+                } ]
+              },
               "sameAsAlreadyRunningInstances" : {
                 "oneOf" : [ {
                   "type" : "boolean"
@@ -52252,6 +52798,25 @@
                 "desc" : "This is the description for EcsBlueGreenCreateServiceStepInfo"
               }
             }
+          },
+          "ProdListenerRuleConfig" : {
+            "title" : "ProdListenerRuleConfig",
+            "type" : "object",
+            "required" : [ "prodListenerRuleArn" ],
+            "properties" : {
+              "prodListenerRuleArn" : {
+                "type" : "string",
+                "pattern" : "^(?=\\s*\\S).*$"
+              },
+              "stageTargetGroupArn" : {
+                "type" : "string"
+              },
+              "description" : {
+                "type" : "string",
+                "desc" : "This is the description for ProdListenerRuleConfig"
+              }
+            },
+            "$schema" : "http://json-schema.org/draft-07/schema#"
           },
           "EcsUpgradeContainerStepNode" : {
             "title" : "EcsUpgradeContainerStepNode",
@@ -79105,6 +79670,18 @@
                     "minLength" : 1
                   } ]
                 },
+                "ruleOverrides" : {
+                  "oneOf" : [ {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/definitions/pipeline/steps/cd/InheritRuleOverride"
+                    }
+                  }, {
+                    "type" : "string",
+                    "pattern" : "(<\\+.+>.*)",
+                    "minLength" : 1
+                  } ]
+                },
                 "downsizeOldService" : {
                   "oneOf" : [ {
                     "type" : "boolean"
@@ -79128,6 +79705,34 @@
                 "desc" : "This is the description for InheritEcsTrafficShiftSpec"
               }
             }
+          },
+          "InheritRuleOverride" : {
+            "title" : "InheritRuleOverride",
+            "type" : "object",
+            "required" : [ "listenerRuleArn" ],
+            "properties" : {
+              "listenerRuleArn" : {
+                "type" : "string",
+                "pattern" : "^(?=\\s*\\S).*$"
+              },
+              "weightPercentage" : {
+                "oneOf" : [ {
+                  "type" : "integer",
+                  "format" : "int32",
+                  "minimum" : 0,
+                  "maximum" : 100
+                }, {
+                  "type" : "string",
+                  "pattern" : "(<\\+.+>.*)",
+                  "minLength" : 1
+                } ]
+              },
+              "description" : {
+                "type" : "string",
+                "desc" : "This is the description for InheritRuleOverride"
+              }
+            },
+            "$schema" : "http://json-schema.org/draft-07/schema#"
           },
           "StandAloneTrafficShiftRollbackStepNode" : {
             "title" : "StandAloneTrafficShiftRollbackStepNode",
@@ -94157,6 +94762,8 @@
                 }, {
                   "$ref" : "#/definitions/pipeline/steps/common/MythosAgentNode"
                 }, {
+                  "$ref" : "#/definitions/pipeline/steps/common/ClaudeCodeSecurityNode"
+                }, {
                   "$ref" : "#/definitions/pipeline/steps/common/SscaEnforcementStepNode"
                 }, {
                   "$ref" : "#/definitions/pipeline/steps/common/SscaOrchestrationStepNode"
@@ -94740,6 +95347,8 @@
                   "$ref" : "#/definitions/pipeline/steps/common/OpenAiNode"
                 }, {
                   "$ref" : "#/definitions/pipeline/steps/common/MythosAgentNode"
+                }, {
+                  "$ref" : "#/definitions/pipeline/steps/common/ClaudeCodeSecurityNode"
                 }, {
                   "$ref" : "#/definitions/pipeline/steps/common/SscaComplianceStepNode"
                 }, {
