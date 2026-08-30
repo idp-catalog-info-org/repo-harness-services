@@ -129,13 +129,16 @@ public class UnifiedPipelineStagePlanCreator implements PartialPlanCreator<Unifi
     if (stageInfo == null) {
       throw new InvalidRequestException("Pipeline Stage yaml does not contain pipeline info");
     }
-    return getStageStepParameters(stageInfo, pipelineInputs, stageNodeId, childPipelineVersion);
+    return getStageStepParameters(stageInfo, pipelineInputs, stageNodeId, childPipelineVersion, stageNode);
   }
 
-  public PipelineStageStepParameters getStageStepParameters(
-      UnifiedPipelineStageInfo stageInfo, YamlField pipelineInputs, String stageNodeId, String childPipelineVersion) {
+  public PipelineStageStepParameters getStageStepParameters(UnifiedPipelineStageInfo stageInfo,
+      YamlField pipelineInputs, String stageNodeId, String childPipelineVersion, UnifiedPipelineStageNode stageNode) {
     IdentifierRef identifierRef = pipelineStageHelperV1.getIdentifierRef(stageInfo.getUses(), "");
     PipelineStageStepParametersBuilder builder = PipelineStageStepParameters.builder()
+                                                     .identifier(stageNode.getId())
+                                                     .name(stageNode.getName())
+                                                     .description(stageNode.getDesc())
                                                      .pipeline(identifierRef.getIdentifier())
                                                      .org(identifierRef.getOrgIdentifier())
                                                      .project(identifierRef.getProjectIdentifier())
