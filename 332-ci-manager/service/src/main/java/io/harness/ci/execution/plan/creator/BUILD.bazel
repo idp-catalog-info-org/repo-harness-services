@@ -71,6 +71,7 @@ java_library(
         "//953-events-api/src/main/java/io/harness/eventsframework:module",
         "//953-events-api/src/main/java/io/harness/eventsframework/api:module",
         "//953-events-api/src/main/proto:953_events_api_java_proto",
+        "//953-yaml-commons/src/main/java/io/harness/plancreator/steps:module",
         "//953-yaml-commons/src/main/java/io/harness/pms/sdk/core/steps/io:module",
         "//953-yaml-commons/src/main/java/io/harness/pms/sdk/core/steps/io/v1:module",
         "//953-yaml-commons/src/main/java/io/harness/pms/yaml:module",

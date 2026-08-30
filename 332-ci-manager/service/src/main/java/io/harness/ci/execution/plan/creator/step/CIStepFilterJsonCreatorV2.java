@@ -9,6 +9,7 @@ package io.harness.ci.execution.plan.creator.step;
 
 import static io.harness.beans.FeatureName.CDS_AI_VERIFY_DEMO;
 import static io.harness.beans.FeatureName.CI_ENABLE_GENERIC_CACHE_STEPS;
+import static io.harness.beans.FeatureName.CI_SECRET_EXPRESSION_REFERENCES;
 import static io.harness.beans.FeatureName.ML_ENABLE_AI_AGENTS;
 
 import io.harness.annotations.dev.HarnessTeam;
@@ -23,6 +24,7 @@ import io.harness.beans.steps.stepinfo.RunStepInfo;
 import io.harness.beans.steps.stepinfo.RunTestStepV2Info;
 import io.harness.beans.steps.stepinfo.RunTestsStepInfo;
 import io.harness.beans.yaml.extended.infrastrucutre.Infrastructure;
+import io.harness.ci.execution.plan.creator.filter.CISecretExpressionExtractor;
 import io.harness.ci.execution.plan.creator.utils.CICreatorUtils;
 import io.harness.ci.ff.CIFeatureFlagService;
 import io.harness.exception.InvalidYamlException;
@@ -50,7 +52,12 @@ public class CIStepFilterJsonCreatorV2 extends GenericStepPMSFilterJsonCreatorV2
   @Override
   public FilterCreationResponse handleNode(FilterCreationContext filterCreationContext, AbstractStepNode yamlField) {
     validateStep(filterCreationContext, yamlField);
-    return super.handleNode(filterCreationContext, yamlField);
+    FilterCreationResponse response = super.handleNode(filterCreationContext, yamlField);
+    if (ciFeatureFlagService.isEnabled(
+            CI_SECRET_EXPRESSION_REFERENCES, filterCreationContext.getSetupMetadata().getAccountId())) {
+      response.addReferredEntities(CISecretExpressionExtractor.extract(filterCreationContext));
+    }
+    return response;
   }
 
   public void validateStep(FilterCreationContext filterCreationContext, AbstractStepNode yamlField) {

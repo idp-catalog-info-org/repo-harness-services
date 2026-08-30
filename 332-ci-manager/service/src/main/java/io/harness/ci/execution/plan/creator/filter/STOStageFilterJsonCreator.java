@@ -7,6 +7,7 @@
 
 package io.harness.ci.execution.plan.creator.filter;
 
+import static io.harness.beans.FeatureName.CI_SECRET_EXPRESSION_REFERENCES;
 import static io.harness.beans.yaml.extended.infrastrucutre.Infrastructure.Type.KUBERNETES_DIRECT;
 import static io.harness.beans.yaml.extended.infrastrucutre.Infrastructure.Type.VM;
 import static io.harness.filters.FilterCreatorHelper.convertToEntityDetailProtoDTO;
@@ -29,6 +30,7 @@ import io.harness.ci.execution.integrationstage.utils.IntegrationStageUtils;
 import io.harness.ci.execution.plan.creator.filter.CIFilter.CIFilterBuilder;
 import io.harness.ci.execution.utils.InfrastructureUtils;
 import io.harness.ci.execution.utils.validation.intfc.ValidationUtils;
+import io.harness.ci.ff.CIFeatureFlagService;
 import io.harness.cimanager.stages.IntegrationStageConfig;
 import io.harness.delegate.beans.ci.pod.ConnectorDetails;
 import io.harness.eventsframework.schemas.entity.EntityDetailProtoDTO;
@@ -61,6 +63,7 @@ public class STOStageFilterJsonCreator extends GenericStageFilterJsonCreatorV2<S
   @Inject private SimpleVisitorFactory simpleVisitorFactory;
   @Inject K8InitializeTaskUtils k8InitializeTaskUtils;
   @Inject ValidationUtils validationUtils;
+  @Inject private CIFeatureFlagService ciFeatureFlagService;
 
   @Override
   public Set<String> getSupportedStageTypes() {
@@ -173,6 +176,9 @@ public class STOStageFilterJsonCreator extends GenericStageFilterJsonCreatorV2<S
 
       result.add(convertToEntityDetailProtoDTO(accountIdentifier, orgIdentifier, projectIdentifier,
           fullQualifiedDomainName, ciCodeBase.getConnectorRef(), EntityTypeProtoEnum.CONNECTORS));
+    }
+    if (ciFeatureFlagService.isEnabled(CI_SECRET_EXPRESSION_REFERENCES, accountIdentifier)) {
+      result.addAll(CISecretExpressionExtractor.extractFromCodebase(filterCreationContext));
     }
 
     IntegrationStageConfig integrationStage = (IntegrationStageConfig) stageNode.getStageInfoConfig();

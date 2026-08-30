@@ -131,7 +131,7 @@ import io.harness.ssca.execution.creator.plan.SscaPrAttestationStepPlanCreator;
 import io.harness.ssca.execution.creator.variable.SscaStepVariableCreator;
 import io.harness.sto.STOStepType;
 import io.harness.sto.creator.variables.STOCommonStepVariableCreator;
-import io.harness.sto.plan.creator.step.STOStepFilterJsonCreatorV2;
+import io.harness.sto.plan.creator.STOSecretAwareStepFilterJsonCreator;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
@@ -225,7 +225,7 @@ public class CIPipelineServiceInfoProvider implements PipelineServiceInfoProvide
     filterJsonCreators.add(new UnifiedStageFilterCreator());
     filterJsonCreators.add(new CIStepFilterJsonCreatorV2());
     filterJsonCreators.add(new CIStageFilterJsonCreatorV2());
-    filterJsonCreators.add(new STOStepFilterJsonCreatorV2());
+    filterJsonCreators.add(new STOSecretAwareStepFilterJsonCreator());
     filterJsonCreators.add(new HsaStepsFilterJsonCreator());
     filterJsonCreators.add(new SscaStepsFilterJsonCreator());
     filterJsonCreators.add(new STOStageFilterJsonCreator());
