@@ -110,7 +110,7 @@ public class ContainerParamsProvider {
 
     return CIK8ContainerParams.builder()
         .name(LITE_ENGINE_CONTAINER_NAME)
-        .containerResourceParams(getLiteEngineResourceParams(stageCpuRequest, stageMemoryRequest))
+        .containerResourceParams(getLiteEngineResourceParams(stageCpuRequest, stageMemoryRequest, ambiance))
         .envVars(getLiteEngineEnvVars(k8PodDetails, workDirPath, logPrefix, ambiance, containerStepInfo))
         .containerType(CIContainerType.LITE_ENGINE)
         .containerSecrets(ContainerSecrets.builder()
@@ -145,7 +145,7 @@ public class ContainerParamsProvider {
 
     return CIECSContainerParams.builder()
         .name(LITE_ENGINE_CONTAINER_NAME)
-        .containerResourceParams(getLiteEngineResourceParams(stageCpuRequest, stageMemoryRequest))
+        .containerResourceParams(getLiteEngineResourceParams(stageCpuRequest, stageMemoryRequest, ambiance))
         .envVars(getLiteEngineEnvVars(k8PodDetails, workDirPath, logPrefix, ambiance, containerStepInfo))
         .containerType(CIContainerType.LITE_ENGINE)
         .containerSecrets(ContainerSecrets.builder()
@@ -166,9 +166,15 @@ public class ContainerParamsProvider {
         .build();
   }
 
-  private ContainerResourceParams getLiteEngineResourceParams(Integer stepCpuRequest, Integer stepMemoryRequest) {
-    Integer cpu = stepCpuRequest + LITE_ENGINE_CONTAINER_CPU;
-    Integer memory = stepMemoryRequest + LITE_ENGINE_CONTAINER_MEM;
+  private ContainerResourceParams getLiteEngineResourceParams(
+      Integer stepCpuRequest, Integer stepMemoryRequest, Ambiance ambiance) {
+    // Lite-engine container size uses CDS_CONSERVATIVE_K8_RESOURCE_LIMITS. The same flag also
+    // zeros stage overlay in ContainerStepInitHelper. CI_CONSERVATIVE_K8_RESOURCE_LIMITS still
+    // zeros K8s runner stage_resource only, in RunnerRequestBuilder.
+    boolean conservative = featureFlagHelper.isEnabled(
+        AmbianceUtils.getAccountId(ambiance), FeatureName.CDS_CONSERVATIVE_K8_RESOURCE_LIMITS);
+    Integer cpu = conservative ? LITE_ENGINE_CONTAINER_CPU : stepCpuRequest + LITE_ENGINE_CONTAINER_CPU;
+    Integer memory = conservative ? LITE_ENGINE_CONTAINER_MEM : stepMemoryRequest + LITE_ENGINE_CONTAINER_MEM;
     return ContainerResourceParams.builder()
         .resourceRequestMilliCpu(cpu)
         .resourceRequestMemoryMiB(memory)

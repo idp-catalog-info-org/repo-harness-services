@@ -302,9 +302,29 @@ public class ContainerStepInitHelper {
         .topologySpreadConstraints(topologySpreadConstraints)
         .activeDeadLineSeconds(getActiveDeadlineSeconds(ambiance, true))
         .volumes(volumes)
-        .stageCpuMilli(stageRequest.getLeft())
-        .stageMemoryMiB(stageRequest.getRight())
+        // CDS zeros overlay for K8s delegate and runner (both read these pod params). CI flag
+        // still zeros K8s runner stage_resource later in RunnerRequestBuilder only.
+        .stageCpuMilli(stageWorkloadResource(AmbianceUtils.getAccountId(ambiance), stageRequest.getLeft()))
+        .stageMemoryMiB(stageWorkloadResource(AmbianceUtils.getAccountId(ambiance), stageRequest.getRight()))
         .build();
+  }
+
+  /**
+   * Workload resource added by the runner to its fixed ephemeral-delegate overhead. Conservative
+   * mode removes the computed workload increment; it does not leave the delegate without resources.
+   *
+   * Gated by CDS_CONSERVATIVE_K8_RESOURCE_LIMITS so CD container groups get the same overlay on
+   * ECS and on K8s (delegate and runner both read these pod params).
+   *
+   * CI_CONSERVATIVE_K8_RESOURCE_LIMITS is left as-is for K8s runner only:
+   * RunnerRequestBuilder.buildStageResource still zeros stage_resource on that flag. Delegate
+   * paths never hit that builder, so CI does not change K8s delegate overlay.
+   *
+   * Lite-engine container size also uses CDS_CONSERVATIVE_K8_RESOURCE_LIMITS.
+   */
+  private int stageWorkloadResource(String accountId, int computedResource) {
+    boolean conservative = featureFlagService.isEnabled(FeatureName.CDS_CONSERVATIVE_K8_RESOURCE_LIMITS, accountId);
+    return conservative ? 0 : computedResource;
   }
 
   private List<String> getSharedPaths(ContainerStepSpec initializeStepInfo) {
@@ -1220,12 +1240,9 @@ public class ContainerStepInitHelper {
     List<PodVolume> volumes = k8sPodInitUtils.convertDirectEcsVolumes(ecsInfra);
     Pair<Integer, Integer> stageRequest =
         k8sPodInitUtils.getStepLimits(containerStepInfo, accountId, InjectUtils.IsFlexibleTemplatesEnabled(ambiance));
-    int stageCpuMilli = stageRequest.getLeft();
-    int stageMemoryMiB = stageRequest.getRight();
-    if (featureFlagService.isEnabled(FeatureName.CI_CONSERVATIVE_K8_RESOURCE_LIMITS, accountId)) {
-      stageCpuMilli = 0;
-      stageMemoryMiB = 0;
-    }
+    // ECS has no RunnerRequestBuilder CI rewrite, so CDS overlay zeroing here is the CD path.
+    int stageCpuMilli = stageWorkloadResource(accountId, stageRequest.getLeft());
+    int stageMemoryMiB = stageWorkloadResource(accountId, stageRequest.getRight());
     Pair<CIECSContainerParams, List<CIECSContainerParams>> podContainers =
         getStepContainersForEcs(containerStepInfo, podDetails, ecsInfra, ambiance, volumes, logPrefix);
     saveSweepingOutputEcs(podName, ecsInfra, podContainers, ambiance, delegateSelectors);

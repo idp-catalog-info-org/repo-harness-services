@@ -9,6 +9,7 @@ package io.harness.steps.container.utils;
 
 import static io.harness.ci.commonconstants.ContainerExecutionConstants.CI_NEW_VERSION_GODOTENV;
 import static io.harness.data.structure.UUIDGenerator.generateUuid;
+import static io.harness.rule.OwnerRule.ABHISHEK;
 import static io.harness.rule.OwnerRule.PIYUSH_BHUWALKA;
 import static io.harness.rule.OwnerRule.YOGESH;
 
@@ -121,6 +122,27 @@ public class ContainerParamsProviderTest extends CategoryTest {
         Mockito.mock(ContainerStepSpec.class));
 
     verifyContainerParams(resultParams, HARNESS_DEFAULT_LITE_ENGINE_IMAGE);
+  }
+
+  @Test
+  @Owner(developers = ABHISHEK)
+  @Category(UnitTests.class)
+  public void getLiteEngineContainerParamsWithConservativeLimitsUsesFixedResources() {
+    ConnectorDetails connectorDetails = ConnectorDetails.builder().build();
+    when(mockFeatureFlagHelper.isEnabled(ACCOUNT_ID, FeatureName.CDS_CONSERVATIVE_K8_RESOURCE_LIMITS)).thenReturn(true);
+
+    CIK8ContainerParams resultParams = containerParamsProvider.getLiteEngineContainerParams(connectorDetails,
+        ContainerDetailsSweepingOutput.builder().build(), 500, 600, serviceEnvironmentVars, Map.of("path", "/volume"),
+        "/work", ContainerSecurityContext.builder().build(), "test", testAmbiance, null, "",
+        Mockito.mock(ContainerStepSpec.class));
+
+    assertThat(resultParams.getContainerResourceParams())
+        .isEqualTo(ContainerResourceParams.builder()
+                       .resourceRequestMemoryMiB(ContainerExecutionConstants.LITE_ENGINE_CONTAINER_MEM)
+                       .resourceLimitMemoryMiB(ContainerExecutionConstants.LITE_ENGINE_CONTAINER_MEM)
+                       .resourceLimitMilliCpu(ContainerExecutionConstants.LITE_ENGINE_CONTAINER_CPU)
+                       .resourceRequestMilliCpu(ContainerExecutionConstants.LITE_ENGINE_CONTAINER_CPU)
+                       .build());
   }
 
   @Test
