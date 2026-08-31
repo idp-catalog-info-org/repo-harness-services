@@ -45,7 +45,6 @@ import io.harness.beans.ScopeInfo;
 import io.harness.beans.ScopeLevel;
 import io.harness.enforcement.client.services.EnforcementClientService;
 import io.harness.enforcement.constants.FeatureRestrictionName;
-import io.harness.enforcement.exceptions.LimitExceededException;
 import io.harness.exception.DuplicateFieldException;
 import io.harness.exception.ExpiredTokenException;
 import io.harness.exception.InvalidRequestException;
@@ -242,10 +241,6 @@ public class InviteServiceImpl implements InviteService {
     preCreateInvite(scopeInfo, invite);
     if (checkIfUserAlreadyAdded(scopeInfo, invite)) {
       return InviteOperationResponse.USER_ALREADY_ADDED;
-    }
-
-    if (!isScimInvite && !isLdap) {
-      checkInviteRateLimit(invite.getAccountIdentifier());
     }
 
     Optional<Invite> existingInviteOptional = getExistingInvite(invite, scopeInfo);
@@ -456,19 +451,6 @@ public class InviteServiceImpl implements InviteService {
 
   private void checkNgLimit(String accountId) {
     enforcementClientService.checkAvailabilityWithIncrement(FeatureRestrictionName.MULTIPLE_USERS, accountId, 1);
-  }
-
-  // Separate from checkNgLimit: that one caps seats and counts memberships, so pending invites are
-  // invisible to it and an account far below its seat limit can still send unbounded invites.
-  // Called from create() for both new invites and resends, so existing members in a request are
-  // not charged, and SCIM/LDAP sync (which call create() directly) are covered too.
-  private void checkInviteRateLimit(String accountId) {
-    try {
-      enforcementClientService.checkAvailabilityWithIncrement(FeatureRestrictionName.INVITE_RATE_LIMIT, accountId, 1);
-    } catch (LimitExceededException ex) {
-      log.info("NG User Invite: invite rate limit reached for account {}", accountId);
-      throw ex;
-    }
   }
 
   private void createAndInviteNonPasswordUser(String accountIdentifier, String jwtToken, String email,
