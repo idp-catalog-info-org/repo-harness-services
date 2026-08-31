@@ -177,7 +177,7 @@ public class CDInputsValidationHelperTest extends NgManagerTestBase {
         serviceOverridesServiceV2, overrideV2ValidationHelper, null, environmentService, gitAwareEntityHelper,
         cdGitXService, infrastructureEntityServiceHelper, infraVersionAwareFacade, orgAndProjectValidationHelper,
         infrastructureYamlSchemaHelper, infrastructureOpaService, featureFlagHelperService, scopeInfoService,
-        cdGitxSettingHelper, environmentInfraFilterHelper, infrastructureOpaStatusHandler, null));
+        cdGitxSettingHelper, environmentInfraFilterHelper, infrastructureOpaStatusHandler, null, null));
     environmentService = spy(new EnvironmentServiceImpl(environmentRepository, entitySetupUsageService, eventProducer,
         outboxService, transactionTemplate, infrastructureEntityService, clusterService, serviceOverrideService,
         serviceOverridesServiceV2, serviceEntityService, accountClient, settingsClient,

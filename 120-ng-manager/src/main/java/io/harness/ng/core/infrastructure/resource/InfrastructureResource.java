@@ -246,6 +246,7 @@ public class InfrastructureResource {
   @Inject private NGFeatureFlagHelperService ngFeatureFlagHelperService;
   @Inject private InfrastructureOpaStatusHandler infrastructureOpaStatusHandler;
   @Inject private CdOpaOnSaveStatusApiHelper cdOpaOnSaveStatusApiHelper;
+  @Inject private io.harness.ng.core.infrastructure.services.DiscoveryOrchestrator discoveryOrchestrator;
 
   public static final String INFRA_PARAM_MESSAGE = "Infrastructure Identifier for the entity";
 
@@ -360,8 +361,12 @@ public class InfrastructureResource {
 
     InfrastructureGovernanceDataResponse createdInfrastructureMapper =
         infrastructureEntityService.create(infrastructureEntity);
-    return ResponseDTO.newResponse(InfrastructureMapper.toResponseWrapper(
-        createdInfrastructureMapper.getInfrastructureEntity(), createdInfrastructureMapper.getGovernanceMetadata()));
+    InfrastructureResponse infraResponse = InfrastructureMapper.toResponseWrapper(
+        createdInfrastructureMapper.getInfrastructureEntity(), createdInfrastructureMapper.getGovernanceMetadata());
+    if (createdInfrastructureMapper.getDiscoveryStatus() != null) {
+      infraResponse.getInfrastructure().setDiscoveryStatus(createdInfrastructureMapper.getDiscoveryStatus());
+    }
+    return ResponseDTO.newResponse(infraResponse);
   }
 
   @POST
@@ -466,8 +471,12 @@ public class InfrastructureResource {
         ENVIRONMENT_UPDATE_PERMISSION, "update");
     validateDeploymentTypeSpecificInfrastructureYaml(infrastructureEntity);
     InfrastructureGovernanceDataResponse updatedInfraMapper = infrastructureEntityService.update(infrastructureEntity);
-    return ResponseDTO.newResponse(InfrastructureMapper.toResponseWrapper(
-        updatedInfraMapper.getInfrastructureEntity(), updatedInfraMapper.getGovernanceMetadata()));
+    InfrastructureResponse infraResponse = InfrastructureMapper.toResponseWrapper(
+        updatedInfraMapper.getInfrastructureEntity(), updatedInfraMapper.getGovernanceMetadata());
+    if (updatedInfraMapper.getDiscoveryStatus() != null) {
+      infraResponse.getInfrastructure().setDiscoveryStatus(updatedInfraMapper.getDiscoveryStatus());
+    }
+    return ResponseDTO.newResponse(infraResponse);
   }
 
   @PUT
@@ -1486,5 +1495,39 @@ public class InfrastructureResource {
       NgManagerErrorResponseDTO error = NgManagerErrorResponseUtils.build(e, contextMessage);
       return ResponseDTO.newResponse(UnifiedGitEntityInfoResponseDTO.builder().error(error).build());
     }
+  }
+
+  @POST
+  @Path("/service-discovery/enable")
+  @ApiOperation(
+      value = "Bulk enable service discovery on infrastructure definitions", nickname = "enableServiceDiscovery")
+  @Operation(operationId = "enableServiceDiscovery",
+      summary = "Enable service discovery on multiple infrastructure definitions",
+      responses =
+      {
+        @io.swagger.v3.oas.annotations.responses.
+        ApiResponse(description = "Returns the list of infrastructure identifiers that were successfully enabled")
+      })
+  @Hidden
+  @Timed
+  @ResponseMetered
+  public ResponseDTO<io.harness.ng.core.infrastructure.dto.ServiceDiscoveryEnableResponseDTO>
+  enableServiceDiscovery(@Parameter(description = NGCommonEntityConstants.ACCOUNT_PARAM_MESSAGE) @NotNull @QueryParam(
+                             NGCommonEntityConstants.ACCOUNT_KEY) @AccountIdentifier String accountId,
+      @Parameter(description = NGCommonEntityConstants.ORG_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.ORG_KEY) @OrgIdentifier String orgIdentifier,
+      @Parameter(description = NGCommonEntityConstants.PROJECT_PARAM_MESSAGE) @QueryParam(
+          NGCommonEntityConstants.PROJECT_KEY) @ProjectIdentifier String projectIdentifier,
+      @Parameter(description = ENVIRONMENT_PARAM_MESSAGE, required = true) @NotNull @QueryParam(
+          ENVIRONMENT_IDENTIFIER_KEY) String envIdentifier,
+      @NotNull @Valid io.harness.ng.core.infrastructure.dto.ServiceDiscoveryEnableRequestDTO request) {
+    if (!ngFeatureFlagHelperService.isEnabled(accountId, FeatureName.CDS_CLUSTER_INVENTORY)) {
+      throw new InvalidRequestException("Service Discovery is not enabled for this account.");
+    }
+    infrastructureHelper.checkForAccessOrThrow(
+        accountId, orgIdentifier, projectIdentifier, envIdentifier, ENVIRONMENT_UPDATE_PERMISSION, "enable");
+    io.harness.ng.core.infrastructure.dto.ServiceDiscoveryEnableResponseDTO response = discoveryOrchestrator.enableAll(
+        accountId, orgIdentifier, projectIdentifier, envIdentifier, request.getInfraIdentifiers());
+    return ResponseDTO.newResponse(response);
   }
 }
