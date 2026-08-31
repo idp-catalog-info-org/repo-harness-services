@@ -405,7 +405,7 @@ public class NodeExecutionMap extends LateBindingMap {
    * propagate through the chain) and SUSPENDED (paused, not finished).
    */
   private static final EnumSet<Status> DAG_DEPENDENCY_SATISFIED_STATUSES =
-      EnumSet.of(Status.SUCCEEDED, Status.IGNORE_FAILED);
+      EnumSet.of(Status.SUCCEEDED, Status.IGNORE_FAILED, Status.PASSED_WITH_WARNING);
 
   /**
    * Resolves <code>&lt;+&lt;scope&gt;.allDependantsSucceeded&gt;</code> and

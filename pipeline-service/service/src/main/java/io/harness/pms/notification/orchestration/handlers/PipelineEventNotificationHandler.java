@@ -255,7 +255,8 @@ public class PipelineEventNotificationHandler implements AsyncInformObserver, Gr
 
     // same conditions as io.harness.pms.plan.execution.handlers.PlanStatusEventEmitterHandler.onPlanStatusUpdate
     if (graphUpdateEventInfo.getStatus().equals(Status.SUCCEEDED)
-        || graphUpdateEventInfo.getStatus().equals(Status.IGNORE_FAILED)) {
+        || graphUpdateEventInfo.getStatus().equals(Status.IGNORE_FAILED)
+        || graphUpdateEventInfo.getStatus().equals(Status.PASSED_WITH_WARNING)) {
       checkAndSendEvent(planExecutionId, graphUpdateEventInfo, planNodeExecution, getSuccessEventType(level),
           notificationsSent, notificationRules);
     } else if (StatusUtils.brokeAndAbortedStatuses().contains(graphUpdateEventInfo.getStatus())) {

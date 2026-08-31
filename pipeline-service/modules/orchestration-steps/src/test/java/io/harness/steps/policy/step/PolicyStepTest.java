@@ -9,6 +9,7 @@ package io.harness.steps.policy.step;
 
 import static io.harness.annotations.dev.HarnessTeam.PIPELINE;
 import static io.harness.rule.OwnerRule.NAMAN;
+import static io.harness.rule.OwnerRule.NIKHIL_NEERUDU;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -288,6 +289,55 @@ public class PolicyStepTest extends CategoryTest {
     assertThat(stepResponse.getStatus()).isEqualTo(Status.SUCCEEDED);
     assertThat(stepExecutionTelemetryEventDTO.getStepType()).isEqualTo(PolicyStep.STEP_TYPE.getType());
 
+    verify(iLogStreamingStepClient, times(3)).writeLogLine(any(), eq("Execute"));
+  }
+
+  @Test
+  @Owner(developers = NIKHIL_NEERUDU)
+  @Category(UnitTests.class)
+  public void testExecuteSyncWithEvaluationWarning() throws IOException {
+    PowerMockito.when(logStreamingStepClientFactory.getLogStreamingStepClient(any()))
+        .thenReturn(iLogStreamingStepClient);
+    String payload = "{\"this\" : \"that\"}";
+    JsonNode payloadObj = YamlUtils.readTree(payload).getNode().getCurrJsonNode();
+    PolicyStepSpecParameters policyStepSpecParameters =
+        PolicyStepSpecParameters.builder()
+            .policySets(ParameterField.createValueField(projLevelPolicySet))
+            .type("Custom")
+            .policySpec(CustomPolicyStepSpec.builder().payload(ParameterField.createValueField(payload)).build())
+            .build();
+    stepParameters = StepElementParameters.builder().name(stepName).spec(policyStepSpecParameters).build();
+
+    String urlPolicySets = "ps1";
+    when(opaServiceClient.evaluateWithCredentialsByID(
+             accountId, orgId, projectId, urlPolicySets, PolicyEvalUtils.getEntityMetadataString(stepName), payloadObj))
+        .thenReturn(request);
+
+    List<OpaPolicyEvaluationResponse> policyDetails =
+        Collections.singletonList(OpaPolicyEvaluationResponse.builder().status("warning").build());
+    List<OpaPolicySetEvaluationResponse> policySetDetails =
+        Collections.singletonList(OpaPolicySetEvaluationResponse.builder().details(policyDetails).build());
+    OpaEvaluationResponseHolder evaluationResponse =
+        OpaEvaluationResponseHolder.builder().status("warning").details(policySetDetails).build();
+
+    Map<String, PolicySetOutcome> policySetOutcomeMap = new HashMap<>();
+    Map<String, PolicyOutcome> policyDetailsMap = new HashMap<>();
+    policyDetailsMap.put("p1",
+        PolicyOutcome.builder()
+            .identifier("p1")
+            .denyMessages(Collections.singletonList("Warning message"))
+            .status("warning")
+            .build());
+    policySetOutcomeMap.put(
+        "ps1", PolicySetOutcome.builder().identifier("ps1").policyDetails(policyDetailsMap).build());
+
+    when(SafeHttpCall.executeWithErrorMessage(request)).thenReturn(evaluationResponse);
+    when(PolicyStepOutcomeMapper.toOutcome(evaluationResponse))
+        .thenReturn(PolicyStepOutcome.builder().status("warning").policySetDetails(policySetOutcomeMap).build());
+
+    StepResponse stepResponse = policyStep.executeSync(ambiance, stepParameters, null, null);
+
+    assertThat(stepResponse.getStatus()).isEqualTo(Status.PASSED_WITH_WARNING);
     verify(iLogStreamingStepClient, times(3)).writeLogLine(any(), eq("Execute"));
   }
 

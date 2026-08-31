@@ -217,8 +217,9 @@ public class NotificationHelper {
     if (!OrchestrationUtils.isStageNode(nodeExecution)) {
       return Optional.empty();
     }
-    // When the stage is IGNORE_FAILED then it would be treated as Stage SUCCEEDED.
-    if (nodeExecution.getStatus() == Status.SUCCEEDED || nodeExecution.getStatus() == Status.IGNORE_FAILED) {
+    // IGNORE_FAILED and PASSED_WITH_WARNING are both treated as Stage SUCCEEDED for notifications.
+    if (nodeExecution.getStatus() == Status.SUCCEEDED || nodeExecution.getStatus() == Status.IGNORE_FAILED
+        || nodeExecution.getStatus() == Status.PASSED_WITH_WARNING) {
       return Optional.of(STAGE_SUCCESS);
     }
     if (StatusUtils.brokeAndAbortedStatuses().contains(nodeExecution.getStatus())) {

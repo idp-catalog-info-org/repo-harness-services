@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
         + " Paused, ResourceWaiting, InterventionWaiting, ApprovalWaiting, WaitStepRunning,"
         + " QueuedLicenseLimitReached, QueuedExecutionConcurrencyReached, Success, Suspended, Skipped, Pausing,"
         + " ApprovalRejected, InputWaiting, AbortedByFreeze, UploadWaiting, QueuedGlobalInfraCapacityReached,"
-        + " QUEUED_PLAN_CREATION.")
+        + " QUEUED_PLAN_CREATION, PassedWithWarning.")
 public enum ExecutionStatus {
   @JsonProperty("Running") RUNNING(Status.RUNNING, "Running"),
   @JsonProperty("AsyncWaiting") ASYNCWAITING(Status.ASYNC_WAITING, "AsyncWaiting"),
@@ -69,6 +69,7 @@ public enum ExecutionStatus {
   @JsonProperty("QueuedGlobalInfraCapacityReached")
   QUEUED_GLOBAL_INFRA_CAPACITY_REACHED(Status.QUEUED_GLOBAL_INFRA_CAPACITY_REACHED, "QueuedGlobalInfraCapacityReached"),
   @JsonProperty("QUEUED_PLAN_CREATION") QUEUED_PLAN_CREATION(Status.QUEUED_PLAN_CREATION, "QUEUED_PLAN_CREATION"),
+  @JsonProperty("PassedWithWarning") PASSED_WITH_WARNING(Status.PASSED_WITH_WARNING, "PassedWithWarning"),
 
   //@JsonIgnore added to not show older enums till migration is written to change their instances to new enums in DB.
   @JsonIgnore NOT_STARTED(null, true),

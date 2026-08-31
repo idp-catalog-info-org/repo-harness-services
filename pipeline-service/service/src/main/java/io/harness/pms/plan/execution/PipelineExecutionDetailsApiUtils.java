@@ -26,6 +26,7 @@ import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.INTERVENT
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.NOTSTARTED;
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.NOT_STARTED;
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.NO_OP;
+import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.PASSEDWITHWARNING;
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.PAUSED;
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.PAUSING;
 import static io.harness.spec.server.pipeline.v1.model.ExecutionStatus.QUEUED;
@@ -284,6 +285,8 @@ public class PipelineExecutionDetailsApiUtils {
         return ASYNCWAITING;
       case IGNORE_FAILED:
         return IGNOREFAILED;
+      case PASSED_WITH_WARNING:
+        return PASSEDWITHWARNING;
       case INPUT_WAITING:
         return INPUTWAITING;
       case TIMED_WAITING:
@@ -879,6 +882,8 @@ public class PipelineExecutionDetailsApiUtils {
         return INPUTWAITING;
       case IGNOREFAILED:
         return IGNOREFAILED;
+      case PASSED_WITH_WARNING:
+        return PASSEDWITHWARNING;
       case ASYNCWAITING:
         return ASYNCWAITING;
       case TASKWAITING:

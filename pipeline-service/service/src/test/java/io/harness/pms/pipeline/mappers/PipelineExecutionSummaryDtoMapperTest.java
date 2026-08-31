@@ -541,6 +541,38 @@ public class PipelineExecutionSummaryDtoMapperTest extends CategoryTest {
   }
 
   @Test
+  @Owner(developers = NIKHIL_NEERUDU)
+  @Category(UnitTests.class)
+  public void testSuccessfulStagesCountIncludesPassedWithWarning() {
+    String startingNodeId = "stage-with-warning";
+    Map<String, GraphLayoutNodeDTO> layoutNodeDTOMap = new HashMap<>();
+    layoutNodeDTOMap.put(startingNodeId,
+        GraphLayoutNodeDTO.builder()
+            .nodeType("Custom")
+            .status(ExecutionStatus.PASSED_WITH_WARNING)
+            .edgeLayoutList(EdgeLayoutListDTO.builder().nextIds(Collections.emptyList()).build())
+            .build());
+
+    PipelineExecutionSummaryEntity executionSummaryEntity = PipelineExecutionSummaryEntity.builder()
+                                                                .accountId(accountId)
+                                                                .orgIdentifier(orgId)
+                                                                .projectIdentifier(projId)
+                                                                .pipelineIdentifier(pipelineId)
+                                                                .planExecutionId(planId)
+                                                                .startingNodeId(startingNodeId)
+                                                                .layoutNodeMap(layoutNodeDTOMap)
+                                                                .status(ExecutionStatus.PASSED_WITH_WARNING)
+                                                                .build();
+
+    PipelineExecutionSummaryDTO executionSummaryDTO =
+        PipelineExecutionSummaryDtoMapper.toDto(executionSummaryEntity, null, false, false, null);
+
+    assertThat(executionSummaryDTO.getSuccessfulStagesCount()).isEqualTo(1);
+    assertThat(executionSummaryDTO.getFailedStagesCount()).isEqualTo(0);
+    assertThat(executionSummaryDTO.getTotalStagesCount()).isEqualTo(1);
+  }
+
+  @Test
   @Owner(developers = SHALINI)
   @Category(UnitTests.class)
   public void testToDtoForParentStageInfo() {

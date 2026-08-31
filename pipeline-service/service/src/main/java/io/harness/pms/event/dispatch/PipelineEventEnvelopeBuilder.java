@@ -54,7 +54,7 @@ public class PipelineEventEnvelopeBuilder {
   }
 
   private static String deriveEventType(Status status) {
-    if (status == Status.SUCCEEDED || status == Status.IGNORE_FAILED) {
+    if (status == Status.SUCCEEDED || status == Status.IGNORE_FAILED || status == Status.PASSED_WITH_WARNING) {
       return "harness.pipeline.completed";
     }
     if (StatusUtils.brokeStatuses().contains(status)) {

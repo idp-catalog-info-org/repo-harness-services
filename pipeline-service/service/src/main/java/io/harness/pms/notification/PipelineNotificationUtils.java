@@ -31,6 +31,7 @@ public class PipelineNotificationUtils {
     switch (status) {
       case SUCCEEDED:
       case IGNORE_FAILED:
+      case PASSED_WITH_WARNING:
         return "completed";
       case FAILED:
       case ERRORED:
@@ -74,6 +75,7 @@ public class PipelineNotificationUtils {
     switch (status) {
       case SUCCEEDED:
       case IGNORE_FAILED:
+      case PASSED_WITH_WARNING:
         return changeNotifactionEventMessage ? "succeeded" : "completed";
       case FAILED:
       case ERRORED:
@@ -102,6 +104,7 @@ public class PipelineNotificationUtils {
     switch (status) {
       case SUCCEEDED:
       case IGNORE_FAILED:
+      case PASSED_WITH_WARNING:
         return PipelineNotificationConstants.SUCCEEDED_COLOR;
       case EXPIRED:
       case APPROVAL_REJECTED:
