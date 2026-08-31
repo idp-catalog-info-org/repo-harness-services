@@ -8,6 +8,8 @@
 package io.harness.ci.execution.states.V1.cd;
 
 import static io.harness.beans.steps.CIStepInfoType.UNIFIED_SERVICE_STEP;
+import static io.harness.beans.steps.constants.ServiceStepConstants.OVERRIDES_COMMAND_UNIT;
+import static io.harness.beans.steps.constants.ServiceStepConstants.SERVICE_STEP_COMMAND_UNIT;
 import static io.harness.rule.OwnerRule.CHIRAG_S;
 import static io.harness.rule.OwnerRule.FERNANDOD;
 import static io.harness.rule.OwnerRule.SHOBHIT_SINGH;
@@ -28,6 +30,7 @@ import io.harness.cd.beans.outcomes.ManifestMetadata;
 import io.harness.cd.beans.outcomes.ManifestsSweepingOutput;
 import io.harness.cd.beans.outcomes.UnifiedServiceOutcome;
 import io.harness.ci.execution.common.ProcessedServiceResult;
+import io.harness.ci.execution.common.ServiceEntityMetadata;
 import io.harness.ci.execution.common.ServiceEntityProcessor;
 import io.harness.ci.execution.common.ServiceStepOutcomeHelper;
 import io.harness.ci.execution.states.helpers.ServiceStepSweepingOutputHelper;
@@ -41,18 +44,22 @@ import io.harness.engine.governance.PolicyEvaluationFailureException;
 import io.harness.exception.InvalidRequestException;
 import io.harness.logging.UnitProgress;
 import io.harness.logging.UnitStatus;
+import io.harness.logstreaming.ILogStreamingStepClient;
 import io.harness.logstreaming.LogStreamingStepClientFactory;
 import io.harness.pms.contracts.ambiance.Ambiance;
 import io.harness.pms.contracts.ambiance.Level;
 import io.harness.pms.contracts.execution.Status;
+import io.harness.pms.contracts.execution.failure.FailureInfo;
 import io.harness.pms.contracts.plan.ExecutionMetadata;
 import io.harness.pms.contracts.steps.StepCategory;
 import io.harness.pms.contracts.steps.StepType;
 import io.harness.pms.sdk.core.data.OptionalSweepingOutput;
 import io.harness.pms.sdk.core.resolver.outputs.ExecutionSweepingOutputService;
 import io.harness.pms.sdk.core.steps.io.StepResponse;
+import io.harness.pms.sdk.core.steps.io.StepResponseNotifyData;
 import io.harness.pms.yaml.ParameterField;
 import io.harness.rule.Owner;
+import io.harness.tasks.ResponseData;
 import io.harness.transientData.service.TransientExecutionDataService;
 import io.harness.unified.cd.service.spec.ServiceConfig;
 import io.harness.unified.cd.service.spec.ServiceInfoConfig;
@@ -60,6 +67,7 @@ import io.harness.unified.cd.service.spec.ServiceType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,12 +88,15 @@ public class UnifiedServiceStepTest {
   @Mock private TransientExecutionDataService transientExecutionDataService;
   @Mock private ServiceEntityProcessor serviceEntityProcessor;
   @Mock private ServiceHookTaskHelper serviceHookTaskHelper;
+  @Mock private LogStreamingStepClientFactory logStreamingStepClientFactory;
+  @Mock private ILogStreamingStepClient logStreamingClient;
 
   @Before
   public void setup() {
     MockitoAnnotations.openMocks(this);
     when(serviceHookTaskHelper.isServiceHooksEnabled(any(String.class))).thenReturn(false);
     when(serviceHookTaskHelper.isServiceHooksEnabled(any(Ambiance.class))).thenReturn(false);
+    when(logStreamingStepClientFactory.getLogStreamingStepClient(any())).thenReturn(logStreamingClient);
   }
 
   private Ambiance buildAmbiance(boolean isPIESimplifyLogBaseEnabled) {
@@ -242,8 +253,10 @@ public class UnifiedServiceStepTest {
 
     List<UnitProgress> unitProgressList = response.getUnitProgressList();
     assertThat(unitProgressList).isNotEmpty();
-    assertThat(unitProgressList.get(0).getUnitName()).isEqualTo(ManifestsStep.MANIFESTS_VALIDATION_UNIT);
-    assertThat(unitProgressList.get(0).getStatus()).isEqualTo(UnitStatus.SUCCESS);
+    assertThat(unitProgressList.get(0).getUnitName()).isEqualTo(SERVICE_STEP_COMMAND_UNIT);
+    assertThat(unitProgressList.get(1).getUnitName()).isEqualTo(OVERRIDES_COMMAND_UNIT);
+    assertThat(unitProgressList.get(2).getUnitName()).isEqualTo(ManifestsStep.MANIFESTS_VALIDATION_UNIT);
+    assertThat(unitProgressList.get(2).getStatus()).isEqualTo(UnitStatus.SUCCESS);
   }
 
   @Test
@@ -261,6 +274,34 @@ public class UnifiedServiceStepTest {
     boolean hasValidationUnit = response.getUnitProgressList().stream().anyMatch(
         up -> ManifestsStep.MANIFESTS_VALIDATION_UNIT.equals(up.getUnitName()));
     assertThat(hasValidationUnit).isFalse();
+  }
+
+  @Test
+  @Owner(developers = FERNANDOD)
+  @Category(UnitTests.class)
+  public void testHandleChildrenResponse_withBrokeChildStatus_serviceUnitIsFailureOverridesIsSuccess() {
+    setupCommonMocksForHandleChildrenResponse();
+    when(serviceStepSweepingOutputHelper.fetchServiceManifestsSweepingOutput(any()))
+        .thenReturn(OptionalSweepingOutput.builder().found(false).build());
+
+    Map<String, ResponseData> responseDataMap = new HashMap<>();
+    responseDataMap.put("childNode",
+        StepResponseNotifyData.builder()
+            .nodeUuid("childNodeId")
+            .status(Status.FAILED)
+            .failureInfo(FailureInfo.newBuilder().setErrorMessage("child failed").build())
+            .build());
+
+    Ambiance ambiance = buildAmbiance(true);
+    StepResponse response =
+        serviceStep.handleChildrenResponse(ambiance, UnifiedServiceStepParameters.builder().build(), responseDataMap);
+
+    List<UnitProgress> unitProgressList = response.getUnitProgressList();
+    assertThat(unitProgressList).hasSizeGreaterThanOrEqualTo(2);
+    assertThat(unitProgressList.get(0).getUnitName()).isEqualTo(SERVICE_STEP_COMMAND_UNIT);
+    assertThat(unitProgressList.get(0).getStatus()).isEqualTo(UnitStatus.FAILURE);
+    assertThat(unitProgressList.get(1).getUnitName()).isEqualTo(OVERRIDES_COMMAND_UNIT);
+    assertThat(unitProgressList.get(1).getStatus()).isEqualTo(UnitStatus.SUCCESS);
   }
 
   @Test
@@ -285,6 +326,7 @@ public class UnifiedServiceStepTest {
     // Service resolves to HELM, but the stage declared 'kubernetes' -> mismatch must fail before any downstream work.
     ProcessedServiceResult resolvedAsHelm =
         ProcessedServiceResult.builder()
+            .serviceEntityMetadata(ServiceEntityMetadata.builder().name("my-svc").identifier("my-svc").build())
             .serviceConfig(ServiceConfig.builder()
                                .serviceInfoConfig(ServiceInfoConfig.builder().uses(ServiceType.HELM).build())
                                .build())
