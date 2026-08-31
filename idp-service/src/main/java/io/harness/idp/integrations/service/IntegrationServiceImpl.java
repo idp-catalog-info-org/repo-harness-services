@@ -65,10 +65,11 @@ public class IntegrationServiceImpl implements IntegrationService {
   @Override
   public DiscoverEntitiesDTO discoverEntities(String harnessAccount, String orgIdentifier, String projectIdentifier,
       String integration, String integrationId, int pageIndex, int pageLimit, String sort, String searchTerm,
-      String kinds, Integer prevOffset, Integer nextOffset) {
+      String kinds, List<String> filters, String includeFields, String includePaths, Integer prevOffset,
+      Integer nextOffset) {
     return getServiceForIntegration(integration)
         .discoverEntities(harnessAccount, orgIdentifier, projectIdentifier, integrationId, pageIndex, pageLimit, sort,
-            searchTerm, kinds, prevOffset, nextOffset);
+            searchTerm, kinds, filters, includeFields, includePaths, prevOffset, nextOffset);
   }
 
   @Override

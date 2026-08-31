@@ -2396,6 +2396,40 @@ paths:
           schema:
             type: string
           description: Comma-separated list of raw entity kinds to filter by (e.g. services,environments)
+        - name: filters
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: >-
+            Field filters in field_name:value format. Repeat the parameter to provide multiple values or fields
+            (for example, filters=org:acme&filters=org:harness). Values for the same field use OR semantics;
+            different fields use AND semantics.
+        - name: include_fields
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >-
+            Comma-separated field names to copy onto each entity (for example, org,isPrivate). Each name is resolved
+            only through the integration config field mappings for the entity kind. The include name must equal
+            source_field exactly; spec.org does not match org. There is no fallback to integration properties. A missing mapping or missing target path is returned as
+            null. Values appear on the entity as fields. Use include_paths to read a raw data path such as
+            metadata.integration_properties.GitHub.org.
+        - name: include_paths
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >-
+            Comma-separated paths read verbatim from the mapped entity data (for example,
+            metadata.integration_properties.GitHub.org). org means data.org. The response key is the path string as
+            requested. Values appear on the entity as paths, never mixed into fields. Omitted when include_paths is
+            not provided.
         - name: prev_offset
           in: query
           required: false
@@ -8904,6 +8938,20 @@ components:
           type: string
         name:
           type: string
+        fields:
+          type: object
+          additionalProperties: {}
+          description: >-
+            Values requested through include_fields. Each name must equal source_field exactly in the integration
+            config field mappings for the entity kind. A requested key is null when the mapping or target path is
+            absent. Omitted when include_fields is not provided.
+        paths:
+          type: object
+          additionalProperties: {}
+          description: >-
+            Values requested through include_paths. Each key is the path string as requested and the value is read
+            from mapped-entity data. A requested key is null when that path is absent. Omitted when include_paths
+            is not provided.
         action_destination:
           type: object
           properties:
