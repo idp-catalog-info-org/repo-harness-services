@@ -17,6 +17,8 @@ import io.harness.callback.DelegateCallbackToken;
 import io.harness.config.NgSecretPersistenceTestConfig;
 import io.harness.configuration.CgiTaskConfig;
 import io.harness.connector.NGConnectorSecretManagerServiceImpl;
+import io.harness.connector.oidc.handler.DefaultOidcHandler;
+import io.harness.connector.oidc.metrics.ConnectorOidcMetrics;
 import io.harness.connector.services.ConnectorService;
 import io.harness.connector.services.NGConnectorSecretManagerService;
 import io.harness.delegate.DelegateServiceGrpc;
@@ -199,6 +201,8 @@ public class NgSecretTestRule implements MethodRule, InjectorRuleMixinNew, Mongo
         bind(EnforcementSdkRegisterService.class).to(EnforcementSdkRegisterServiceImpl.class);
         bind(VariableFunctorProcessor.class).toInstance(mock(VariableFunctorProcessor.class));
         bind(NGConnectorSecretManagerService.class).to(NGConnectorSecretManagerServiceImpl.class);
+        bind(DefaultOidcHandler.class).toInstance(mock(DefaultOidcHandler.class));
+        bind(ConnectorOidcMetrics.class).toInstance(mock(ConnectorOidcMetrics.class));
         bind(NgConnectorManagerClientService.class).toInstance(mock(NgConnectorManagerClientService.class));
         // Bind encryptors
         bind(KmsEncryptor.class)
