@@ -107,6 +107,7 @@ public class SaveCacheStepVariableCreatorTest extends CategoryTest {
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.providerType",
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.archiveFormat",
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.override",
+            "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.ignoreMissingPaths",
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.pathStyle",
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.runAsUser",
             "pipeline.stages.generic_cache.spec.execution.steps.saveCache.spec.endpoint",
