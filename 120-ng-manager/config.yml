@@ -915,6 +915,12 @@ pluginExecutionConfig:
     image: harness/prometheus-metric-data-collection-plugin:stable-amd64
     entrypoint:
       - /app/prometheus-metric
+  # NOTE: the custom-log plugin image tag below must be published to Docker Hub before this config is
+  # exercised end-to-end. See CDS-129810 for image build/publish tracking.
+  aiVerifyCustomLogPluginImageConfig:
+    image: harness/custom-log-data-collection-plugin:stable-amd64
+    entrypoint:
+      - /app/custom-log
   serverlessBaseRepository: "harness/serverless-plugin"
   apiUrl: https://localhost:8181/#/
 
