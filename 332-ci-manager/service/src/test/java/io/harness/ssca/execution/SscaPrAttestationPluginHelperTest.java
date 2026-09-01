@@ -16,6 +16,8 @@ import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUti
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.PLUGIN_ARTIFACT_VARIANT_TYPE;
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.PLUGIN_KEYLESS_TYPE;
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.PLUGIN_PR_NUMBER;
+import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.PLUGIN_TYPE;
+import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.PLUGIN_TYPE_PR_ATTEST;
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.SOURCE_PLATFORM;
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.STAGE_EXECUTION_ID;
 import static io.harness.ssca.execution.attestation.SscaAttestationStepPluginUtils.STAGE_NAME;
@@ -93,6 +95,7 @@ public class SscaPrAttestationPluginHelperTest extends CIExecutionTestBase {
         sscaPrAttestationPluginHelper.getSscaPrAttestationStepEnvVariables(stepInfo, "id1", ambiance);
 
     assertThat(envMap).isNotNull().isNotEmpty();
+    assertThat(envMap.get(PLUGIN_TYPE)).isEqualTo(PLUGIN_TYPE_PR_ATTEST);
     assertThat(envMap.get(PLUGIN_ARTIFACT_URL)).isEqualTo("https://github.com/org/repo");
     assertThat(envMap.get(PLUGIN_ARTIFACT_TYPE)).isEqualTo("repository");
     assertThat(envMap.get(PLUGIN_ARTIFACT_VARIANT_TYPE)).isEqualTo("branch");

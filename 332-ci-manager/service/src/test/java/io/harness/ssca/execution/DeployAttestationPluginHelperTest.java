@@ -11,6 +11,8 @@ import static io.harness.rule.OwnerRule.VEDANT;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.PLUGIN_DEPLOYMENT_INFO;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.PLUGIN_KEYLESS_TYPE;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.PLUGIN_NON_HARNESS_OIDC_TOKEN;
+import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.PLUGIN_TYPE;
+import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.PLUGIN_TYPE_DEPLOY_ATTEST;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.STAGE_EXECUTION_ID;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.STAGE_NAME;
 import static io.harness.ssca.execution.attestation.DeployAttestationStepPluginUtils.STAGE_TYPE;
@@ -130,6 +132,7 @@ public class DeployAttestationPluginHelperTest extends CIExecutionTestBase {
         deployAttestationPluginHelper.getDeployAttestationStepEnvVariables(stepInfo, "id1", ambiance);
 
     assertThat(envMap).isNotNull().isNotEmpty();
+    assertThat(envMap.get(PLUGIN_TYPE)).isEqualTo(PLUGIN_TYPE_DEPLOY_ATTEST);
     assertThat(envMap.get(PLUGIN_DEPLOYMENT_INFO))
         .contains("app-pod-1")
         .contains("docker.io/org/app:tag")
