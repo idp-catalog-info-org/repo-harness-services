@@ -855,6 +855,7 @@ java_library(
         "//879-pipeline-ci-commons/src/main/java/io/harness/beans/script:module",
         "//879-pipeline-ci-commons/src/main/java/io/harness/ci/ff/impl:module",
         "//879-pipeline-ci-commons/src/main/java/io/harness/ci/permission:module",
+        "//879-pipeline-ci-commons/src/main/java/io/harness/ci/utils:module",
         "//945-license-usage-sdk/src/main/java/io/harness/licensing/usage/utils:module",
         "//960-persistence:supporter-test",
         "//970-ng-commons:module",

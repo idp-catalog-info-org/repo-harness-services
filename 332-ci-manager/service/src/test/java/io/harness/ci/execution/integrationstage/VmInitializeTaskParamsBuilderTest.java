@@ -60,6 +60,7 @@ import io.harness.ci.executionplan.base.CIExecutionTestBase;
 import io.harness.ci.ff.CIFeatureFlagService;
 import io.harness.ci.logserviceclient.CILogServiceUtils;
 import io.harness.ci.tiserviceclient.TIServiceUtils;
+import io.harness.ci.utils.EgressProxyUtils;
 import io.harness.connector.SecretSpecBuilder;
 import io.harness.data.structure.UUIDGenerator;
 import io.harness.delegate.beans.ci.CIInitializeTaskParams;
@@ -139,6 +140,7 @@ public class VmInitializeTaskParamsBuilderTest extends CIExecutionTestBase {
   @Mock CIExecutionServiceConfig ciExecutionServiceConfig;
   @Mock HostedVmSecretResolver hostedVmSecretResolver;
   @Mock private CIFeatureFlagService featureFlagService;
+  @Mock private EgressProxyUtils egressProxyUtils;
   @InjectMocks CILicenseUsageUtils ciLicenseUsageUtils;
 
   @Mock private VmInitializeUtilsImpl vmInitializeUtils;
