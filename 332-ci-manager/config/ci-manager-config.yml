@@ -852,7 +852,7 @@ ciExecutionServiceConfig:
         disableClone: false
         binarySuffix: plugin-{{ os }}-{{ arch }}.zst
       buildCacheConfig:
-        name: github.com/wings-software/harness-cache@refs/tags/cache-proxy/v1.7.29
+        name: github.com/wings-software/harness-cache@refs/tags/v1.7.29
         disableClone: true
         binarySuffix: cache-proxy-{{ os }}-{{ arch }}.zst
   gitnessConfig:
