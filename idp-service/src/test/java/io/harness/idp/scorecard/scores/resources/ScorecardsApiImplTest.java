@@ -7,6 +7,7 @@
 
 package io.harness.idp.scorecard.scores.resources;
 
+import static io.harness.rule.OwnerRule.NITESH_GAHLOT;
 import static io.harness.rule.OwnerRule.VIGNESWARA;
 
 import static junit.framework.TestCase.assertEquals;
@@ -18,6 +19,7 @@ import io.harness.CategoryTest;
 import io.harness.annotations.dev.HarnessTeam;
 import io.harness.annotations.dev.OwnedBy;
 import io.harness.category.element.UnitTests;
+import io.harness.eraro.ResponseMessage;
 import io.harness.exception.InvalidRequestException;
 import io.harness.idp.scorecard.scorecards.resources.ScorecardsApiImpl;
 import io.harness.idp.scorecard.scorecards.service.ScorecardService;
@@ -145,12 +147,23 @@ public class ScorecardsApiImplTest extends CategoryTest {
   }
 
   @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testCreateScorecardReturnsBadRequestForInvalidRequestException() {
+    String errorMessage = "Tier group identifier is required for scorecard";
+    doThrow(new InvalidRequestException(errorMessage))
+        .when(scorecardService)
+        .saveScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
+    Response response = scorecardsApiImpl.createScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals(errorMessage, ((ResponseMessage) response.getEntity()).getMessage());
+  }
+
+  @Test
   @Owner(developers = VIGNESWARA)
   @Category(UnitTests.class)
   public void testCreateScorecardThrowsException() {
-    doThrow(InvalidRequestException.class)
-        .when(scorecardService)
-        .saveScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
+    doThrow(RuntimeException.class).when(scorecardService).saveScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
     Response response = scorecardsApiImpl.createScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
@@ -214,12 +227,23 @@ public class ScorecardsApiImplTest extends CategoryTest {
   }
 
   @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testUpdateScorecardReturnsBadRequestForInvalidRequestException() {
+    String errorMessage = "Error while saving scorecard. Could not find tier group nonexistent_tg_xyz";
+    doThrow(new InvalidRequestException(errorMessage))
+        .when(scorecardService)
+        .updateScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
+    Response response = scorecardsApiImpl.updateScorecard(SCORECARD_ID, new ScorecardDetailsRequest(), ACCOUNT_ID);
+    assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals(errorMessage, ((ResponseMessage) response.getEntity()).getMessage());
+  }
+
+  @Test
   @Owner(developers = VIGNESWARA)
   @Category(UnitTests.class)
   public void testUpdateScorecardThrowsException() {
-    doThrow(InvalidRequestException.class)
-        .when(scorecardService)
-        .updateScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
+    doThrow(RuntimeException.class).when(scorecardService).updateScorecard(new ScorecardDetailsRequest(), ACCOUNT_ID);
     Response response = scorecardsApiImpl.updateScorecard(SCORECARD_ID, new ScorecardDetailsRequest(), ACCOUNT_ID);
     assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
   }
