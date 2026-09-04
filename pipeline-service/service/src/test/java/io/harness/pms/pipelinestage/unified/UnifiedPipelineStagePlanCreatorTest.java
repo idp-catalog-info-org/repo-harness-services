@@ -7,6 +7,7 @@
 
 package io.harness.pms.pipelinestage.unified;
 
+import static io.harness.rule.OwnerRule.SOUMYO_PURKAYASTHA;
 import static io.harness.rule.OwnerRule.UTKARSH_CHOUBEY;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,7 @@ import io.harness.pms.execution.OrchestrationFacilitatorType;
 import io.harness.pms.pipeline.PipelineEntity;
 import io.harness.pms.pipeline.service.enforcement.PipelineEnforcementService;
 import io.harness.pms.pipeline.service.intfc.PMSPipelineService;
+import io.harness.pms.pipelinestage.PipelineStageStepParameters;
 import io.harness.pms.pipelinestage.v1.helper.PipelineStageHelperV1;
 import io.harness.pms.plan.execution.helper.PipelineStageHelper;
 import io.harness.pms.plan.execution.helper.PipelineStageStep;
@@ -145,9 +147,52 @@ public class UnifiedPipelineStagePlanCreatorTest extends CategoryTest {
     assertThat(planNode.getFacilitatorObtainments().get(0).getType().getType())
         .isEqualTo(OrchestrationFacilitatorType.ASYNC);
 
+    assertThat(planNode.getStepParameters()).isInstanceOf(PipelineStageStepParameters.class);
+    PipelineStageStepParameters stepParameters = (PipelineStageStepParameters) planNode.getStepParameters();
+    assertThat(stepParameters.getName()).isEqualTo("parent pipeline");
+    assertThat(stepParameters.getIdentifier()).isEqualTo("parent_pipeline");
+
     verify(pipelineEnforcementService, times(1)).validatePipelineChainingEnforcement(ACC);
     verify(pipelineStageHelper, times(1))
         .validateNestedChainedPipeline(any(PipelineEntity.class), eq("parent pipeline"), eq(""), eq(scopeInfo));
     verify(pipelineStageHelperV1, times(1)).validateFailureStrategy(any());
+  }
+
+  @Test
+  @Owner(developers = SOUMYO_PURKAYASTHA)
+  @Category(UnitTests.class)
+  public void testGetStageStepParametersPopulatesStageMetadata() throws IOException {
+    String yamlField = "stage:\n"
+        + "  id: chained_stage_1\n"
+        + "  name: chained_stage\n"
+        + "  desc: stage description\n"
+        + "  type: pipeline\n"
+        + "  __uuid: uuid\n"
+        + "  chain:\n"
+        + "    uses: " + ORG + "/" + PROJ + "/" + PIPELINE + "\n"
+        + "    ref: main\n"
+        + "    with:\n"
+        + "      input-sets: []\n";
+
+    YamlField stageYamlField = YamlUtils.injectUuidInYamlField(yamlField).getNode().getField("stage");
+    UnifiedPipelineStageNode stageNode =
+        YamlUtils.read(stageYamlField.getNode().toString(), UnifiedPipelineStageNode.class);
+
+    IdentifierRef identifierRef =
+        IdentifierRef.builder().identifier(PIPELINE).orgIdentifier(ORG).projectIdentifier(PROJ).build();
+    when(pipelineStageHelperV1.getIdentifierRef(anyString(), anyString())).thenReturn(identifierRef);
+
+    PipelineStageStepParameters stepParameters = unifiedPipelineStagePlanCreator.getStageStepParameters(
+        stageNode.getUnifiedPipelineStageInfo(), null, "stageNodeId", HarnessYamlVersion.V1, stageNode);
+
+    assertThat(stepParameters.getIdentifier()).isEqualTo("chained_stage_1");
+    assertThat(stepParameters.getName()).isEqualTo("chained_stage");
+    assertThat(stepParameters.getDescription()).isEqualTo("stage description");
+    assertThat(stepParameters.getPipeline()).isEqualTo(PIPELINE);
+    assertThat(stepParameters.getOrg()).isEqualTo(ORG);
+    assertThat(stepParameters.getProject()).isEqualTo(PROJ);
+    assertThat(stepParameters.getStageNodeId()).isEqualTo("stageNodeId");
+    assertThat(stepParameters.getGitBranch()).isEqualTo("main");
+    assertThat(stepParameters.getTags()).isNull();
   }
 }
