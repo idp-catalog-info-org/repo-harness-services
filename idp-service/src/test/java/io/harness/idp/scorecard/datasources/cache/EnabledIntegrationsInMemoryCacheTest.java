@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -94,12 +95,17 @@ public class EnabledIntegrationsInMemoryCacheTest extends CategoryTest {
     when(integrationManagerClientHelper.listIntegrationConfigs(
              eq(ACCOUNT_IDENTIFIER), eq(ACCOUNT_IDENTIFIER), eq(INTEGRATION_TYPES_TO_CHECK), eq(true), eq(true)))
         .thenReturn(integrationConfigsCall);
-    when(integrationConfigsCall.execute())
-        .thenThrow(new IOException("integration-manager unavailable"))
-        .thenReturn(Response.success(List.of(integrationConfig(EnumIntegrationType.DataDog, true))));
+    AtomicBoolean shouldFail = new AtomicBoolean(true);
+    when(integrationConfigsCall.execute()).thenAnswer(invocation -> {
+      if (shouldFail.get()) {
+        throw new IOException("integration-manager unavailable");
+      }
+      return Response.success(List.of(integrationConfig(EnumIntegrationType.DataDog, true)));
+    });
 
     Optional<Set<EnumIntegrationType>> firstCall =
         enabledIntegrationsInMemoryCache.getEnabledIntegrationTypes(ACCOUNT_IDENTIFIER);
+    shouldFail.set(false);
     Optional<Set<EnumIntegrationType>> secondCall =
         enabledIntegrationsInMemoryCache.getEnabledIntegrationTypes(ACCOUNT_IDENTIFIER);
 
