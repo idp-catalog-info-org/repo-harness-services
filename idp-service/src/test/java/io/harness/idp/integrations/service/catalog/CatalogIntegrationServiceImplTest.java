@@ -38,6 +38,7 @@ import io.harness.clients.integrationmanager.EntityMappedEntityResponse;
 import io.harness.clients.integrationmanager.EntityMappedEntityResponseObject;
 import io.harness.clients.integrationmanager.EntitySubscribeEntitiesResponse;
 import io.harness.clients.integrationmanager.IntegrationManagerClientHelper;
+import io.harness.clients.integrationmanager.OpenapiGetMappedEntitiesRequest;
 import io.harness.clients.integrationmanager.TypesIntegrationConfig;
 import io.harness.eventsframework.schemas.idp.UserPrincipal;
 import io.harness.exception.InvalidRequestException;
@@ -2077,7 +2078,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(GetEntitiesDTO.builder().entityResponses(List.of(workflowEntity)).build());
 
     DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null);
+        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null, null, null, null);
 
     assertThat(result.getDiscoverEntitiesResponses()).isEmpty();
     verify(catalogService, never())
@@ -2115,7 +2116,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(GetEntitiesDTO.builder().entityResponses(Collections.emptyList()).build());
 
     DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null);
+        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null, null, null, null);
 
     assertThat(result.getDiscoverEntitiesResponses()).hasSize(1);
     DiscoverEntitiesResponse discoverResponse = result.getDiscoverEntitiesResponses().get(0);
@@ -2161,7 +2162,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(GetEntitiesDTO.builder().entityResponses(Collections.emptyList()).build());
 
     DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null);
+        integrationId, 0, 10, "created,desc", null, "catalog_info_file", null, null, null, null, null);
 
     assertThat(result.getDiscoverEntitiesResponses()).hasSize(2);
     verify(catalogService)
@@ -2272,6 +2273,15 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
             eq(HARNESS_CI_INTEGRATION_ID), any());
   }
 
+  private EntityMappedEntityResponse githubMappedEntityWithOrg() {
+    EntityMappedEntityResponse entity = buildEntityMappedEntityResponse("github-1", "component", "github-service");
+    entity.setKind("repo_details");
+    entity.getData().put("org", "wrong-top-level-value");
+    entity.getData().put(
+        "metadata", Map.of("integration_properties", Map.of("GitHub", Map.of("org", "acme", "isPrivate", false))));
+    return entity;
+  }
+
   private void stubDiscoverEntitiesImCalls(TypesIntegrationConfig config, List<EntityMappedEntityResponse> entities)
       throws Exception {
     EntityMappedEntityResponseObject responseObject = new EntityMappedEntityResponseObject(entities);
@@ -2316,6 +2326,13 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     configuration.put("all_scopes", true);
     config.setConfiguration(configuration);
     return config;
+  }
+
+  private void putFieldMapping(TypesIntegrationConfig config, String kind, String sourceField, String targetField) {
+    Map<String, Object> configuration = new HashMap<>(config.getConfiguration());
+    configuration.put("field_mappings_per_kind",
+        Map.of(kind, List.of(Map.of("source_field", sourceField, "target_field", targetField))));
+    config.setConfiguration(configuration);
   }
 
   private void stubIntegrationConfig(TypesIntegrationConfig config) throws Exception {
@@ -2658,8 +2675,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         buildEntityMappedEntityResponse("e1", "component", "svc1"));
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 99, 2, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 99, 2, null, null, null, null, null, null, null, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getTotalElements()).isZero();
@@ -2700,8 +2717,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
                         .totalElements(2)
                         .build());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null, null, null, null);
 
     assertThat(result.getMergeSuggestions()).isEmpty();
     assertThat(result.getDiscoverEntitiesResponses()).hasSize(1);
@@ -2720,8 +2737,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         buildEntityMappedEntityResponse("e1", "component", "svc1"));
     stubMappedEntitiesByOffset(source, -1);
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 1, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 1, null, null, null, null, null, null, null, null);
 
     assertThat(result.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -2750,7 +2767,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(Response.success(new EntityMappedEntityResponseObject(List.of(entity)), headers));
 
     DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, null, null);
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, null, null, null, null, null);
 
     assertThat(result.isOffsetPagination()).isFalse();
     assertThat(result.getTotalElements()).isEqualTo(7);
@@ -2760,6 +2777,294 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     verify(integrationManagerClientHelper, never())
         .getMappedEntitiesByOffset(any(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), anyInt(),
             anyInt(), any(), any(), anyBoolean());
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_AppliesFiltersPerKindWithoutPopulatingFields() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details", "team_repositories"));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(githubMappedEntityWithOrg()));
+
+    DiscoverEntitiesDTO result =
+        catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null,
+            null, null, List.of("org:acme", "org:service", "isPrivate:false"), null, null, null, null);
+
+    ArgumentCaptor<OpenapiGetMappedEntitiesRequest> requestCaptor =
+        ArgumentCaptor.forClass(OpenapiGetMappedEntitiesRequest.class);
+    verify(integrationManagerClientHelper)
+        .getMappedEntities(eq(TEST_ACCOUNT_IDENTIFIER), eq(TEST_ACCOUNT_IDENTIFIER), any(), any(), eq(TEST_IDENTIFIER),
+            any(), eq(true), any(), any(), eq(0), eq(10), any(), requestCaptor.capture(), eq(true));
+    OpenapiGetMappedEntitiesRequest request = requestCaptor.getValue();
+    assertThat(request.getKinds()).containsExactly("repo_details", "team_repositories");
+    assertThat(request.getFieldValsPerKind()).containsOnlyKeys("repo_details", "team_repositories");
+    request.getFieldValsPerKind().values().forEach(filters -> {
+      assertThat(filters)
+          .extracting(OpenapiGetMappedEntitiesRequest.FieldValFilter::getFieldName)
+          .containsExactly("org", "isPrivate");
+      assertThat(filters.get(0).getFieldValues()).containsExactly("acme", "service");
+      assertThat(filters.get(1).getFieldValues()).containsExactly("false");
+    });
+    assertThat(result.getDiscoverEntitiesResponses()).hasSize(1);
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).isNullOrEmpty();
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsWithoutMappingAreNull() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details"));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(githubMappedEntityWithOrg()));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        TEST_IDENTIFIER, 0, 10, null, null, null, null, "org,isPrivate", null, null, null);
+
+    verify(integrationManagerClientHelper)
+        .getMappedEntities(eq(TEST_ACCOUNT_IDENTIFIER), eq(TEST_ACCOUNT_IDENTIFIER), any(), any(), eq(TEST_IDENTIFIER),
+            any(), eq(true), any(), any(), eq(0), eq(10), any(), any(), eq(true));
+    assertThat(result.getDiscoverEntitiesResponses()).hasSize(1);
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields())
+        .containsEntry("org", null)
+        .containsEntry("isPrivate", null)
+        .doesNotContainValue("wrong-top-level-value");
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths()).isNullOrEmpty();
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsTrimsAndDropsBlankSegments() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details"));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(githubMappedEntityWithOrg()));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        TEST_IDENTIFIER, 0, 10, null, null, null, null, " org, isPrivate, ", null, null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields())
+        .containsOnlyKeys("org", "isPrivate")
+        .doesNotContainKey(" isPrivate")
+        .doesNotContainKey("");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_FiltersAndIncludeFieldsAreIndependent() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details", "team_repositories"));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(githubMappedEntityWithOrg()));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        TEST_IDENTIFIER, 0, 10, null, null, null, List.of("org:acme"), "org", null, null, null);
+
+    ArgumentCaptor<OpenapiGetMappedEntitiesRequest> requestCaptor =
+        ArgumentCaptor.forClass(OpenapiGetMappedEntitiesRequest.class);
+    verify(integrationManagerClientHelper)
+        .getMappedEntities(eq(TEST_ACCOUNT_IDENTIFIER), eq(TEST_ACCOUNT_IDENTIFIER), any(), any(), eq(TEST_IDENTIFIER),
+            any(), eq(true), any(), any(), eq(0), eq(10), any(), requestCaptor.capture(), eq(true));
+    assertThat(requestCaptor.getValue().getFieldValsPerKind()).containsOnlyKeys("repo_details", "team_repositories");
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields())
+        .containsEntry("org", null)
+        .doesNotContainKey("isPrivate");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsUsesFieldMappingTargetPath() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details"));
+    putFieldMapping(config, "repo_details", "org", "metadata.custom.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.getData().put("metadata",
+        Map.of("custom", Map.of("org", "from-mapping"), "integration_properties",
+            Map.of("GitHub", Map.of("org", "acme", "isPrivate", false))));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        TEST_IDENTIFIER, 0, 10, null, null, null, null, "org,isPrivate", null, null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields())
+        .containsEntry("org", "from-mapping")
+        .containsEntry("isPrivate", null);
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsRequiresExactSourceField() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details"));
+    putFieldMapping(config, "repo_details", "spec.org", "metadata.custom.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.getData().put("metadata",
+        Map.of("custom", Map.of("org", "from-spec-mapping"), "integration_properties",
+            Map.of("GitHub", Map.of("org", "acme", "isPrivate", false))));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null, null, null, null, "org", null, null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields())
+        .containsEntry("org", null)
+        .doesNotContainValue("from-spec-mapping");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsNullWhenMappingPathIsMissing() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("aiasset_skill"));
+    putFieldMapping(config, "aiasset_skill", "org", "spec.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.setKind("aiasset_skill");
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null, null, null, null, "org", null, null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).containsEntry("org", null);
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths()).isNullOrEmpty();
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsUsesExplicitMappingToIntegrationProperty() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("aiasset_skill"));
+    putFieldMapping(config, "aiasset_skill", "org", "metadata.integration_properties.GitHub.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.setKind("aiasset_skill");
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null, null, null, null, "org", null, null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).containsEntry("org", "acme");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludePathsReadDottedPathFromMappedData() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("aiasset_skill"));
+    putFieldMapping(config, "aiasset_skill", "org", "spec.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.setKind("aiasset_skill");
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        TEST_IDENTIFIER, 0, 10, null, null, null, null, null, "metadata.integration_properties.GitHub.org", null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).isNullOrEmpty();
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths())
+        .containsEntry("metadata.integration_properties.GitHub.org", "acme")
+        .doesNotContainKey("org")
+        .doesNotContainValue("wrong-top-level-value");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludePathsReadTopLevelPathWithoutFieldMappings() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("aiasset_skill"));
+    putFieldMapping(config, "aiasset_skill", "org", "metadata.integration_properties.GitHub.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.setKind("aiasset_skill");
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null, null, null, null, null, "org", null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).isNullOrEmpty();
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths()).containsEntry("org", "wrong-top-level-value");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsAndIncludePathsAreIndependent() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("repo_details"));
+    putFieldMapping(config, "repo_details", "org", "metadata.custom.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.getData().put("metadata",
+        Map.of("custom", Map.of("org", "from-mapping"), "integration_properties",
+            Map.of("GitHub", Map.of("org", "acme", "isPrivate", false))));
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result =
+        catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null,
+            null, null, null, "org", "metadata.integration_properties.GitHub.org", null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).containsEntry("org", "from-mapping");
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths())
+        .containsEntry("metadata.integration_properties.GitHub.org", "acme");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_IncludeFieldsAndIncludePathsSameTokenStaySeparate() throws Exception {
+    TypesIntegrationConfig config = buildNonCIConfig();
+    config.setIntegrationType(TypesIntegrationConfig.EnumIntegrationType.GitHub);
+    config.setKinds(List.of("aiasset_skill"));
+    putFieldMapping(config, "aiasset_skill", "organization", "metadata.custom.org");
+    EntityMappedEntityResponse entity = githubMappedEntityWithOrg();
+    entity.setKind("aiasset_skill");
+    stubEmptyCatalogEntities();
+    stubDiscoverEntitiesImCalls(config, List.of(entity));
+
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 0, 10, null, null, null, null, "org", "org", null, null);
+
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getFields()).containsEntry("org", null);
+    assertThat(result.getDiscoverEntitiesResponses().get(0).getPaths()).containsEntry("org", "wrong-top-level-value");
+  }
+
+  @Test
+  @Owner(developers = NITESH_GAHLOT)
+  @Category(UnitTests.class)
+  public void testDiscoverEntities_InvalidFilterThrows() throws Exception {
+    stubIntegrationConfig(buildNonCIConfig());
+
+    assertThatThrownBy(()
+                           -> catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+                               TEST_IDENTIFIER, 0, 10, null, null, null, List.of("org"), null, null, null, null))
+        .isInstanceOf(InvalidRequestException.class)
+        .hasMessageContaining("field_name:value");
+    verify(integrationManagerClientHelper, never())
+        .getMappedEntities(any(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), anyInt(), anyInt(),
+            any(), any(), anyBoolean());
   }
 
   @Test
@@ -2780,7 +3085,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(Response.success(new EntityMappedEntityResponseObject(List.of()), headers));
 
     DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 3, 10, null, null, null, 5, 15);
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 3, 10, null, null, null, null, null, null, 5, 15);
 
     assertThat(result.isOffsetPagination()).isFalse();
     assertThat(result.getTotalElements()).isZero();
@@ -2801,7 +3106,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
 
     assertThatThrownBy(()
                            -> catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, 1, 2))
+                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null, null, 1, 2))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessageContaining("prevOffset and nextOffset cannot both be provided");
   }
@@ -2814,13 +3119,13 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
 
     assertThatThrownBy(()
                            -> catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, -1, null))
+                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null, null, -1, null))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessageContaining("Pagination offsets cannot be negative");
 
     assertThatThrownBy(()
                            -> catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, -5))
+                               HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null, null, null, -5))
         .isInstanceOf(InvalidRequestException.class)
         .hasMessageContaining("Pagination offsets cannot be negative");
   }
@@ -2836,8 +3141,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubImportedCatalogEntitiesForDenseSource(totalSize, eligibleOffsets);
     stubMappedEntitiesByOffset(source, -1);
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, null, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getDiscoverEntitiesResponses())
@@ -2865,8 +3170,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         buildEntityMappedEntityResponse("e3", "component", "svc3"));
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, 2);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, null, 2);
 
     assertThat(result.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -2887,14 +3192,14 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         buildEntityMappedEntityResponse("e3", "component", "svc3"));
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO firstPage = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, null);
+    DiscoverEntitiesDTO firstPage = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, null, null, null, null);
     assertThat(firstPage.getDiscoverEntitiesResponses()).hasSize(3);
     assertThat(firstPage.getNextOffset()).isEqualTo(3);
     assertThat(firstPage.getPrevOffset()).isNull();
 
-    DiscoverEntitiesDTO lastPage = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, 3);
+    DiscoverEntitiesDTO lastPage = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, null, null, null, 3);
     assertThat(lastPage.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
         .containsExactly("e3");
@@ -2915,8 +3220,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         buildEntityMappedEntityResponse("e4", "component", "svc4"));
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, 4, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, 4, null);
 
     assertThat(result.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -2937,8 +3242,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubMappedEntitiesByOffset(source, source.size());
 
     // Exactly pageLimit eligible entities before the boundary — no forward rebuild.
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, 2, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, 2, null);
 
     assertThat(result.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -2965,8 +3270,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     List<EntityMappedEntityResponse> source = List.of(outOfScope, inScope);
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 10, null, null, null, null, null, null, null, null);
 
     assertThat(result.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -2979,8 +3284,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
   public void testDiscoverEntities_HarnessCI_PageLimitZeroReturnsEmptyOffsetPagination() throws Exception {
     stubIntegrationConfig(buildHarnessCIConfig());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 0, null, null, null, null, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 0, null, null, null, null, null, null, null, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getDiscoverEntitiesResponses()).isEmpty();
@@ -3010,9 +3315,9 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
         .thenReturn(Response.success(new EntityMappedEntityResponseObject(List.of(entity)), headers));
 
     DiscoverEntitiesDTO withPrevOffset = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, 5, null);
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, null, null, null, 5, null);
     DiscoverEntitiesDTO withNextOffset = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, null, 9);
+        TEST_ACCOUNT_IDENTIFIER, null, null, TEST_IDENTIFIER, 2, 10, null, null, null, null, null, null, null, 9);
 
     assertThat(withPrevOffset.isOffsetPagination()).isFalse();
     assertThat(withNextOffset.isOffsetPagination()).isFalse();
@@ -3045,8 +3350,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubImportedCatalogEntitiesForDenseSource(totalSize, eligibleOffsets);
     stubMappedEntitiesByOffset(source, totalSize);
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, boundary, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, boundary, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getDiscoverEntitiesResponses())
@@ -3078,8 +3383,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubImportedCatalogEntities("imp0", "imp1", "imp2");
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO forward = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null);
+    DiscoverEntitiesDTO forward = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, null, null);
 
     assertThat(forward.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -3088,7 +3393,7 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     assertThat(forward.getNextOffset()).isEqualTo(4);
 
     DiscoverEntitiesDTO backward = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
-        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, forward.getNextOffset(), null);
+        HARNESS_CI_INTEGRATION_ID, 0, 2, null, null, null, null, null, null, forward.getNextOffset(), null);
 
     assertThat(backward.getDiscoverEntitiesResponses())
         .extracting(DiscoverEntitiesResponse::getIntegrationEntityId)
@@ -3113,8 +3418,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubMappedEntitiesByOffset(source, source.size());
 
     // Only eligA exists before prevOffset=3, but enough eligible entities exist at/after the boundary.
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, 3, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, null, null, 3, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getDiscoverEntitiesResponses())
@@ -3138,8 +3443,8 @@ public class CatalogIntegrationServiceImplTest extends CategoryTest {
     stubImportedCatalogEntities("imp0", "imp1");
     stubMappedEntitiesByOffset(source, source.size());
 
-    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(
-        TEST_ACCOUNT_IDENTIFIER, null, null, HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, 4, null);
+    DiscoverEntitiesDTO result = catalogIntegrationService.discoverEntities(TEST_ACCOUNT_IDENTIFIER, null, null,
+        HARNESS_CI_INTEGRATION_ID, 0, 3, null, null, null, null, null, null, 4, null);
 
     assertThat(result.isOffsetPagination()).isTrue();
     assertThat(result.getDiscoverEntitiesResponses())

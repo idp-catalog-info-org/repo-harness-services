@@ -74,13 +74,13 @@ public class IntegrationsApiImplFeatureFlagTest extends CategoryTest {
     dto.setOffsetPagination(false);
 
     when(integrationService.discoverEntities(eq(ACCOUNT_ID), isNull(), isNull(), any(), eq("integration-1"), eq(0),
-             eq(10), isNull(), isNull(), isNull(), isNull(), isNull()))
+             eq(10), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
         .thenReturn(dto);
     when(idpCommonService.buildPageResponse(eq(0), eq(10), eq(0L), any()))
         .thenReturn(Response.status(Response.Status.OK).build());
 
-    Response response =
-        integrationsApi.discoverEntities("integration-1", ACCOUNT_ID, null, null, 0, 10, null, null, null, null, null);
+    Response response = integrationsApi.discoverEntities(
+        "integration-1", ACCOUNT_ID, null, null, 0, 10, null, null, null, null, null, null, null, null);
 
     verify(idpCommonService).newFlowCheck(ACCOUNT_ID);
   }
@@ -100,11 +100,11 @@ public class IntegrationsApiImplFeatureFlagTest extends CategoryTest {
                                   .build();
 
     when(integrationService.discoverEntities(eq(ACCOUNT_ID), isNull(), isNull(), any(), eq("integration-1"), eq(0),
-             eq(10), isNull(), isNull(), isNull(), eq(2), isNull()))
+             eq(10), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), eq(2), isNull()))
         .thenReturn(dto);
 
-    Response response =
-        integrationsApi.discoverEntities("integration-1", ACCOUNT_ID, null, null, 0, 10, null, null, null, 2, null);
+    Response response = integrationsApi.discoverEntities(
+        "integration-1", ACCOUNT_ID, null, null, 0, 10, null, null, null, null, null, null, 2, null);
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     @SuppressWarnings("unchecked") Map<String, Object> body = (Map<String, Object>) response.getEntity();
@@ -121,8 +121,8 @@ public class IntegrationsApiImplFeatureFlagTest extends CategoryTest {
         .newFlowCheck(ACCOUNT_ID);
 
     assertThatThrownBy(()
-                           -> integrationsApi.discoverEntities(
-                               "integration-1", ACCOUNT_ID, null, null, 0, 10, null, null, null, null, null))
+                           -> integrationsApi.discoverEntities("integration-1", ACCOUNT_ID, null, null, 0, 10, null,
+                               null, null, null, null, null, null, null))
         .isInstanceOf(InvalidRequestException.class);
   }
 

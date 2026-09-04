@@ -121,6 +121,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -321,7 +323,7 @@ public class CatalogIntegrationServiceImpl
   @Override
   public DiscoverEntitiesDTO discoverEntities(String accountIdentifier, String orgIdentifier, String projectIdentifier,
       String integrationId, int pageIndex, int pageLimit, String sort, String searchTerm, String kinds,
-      Integer prevOffset, Integer nextOffset) {
+      List<String> filters, String includeFields, String includePaths, Integer prevOffset, Integer nextOffset) {
     long methodStart = System.currentTimeMillis();
     log.info("discoverEntities called for account = {}, integrationId = {}, kinds = {}", accountIdentifier,
         integrationId, kinds);
@@ -330,15 +332,20 @@ public class CatalogIntegrationServiceImpl
     TypesIntegrationConfig integrationConfig =
         getIntegrationConfig(accountIdentifier, orgIdentifier, projectIdentifier, integrationId);
     log.info("[TIMER] getIntegrationConfig took {}ms", System.currentTimeMillis() - t0);
+    Map<String, List<String>> parsedFilters = parseDiscoverFilters(filters);
     if (integrationConfig.getIntegrationType() == TypesIntegrationConfig.EnumIntegrationType.HarnessCI) {
+      if (isNotEmpty(parsedFilters)) {
+        throw new InvalidRequestException("Filters are not supported for HarnessCI integrations");
+      }
       return discoverHarnessCIEntities(accountIdentifier, orgIdentifier, projectIdentifier, integrationId, pageLimit,
           sort, searchTerm, kinds, prevOffset, nextOffset, integrationConfig);
     }
 
     t0 = System.currentTimeMillis();
+    List<String> filterKinds = resolveFilterKinds(kinds, integrationConfig, parsedFilters);
     UnsubscribedIntegrationEntitiesResult unsubscribedResult =
         getUnsubscribedIntegrationEntities(accountIdentifier, orgIdentifier, projectIdentifier, integrationId, true,
-            true, List.of(), sort, searchTerm, kinds, pageIndex, pageLimit);
+            true, List.of(), sort, searchTerm, kinds, parsedFilters, filterKinds, pageIndex, pageLimit);
     List<EntityMappedEntityResponse> entityMappedEntityResponses = unsubscribedResult.getEntities();
     int unsubscribedTotalElements = unsubscribedResult.getTotalElements();
     log.info("[TIMER] getIntegrationEntities took {}ms, returned {} entities (totalElements={}, totalPages={}, "
@@ -357,8 +364,9 @@ public class CatalogIntegrationServiceImpl
           .build();
     }
 
-    DiscoveryPreparationResult preparationResult = prepareDiscoveryResponses(
-        accountIdentifier, integrationId, integrationConfig, entityMappedEntityResponses, new DiscoveryCatalogCache());
+    DiscoveryPreparationResult preparationResult =
+        prepareDiscoveryResponses(accountIdentifier, integrationId, integrationConfig, entityMappedEntityResponses,
+            new DiscoveryCatalogCache(), parseIncludeTokens(includeFields), parseIncludeTokens(includePaths));
     log.debug("[TIMER] discoverEntities total={}ms for account={}, integrationId={}, "
             + "mappedEntities={}, discoverResponses={}, mergeSuggestions={}",
         System.currentTimeMillis() - methodStart, accountIdentifier, integrationId, entityMappedEntityResponses.size(),
@@ -369,6 +377,59 @@ public class CatalogIntegrationServiceImpl
         .mergeSuggestions(preparationResult.getMergeSuggestions())
         .offsetPagination(false)
         .build();
+  }
+
+  private List<String> parseIncludeTokens(String includeTokens) {
+    if (isEmpty(includeTokens)) {
+      return List.of();
+    }
+    return Arrays.stream(includeTokens.split(","))
+        .map(String::trim)
+        .filter(StringUtils::isNotBlank)
+        .distinct()
+        .toList();
+  }
+
+  private Map<String, List<String>> parseDiscoverFilters(List<String> filters) {
+    if (isEmpty(filters)) {
+      return Map.of();
+    }
+    Map<String, LinkedHashSet<String>> valuesByField = new LinkedHashMap<>();
+    for (String filter : filters) {
+      if (StringUtils.isBlank(filter)) {
+        throw new InvalidRequestException("Filter must use field_name:value format");
+      }
+      int separator = filter.indexOf(':');
+      if (separator <= 0 || separator == filter.length() - 1) {
+        throw new InvalidRequestException("Filter must use field_name:value format: " + filter);
+      }
+      String fieldName = filter.substring(0, separator).trim();
+      String fieldValue = filter.substring(separator + 1).trim();
+      if (!fieldName.matches("[A-Za-z0-9_]+") || fieldValue.isEmpty()) {
+        throw new InvalidRequestException("Invalid discover filter: " + filter);
+      }
+      valuesByField.computeIfAbsent(fieldName, ignored -> new LinkedHashSet<>()).add(fieldValue);
+    }
+    Map<String, List<String>> parsedFilters = new LinkedHashMap<>();
+    valuesByField.forEach((field, values) -> parsedFilters.put(field, List.copyOf(values)));
+    return parsedFilters;
+  }
+
+  private List<String> resolveFilterKinds(
+      String kinds, TypesIntegrationConfig integrationConfig, Map<String, List<String>> parsedFilters) {
+    if (isEmpty(parsedFilters)) {
+      return List.of();
+    }
+    List<String> resolvedKinds = isEmpty(kinds) ? integrationConfig.getKinds() : Arrays.asList(kinds.split(","));
+    if (isEmpty(resolvedKinds)) {
+      throw new InvalidRequestException("Unable to resolve integration kinds for discover filters");
+    }
+    List<String> normalizedKinds =
+        resolvedKinds.stream().map(String::trim).filter(StringUtils::isNotBlank).distinct().toList();
+    if (normalizedKinds.isEmpty()) {
+      throw new InvalidRequestException("At least one kind is required when discover filters are provided");
+    }
+    return normalizedKinds;
   }
 
   private DiscoverEntitiesDTO discoverHarnessCIEntities(String accountIdentifier, String orgIdentifier,
@@ -414,8 +475,8 @@ public class CatalogIntegrationServiceImpl
         sourceExhausted = true;
         break;
       }
-      DiscoveryPreparationResult prepared =
-          prepareDiscoveryResponses(accountIdentifier, integrationId, integrationConfig, sourceEntities, catalogCache);
+      DiscoveryPreparationResult prepared = prepareDiscoveryResponses(
+          accountIdentifier, integrationId, integrationConfig, sourceEntities, catalogCache, List.of(), List.of());
       addUniqueMergeSuggestions(mergeSuggestions, mergeSuggestionRefs, prepared.getMergeSuggestions());
       Map<String, DiscoverEntitiesResponse> responseByUuid =
           prepared.getDiscoverEntitiesResponses().stream().collect(Collectors.toMap(
@@ -466,8 +527,8 @@ public class CatalogIntegrationServiceImpl
         cursor = windowOffset;
         continue;
       }
-      DiscoveryPreparationResult prepared =
-          prepareDiscoveryResponses(accountIdentifier, integrationId, integrationConfig, sourceEntities, catalogCache);
+      DiscoveryPreparationResult prepared = prepareDiscoveryResponses(
+          accountIdentifier, integrationId, integrationConfig, sourceEntities, catalogCache, List.of(), List.of());
       addUniqueMergeSuggestions(mergeSuggestions, mergeSuggestionRefs, prepared.getMergeSuggestions());
       Map<String, DiscoverEntitiesResponse> responseByUuid =
           prepared.getDiscoverEntitiesResponses().stream().collect(Collectors.toMap(
@@ -518,8 +579,8 @@ public class CatalogIntegrationServiceImpl
       OffsetMappedEntitiesResult window = getMappedEntitiesByOffset(accountIdentifier, orgIdentifier, projectIdentifier,
           integrationId, sortBy, searchTerm, kinds, windowOffset, windowLimit);
       if (!window.getEntities().isEmpty()
-          && !prepareDiscoveryResponses(
-              accountIdentifier, integrationId, integrationConfig, window.getEntities(), catalogCache)
+          && !prepareDiscoveryResponses(accountIdentifier, integrationId, integrationConfig, window.getEntities(),
+              catalogCache, List.of(), List.of())
                   .getDiscoverEntitiesResponses()
                   .isEmpty()) {
         return true;
@@ -540,7 +601,7 @@ public class CatalogIntegrationServiceImpl
 
   private DiscoveryPreparationResult prepareDiscoveryResponses(String accountIdentifier, String integrationId,
       TypesIntegrationConfig integrationConfig, List<EntityMappedEntityResponse> entityMappedEntityResponses,
-      DiscoveryCatalogCache catalogCache) {
+      DiscoveryCatalogCache catalogCache, List<String> includeFields, List<String> includePaths) {
     if (isEmpty(entityMappedEntityResponses)) {
       return new DiscoveryPreparationResult(List.of(), List.of());
     }
@@ -651,6 +712,8 @@ public class CatalogIntegrationServiceImpl
         && !integrationConfig.getIntegrationMode().equals(TypesIntegrationConfig.IntegrationMode.platform);
     log.info("allScopes: {}, allowCrossScopeCorrelation: {}", allScopes, allowCrossScopeCorrelation);
     Map<String, String> actionPerKind = integrationConfig.getActionPerKind();
+    Map<String, List<SourceTargetFieldMapping>> fieldMappingsPerKind =
+        isEmpty(includeFields) ? Map.of() : parseFieldMappingsPerKind(integrationConfig);
 
     // Build map: IDP kind name (lowercase) -> configAction
     // actionPerKind keys use integration-manager naming (e.g., "services", "teams")
@@ -677,7 +740,8 @@ public class CatalogIntegrationServiceImpl
               actionPerKind != null && integrationKind != null ? actionPerKind.get(integrationKind) : null;
           Optional<DiscoverEntitiesResponse> optionalDiscoverEntitiesResponse =
               prepareDiscoverEntitiesResponse(entityMappedEntityResponse, entityResponses, spacePath, integrationId,
-                  allowCrossScopeCorrelation, integrationConfig.getIntegrationType(), configAction, correlationLookup);
+                  allowCrossScopeCorrelation, integrationConfig.getIntegrationType(), configAction, correlationLookup,
+                  includeFields, includePaths, fieldMappingsPerKind);
           optionalDiscoverEntitiesResponse.ifPresent(discoverEntitiesResponses::add);
         } catch (Exception e) {
           log.error("Error in prepareDiscoverEntitiesResponse for entityMappedEntityResponse = {} Exception = {}",
@@ -3396,7 +3460,8 @@ public class CatalogIntegrationServiceImpl
       EntityMappedEntityResponse entityMappedEntityResponse, List<EntityResponse> entityResponses, String spacePath,
       String integrationId, boolean allowCrossScopeCorrelation,
       TypesIntegrationConfig.EnumIntegrationType integrationType, String configAction,
-      CorrelationLookup correlationLookup) {
+      CorrelationLookup correlationLookup, List<String> includeFields, List<String> includePaths,
+      Map<String, List<SourceTargetFieldMapping>> fieldMappingsPerKind) {
     String kind = (String) entityMappedEntityResponse.getData().get(MAPPED_ENTITY_RESPONSE_KIND_KEY);
     String type = (String) entityMappedEntityResponse.getData().get(MAPPED_ENTITY_RESPONSE_TYPE_KEY);
     String scope = entityMappedEntityResponse.getScope().toString();
@@ -3410,6 +3475,13 @@ public class CatalogIntegrationServiceImpl
 
     discoverEntitiesResponse.setType(type);
     discoverEntitiesResponse.setName(entityMappedEntityResponse.getName());
+    if (isNotEmpty(includeFields)) {
+      discoverEntitiesResponse.setFields(extractIncludedFields(entityMappedEntityResponse.getData(),
+          entityMappedEntityResponse.getKind(), fieldMappingsPerKind, includeFields));
+    }
+    if (isNotEmpty(includePaths)) {
+      discoverEntitiesResponse.setPaths(extractIncludedPaths(entityMappedEntityResponse.getData(), includePaths));
+    }
     DiscoverEntitiesResponseActionDestination discoverEntitiesResponseActionDestination =
         new DiscoverEntitiesResponseActionDestination();
 
@@ -3522,6 +3594,115 @@ public class CatalogIntegrationServiceImpl
     discoverEntitiesResponse.setActionDestination(discoverEntitiesResponseActionDestination);
     discoverEntitiesResponse.setDiscoveredAt(entityMappedEntityResponse.getDetectedAt());
     return Optional.of(discoverEntitiesResponse);
+  }
+
+  /**
+   * Resolves {@code include_fields} through {@code field_mappings_per_kind} only. A missing mapping or missing
+   * target path is {@code null}; there is no integration-properties fallback.
+   */
+  private Map<String, Object> extractIncludedFields(Map<String, Object> mappedEntityData, String integrationKind,
+      Map<String, List<SourceTargetFieldMapping>> fieldMappingsPerKind, List<String> includeFields) {
+    Map<String, Object> fields = new LinkedHashMap<>();
+    includeFields.forEach(field -> fields.put(field, null));
+    if (isEmpty(mappedEntityData)) {
+      return fields;
+    }
+    List<SourceTargetFieldMapping> kindMappings = lookupKindFieldMappings(fieldMappingsPerKind, integrationKind);
+    for (String field : includeFields) {
+      String targetField = resolveTargetField(kindMappings, field);
+      fields.put(field, isNotEmpty(targetField) ? readDottedPath(mappedEntityData, targetField) : null);
+    }
+    return fields;
+  }
+
+  /** Reads {@code include_paths} from mapped-entity {@code data}. The response key is the path token as requested. */
+  private Map<String, Object> extractIncludedPaths(Map<String, Object> mappedEntityData, List<String> includePaths) {
+    Map<String, Object> paths = new LinkedHashMap<>();
+    includePaths.forEach(path -> paths.put(path, null));
+    if (isEmpty(mappedEntityData)) {
+      return paths;
+    }
+    for (String path : includePaths) {
+      paths.put(path, readDottedPath(mappedEntityData, path));
+    }
+    return paths;
+  }
+
+  private Map<String, List<SourceTargetFieldMapping>> parseFieldMappingsPerKind(
+      TypesIntegrationConfig integrationConfig) {
+    if (integrationConfig == null || isEmpty(integrationConfig.getConfiguration())) {
+      return Map.of();
+    }
+    Object rawMappings = integrationConfig.getConfiguration().get("field_mappings_per_kind");
+    if (!(rawMappings instanceof Map<?, ?> mappingsByKind)) {
+      return Map.of();
+    }
+    Map<String, List<SourceTargetFieldMapping>> parsed = new LinkedHashMap<>();
+    mappingsByKind.forEach((kindKey, mappings) -> {
+      if (kindKey == null || !(mappings instanceof List<?> mappingList)) {
+        return;
+      }
+      List<SourceTargetFieldMapping> kindMappings = new ArrayList<>();
+      for (Object mapping : mappingList) {
+        if (!(mapping instanceof Map<?, ?> mappingMap)) {
+          continue;
+        }
+        String sourceField = stringField(mappingMap, "source_field");
+        String targetField = stringField(mappingMap, "target_field");
+        if (isNotEmpty(sourceField) || isNotEmpty(targetField)) {
+          kindMappings.add(new SourceTargetFieldMapping(sourceField, targetField));
+        }
+      }
+      if (isNotEmpty(kindMappings)) {
+        parsed.put(String.valueOf(kindKey), kindMappings);
+      }
+    });
+    return parsed;
+  }
+
+  private List<SourceTargetFieldMapping> lookupKindFieldMappings(
+      Map<String, List<SourceTargetFieldMapping>> fieldMappingsPerKind, String integrationKind) {
+    if (isEmpty(fieldMappingsPerKind) || isEmpty(integrationKind)) {
+      return List.of();
+    }
+    List<SourceTargetFieldMapping> kindMappings = fieldMappingsPerKind.get(integrationKind);
+    if (kindMappings != null) {
+      return kindMappings;
+    }
+    return fieldMappingsPerKind.entrySet()
+        .stream()
+        .filter(entry -> integrationKind.equalsIgnoreCase(entry.getKey()))
+        .map(Map.Entry::getValue)
+        .findFirst()
+        .orElse(List.of());
+  }
+
+  private String resolveTargetField(List<SourceTargetFieldMapping> kindMappings, String includeField) {
+    if (isEmpty(kindMappings) || isEmpty(includeField)) {
+      return null;
+    }
+    for (SourceTargetFieldMapping mapping : kindMappings) {
+      if (includeField.equals(mapping.getSourceField()) && isNotEmpty(mapping.getTargetField())) {
+        return mapping.getTargetField();
+      }
+    }
+    return null;
+  }
+
+  private Object readDottedPath(Map<String, Object> data, String path) {
+    Object current = data;
+    for (String part : path.split("\\.")) {
+      if (!(current instanceof Map<?, ?> currentMap)) {
+        return null;
+      }
+      current = currentMap.get(part);
+    }
+    return current;
+  }
+
+  private String stringField(Map<?, ?> mappingMap, String key) {
+    Object value = mappingMap.get(key);
+    return value == null ? null : String.valueOf(value);
   }
 
   private boolean isAlreadyLinkedToEntity(EntityResponse er, String spacePath, String integrationId,
@@ -3711,6 +3892,12 @@ public class CatalogIntegrationServiceImpl
   }
 
   @lombok.Value
+  private static class SourceTargetFieldMapping {
+    String sourceField;
+    String targetField;
+  }
+
+  @lombok.Value
   private static class OffsetMappedEntitiesResult {
     List<EntityMappedEntityResponse> entities;
     int requestedLimit;
@@ -3775,19 +3962,33 @@ public class CatalogIntegrationServiceImpl
 
   private UnsubscribedIntegrationEntitiesResult getUnsubscribedIntegrationEntities(String accountIdentifier,
       String orgIdentifier, String projectIdentifier, String integrationId, boolean fetchAll, boolean detailed,
-      List<String> integrationEntitiesUuids, String sortBy, String searchTerm, String kinds, int page, int limit) {
+      List<String> integrationEntitiesUuids, String sortBy, String searchTerm, String kinds,
+      Map<String, List<String>> parsedFilters, List<String> filterKinds, int page, int limit) {
     String sort = "name";
     String order = "asc";
     if (!isEmpty(sortBy)) {
       sort = sortBy.split(",")[0];
       order = sortBy.split(",")[1];
     }
-    List<String> kindsList = isEmpty(kinds) ? null : Arrays.asList(kinds.split(","));
+    List<String> kindsList =
+        isNotEmpty(parsedFilters) ? filterKinds : (isEmpty(kinds) ? null : Arrays.asList(kinds.split(",")));
     OpenapiGetMappedEntitiesRequest fetchAllRequest = new OpenapiGetMappedEntitiesRequest();
     if (isNotEmpty(kindsList)) {
       fetchAllRequest.setKinds(kindsList);
       log.info("getIntegrationEntities: Filtering by kinds = {} for account = {}, integrationId = {}", kindsList,
           accountIdentifier, integrationId);
+    }
+    if (isNotEmpty(parsedFilters)) {
+      Map<String, List<OpenapiGetMappedEntitiesRequest.FieldValFilter>> fieldValsPerKind = new LinkedHashMap<>();
+      for (String kind : filterKinds) {
+        List<OpenapiGetMappedEntitiesRequest.FieldValFilter> fieldFilters =
+            parsedFilters.entrySet()
+                .stream()
+                .map(entry -> new OpenapiGetMappedEntitiesRequest.FieldValFilter(entry.getKey(), entry.getValue()))
+                .toList();
+        fieldValsPerKind.put(kind, fieldFilters);
+      }
+      fetchAllRequest.setFieldValsPerKind(fieldValsPerKind);
     }
     try {
       Response<EntityMappedEntityResponseObject> entityMappedEntityResponseObjectResponse;

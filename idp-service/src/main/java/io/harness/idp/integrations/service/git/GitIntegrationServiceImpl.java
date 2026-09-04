@@ -314,7 +314,7 @@ public class GitIntegrationServiceImpl
   @Override
   public DiscoverEntitiesDTO discoverEntities(String accountIdentifier, String orgIdentifier, String projectIdentifier,
       String integrationId, int pageIndex, int pageLimit, String sort, String searchTerm, String kinds,
-      Integer prevOffset, Integer nextOffset) {
+      List<String> filters, String includeFields, String includePaths, Integer prevOffset, Integer nextOffset) {
     throw new UnsupportedOperationException("Git integration discoverEntities not supported yet");
   }
 

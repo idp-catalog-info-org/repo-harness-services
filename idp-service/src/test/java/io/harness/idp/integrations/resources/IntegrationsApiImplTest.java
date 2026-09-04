@@ -306,11 +306,11 @@ public class IntegrationsApiImplTest extends CategoryTest {
 
     when(integrationService.discoverEntities(eq(TEST_ACCOUNT_IDENTIFIER), isNull(), isNull(),
              eq(BaseIntegrationRequest.TypeEnum.CATALOG.value()), eq("integration-1"), eq(0), eq(10), isNull(),
-             isNull(), isNull(), isNull(), isNull()))
+             isNull(), isNull(), eq(List.of("org:acme")), eq("org"), isNull(), isNull(), isNull()))
         .thenReturn(dto);
 
-    Response response = integrationsApi.discoverEntities(
-        "integration-1", TEST_ACCOUNT_IDENTIFIER, null, null, 0, 10, null, null, null, null, null);
+    Response response = integrationsApi.discoverEntities("integration-1", TEST_ACCOUNT_IDENTIFIER, null, null, 0, 10,
+        null, null, null, List.of("org:acme"), "org", null, null, null);
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     @SuppressWarnings("unchecked") Map<String, Object> body = (Map<String, Object>) response.getEntity();
@@ -338,12 +338,12 @@ public class IntegrationsApiImplTest extends CategoryTest {
 
     when(integrationService.discoverEntities(eq(TEST_ACCOUNT_IDENTIFIER), isNull(), isNull(),
              eq(BaseIntegrationRequest.TypeEnum.CATALOG.value()), eq("integration-1"), eq(1), eq(10), isNull(),
-             isNull(), isNull(), eq(3), isNull()))
+             isNull(), isNull(), isNull(), isNull(), isNull(), eq(3), isNull()))
         .thenReturn(dto);
     when(idpCommonService.buildPageResponse(eq(1), eq(10), eq(12L), any())).thenReturn(pageResponse);
 
     Response response = integrationsApi.discoverEntities(
-        "integration-1", TEST_ACCOUNT_IDENTIFIER, null, null, 1, 10, null, null, null, 3, null);
+        "integration-1", TEST_ACCOUNT_IDENTIFIER, null, null, 1, 10, null, null, null, null, null, null, 3, null);
 
     assertThat(response).isSameAs(pageResponse);
     verify(idpCommonService).buildPageResponse(eq(1), eq(10), eq(12L), any());

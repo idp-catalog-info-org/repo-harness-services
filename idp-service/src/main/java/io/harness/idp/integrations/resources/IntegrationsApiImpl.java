@@ -92,13 +92,14 @@ public class IntegrationsApiImpl implements IntegrationsApi {
   @NGAccessControlCheck(resourceType = IDP_INTEGRATION, permission = IDP_INTEGRATION_VIEW)
   public Response discoverEntities(String integrationId, @AccountIdentifier String harnessAccount,
       @OrgIdentifier String orgIdentifier, @ProjectIdentifier String projectIdentifier, Integer page, Integer limit,
-      String sort, String searchTerm, String kinds, Integer prevOffset, Integer nextOffset) {
+      String sort, String searchTerm, String kinds, List<String> filters, String includeFields, String includePaths,
+      Integer prevOffset, Integer nextOffset) {
     idpCommonService.newFlowCheck(harnessAccount);
     int pageIndex = page == null ? 0 : page;
     int pageLimit = limit == null ? 10 : limit;
     DiscoverEntitiesDTO discoveredEntities = integrationService.discoverEntities(harnessAccount, orgIdentifier,
         projectIdentifier, BaseIntegrationRequest.TypeEnum.CATALOG.value(), integrationId, pageIndex, pageLimit, sort,
-        searchTerm, kinds, prevOffset, nextOffset);
+        searchTerm, kinds, filters, includeFields, includePaths, prevOffset, nextOffset);
     Map<String, Object> responseBody = new LinkedHashMap<>();
     responseBody.put("entities", discoveredEntities.getDiscoverEntitiesResponses());
     responseBody.put("merge_suggestions", discoveredEntities.getMergeSuggestions());
