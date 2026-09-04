@@ -91,6 +91,7 @@ public class AIVerifyMatrixPreprocessorTest extends CategoryTest {
         .isEqualTo(AIVerifyMatrixPreprocessor.MATRIX_EXPRESSION);
     // The synthetic healthSources entry must be stamped with a UUID for FQN/log-key generation.
     assertThat(stepNode.path("spec").path("healthSources").get(0).path(YamlNode.UUID_FIELD_NAME).isTextual()).isTrue();
+    assertThat(stepNode.path("spec").path(AIVerifyMatrixPreprocessor.HEALTH_SOURCE_FANOUT_SIZE).asInt()).isEqualTo(2);
   }
 
   @Test
@@ -107,6 +108,8 @@ public class AIVerifyMatrixPreprocessorTest extends CategoryTest {
     assertThat(hsAxis.get(0).asText()).isEqualTo("test");
     assertThat(aiVerifyStep(result).path("strategy").path("matrix").path("nodeName").asText())
         .isEqualTo(AIVerifyMatrixPreprocessor.MATRIX_EXPRESSION);
+    assertThat(aiVerifyStep(result).path("spec").path(AIVerifyMatrixPreprocessor.HEALTH_SOURCE_FANOUT_SIZE).asInt())
+        .isEqualTo(1);
   }
 
   @Test
