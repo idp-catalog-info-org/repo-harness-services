@@ -15,6 +15,10 @@ kind: Component
 metadata:
   name: ng-manager
   description: Next-gen manager (static snapshot from 120-ng-manager)
+  links:
+    - url: https://developer.harness.io
+      title: Harness Developer Hub
+      icon: docs
   annotations:
     github.com/project-slug: idp-catalog-info-org/repo-harness-services
 spec:
