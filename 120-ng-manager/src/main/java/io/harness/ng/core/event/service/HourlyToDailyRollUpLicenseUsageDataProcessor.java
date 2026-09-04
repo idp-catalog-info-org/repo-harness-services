@@ -311,47 +311,57 @@ public class HourlyToDailyRollUpLicenseUsageDataProcessor {
   private int getLinuxBuildCredits(CILicenseUsage ciLicenseUsage, boolean useOldCredit) {
     int buildMinutes = ciLicenseUsage.getBuildMinutes();
     ResourceClass resourceClass = ciLicenseUsage.getResourceClass();
-    if (useOldCredit) {
-      switch (resourceClass) {
-        case XSMALL:
-        case FLEX:
-          return LINUX_FLEX_MULTIPLIER * buildMinutes;
-        case SMALL:
-          return LINUX_SMALL_MULTIPLIER * buildMinutes;
-        case MEDIUM:
-          return LINUX_MEDIUM_MULTIPLIER * buildMinutes;
-        case LARGE:
-          return LINUX_LARGE_MULTIPLIER * buildMinutes;
-        case XLARGE:
-          return LINUX_XLARGE_MULTIPLIER * buildMinutes;
-        case XXLARGE:
-          return LINUX_XXLARGE_MULTIPLIER * buildMinutes;
-        case XXXLARGE:
-          return LINUX_XXXLARGE_MULTIPLIER * buildMinutes;
-        default:
-          throw new RuntimeException(String.format(resourceClassDefaultMsg, resourceClass, OSType.LINUX));
-      }
+    ArchitectureType architectureType = ciLicenseUsage.getArchitectureType();
+    int newMultiplier = getNewLinuxMultiplier(resourceClass, architectureType);
+    if (!useOldCredit) {
+      return newMultiplier * buildMinutes;
     }
+    return Math.min(getOldLinuxMultiplier(resourceClass), newMultiplier) * buildMinutes;
+  }
+
+  private static int getOldLinuxMultiplier(ResourceClass resourceClass) {
     switch (resourceClass) {
       case XSMALL:
-        return NEW_LINUX_XSMALL_MULTIPLIER * buildMinutes;
       case FLEX:
-        return NEW_LINUX_MEDIUM_MULTIPLIER * buildMinutes;
+        return LINUX_FLEX_MULTIPLIER;
       case SMALL:
-        return NEW_LINUX_SMALL_MULTIPLIER * buildMinutes;
+        return LINUX_SMALL_MULTIPLIER;
       case MEDIUM:
-        return NEW_LINUX_MEDIUM_MULTIPLIER * buildMinutes;
+        return LINUX_MEDIUM_MULTIPLIER;
       case LARGE:
-        return NEW_LINUX_LARGE_MULTIPLIER * buildMinutes;
+        return LINUX_LARGE_MULTIPLIER;
       case XLARGE:
-        return NEW_LINUX_XLARGE_MULTIPLIER * buildMinutes;
+        return LINUX_XLARGE_MULTIPLIER;
       case XXLARGE:
-        if (ciLicenseUsage.getArchitectureType() == ArchitectureType.ARM64) {
-          return NEW_LINUX_XXLARGE_ARM_MULTIPLIER * buildMinutes;
-        }
-        return NEW_LINUX_XXLARGE_AMD_MULTIPLIER * buildMinutes;
+        return LINUX_XXLARGE_MULTIPLIER;
       case XXXLARGE:
-        return NEW_LINUX_XXXLARGE_MULTIPLIER * buildMinutes;
+        return LINUX_XXXLARGE_MULTIPLIER;
+      default:
+        throw new RuntimeException(String.format(resourceClassDefaultMsg, resourceClass, OSType.LINUX));
+    }
+  }
+
+  private static int getNewLinuxMultiplier(ResourceClass resourceClass, ArchitectureType architectureType) {
+    switch (resourceClass) {
+      case XSMALL:
+        return NEW_LINUX_XSMALL_MULTIPLIER;
+      case FLEX:
+        return NEW_LINUX_MEDIUM_MULTIPLIER;
+      case SMALL:
+        return NEW_LINUX_SMALL_MULTIPLIER;
+      case MEDIUM:
+        return NEW_LINUX_MEDIUM_MULTIPLIER;
+      case LARGE:
+        return NEW_LINUX_LARGE_MULTIPLIER;
+      case XLARGE:
+        return NEW_LINUX_XLARGE_MULTIPLIER;
+      case XXLARGE:
+        if (architectureType == ArchitectureType.ARM64) {
+          return NEW_LINUX_XXLARGE_ARM_MULTIPLIER;
+        }
+        return NEW_LINUX_XXLARGE_AMD_MULTIPLIER;
+      case XXXLARGE:
+        return NEW_LINUX_XXXLARGE_MULTIPLIER;
       default:
         throw new RuntimeException(String.format(resourceClassDefaultMsg, resourceClass, OSType.LINUX));
     }

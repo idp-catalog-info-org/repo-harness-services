@@ -8,9 +8,21 @@
 package io.harness.ng.core.event.service;
 
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_FLEX_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_LARGE_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_MEDIUM_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_SMALL_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_XLARGE_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_XXLARGE_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.LINUX_XXXLARGE_MULTIPLIER;
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.MAC_FLEX_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_LARGE_MULTIPLIER;
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_MEDIUM_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_SMALL_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_XLARGE_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_XSMALL_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_XXLARGE_AMD_MULTIPLIER;
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_XXLARGE_ARM_MULTIPLIER;
+import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_LINUX_XXXLARGE_MULTIPLIER;
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.NEW_WINDOWS_LARGE_MULTIPLIER;
 import static io.harness.ng.core.event.service.HourlyToDailyRollUpLicenseUsageDataProcessor.WINDOWS_FLEX_MULTIPLIER;
 import static io.harness.ng.core.event.service.LicenseUsageSQLHelper.LICENSE_USAGE_DAILY;
@@ -53,6 +65,7 @@ import io.harness.ng.core.licenseusage.utils.LicenseUsageMetricHelper;
 import io.harness.rule.Owner;
 
 import com.google.inject.Inject;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -414,6 +427,106 @@ public class LicenseUsageDataProcessorTest extends CategoryTest {
         + ciWindowsFlexPipelineUsageEvent.getBuildMinutes() * WINDOWS_FLEX_MULTIPLIER;
 
     assertEquals(expectedUsedCredits, updatedCredit.getUsedCredits());
+  }
+
+  @Test
+  @Owner(developers = TAPAN)
+  @Category(UnitTests.class)
+  public void testGetLinuxBuildCredits_OldCredit_PicksCheaperOfOldAndNewForEveryResourceClass() throws Exception {
+    Method getLinuxBuildCreditsMethod = HourlyToDailyRollUpLicenseUsageDataProcessor.class.getDeclaredMethod(
+        "getLinuxBuildCredits", CILicenseUsage.class, boolean.class);
+    getLinuxBuildCreditsMethod.setAccessible(true);
+    int buildMinutes = 5;
+
+    int expectedXsmall = Math.min(LINUX_FLEX_MULTIPLIER, NEW_LINUX_XSMALL_MULTIPLIER) * buildMinutes;
+    int actualXsmall = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.XSMALL)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedXsmall, actualXsmall);
+
+    int expectedFlex = Math.min(LINUX_FLEX_MULTIPLIER, NEW_LINUX_MEDIUM_MULTIPLIER) * buildMinutes;
+    int actualFlex = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.FLEX)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedFlex, actualFlex);
+
+    int expectedSmall = Math.min(LINUX_SMALL_MULTIPLIER, NEW_LINUX_SMALL_MULTIPLIER) * buildMinutes;
+    int actualSmall = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.SMALL)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedSmall, actualSmall);
+
+    int expectedMedium = Math.min(LINUX_MEDIUM_MULTIPLIER, NEW_LINUX_MEDIUM_MULTIPLIER) * buildMinutes;
+    int actualMedium = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.MEDIUM)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedMedium, actualMedium);
+
+    int expectedLarge = Math.min(LINUX_LARGE_MULTIPLIER, NEW_LINUX_LARGE_MULTIPLIER) * buildMinutes;
+    int actualLarge = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.LARGE)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedLarge, actualLarge);
+
+    int expectedXlarge = Math.min(LINUX_XLARGE_MULTIPLIER, NEW_LINUX_XLARGE_MULTIPLIER) * buildMinutes;
+    int actualXlarge = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.XLARGE)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedXlarge, actualXlarge);
+
+    int expectedXxlargeAmd = Math.min(LINUX_XXLARGE_MULTIPLIER, NEW_LINUX_XXLARGE_AMD_MULTIPLIER) * buildMinutes;
+    int actualXxlargeAmd = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.XXLARGE)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedXxlargeAmd, actualXxlargeAmd);
+
+    int expectedXxlargeArm = Math.min(LINUX_XXLARGE_MULTIPLIER, NEW_LINUX_XXLARGE_ARM_MULTIPLIER) * buildMinutes;
+    int actualXxlargeArm = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.XXLARGE)
+            .architectureType(ArchitectureType.ARM64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedXxlargeArm, actualXxlargeArm);
+
+    int expectedXxxlarge = Math.min(LINUX_XXXLARGE_MULTIPLIER, NEW_LINUX_XXXLARGE_MULTIPLIER) * buildMinutes;
+    int actualXxxlarge = (int) getLinuxBuildCreditsMethod.invoke(licenseUsageDataProcessor,
+        CILicenseUsage.builder()
+            .resourceClass(ResourceClass.XXXLARGE)
+            .architectureType(ArchitectureType.AMD64)
+            .buildMinutes(buildMinutes)
+            .build(),
+        true);
+    assertEquals(expectedXxxlarge, actualXxxlarge);
   }
 
   @Test
