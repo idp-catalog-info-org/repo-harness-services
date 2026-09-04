@@ -32,6 +32,7 @@ import io.harness.engine.expressions.functors.OutcomeFunctor;
 import io.harness.engine.expressions.functors.SecretFunctor;
 import io.harness.engine.expressions.functors.SecretFunctorWithRbac;
 import io.harness.engine.expressions.functors.SecretJsonFunctor;
+import io.harness.engine.expressions.functors.ServerlessImageConfigFunctor;
 import io.harness.engine.expressions.functors.type.NodeExecutionEntityType;
 import io.harness.engine.expressions.metadata.ExecutionSweepingOutputMetadata;
 import io.harness.engine.expressions.metadata.OutcomeMetadata;
@@ -216,6 +217,8 @@ public class AmbianceExpressionEvaluator extends EngineExpressionEvaluator {
     if (!refObjectSpecific) {
       // Add basic functors.
       addToContext("regex", new RegexFunctor());
+      addToContext(ServerlessImageConfigFunctor.SERVERLESS_IMAGE_CONFIG_FUNCTOR_NAME,
+          new ServerlessImageConfigFunctor(ambiance, pmsSweepingOutputService));
       addToContext("shell", new NGShellScriptFunctor(ScriptType.BASH));
       // Todo(Archit): revisit NGJsonFunctor(PIE-9772)
       if (contextMapProvided) {

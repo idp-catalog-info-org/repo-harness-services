@@ -162,6 +162,7 @@ public class ServiceEntityProcessor {
   private static final String VALUE = "value";
   private static final String ARTIFACTS = "artifacts";
   private static final String MANIFESTS = "manifests";
+  private static final String PLUGIN_INFO = "pluginInfo";
   private static final String ID = "id";
   public static final String TYPE = "type";
   public static final String SECRET = "secret";
@@ -1145,8 +1146,9 @@ public class ServiceEntityProcessor {
    */
   private Map<String, Map<String, Object>> saveServiceOutput(
       Ambiance ambiance, ServiceConfig serviceConfig, String resolvedV0ServiceYaml) {
+    Map<String, Object> specMap = null;
     if (isNotEmpty(resolvedV0ServiceYaml)) {
-      Map<String, Object> specMap = ngServiceYamlHelper.buildNgServiceYamlSpecMap(resolvedV0ServiceYaml);
+      specMap = ngServiceYamlHelper.buildNgServiceYamlSpecMap(resolvedV0ServiceYaml);
       if (isNotEmpty(specMap)) {
         NgServiceYamlOutcome ngServiceYamlOutcome = NgServiceYamlOutcome.builder().spec(specMap).build();
         serviceStepSweepingOutputHelper.saveNgServiceYamlSweepingOutput(ambiance, ngServiceYamlOutcome);
@@ -1160,6 +1162,7 @@ public class ServiceEntityProcessor {
     Map<String, Object> configFilesMap = processConfigFiles(ambiance, serviceConfig);
     Map<String, Object> startupScriptMap = processStartupScript(ambiance, serviceConfig);
     Map<String, Object> hooksMap = processHooks(serviceConfig);
+    Map<String, Object> pluginInfoMap = processServicePluginInfo(specMap);
 
     ServiceConfigOutcome serviceConfigOutcome = ServiceConfigOutcome.builder()
                                                     .manifests(manifestsMap)
@@ -1167,6 +1170,7 @@ public class ServiceEntityProcessor {
                                                     .configFiles(configFilesMap)
                                                     .startupScript(startupScriptMap)
                                                     .hooks(hooksMap)
+                                                    .pluginInfo(pluginInfoMap)
                                                     .build();
     serviceStepSweepingOutputHelper.saveServiceConfigSweepingOutput(ambiance, serviceConfigOutcome);
 
@@ -1176,6 +1180,27 @@ public class ServiceEntityProcessor {
     serviceOutputMap.put(
         ProcessedServiceResult.CONFIG_FILES_KEY, configFilesMap != null ? configFilesMap : new HashMap<>());
     return serviceOutputMap;
+  }
+
+  /**
+   * Extracts pluginInfo from the resolved v0 service spec map and exposes it under the serviceOutput root, so that
+   * templates can reference values like {@code <+serviceOutput.pluginInfo.runtimeLanguage>}.
+   *
+   * <p>Purely additive: returns an empty map when the service does not define pluginInfo (or the spec map is
+   * unavailable), so services that do not use pluginInfo are unaffected.
+   */
+  @VisibleForTesting
+  Map<String, Object> processServicePluginInfo(Map<String, Object> specMap) {
+    Map<String, Object> pluginInfoMap = new HashMap<>();
+    if (isEmpty(specMap)) {
+      return pluginInfoMap;
+    }
+    Object pluginInfo = specMap.get(PLUGIN_INFO);
+    if (pluginInfo instanceof Map) {
+      @SuppressWarnings("unchecked") Map<String, Object> pluginInfoValues = (Map<String, Object>) pluginInfo;
+      pluginInfoMap.putAll(pluginInfoValues);
+    }
+    return pluginInfoMap;
   }
 
   /**
