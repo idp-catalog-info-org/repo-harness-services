@@ -111,12 +111,6 @@ public class WorkflowLibraryApiImpl implements WorkflowLibraryApi {
     if (StringUtils.isEmpty(integration.getIdentifier())) {
       throw new InvalidRequestException("integration.identifier is required when integration is provided");
     }
-    if (StringUtils.isEmpty(integration.getOrgIdentifier())) {
-      throw new InvalidRequestException("integration.orgIdentifier is required when integration is provided");
-    }
-    if (StringUtils.isEmpty(integration.getProjectIdentifier())) {
-      throw new InvalidRequestException("integration.projectIdentifier is required when integration is provided");
-    }
     if (CollectionUtils.isEmpty(integration.getScopes())) {
       throw new InvalidRequestException("integration.scopes is required when integration is provided");
     }
