@@ -27,6 +27,4 @@ public interface InviteRepositoryCustom {
   DeleteResult deleteAll(Criteria criteria);
 
   Page<Invite> findAllWithCollation(Criteria criteria, Pageable pageable);
-
-  long countByAccountIdentifierAndCreatedAtAfter(String accountIdentifier, long createdAtThreshold);
 }

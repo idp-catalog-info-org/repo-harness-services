@@ -291,7 +291,6 @@ instanceSyncTaskSchedule {"name": "accountId_1", "unique": true} {"accountId": 1
 invalidPerpetualTaskInfo {"name": "invalidPerpetualTaskIteration_1", "background": true} {"invalidPerpetualTaskIteration": 1}
 invalidPerpetualTaskInfo {"name": "perpetualTaskId_1", "background": true} {"perpetualTaskId": 1}
 invalidPerpetualTaskInfo {"name": "unique_account_id_perpetualTaskId", "unique": true} {"accountIdentifier": 1, "perpetualTaskId": 1}
-invites {"name": "ng_invite_account_createdAt", "background": true} {"accountIdentifier": 1, "createdAt": 1}
 invites {"name": "ng_invite_account_org_project_identifiers_email_role_deleted", "background": true} {"deleted": 1, "email": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1}
 invites {"name": "ng_invite_account_parentuniqueid_email_role_deleted", "background": true} {"deleted": 1, "email": 1, "accountIdentifier": 1, "parentUniqueId": 1}
 invites {"name": "ng_invite_deleted_email_account_org_project_roleBindings_with_collation", "background": true, "collation": {"locale": "en", "strength": 2}} {"deleted": 1, "email": 1, "accountIdentifier": 1, "orgIdentifier": 1, "projectIdentifier": 1, "roleBindings": 1}

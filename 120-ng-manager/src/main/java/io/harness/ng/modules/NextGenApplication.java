@@ -195,7 +195,6 @@ import io.harness.ng.core.exceptionmappers.QueryParamExceptionMapper;
 import io.harness.ng.core.exceptionmappers.WingsExceptionMapperV2;
 import io.harness.ng.core.filter.ApiResponseFilter;
 import io.harness.ng.core.handler.freezeHandlers.NgDeploymentFreezeActivationHandler;
-import io.harness.ng.core.invites.api.impl.InviteRateLimitRestrictionUsageImpl;
 import io.harness.ng.core.iterator.TokenExpiryAlertIterator;
 import io.harness.ng.core.licenserestriction.OrgRestrictionsUsageImpl;
 import io.harness.ng.core.licenserestriction.ProjectRestrictionsUsageImpl;
@@ -1740,7 +1739,6 @@ public class NextGenApplication extends Application<NextGenConfiguration> {
                     .put(FeatureRestrictionName.MULTIPLE_SECRETS, SecretRestrictionUsageImpl.class)
                     .put(FeatureRestrictionName.MULTIPLE_USER_GROUPS, UserGroupRestrictionUsageImpl.class)
                     .put(FeatureRestrictionName.MULTIPLE_USERS, UsersRestrictionUsageImpl.class)
-                    .put(FeatureRestrictionName.INVITE_RATE_LIMIT, InviteRateLimitRestrictionUsageImpl.class)
                     .put(FeatureRestrictionName.MULTIPLE_SERVICE_ACCOUNTS, ServiceAccountRestrictionUsageImpl.class)
                     .put(FeatureRestrictionName.MULTIPLE_VARIABLES, VariableRestrictionUsageImpl.class)
                     .put(FeatureRestrictionName.MULTIPLE_CONNECTORS, ConnectorRestrictionUsageImpl.class)

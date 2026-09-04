@@ -26,7 +26,6 @@ import static io.harness.rule.OwnerRule.SAHIBA;
 import static io.harness.rule.OwnerRule.TEJAS;
 import static io.harness.rule.OwnerRule.UJJAWAL;
 import static io.harness.rule.OwnerRule.VIKAS_M;
-import static io.harness.rule.OwnerRule.ZHENYU;
 
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -34,12 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -57,8 +54,6 @@ import io.harness.beans.ScopeInfo;
 import io.harness.beans.ScopeLevel;
 import io.harness.category.element.UnitTests;
 import io.harness.enforcement.client.services.EnforcementClientService;
-import io.harness.enforcement.constants.FeatureRestrictionName;
-import io.harness.enforcement.exceptions.LimitExceededException;
 import io.harness.exception.ExpiredTokenException;
 import io.harness.exception.InvalidTokenException;
 import io.harness.invites.remote.InviteAcceptResponse;
@@ -265,100 +260,6 @@ public class InviteServiceImplTest extends CategoryTest {
     InviteOperationResponse inviteOperationResponse =
         inviteService.create(projectScopeInfo, getDummyInvite(), false, false);
     assertThat(inviteOperationResponse).isEqualTo(USER_ALREADY_ADDED);
-  }
-
-  @Test
-  @Owner(developers = ZHENYU)
-  @Category(UnitTests.class)
-  public void testCreate_InviteRateLimitExceeded_Throws() throws IOException {
-    when(ngUserService.getUserByEmail(eq(emailId), anyBoolean())).thenReturn(Optional.empty());
-    when(inviteRepository.save(any())).thenReturn(getDummyInvite());
-    doThrow(new LimitExceededException("Exceeded rate limitation. Current Limit: 50"))
-        .when(enforcementClientService)
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), anyLong());
-
-    assertThatThrownBy(() -> inviteService.create(projectScopeInfo, getDummyInvite(), false, false))
-        .isInstanceOf(LimitExceededException.class);
-
-    // The rate limit must reject before anything is persisted or emailed.
-    verify(inviteRepository, never()).save(any());
-    verify(notificationClient, never()).sendNotificationAsync(any());
-  }
-
-  @Test
-  @Owner(developers = ZHENYU)
-  @Category(UnitTests.class)
-  public void testCreate_InviteRateLimitCheckedPerCreatedInvite() throws IOException {
-    when(ngUserService.getUserByEmail(eq(emailId), anyBoolean())).thenReturn(Optional.empty());
-    when(inviteRepository.save(any())).thenReturn(getDummyInvite());
-    when(accountClient.checkAutoInviteAcceptanceEnabledForAccount(any()).execute())
-        .thenReturn(Response.success(new RestResponse(false)));
-
-    InviteOperationResponse response = inviteService.create(projectScopeInfo, getDummyInvite(), false, false);
-
-    assertThat(response).isEqualTo(USER_INVITED_SUCCESSFULLY);
-    // One invite created => the window is charged exactly once, not once per requested email.
-    verify(enforcementClientService, times(1))
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), eq(1L));
-  }
-
-  @Test
-  @Owner(developers = ZHENYU)
-  @Category(UnitTests.class)
-  public void testCreate_UserAlreadyAdded_DoesNotConsumeRateLimit() {
-    when(ngUserService.isUserAtScope(any(), (ScopeInfo) any())).thenReturn(true);
-    when(ngUserService.getUserByEmail(any(), anyBoolean()))
-        .thenReturn(of(UserMetadataDTO.builder().uuid(userId).build()));
-
-    InviteOperationResponse response = inviteService.create(projectScopeInfo, getDummyInvite(), false, false);
-
-    assertThat(response).isEqualTo(USER_ALREADY_ADDED);
-    // No invite is created, so an existing member must not eat into the account's quota.
-    verify(enforcementClientService, never())
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), anyLong());
-  }
-
-  @Test
-  @Owner(developers = ZHENYU)
-  @Category(UnitTests.class)
-  public void testResend_InviteRateLimitExceeded_Throws() {
-    when(ngUserService.getUserByEmail(eq(emailId), anyBoolean())).thenReturn(Optional.empty());
-    when(inviteRepository.findFirstByAccountIdentifierAndParentUniqueIdAndEmailAndDeletedFalse(any(), any(), any()))
-        .thenReturn(of(getDummyInvite()));
-    doThrow(new LimitExceededException("Exceeded rate limitation. Current Limit: 50"))
-        .when(enforcementClientService)
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), anyLong());
-
-    assertThatThrownBy(() -> inviteService.create(projectScopeInfo, getDummyInvite(), false, false))
-        .isInstanceOf(LimitExceededException.class);
-
-    // Resend path must also be blocked — no email sent.
-    verify(notificationClient, never()).sendNotificationAsync(any());
-  }
-
-  @Test
-  @Owner(developers = ZHENYU)
-  @Category(UnitTests.class)
-  public void testCreate_ScimInvite_BypassesRateLimit() throws IOException {
-    when(ngUserService.getUserByEmail(eq(emailId), anyBoolean())).thenReturn(Optional.empty());
-    Invite scimInvite = getDummyInvite();
-    scimInvite.setApproved(true);
-    when(inviteRepository.save(any())).thenReturn(scimInvite);
-    Call<RestResponse<Boolean>> ffCall = mock(Call.class);
-    when(accountClient.checkAutoInviteAcceptanceEnabledForAccount(any())).thenReturn(ffCall);
-    when(ffCall.execute()).thenReturn(Response.success(new RestResponse<>(true)));
-    Call<RestResponse<Boolean>> userCall = mock(Call.class);
-    when(userClient.createUserAndCompleteNGInvite(any(), anyBoolean(), anyBoolean())).thenReturn(userCall);
-    when(userCall.execute()).thenReturn(Response.success(new RestResponse<>(true)));
-    doThrow(new LimitExceededException("Exceeded rate limitation. Current Limit: 50"))
-        .when(enforcementClientService)
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), anyLong());
-
-    inviteService.create(projectScopeInfo, scimInvite, true, false);
-
-    // SCIM must bypass rate limit even when it would otherwise be exceeded.
-    verify(enforcementClientService, never())
-        .checkAvailabilityWithIncrement(eq(FeatureRestrictionName.INVITE_RATE_LIMIT), anyString(), anyLong());
   }
 
   @Test

@@ -71,16 +71,4 @@ public class InviteRepositoryCustomImpl implements InviteRepositoryCustom {
     return PageableExecutionUtils.getPage(
         invites, pageable, () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), Invite.class));
   }
-
-  @Override
-  public long countByAccountIdentifierAndCreatedAtAfter(String accountIdentifier, long createdAtThreshold) {
-    // Unlike every other query on this collection, this one does not filter on `deleted`.
-    // Filtering it out would let a caller reset their rate-limit quota by deleting the
-    // invites they just sent.
-    Criteria criteria = Criteria.where(InviteKeys.accountIdentifier)
-                            .is(accountIdentifier)
-                            .and(InviteKeys.createdAt)
-                            .gt(createdAtThreshold);
-    return mongoTemplate.count(new Query(criteria), Invite.class);
-  }
 }
