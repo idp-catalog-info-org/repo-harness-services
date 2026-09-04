@@ -14,6 +14,8 @@ java_library(
         "//:lombok",
         "//120-ng-manager/contracts/openapi/v1:ng-manager-server-spec-module",
         "//120-ng-manager/src/main/java/io/harness/ng/config:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/sfchangeset/entity:module",
+        "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/sfchangeset/services:module",
         "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/sfexecution/entity:module",
         "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/sfexecution/mappers:module",
         "//127-cd-nextgen-entities/src/main/java/io/harness/ng/core/sfexecution/services:module",

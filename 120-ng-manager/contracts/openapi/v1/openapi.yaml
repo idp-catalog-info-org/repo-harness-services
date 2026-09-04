@@ -8483,6 +8483,14 @@ components:
           type: integer
           format: int64
           description: Last update timestamp for output fields
+        state:
+          type: string
+          description: Lifecycle state of the changeset
+          enum:
+            - DRAFT
+            - BACKED_UP
+            - VALIDATED
+            - DEPLOYED
         validUntil:
           type: integer
           format: int64
@@ -8554,6 +8562,14 @@ components:
           type: integer
           format: int64
           description: Last update timestamp for output fields
+        state:
+          type: string
+          description: Lifecycle state of the changeset
+          enum:
+            - DRAFT
+            - BACKED_UP
+            - VALIDATED
+            - DEPLOYED
     SalesforceChangesetCreateRequest:
       type: object
       description: Salesforce Changeset creation request body
@@ -8906,6 +8922,7 @@ components:
             - VALIDATE
             - QUICK_DEPLOY
             - EVALUATE_DIFF
+            - SOURCE_BACKUP
           description: Type of Salesforce execution
         changesetId:
           type: string
@@ -12745,6 +12762,7 @@ components:
             - VALIDATE
             - QUICK_DEPLOY
             - EVALUATE_DIFF
+            - SOURCE_BACKUP
         status:
           type: string
           description: Execution status
@@ -12774,6 +12792,21 @@ components:
         changesetId:
           type: string
           description: Salesforce Changeset identifier
+        prNumber:
+          type: string
+          description: Pull request number (set after a successful SOURCE_BACKUP step)
+        prUrl:
+          type: string
+          description: Pull request URL (set after a successful SOURCE_BACKUP step)
+        commitId:
+          type: string
+          description: Commit ID of the backup (set after a successful SOURCE_BACKUP step)
+        commitUrl:
+          type: string
+          description: Commit URL of the backup (set after a successful SOURCE_BACKUP step)
+        branch:
+          type: string
+          description: Git branch used for the backup (set after a successful SOURCE_BACKUP step)
       required:
         - identifier
         - name
@@ -12821,6 +12854,7 @@ components:
             - VALIDATE
             - QUICK_DEPLOY
             - EVALUATE_DIFF
+            - SOURCE_BACKUP
         status:
           type: string
           description: Execution status
@@ -12846,6 +12880,21 @@ components:
         changesetId:
           type: string
           description: Salesforce Changeset identifier
+        prNumber:
+          type: string
+          description: Pull request number (set after a successful SOURCE_BACKUP step)
+        prUrl:
+          type: string
+          description: Pull request URL (set after a successful SOURCE_BACKUP step)
+        commitId:
+          type: string
+          description: Commit ID of the backup (set after a successful SOURCE_BACKUP step)
+        commitUrl:
+          type: string
+          description: Commit URL of the backup (set after a successful SOURCE_BACKUP step)
+        branch:
+          type: string
+          description: Git branch used for the backup (set after a successful SOURCE_BACKUP step)
     GitXWebhookStatusPerRepoDTO:
       title: GitXWebhookStatusPerRepoDTO
       x-stoplight:
