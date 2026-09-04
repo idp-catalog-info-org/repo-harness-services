@@ -16,6 +16,8 @@ import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.POST_FE
 import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.POST_TEMPLATE_HOOKS_NODE_ID;
 import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.PRE_FETCH_FILES_HOOKS_NODE_ID;
 import static io.harness.beans.steps.constants.PlanCreatorNodesConstants.PRE_TEMPLATE_HOOKS_NODE_ID;
+import static io.harness.beans.steps.constants.ServiceStepConstants.OVERRIDES_COMMAND_UNIT;
+import static io.harness.beans.steps.constants.ServiceStepConstants.SERVICE_STEP_COMMAND_UNIT;
 import static io.harness.data.structure.EmptyPredicate.isEmpty;
 import static io.harness.data.structure.EmptyPredicate.isNotEmpty;
 import static io.harness.eraro.ErrorCode.FREEZE_EXCEPTION;
@@ -69,9 +71,12 @@ import io.harness.freeze.beans.response.ActiveFreezeEntitiesResponseDTO;
 import io.harness.freeze.entity.FrozenExecutionDTO;
 import io.harness.freeze.helpers.FreezeRBACHelper;
 import io.harness.freeze.mappers.FrozenExecutionMapper;
+import io.harness.logging.CommandExecutionStatus;
+import io.harness.logging.LogLevel;
 import io.harness.logging.UnitProgress;
 import io.harness.logging.UnitStatus;
 import io.harness.logstreaming.LogStreamingStepClientFactory;
+import io.harness.logstreaming.NGLogCallback;
 import io.harness.pms.contracts.ambiance.Ambiance;
 import io.harness.pms.contracts.execution.ChildrenExecutableResponse;
 import io.harness.pms.contracts.execution.Status;
@@ -82,6 +87,7 @@ import io.harness.pms.contracts.execution.failure.FailureTypeInfo;
 import io.harness.pms.contracts.steps.StepCategory;
 import io.harness.pms.contracts.steps.StepType;
 import io.harness.pms.execution.utils.AmbianceUtils;
+import io.harness.pms.execution.utils.StatusUtils;
 import io.harness.pms.sdk.core.data.OptionalSweepingOutput;
 import io.harness.pms.sdk.core.resolver.RefObjectUtils;
 import io.harness.pms.sdk.core.resolver.outputs.ExecutionSweepingOutputService;
@@ -139,6 +145,7 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
   @Inject private ServiceHookImplicitStepHelper serviceHookImplicitStepHelper;
   @Inject private CIFeatureFlagService ciFeatureFlagService;
   @Inject private ServiceHookTaskHelper serviceHookTaskHelper;
+  @Inject private LogStreamingStepClientFactory logStreamingStepClientFactory;
 
   public static final StepType STEP_TYPE =
       StepType.newBuilder().setType(UNIFIED_SERVICE_STEP.getDisplayName()).setStepCategory(StepCategory.STEP).build();
@@ -163,6 +170,11 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
     final String orgIdentifier = AmbianceUtils.getOrgIdentifier(ambiance);
     final String projectIdentifier = AmbianceUtils.getProjectIdentifier(ambiance);
     final String logBaseKey = LogStreamingStepClientFactory.getLogBaseKey(ambiance);
+    NGLogCallback serviceStepLogCallback =
+        new NGLogCallback(logStreamingStepClientFactory, ambiance, SERVICE_STEP_COMMAND_UNIT, true);
+    NGLogCallback overrideLogCallback =
+        new NGLogCallback(logStreamingStepClientFactory, ambiance, OVERRIDES_COMMAND_UNIT, true);
+    serviceStepLogCallback.saveExecutionLog("Starting service step...");
     final String pipelineIdentifier = AmbianceUtils.getPipelineIdentifier(ambiance);
     final Map<String, Object> serviceInputs = ParameterField.isNull(stepParameters.getServiceInputs())
         ? new HashMap<>()
@@ -183,6 +195,12 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
         environmentRef, envBranchRef, infraId, accountId, orgIdentifier, projectIdentifier, serviceInputs,
         stepParameters.getInfraInputs(), envOverridesInputs, svcOverridesInputs, branch, envGroupRef);
 
+    serviceStepLogCallback.saveExecutionLog("Service Name: " + result.getServiceEntityMetadata().getName()
+        + " , Identifier: " + result.getServiceEntityMetadata().getIdentifier());
+    serviceStepLogCallback.saveExecutionLog("Processed service & environment variables");
+    overrideLogCallback.saveExecutionLog(
+        "Successfully collected overrides.", LogLevel.INFO, CommandExecutionStatus.SUCCESS);
+
     // When a group-level 'type' is declared, validate the actual resolved service type against it. For a single service
     // this also covers a non-runtime-input expression ref, which only resolves here. No-op when no type was declared.
     ServiceType resolvedServiceType = result.getServiceConfig().getServiceInfoConfig().getUses();
@@ -194,26 +212,50 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
 
     List<String> stepLogKeys = new ArrayList<>();
     List<String> stepCommandUnits = new ArrayList<>();
+    stepLogKeys.add(ServiceStepUtility.generateLogKey(logBaseKey, SERVICE_STEP_COMMAND_UNIT));
+    stepLogKeys.add(ServiceStepUtility.generateLogKey(logBaseKey, OVERRIDES_COMMAND_UNIT));
+    stepCommandUnits.add(SERVICE_STEP_COMMAND_UNIT);
+    stepCommandUnits.add(OVERRIDES_COMMAND_UNIT);
 
     Map<String, List<String>> fetchHookKeys = Collections.emptyMap();
     boolean serviceHookEnabled = serviceHookTaskHelper.isServiceHooksEnabled(ambiance);
     if (serviceHookEnabled) {
-      fetchHookKeys = handleServiceHooksPart(
-          ambiance, result.getServiceConfig(), logBaseKey, stepParameters.getEnvVars(), ServiceHookAction.FETCH_FILES);
-      stepLogKeys.addAll(fetchHookKeys.getOrDefault("preLogKeys", Collections.emptyList()));
-      stepCommandUnits.addAll(fetchHookKeys.getOrDefault("preCommandUnits", Collections.emptyList()));
+      List<ServiceHookConfig> hooks = result.getServiceConfig().getServiceInfoConfig().getWith().getHooks();
+      if (isEmpty(hooks)) {
+        serviceStepLogCallback.saveExecutionLog(
+            "No service hooks configured in the service. hooks expressions will not be applied", LogLevel.WARN);
+      } else {
+        fetchHookKeys = handleServiceHooksPart(ambiance, result.getServiceConfig(), logBaseKey,
+            stepParameters.getEnvVars(), ServiceHookAction.FETCH_FILES);
+        stepLogKeys.addAll(fetchHookKeys.getOrDefault("preLogKeys", Collections.emptyList()));
+        stepCommandUnits.addAll(fetchHookKeys.getOrDefault("preCommandUnits", Collections.emptyList()));
 
-      handleServiceHooksPart(ambiance, result.getServiceConfig(), logBaseKey, stepParameters.getEnvVars(),
-          ServiceHookAction.TEMPLATE_MANIFEST);
+        handleServiceHooksPart(ambiance, result.getServiceConfig(), logBaseKey, stepParameters.getEnvVars(),
+            ServiceHookAction.TEMPLATE_MANIFEST);
+      }
     }
 
+    if (ServiceStepUtility.isManifestPresent(result.getServiceConfig())) {
+      serviceStepLogCallback.saveExecutionLog("Adding manifest from service");
+    }
     handleManifestsPart(ambiance, result.getServiceConfig(), stepLogKeys, stepCommandUnits, logBaseKey,
         stepParameters.getEnvVars(), result.getManifestMap());
 
     stepLogKeys.addAll(fetchHookKeys.getOrDefault("postLogKeys", Collections.emptyList()));
     stepCommandUnits.addAll(fetchHookKeys.getOrDefault("postCommandUnits", Collections.emptyList()));
+    if (!ServiceStepUtility.isConfigFilesPresent(result.getServiceConfig())
+        && !ServiceStepUtility.isStartupScriptCodeFetchRequired(result.getServiceConfig())) {
+      serviceStepLogCallback.saveExecutionLog("No config files configured in the service or in overrides."
+          + " configFiles expressions will not be applied");
+    }
     handleConfigFilesPart(ambiance, result.getServiceConfig(), stepLogKeys, stepCommandUnits, logBaseKey,
         stepParameters.getEnvVars(), result.getConfigFileMap());
+    if (ServiceStepUtility.isArtifactSourcePresent(result.getServiceConfig())) {
+      ArtifactWrapper artifacts = result.getServiceConfig().getServiceInfoConfig().getWith().getArtifacts();
+      if (ArtifactStepUtils.getPrimaryArtifact(artifacts).isPresent()) {
+        serviceStepLogCallback.saveExecutionLog("Processing primary artifact...");
+      }
+    }
     handleArtifactsPart(ambiance, logBaseKey, result, stepLogKeys, stepCommandUnits, stepParameters.getEnvVars());
 
     // Deployment freeze
@@ -324,10 +366,31 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
   @Override
   public StepResponse handleChildrenResponse(
       Ambiance ambiance, UnifiedServiceStepParameters stepParameters, Map<String, ResponseData> responseDataMap) {
+    // Reconnect to the open "Service Step" log stream (shouldOpenStream=false — stream was opened in obtainChildren)
+    NGLogCallback serviceStepLogCallback =
+        new NGLogCallback(logStreamingStepClientFactory, ambiance, SERVICE_STEP_COMMAND_UNIT, false);
     // check if freeze is active return freeze response
     StepResponse stepFreezeResponse = handleFreezeResponse(ambiance);
     if (stepFreezeResponse != null) {
-      return stepFreezeResponse;
+      serviceStepLogCallback.saveExecutionLog(
+          "Service aborted due to freeze", LogLevel.ERROR, CommandExecutionStatus.FAILURE);
+      long freezeStartTs = AmbianceUtils.getCurrentLevelStartTs(ambiance);
+      long freezeEndTs = System.currentTimeMillis();
+      List<UnitProgress> freezeUnitProgresses = new ArrayList<>();
+      freezeUnitProgresses.add(UnitProgress.newBuilder()
+                                   .setStatus(UnitStatus.SUCCESS)
+                                   .setUnitName(OVERRIDES_COMMAND_UNIT)
+                                   .setStartTime(freezeStartTs)
+                                   .setEndTime(freezeEndTs)
+                                   .build());
+      freezeUnitProgresses.add(0,
+          UnitProgress.newBuilder()
+              .setStatus(UnitStatus.FAILURE)
+              .setUnitName(SERVICE_STEP_COMMAND_UNIT)
+              .setStartTime(freezeStartTs)
+              .setEndTime(freezeEndTs)
+              .build());
+      return stepFreezeResponse.toBuilder().unitProgressList(freezeUnitProgresses).build();
     }
     StepResponse stepResponse = SdkCoreStepUtils.createStepResponseFromChildResponse(responseDataMap);
     List<UnitProgress> unitProgresses = new ArrayList<>();
@@ -423,6 +486,28 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
     stepResponse = stepResponse.withStepOutcomes(stepOutcomes);
 
     callOpaForServiceRuntimeContext(ambiance, stepOutcomes, stepResponse);
+
+    boolean isFailed = StatusUtils.brokeStatuses().contains(stepResponse.getStatus());
+    if (isFailed) {
+      serviceStepLogCallback.saveExecutionLog(
+          "Failed to complete service", LogLevel.ERROR, CommandExecutionStatus.FAILURE);
+    } else {
+      serviceStepLogCallback.saveExecutionLog("Completed service", LogLevel.INFO, CommandExecutionStatus.SUCCESS);
+    }
+    unitProgresses.add(0,
+        UnitProgress.newBuilder()
+            .setStatus(UnitStatus.SUCCESS)
+            .setUnitName(OVERRIDES_COMMAND_UNIT)
+            .setStartTime(serviceStepStartTs)
+            .setEndTime(stepEndTs)
+            .build());
+    unitProgresses.add(0,
+        UnitProgress.newBuilder()
+            .setStatus(isFailed ? UnitStatus.FAILURE : UnitStatus.SUCCESS)
+            .setUnitName(SERVICE_STEP_COMMAND_UNIT)
+            .setStartTime(serviceStepStartTs)
+            .setEndTime(stepEndTs)
+            .build());
 
     return stepResponse.toBuilder().unitProgressList(unitProgresses).build();
   }
