@@ -252,28 +252,28 @@ ci_images:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.18.31"
+      tag: "1.18.32"
       repository: harness/ci-addon
       imagePullSecrets: []
   addon_rootless:
     image:
       registry: docker.io
       digest: ""
-      tag: "rootless-1.18.31"
+      tag: "rootless-1.18.32"
       repository: harness/ci-addon
       imagePullSecrets: []
   lite_engine:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.18.31"
+      tag: "1.18.32"
       repository: harness/ci-lite-engine
       imagePullSecrets: []
   lite_engine_rootless:
     image:
       registry: docker.io
       digest: ""
-      tag: "rootless-1.18.31"
+      tag: "rootless-1.18.32"
       repository: harness/ci-lite-engine
       imagePullSecrets: []
   cache_proxy:
