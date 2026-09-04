@@ -14,6 +14,7 @@ import io.harness.ng.core.api.cache.JwtTokenScimAccountSettingsData;
 import io.harness.ng.core.api.cache.JwtTokenServiceAccountData;
 import io.harness.ng.runner.scheduledtask.response.driftdetection.DriftDetectionDiffNotifyCallback;
 import io.harness.ng.runner.scheduledtask.response.driftdetection.DriftDetectionFetchValuesNotifyCallback;
+import io.harness.ng.servicediscovery.ServiceDiscoveryNotifyCallback;
 import io.harness.ngsettings.SettingCategory;
 import io.harness.ngsettings.SettingSource;
 import io.harness.ngsettings.SettingValueType;
@@ -38,5 +39,6 @@ public class NGCacheDataKryoRegistrar implements KryoRegistrar {
     kryo.register(DriftDetectionFetchValuesNotifyCallback.class, 10000533);
     kryo.register(ChaosNotifyCallback.class, 10000534);
     kryo.register(ChaosCleanupNotifyCallback.class, 10000535);
+    kryo.register(ServiceDiscoveryNotifyCallback.class, 10000536);
   }
 }

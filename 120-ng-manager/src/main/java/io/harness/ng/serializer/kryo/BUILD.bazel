@@ -13,6 +13,7 @@ java_library(
     deps = [
         "//120-ng-manager/src/main/java/io/harness/ng/core/api/cache:module",
         "//120-ng-manager/src/main/java/io/harness/ng/runner/scheduledtask/response/driftdetection:module",
+        "//120-ng-manager/src/main/java/io/harness/ng/servicediscovery:module",
         "//128-resiliencetesting/src/main/java/io/harness/ng/chaos:module",
         "//970-ng-commons/src/main/java/io/harness/beans/scope:module",
         "//980-commons/src/main/java/io/harness/serializer:module",
