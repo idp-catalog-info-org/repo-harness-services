@@ -55,7 +55,6 @@ import io.harness.ssca.execution.creator.variable.SscaSTOStepVariableCreator;
 import io.harness.sto.STOStepType;
 import io.harness.sto.creator.variables.STOCommonStepVariableCreator;
 import io.harness.sto.creator.variables.STOStepVariableCreator;
-import io.harness.sto.plan.creator.step.STOStepFilterJsonCreatorV2;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -104,7 +103,7 @@ public class STOPipelineServiceInfoProvider implements PipelineServiceInfoProvid
   public List<FilterJsonCreator> getFilterJsonCreators() {
     List<FilterJsonCreator> filterJsonCreators = new ArrayList<>();
     filterJsonCreators.add(new STOStageFilterJsonCreator());
-    filterJsonCreators.add(new STOStepFilterJsonCreatorV2());
+    filterJsonCreators.add(new STOSecretAwareStepFilterJsonCreator());
     filterJsonCreators.add(new SscaSTOStepsFilterJsonCreator());
 
     injectorUtils.injectMembers(filterJsonCreators);

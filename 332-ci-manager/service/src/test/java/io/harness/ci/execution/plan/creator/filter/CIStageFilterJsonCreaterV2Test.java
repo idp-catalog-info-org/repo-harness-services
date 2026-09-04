@@ -7,6 +7,8 @@
 
 package io.harness.ci.execution.plan.creator.filter;
 
+import static io.harness.beans.FeatureName.CI_SECRET_EXPRESSION_REFERENCES;
+import static io.harness.rule.OwnerRule.CHIRAG_S;
 import static io.harness.rule.OwnerRule.SAHITHI;
 import static io.harness.rule.OwnerRule.SHUBHAM_AGARWAL;
 
@@ -25,6 +27,7 @@ import io.harness.category.element.UnitTests;
 import io.harness.ci.execution.buildstate.ConnectorUtils;
 import io.harness.ci.execution.integrationstage.k8s.K8InitializeTaskUtils;
 import io.harness.ci.execution.utils.validation.ValidationUtilsImpl;
+import io.harness.ci.ff.CIFeatureFlagService;
 import io.harness.eventsframework.schemas.entity.EntityDetailProtoDTO;
 import io.harness.eventsframework.schemas.entity.EntityTypeProtoEnum;
 import io.harness.eventsframework.schemas.entity.IdentifierRefProtoDTO;
@@ -47,6 +50,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -64,6 +68,7 @@ public class CIStageFilterJsonCreaterV2Test {
   @Mock private K8InitializeTaskUtils k8InitializeTaskUtils;
   @Mock private ValidationUtilsImpl validationUtils;
   @Mock private CILicenseService ciLicenseService;
+  @Mock private CIFeatureFlagService ciFeatureFlagService;
 
   @Mock private CodeBase ciCodeBase;
 
@@ -213,5 +218,58 @@ public class CIStageFilterJsonCreaterV2Test {
 
     assertThatThrownBy(() -> ciStageFilterJsonCreatorV2.getFilter(filterCreationContext, integrationStageNode))
         .isInstanceOf(CIStageExecutionException.class);
+  }
+
+  @Test
+  @Owner(developers = CHIRAG_S)
+  @Category(UnitTests.class)
+  public void testGetReferredEntitiesIncludesCodebaseSecretExpressions() throws IOException {
+    when(ciFeatureFlagService.isEnabled(CI_SECRET_EXPRESSION_REFERENCES, ACCOUNT_ID)).thenReturn(true);
+
+    YamlField stagesNode = readStages("pipeline_codebase_secret_expression_test.yml");
+
+    // The codebase is declared once at pipeline level, so every stage reports the same pipeline-level FQN.
+    assertThat(codebaseSecretFqns(stagesNode, 0))
+        .containsExactlyInAnyOrder(
+            "pipeline.properties.ci.codebase.cloneDirectory", "pipeline.properties.ci.codebase.preFetchCommand");
+    assertThat(codebaseSecretFqns(stagesNode, 1))
+        .containsExactlyInAnyOrder(
+            "pipeline.properties.ci.codebase.cloneDirectory", "pipeline.properties.ci.codebase.preFetchCommand");
+  }
+
+  @Test
+  @Owner(developers = CHIRAG_S)
+  @Category(UnitTests.class)
+  public void testGetReferredEntitiesSkipsCodebaseSecretExpressionsWhenFeatureFlagIsOff() throws IOException {
+    when(ciFeatureFlagService.isEnabled(CI_SECRET_EXPRESSION_REFERENCES, ACCOUNT_ID)).thenReturn(false);
+
+    YamlField stagesNode = readStages("pipeline_codebase_secret_expression_test.yml");
+
+    assertThat(codebaseSecretFqns(stagesNode, 0)).isEmpty();
+  }
+
+  private YamlField readStages(String resourceName) throws IOException {
+    final URL testFile = this.getClass().getClassLoader().getResource(resourceName);
+    String yamlContent = Resources.toString(testFile, Charsets.UTF_8);
+    YamlField yamlField = YamlUtils.readTree(YamlUtils.injectUuid(yamlContent));
+    return yamlField.getNode().getField("pipeline").getNode().getField("stages");
+  }
+
+  private Set<String> codebaseSecretFqns(YamlField stagesNode, int stageIndex) throws IOException {
+    YamlField stageField = stagesNode.getNode().asArray().get(stageIndex).getField("stage");
+    FilterCreationContext filterCreationContext =
+        FilterCreationContext.builder()
+            .currentField(new YamlField("stage", stageField.getNode()))
+            .setupMetadata(
+                SetupMetadata.newBuilder().setAccountId(ACCOUNT_ID).setOrgId(ORG_ID).setProjectId(PROJECT_ID).build())
+            .build();
+    IntegrationStageNode integrationStageNode =
+        YamlUtils.read(stageField.getNode().toString(), IntegrationStageNode.class);
+
+    return ciStageFilterJsonCreatorV2.getReferredEntities(filterCreationContext, integrationStageNode)
+        .stream()
+        .filter(reference -> reference.getType() == EntityTypeProtoEnum.SECRETS)
+        .map(reference -> reference.getIdentifierRef().getMetadataMap().get("fqn"))
+        .collect(Collectors.toSet());
   }
 }
