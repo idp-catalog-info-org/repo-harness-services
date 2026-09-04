@@ -557,7 +557,7 @@ ciExecutionServiceConfig:
       windowsEntrypoint:
         - "C:\\drone-cache.exe"
     cacheProxyConfig:
-      image: harness/harness-cache-server:1.7.25
+      image: harness/harness-cache-server:1.7.29
       entrypoint:
         - /app/cache-proxy
         - server
@@ -737,7 +737,7 @@ ciExecutionServiceConfig:
       cacheS3: plugins/cache:1.10.10
       cacheAzure: plugins/cache:1.10.10
       cache: plugins/cache:1.10.10
-      cacheProxy: harness/harness-cache-server:1.7.25
+      cacheProxy: harness/harness-cache-server:1.7.29
       hsaRepositoryScan: harness/hsa-repo-scan-plugin:latest
       sscaOrchestration: harness/ssca-plugin:0.67.0
       sscaEnforcement: harness/ssca-plugin:0.67.0
@@ -852,7 +852,7 @@ ciExecutionServiceConfig:
         disableClone: false
         binarySuffix: plugin-{{ os }}-{{ arch }}.zst
       buildCacheConfig:
-        name: github.com/wings-software/harness-cache@refs/tags/v1.7.19
+        name: github.com/wings-software/harness-cache@refs/tags/cache-proxy/v1.7.29
         disableClone: true
         binarySuffix: cache-proxy-{{ os }}-{{ arch }}.zst
   gitnessConfig:
