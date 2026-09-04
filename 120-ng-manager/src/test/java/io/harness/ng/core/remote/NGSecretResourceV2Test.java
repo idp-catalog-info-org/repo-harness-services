@@ -132,7 +132,8 @@ public class NGSecretResourceV2Test extends CategoryTest {
   public void setup() {
     secretApiUtils = new SecretApiUtils(validator, featureFlagService);
     ngSecretResourceV2 = new NGSecretResourceV2(ngSecretService, secretScopeService, validator, encryptedDataService,
-        secretPermissionValidator, ngEncryptorService, scopeResolverService, secretApiUtils, executorService);
+        secretPermissionValidator, ngEncryptorService, scopeResolverService, secretApiUtils, featureFlagService,
+        executorService);
   }
 
   @Test

@@ -85,6 +85,8 @@ java_library(
         "//clients/fme-composite-client/src/main/java/io/harness/fme/client:module",
         "//clients/ngsettings/src/main/java/io/harness/ngsettings/client/remote:module",
         "//clients/template-service/src/main/java/io/harness/template/remote:module",
+        "//connector-oidc/src/main/java/io/harness/connector/oidc/handler:module",
+        "//connector-oidc/src/main/java/io/harness/connector/oidc/metrics:module",
         "//favorites/src/main/java/io/harness/favorites/services:module",
         "//pipeline-service/modules/pms-contracts/src/main/java/io/harness/pms/serializer/json:module",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
