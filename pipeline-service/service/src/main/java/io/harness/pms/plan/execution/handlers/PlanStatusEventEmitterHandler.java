@@ -48,7 +48,8 @@ public class PlanStatusEventEmitterHandler implements AsyncInformObserver, PlanS
 
   @Override
   public void onPlanStatusUpdate(Ambiance ambiance, Status currentStatus, Status previousStatus) {
-    if (currentStatus == Status.SUCCEEDED || currentStatus == Status.IGNORE_FAILED) {
+    if (currentStatus == Status.SUCCEEDED || currentStatus == Status.IGNORE_FAILED
+        || currentStatus == Status.PASSED_WITH_WARNING) {
       planExecutionSubject.fireInform(NotificationObserver::onSuccess, ambiance);
       eventEnvelopePublisher.publishPipelineEvent(ambiance, currentStatus);
       systemEventPublisher.publish(ambiance, SystemEventType.PIPELINE_SUCCESS);

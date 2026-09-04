@@ -51,4 +51,8 @@ enum Status {
                                 // receive same message from queue service twice)
 
   QUEUED_GLOBAL_INFRA_CAPACITY_REACHED = 31;  // This status is used when there is no capacity to run a hosted build
+
+  // Node completed but a non-blocking governance violation was raised (OPA "Warn & Continue").
+  // Positive/final status: execution continues, no rollback, distinct from IGNORE_FAILED.
+  PASSED_WITH_WARNING = 32;
 }

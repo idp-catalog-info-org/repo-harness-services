@@ -3023,6 +3023,7 @@ components:
             - APPROVAL_WAITING
             - APPROVAL_REJECTED
             - Waiting
+            - PassedWithWarning
         started:
           type: integer
           format: int64
@@ -5658,6 +5659,7 @@ components:
         - QueuedExecutionConcurrencyReached
         - QueuedGlobalInfraCapacityReached
         - QUEUED_PLAN_CREATION
+        - PassedWithWarning
       x-stoplight:
         id: s6xr6ltu19tv1
     PipelineExecutionSummaryDTO:

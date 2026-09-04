@@ -161,11 +161,15 @@ public class PolicyStep implements SyncExecutable<StepBaseParameters> {
       return PolicyEvalUtils.buildFailureStepResponse(ErrorCode.POLICY_EVALUATION_FAILURE, errorMessage,
           FailureType.POLICY_EVALUATION_FAILURE, stepOutcome, unitProgressBuilder);
     }
+    Status stepStatus =
+        PolicyEvalUtils.mapOpaEvaluationStatusToExecutionStatus(opaEvaluationResponseHolder.getStatus());
+    String completionMessage =
+        stepStatus == Status.PASSED_WITH_WARNING ? "Policy step completed with warnings" : "Policy step succeeded";
     // No need to close the client explicitly, since if command execution status is terminal, save execution log
     // automatically closes the connection.
-    saveExecutionLog(logCallback, "Policy step succeeded", LogLevel.INFO, CommandExecutionStatus.SUCCESS);
+    saveExecutionLog(logCallback, completionMessage, LogLevel.INFO, CommandExecutionStatus.SUCCESS);
     return StepResponse.builder()
-        .status(Status.SUCCEEDED)
+        .status(stepStatus)
         .stepOutcome(stepOutcome)
         .unitProgressList(Collections.singletonList(unitProgressBuilder.build()))
         .build();

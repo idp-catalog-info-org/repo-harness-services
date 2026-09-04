@@ -1161,13 +1161,14 @@ public class PipelineServiceApplication extends Application<PipelineServiceConfi
   @VisibleForTesting
   public Map<String, String> getStaticAliases() {
     Map<String, String> aliases = new HashMap<>();
-    aliases.put(OrchestrationConstants.STAGE_SUCCESS, "<+stage.currentStatus> =~ [\"SUCCEEDED\", \"IGNORE_FAILED\"]");
+    aliases.put(OrchestrationConstants.STAGE_SUCCESS,
+        "<+stage.currentStatus> =~ [\"SUCCEEDED\", \"IGNORE_FAILED\", \"PASSED_WITH_WARNING\"]");
     aliases.put(OrchestrationConstants.STAGE_FAILURE,
         "<+stage.currentStatus> =~ [\"FAILED\", \"ERRORED\", \"EXPIRED\", \"APPROVAL_REJECTED\"]");
     aliases.put(OrchestrationConstants.PIPELINE_FAILURE,
         "<+pipeline.currentStatus> =~ [\"FAILED\", \"ERRORED\", \"EXPIRED\", \"APPROVAL_REJECTED\"]");
-    aliases.put(
-        OrchestrationConstants.PIPELINE_SUCCESS, "<+pipeline.currentStatus> =~ [\"SUCCEEDED\", \"IGNORE_FAILED\"]");
+    aliases.put(OrchestrationConstants.PIPELINE_SUCCESS,
+        "<+pipeline.currentStatus> =~ [\"SUCCEEDED\", \"IGNORE_FAILED\", \"PASSED_WITH_WARNING\"]");
     // DAG dependency status aliases. Resolved by NodeExecutionMap.fetchDependencyStatus against the
     // current scope's NodeExecution, so the same resolver code will serve step-level DAG once it lands
     // (at which point a matching OnStepDependantsSuccess alias pointing to <+step.allDependantsSucceeded>

@@ -310,7 +310,7 @@ public class NodeExecutionInfoServiceImpl implements NodeExecutionInfoService {
 
   private boolean shouldUpdateOnStatus(Status status) {
     return StatusUtils.isFinalStatus(status) && Status.SUCCEEDED != status && Status.SKIPPED != status
-        && Status.IGNORE_FAILED != status;
+        && Status.IGNORE_FAILED != status && Status.PASSED_WITH_WARNING != status;
   }
 
   private boolean shouldSkipUpdateOnAdviserResponse(AdviserResponse adviserResponse) {
