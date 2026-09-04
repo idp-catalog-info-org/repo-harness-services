@@ -391,6 +391,7 @@ public class CIPipelineEndEventHandler implements OrchestrationEventHandler {
     boolean isMavenBIUsed = false;
     boolean isGradleBIUsed = false;
     boolean isBazelBIUsed = false;
+    boolean isGoBIUsed = false;
     boolean isNonDefaultPath = false;
     boolean isCustomKeys = false;
 
@@ -433,6 +434,7 @@ public class CIPipelineEndEventHandler implements OrchestrationEventHandler {
         isMavenBIUsed = isMavenBIUsed || buildInfo.isMavenBIUsed();
         isGradleBIUsed = isGradleBIUsed || buildInfo.isGradleBIUsed();
         isBazelBIUsed = isBazelBIUsed || buildInfo.isBazelBIUsed();
+        isGoBIUsed = isGoBIUsed || buildInfo.isGoBIUsed();
       }
 
       // Test Intelligence Info
@@ -529,6 +531,7 @@ public class CIPipelineEndEventHandler implements OrchestrationEventHandler {
     result.put("bi_is_maven_used", isMavenBIUsed);
     result.put("bi_is_gradle_used", isGradleBIUsed);
     result.put("bi_is_bazel_used", isBazelBIUsed);
+    result.put("bi_is_go_used", isGoBIUsed);
     result.put("ti_total_tests", totalTests);
     result.put("ti_total_test_classes", totalTestClasses);
     result.put("ti_total_selected_tests", totalSelectedTests);
