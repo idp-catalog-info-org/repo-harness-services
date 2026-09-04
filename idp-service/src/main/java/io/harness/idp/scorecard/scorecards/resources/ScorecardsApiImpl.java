@@ -18,6 +18,7 @@ import io.harness.accesscontrol.ResourceIdentifier;
 import io.harness.annotations.dev.HarnessTeam;
 import io.harness.annotations.dev.OwnedBy;
 import io.harness.eraro.ResponseMessage;
+import io.harness.exception.InvalidRequestException;
 import io.harness.idp.scorecard.scorecards.mappers.ScorecardMapper;
 import io.harness.idp.scorecard.scorecards.service.ScorecardService;
 import io.harness.security.annotations.NextGenManagerAuth;
@@ -98,6 +99,10 @@ public class ScorecardsApiImpl implements ScorecardsApi {
       return Response.status(Response.Status.CREATED)
           .entity(new DefaultSaveResponse().status(SUCCESS_RESPONSE))
           .build();
+    } catch (InvalidRequestException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ResponseMessage.builder().message(e.getMessage()).build())
+          .build();
     } catch (DuplicateKeyException e) {
       String errorMessage = String.format(
           "Scorecard [%s] already created for accountId [%s]", body.getScorecard().getIdentifier(), harnessAccount);
@@ -150,6 +155,10 @@ public class ScorecardsApiImpl implements ScorecardsApi {
     try {
       scorecardService.updateScorecard(body, harnessAccount);
       return Response.status(Response.Status.OK).entity(new DefaultSaveResponse().status(SUCCESS_RESPONSE)).build();
+    } catch (InvalidRequestException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(ResponseMessage.builder().message(e.getMessage()).build())
+          .build();
     } catch (Exception e) {
       log.error("Could not update scorecard", e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
