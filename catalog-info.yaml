@@ -27,6 +27,9 @@ kind: Component
 metadata:
   name: ci-manager
   description: CI manager (static snapshot from 332-ci-manager)
+  tags:
+    - ci
+    - lite-engine
   annotations:
     github.com/project-slug: idp-catalog-info-org/repo-harness-services
 spec:
