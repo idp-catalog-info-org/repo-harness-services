@@ -79,6 +79,7 @@ public class S3SaveCacheStepVariableCreatorTest extends CategoryTest {
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.archiveFormat",
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.description",
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.override",
+            "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.ignoreMissingPaths",
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.region",
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.pathStyle",
             "pipeline.stages.s3_save_cache.spec.execution.steps.saveCacheTar.spec.runAsUser",

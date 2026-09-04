@@ -84,6 +84,7 @@ public class GCSSaveCacheStepVariableCreatorTest extends CategoryTest {
             "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.timeout",
             "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.spec.key",
             "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.spec.override",
+            "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.spec.ignoreMissingPaths",
             "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.spec.sourcePaths",
             "pipeline.stages.gcs_save_cache.spec.execution.steps.saveCacheTar.when");
 

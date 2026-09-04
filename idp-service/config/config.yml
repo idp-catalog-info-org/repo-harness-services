@@ -710,25 +710,25 @@ ciExecutionServiceConfig:
       windowsEntrypoint:
         - "C:\\bin\\har.exe"
     cacheGCSConfig:
-      image: plugins/cache:1.10.10
+      image: plugins/cache:1.10.11
       entrypoint:
         - /bin/drone-cache
       windowsEntrypoint:
         - "C:\\drone-cache.exe"
     cacheConfig:
-      image: plugins/cache:1.10.10
+      image: plugins/cache:1.10.11
       entrypoint:
         - /bin/drone-cache
       windowsEntrypoint:
         - "C:\\drone-cache.exe"
     cacheS3Config:
-      image: plugins/cache:1.10.10
+      image: plugins/cache:1.10.11
       entrypoint:
         - /bin/drone-cache
       windowsEntrypoint:
         - "C:\\drone-cache.exe"
     cacheAzureConfig:
-      image: plugins/cache:1.10.10
+      image: plugins/cache:1.10.11
       entrypoint:
         - /bin/drone-cache
       windowsEntrypoint:
@@ -915,9 +915,9 @@ ciExecutionServiceConfig:
       security: harness/sto-plugin:${STO_STEP_CONFIG_DEFAULT_TAG:-latest}
       artifactoryUpload: plugins/artifactory:1.9.0
       harUpload: harness/har-plugin:1.0.0
-      cacheGCS: plugins/cache:1.10.10
-      cacheS3: plugins/cache:1.10.10
-      cacheAzure: plugins/cache:1.10.10
+      cacheGCS: plugins/cache:1.10.11
+      cacheS3: plugins/cache:1.10.11
+      cacheAzure: plugins/cache:1.10.11
       cacheProxy: harness/harness-cache-server:1.7.29
       sscaOrchestration: harness/ssca-plugin:0.17.3
       sscaEnforcement: harness/ssca-plugin:0.17.3

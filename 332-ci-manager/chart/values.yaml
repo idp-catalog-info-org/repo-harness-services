@@ -410,28 +410,28 @@ ci_images:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.10.10"
+      tag: "1.10.11"
       repository: plugins/cache
       imagePullSecrets: []
   s3_cache:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.10.10"
+      tag: "1.10.11"
       repository: plugins/cache
       imagePullSecrets: []
   azure_cache:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.10.10"
+      tag: "1.10.11"
       repository: plugins/cache
       imagePullSecrets: []
   generic_cache:
     image:
       registry: docker.io
       digest: ""
-      tag: "1.10.10"
+      tag: "1.10.11"
       repository: plugins/cache
       imagePullSecrets: []
   ssca_plugin:
