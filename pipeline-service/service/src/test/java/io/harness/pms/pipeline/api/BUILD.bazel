@@ -24,6 +24,7 @@ java_library(
         "//900-git-sync-sdk/src/main/java/io/harness/gitsync/scm/beans:module",
         "//930-ng-core-clients/src/main/java/io/harness/organization/remote:module",
         "//930-ng-core-clients/src/main/java/io/harness/project/remote:module",
+        "//951-opa-contracts/src/main/proto:opa_contracts_java_proto",
         "//960-ng-core-beans/src/main/java/io/harness/ng/core/template:module",
         "//960-yaml-sdk/src/main/java/io/harness/yaml/validator:module",
         "//970-api-services-beans/src/main/java/io/harness/git/model:module",

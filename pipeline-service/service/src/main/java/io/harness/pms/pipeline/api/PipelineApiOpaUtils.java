@@ -24,20 +24,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Utility class for converting OPA/Governance metadata from protobuf to Pipeline V1 API models.
- * This class specifically handles governance-related conversions for Pipeline V1 API responses
- * (create/update/patch operations).
+ * Converts OPA/Governance protobuf metadata to Pipeline V1 OpenAPI models.
+ * Field names on the generated models match GovernanceMetadata / PolicySetMetadata / PolicyMetadata proto.
  */
 @CodePulse(module = ProductModule.CDS, unitCoverageRequired = true, components = {HarnessModuleComponent.CDS_PIPELINE})
 @OwnedBy(HarnessTeam.PIPELINE)
 public class PipelineApiOpaUtils {
   public static PipelineGovernanceMetadata buildGovernanceMetadataFromProto(
       io.harness.governance.GovernanceMetadata protoMetadata) {
+    if (protoMetadata == null) {
+      return null;
+    }
     return new PipelineGovernanceMetadata()
+        .id(nullIfEmpty(protoMetadata.getId()))
         .deny(protoMetadata.getDeny())
-        .message(protoMetadata.getMessage())
-        .status(GovernanceStatus.fromValue(protoMetadata.getStatus().toUpperCase()))
-        .policySets(buildPolicySetMetadata(protoMetadata.getDetailsList()));
+        .details(buildPolicySetMetadata(protoMetadata.getDetailsList()))
+        .message(nullIfEmpty(protoMetadata.getMessage()))
+        .timestamp(nullIfZero(protoMetadata.getTimestamp()))
+        .status(toGovernanceStatus(protoMetadata.getStatus()))
+        .accountId(nullIfEmpty(protoMetadata.getAccountId()))
+        .orgId(nullIfEmpty(protoMetadata.getOrgId()))
+        .projectId(nullIfEmpty(protoMetadata.getProjectId()))
+        .entity(nullIfEmpty(protoMetadata.getEntity()))
+        .type(nullIfEmpty(protoMetadata.getType()))
+        .action(nullIfEmpty(protoMetadata.getAction()))
+        .created(nullIfZero(protoMetadata.getCreated()));
   }
 
   private static List<PipelineGovernancePolicySet> buildPolicySetMetadata(List<PolicySetMetadata> detailsList) {
@@ -47,12 +58,17 @@ public class PipelineApiOpaUtils {
     return detailsList.stream()
         .map(policySet
             -> new PipelineGovernancePolicySet()
-                   .identifier(policySet.getIdentifier())
-                   .name(policySet.getPolicySetName())
-                   .org(policySet.getOrgId())
-                   .project(policySet.getProjectId())
-                   .status(GovernanceStatus.fromValue(policySet.getStatus().toUpperCase()))
-                   .policies(buildPoliciesMetadata(policySet.getPolicyMetadataList())))
+                   .policySetId(nullIfEmpty(policySet.getPolicySetId()))
+                   .deny(policySet.getDeny())
+                   .policyMetadata(buildPoliciesMetadata(policySet.getPolicyMetadataList()))
+                   .policySetName(nullIfEmpty(policySet.getPolicySetName()))
+                   .status(toGovernanceStatus(policySet.getStatus()))
+                   .identifier(nullIfEmpty(policySet.getIdentifier()))
+                   .created(nullIfZero(policySet.getCreated()))
+                   .accountId(nullIfEmpty(policySet.getAccountId()))
+                   .orgId(nullIfEmpty(policySet.getOrgId()))
+                   .projectId(nullIfEmpty(policySet.getProjectId()))
+                   .description(nullIfEmpty(policySet.getDescription())))
         .collect(Collectors.toList());
   }
 
@@ -63,13 +79,34 @@ public class PipelineApiOpaUtils {
     return policyMetadataList.stream()
         .map(policy
             -> new PipelineGovernancePolicy()
-                   .identifier(policy.getIdentifier())
-                   .name(policy.getPolicyName())
-                   .org(policy.getOrgId())
-                   .project(policy.getProjectId())
-                   .evaluationError(policy.getError())
-                   .denyMessages(policy.getDenyMessagesList())
-                   .status(GovernanceStatus.fromValue(policy.getStatus().toUpperCase())))
+                   .policyId(nullIfEmpty(policy.getPolicyId()))
+                   .policyName(nullIfEmpty(policy.getPolicyName()))
+                   .severity(nullIfEmpty(policy.getSeverity()))
+                   .denyMessages(
+                       EmptyPredicate.isEmpty(policy.getDenyMessagesList()) ? null : policy.getDenyMessagesList())
+                   .status(toGovernanceStatus(policy.getStatus()))
+                   .identifier(nullIfEmpty(policy.getIdentifier()))
+                   .accountId(nullIfEmpty(policy.getAccountId()))
+                   .orgId(nullIfEmpty(policy.getOrgId()))
+                   .projectId(nullIfEmpty(policy.getProjectId()))
+                   .created(nullIfZero(policy.getCreated()))
+                   .updated(nullIfZero(policy.getUpdated()))
+                   .error(nullIfEmpty(policy.getError())))
         .collect(Collectors.toList());
+  }
+
+  private static String nullIfEmpty(String value) {
+    return EmptyPredicate.isEmpty(value) ? null : value;
+  }
+
+  private static Long nullIfZero(long value) {
+    return value == 0 ? null : value;
+  }
+
+  private static GovernanceStatus toGovernanceStatus(String status) {
+    if (EmptyPredicate.isEmpty(status)) {
+      return null;
+    }
+    return GovernanceStatus.fromValue(status.toUpperCase());
   }
 }
