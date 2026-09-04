@@ -321,7 +321,7 @@ public class UnifiedStageServicePlanCreatorUtils {
         .stepParameters(new EmptyStepParameters())
         .facilitatorObtainment(
             FacilitatorObtainment.newBuilder()
-                .setType(FacilitatorType.newBuilder().setType(OrchestrationFacilitatorType.ASYNC).build())
+                .setType(FacilitatorType.newBuilder().setType(OrchestrationFacilitatorType.ASYNC_CHAIN).build())
                 .build())
         .skipExpressionChain(true)
         .skipGraphType(SkipType.SKIP_TREE)
@@ -353,7 +353,7 @@ public class UnifiedStageServicePlanCreatorUtils {
         .stepParameters(new EmptyStepParameters())
         .facilitatorObtainment(
             FacilitatorObtainment.newBuilder()
-                .setType(FacilitatorType.newBuilder().setType(OrchestrationFacilitatorType.ASYNC).build())
+                .setType(FacilitatorType.newBuilder().setType(OrchestrationFacilitatorType.ASYNC_CHAIN).build())
                 .build())
         .skipExpressionChain(true)
         .skipGraphType(SkipType.SKIP_TREE)

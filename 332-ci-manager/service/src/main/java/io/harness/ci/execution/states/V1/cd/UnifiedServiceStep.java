@@ -114,6 +114,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -446,6 +447,8 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
       List<ServiceHookConfig> hooks, String logBaseKey, ParameterField<Map<String, ParameterField<JsonNode>>> envVars) {
     boolean captureOverrideFiles = isNativeHelmWithSopsEnabled(ambiance, serviceConfig);
 
+    hooks = hooks.stream().sorted(Comparator.comparingInt(ServiceHookConfig::getOrder)).collect(Collectors.toList());
+
     LinkedHashMap<String, ServiceHookMetadata> preHookMetadataMap = new LinkedHashMap<>();
     LinkedHashMap<String, ServiceHookMetadata> postHookMetadataMap = new LinkedHashMap<>();
     List<String> preLogKeys = new ArrayList<>();
@@ -497,6 +500,8 @@ public class UnifiedServiceStep implements ChildrenExecutableWithRbac<UnifiedSer
       String logBaseKey, ParameterField<Map<String, ParameterField<JsonNode>>> envVars) {
     LinkedHashMap<String, ServiceHookMetadata> preHookMetadataMap = new LinkedHashMap<>();
     LinkedHashMap<String, ServiceHookMetadata> postHookMetadataMap = new LinkedHashMap<>();
+
+    hooks = hooks.stream().sorted(Comparator.comparingInt(ServiceHookConfig::getOrder)).collect(Collectors.toList());
 
     // Template manifest hooks are stage-level siblings of service (e.g. .../steps/preTemplateHooks),
     // not children (.../steps/service/preTemplateHooks). Strip the service level to fix UI grouping.

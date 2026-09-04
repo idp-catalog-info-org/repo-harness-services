@@ -22,6 +22,7 @@ import io.harness.cd.beans.outcomes.UnifiedServiceOutcome;
 import io.harness.ci.execution.integrationstage.ci.CIStepGroupUtils;
 import io.harness.ci.execution.states.helpers.ServiceStepSweepingOutputHelper;
 import io.harness.ci.states.V1.cd.TemplatingStepPassThroughData.ChainLink;
+import io.harness.ci.states.V1.cd.TemplatingStepPassThroughData.TemplatingStepPassThroughDataBuilder;
 import io.harness.delegate.beans.ErrorNotifyResponseData;
 import io.harness.delegate.beans.ci.vm.VmTaskExecutionResponse;
 import io.harness.delegate.task.stepstatus.StepExecutionStatus;
@@ -40,6 +41,7 @@ import io.harness.pms.sdk.core.plugin.CommonAbstractStepUtils;
 import io.harness.pms.sdk.core.steps.io.PassThroughData;
 import io.harness.pms.sdk.core.steps.io.StepInputPackage;
 import io.harness.pms.sdk.core.steps.io.StepResponse;
+import io.harness.pms.yaml.ParameterField;
 import io.harness.runner.request.builder.RunnerRequestBuilder;
 import io.harness.runner.request.utils.RunnerSubmitTaskUtils;
 import io.harness.serializer.recaster.RecastOrchestrationUtils;
@@ -50,6 +52,7 @@ import io.harness.unified.cd.service.spec.ServiceType;
 import io.harness.utils.CDStepsExpressionResolver;
 import io.harness.utils.DeployTemplateFetchHelper;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.protobuf.ByteString;
@@ -60,8 +63,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Two ways to make service hooks run sequentially:
+ * Method 1: Make TemplatingStep of AsyncChain type and have all the children run sequentially, one after the other
+ * Method 2: Keep TemplatingStep of Async type and introduce a new dummy node like TemplatingSection of AsyncChain type
+ * (like we have ManifestSection under Service node), as child of TemplatingStep. Now, all the hooks and the templating
+ * logic will run sequentially one after the other.
+ *
+ * We've moved ahead with Method 1 because, besides service hook, the only possible logic that can run inside
+ * TemplatingStep is the templating logic itself so introducing a dummy node would be more of an overhead.
+ *
+ * If later we do plan to introduce new steps under TemplatingStep which can run independently of the service hooks and
+ * the templating logic, then moving to Method 2 would be the more optimal approach.
+ */
 @OwnedBy(HarnessTeam.CI)
 @Singleton
 @Slf4j
@@ -98,7 +115,7 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
     return TemplatingStepParameters.class;
   }
 
-  // Chain link 1: submit pre-template hook tasks (or skip if none configured).
+  // Chain link 1: submit the first pre-template hook (or skip to templating/post-hooks if none).
   // All logKeys (pre-hooks, templating, post-hooks) are declared upfront so the UI renders all
   // log tabs from the start. Hook logKeys are computed from RunnerRequestBuilder.generateLogKey
   // against the TemplatingStep's ambiance — this matches what the runner actually uses, regardless
@@ -108,7 +125,6 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
       Ambiance ambiance, TemplatingStepParameters stepParameters, StepInputPackage inputPackage) {
     List<String> logKeys = new ArrayList<>();
     List<String> commandUnits = new ArrayList<>();
-    List<String> callbackIds = new ArrayList<>();
     Map<String, String> postHookLogKeys = new LinkedHashMap<>();
 
     boolean hooksEnabled = serviceHookTaskHelper.isServiceHooksEnabled(ambiance);
@@ -124,22 +140,16 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
     List<ServiceHookMetadata> postHookList = toHookList(postHooks);
     boolean templatingWillRun = willRunTemplating(ambiance);
 
-    // Nothing to do — signal chain end immediately
+    // Nothing to do — signal chain end immediately (finalizeExecution gets ptd==null → SKIPPED).
     if (preHookList.isEmpty() && postHookList.isEmpty() && !templatingWillRun) {
       return AsyncChainExecutableResponse.newBuilder().setChainEnd(true).build();
     }
 
-    // Pre-hooks: register log keys/command units and submit tasks.
+    // Register all log keys/command units upfront so the UI renders tabs in the correct order.
     for (ServiceHookMetadata hookMetadata : preHookList) {
       String logKey = RunnerRequestBuilder.generateLogKey(ambiance, hookMetadata.getStepId());
       logKeys.add(logKey);
       commandUnits.add(hookMetadata.getStepId());
-
-      String callbackId =
-          serviceHookTaskHelper.submitHookTask(ambiance, hookMetadata, preHooks.getEnvVars(), new HashMap<>(), logKey);
-      if (isNotEmpty(callbackId)) {
-        callbackIds.add(callbackId);
-      }
     }
 
     // Only register the templating tab when the plugin will actually run.
@@ -156,59 +166,50 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
       commandUnits.add(hookMetadata.getStepId());
     }
 
-    TemplatingStepPassThroughData ptd = isNotEmpty(postHookLogKeys)
-        ? TemplatingStepPassThroughData.builder().postHookLogKeys(postHookLogKeys).build()
-        : null;
+    AsyncChainExecutableResponse.Builder builder =
+        AsyncChainExecutableResponse.newBuilder().addAllLogKeys(logKeys).addAllUnits(commandUnits);
 
-    AsyncChainExecutableResponse.Builder builder = AsyncChainExecutableResponse.newBuilder()
-                                                       .setChainEnd(false)
-                                                       .addAllCallbackIds(callbackIds)
-                                                       .addAllLogKeys(logKeys)
-                                                       .addAllUnits(commandUnits);
-    if (ptd != null) {
-      builder.setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)));
+    if (isEmpty(preHookList)) {
+      // No pre-hooks: go straight to templating or post-hooks.
+      return submitTemplatingOrPostHooks(ambiance, stepParameters, postHookList, postHooks, postHookLogKeys, builder);
     }
-    return builder.build();
+
+    // Submit only the first pre-hook; carry the rest as pendingPreHooks.
+    TemplatingStepPassThroughDataBuilder ptdBuilder =
+        TemplatingStepPassThroughData.builder()
+            .postHookLogKeys(isNotEmpty(postHookLogKeys) ? postHookLogKeys : null)
+            .pendingPostHooks(new ArrayList<>(postHookList));
+
+    return submitNextHook(ambiance, preHookList, preHooks.getEnvVars(),
+        stepId -> RunnerRequestBuilder.generateLogKey(ambiance, stepId), ptdBuilder, true, builder);
   }
 
-  // executeNextLinkWithSecurityContext is called up to three times:
-  //   Call 1 (ptd == null or completedLink == null): pre-hooks finished → submit templating
-  //   Call 2 (completedLink == PRE_HOOKS)           : templating finished → submit post-hooks (chainEnd=false)
-  //   Call 3 (completedLink == TEMPLATING)          : post-hooks finished → emit terminal chainEnd=true (no callbacks)
+  // executeNextLink state machine:
+  //  completedLink==null, pendingPreHooks non-empty → another pre-hook just finished; submit next
+  //  completedLink==null, pendingPreHooks empty     → last pre-hook done; submit templating (or skip to post-hooks)
+  //  completedLink==PRE_HOOKS, pendingPostHooks non-empty → templating done; submit first post-hook
+  //  completedLink==PRE_HOOKS, pendingPostHooks empty     → templating done, no post-hooks; chainEnd=true
+  //  completedLink==TEMPLATING, pendingPostHooks non-empty → a post-hook just finished; submit next
+  //  completedLink==TEMPLATING, pendingPostHooks empty     → last post-hook done; chainEnd=true
   @Override
   public AsyncChainExecutableResponse executeNextLinkWithSecurityContext(Ambiance ambiance,
       TemplatingStepParameters stepParameters, StepInputPackage inputPackage, PassThroughData passThroughData,
       ThrowingSupplier<Map<String, ResponseData>> responseSupplier) throws Exception {
     TemplatingStepPassThroughData ptd = (TemplatingStepPassThroughData) passThroughData;
+    Map<String, ResponseData> responseDataMap = responseSupplier.get();
 
+    // A pre-hook just finished.
     if (ptd == null || ptd.getCompletedLink() == null) {
-      // Pre-hooks just finished; handle their responses and now run actual templating.
-      // Carry forward postHookLogKeys that were pre-computed in startChainLinkAfterRbac.
-      handleHookResponses(ambiance, responseSupplier.get(), "pre-template");
-      Map<String, String> postHookLogKeys = ptd != null ? ptd.getPostHookLogKeys() : null;
-      return submitTemplatingOrSkip(ambiance, stepParameters, postHookLogKeys);
+      return onPreHookLinkCompleted(ambiance, stepParameters, ptd, responseDataMap);
     }
 
+    // Templating just finished.
     if (ChainLink.PRE_HOOKS.equals(ptd.getCompletedLink())) {
-      // Templating just finished; handle its response and now submit post-hooks.
-      List<Map<String, String>> outputVars = new ArrayList<>();
-      if (!ptd.isTemplatingSkipped()) {
-        outputVars = handleTemplatingResponse(ambiance, responseSupplier.get());
-      }
-      return submitPostHooks(ambiance, outputVars, ptd.getPostHookLogKeys(), ptd.isTemplatingSkipped());
+      return onTemplatingLinkCompleted(ambiance, ptd, responseDataMap);
     }
 
-    // Post-hooks just finished; handle all their responses via the full map, then signal chain end.
-    handleHookResponses(ambiance, responseSupplier.get(), "post-template");
-    TemplatingStepPassThroughData nextPtd = TemplatingStepPassThroughData.builder()
-                                                .completedLink(ChainLink.POST_HOOKS)
-                                                .templatingSkipped(ptd.isTemplatingSkipped())
-                                                .outputVars(ptd.getOutputVars())
-                                                .build();
-    return AsyncChainExecutableResponse.newBuilder()
-        .setChainEnd(true)
-        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(nextPtd)))
-        .build();
+    // completedLink == TEMPLATING: a post-hook just finished.
+    return onPostHookLinkCompleted(ambiance, ptd, responseDataMap);
   }
 
   // Chain end: finalize after all links complete.
@@ -263,107 +264,12 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
     return new ArrayList<>(hooks.getHookMetadataMap().values());
   }
 
-  private AsyncChainExecutableResponse submitTemplatingOrSkip(
-      Ambiance ambiance, TemplatingStepParameters stepParameters, Map<String, String> postHookLogKeys) {
-    if (!willRunTemplating(ambiance)) {
-      return buildSkippedTemplatingChainResponse(postHookLogKeys);
-    }
-
-    String manifestType =
-        cdStepsExpressionResolver.renderValue(ambiance, SERVICE_OUTPUT_MANIFESTS_PRIMARY_TYPE_EXP, true);
-    String templateYaml = deployTemplateFetchHelper.getTemplatingTemplateYamlContent(manifestType, ambiance);
-
-    String callbackId;
-    StageInfraDetails stageInfraDetails = commonAbstractStepUtils.getStageInfra(ambiance);
-    StageInfraDetails.Type stageInfraType = stageInfraDetails.getType();
-    String logKey = RunnerRequestBuilder.generateLogKey(ambiance, COMMAND_UNIT_TEMPLATING);
-
-    if (stageInfraType == StageInfraDetails.Type.K8 || stageInfraType.name().equals("K8")) {
-      String completeStepId =
-          CIStepGroupUtils.getUniqueStepIdentifier(ambiance.getLevelsList(), stepParameters.getId());
-      callbackId = runnerSubmitTaskUtils.submitK8sTask(ambiance, completeStepId, stepParameters.getEnvVars(),
-          templateYaml, (K8StageInfraDetails) stageInfraDetails, logKey, new HashMap<>(), new ArrayList<>());
-    } else {
-      callbackId = runnerSubmitTaskUtils.submitTaskByTemplate(ambiance, COMMAND_UNIT_TEMPLATING,
-          stepParameters.getEnvVars(), templateYaml, new ArrayList<>(), new HashMap<>());
-    }
-
-    TemplatingStepPassThroughData ptd = TemplatingStepPassThroughData.builder()
-                                            .completedLink(ChainLink.PRE_HOOKS)
-                                            .templatingSkipped(false)
-                                            .postHookLogKeys(postHookLogKeys)
-                                            .build();
-
-    return AsyncChainExecutableResponse.newBuilder()
-        .setChainEnd(false)
-        .addCallbackIds(callbackId)
-        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
-        .build();
-  }
-
-  private AsyncChainExecutableResponse buildSkippedTemplatingChainResponse(Map<String, String> postHookLogKeys) {
-    TemplatingStepPassThroughData ptd = TemplatingStepPassThroughData.builder()
-                                            .completedLink(ChainLink.PRE_HOOKS)
-                                            .templatingSkipped(true)
-                                            .postHookLogKeys(postHookLogKeys)
-                                            .build();
-    return AsyncChainExecutableResponse.newBuilder()
-        .setChainEnd(false)
-        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
-        .build();
-  }
-
-  private AsyncChainExecutableResponse submitPostHooks(Ambiance ambiance, List<Map<String, String>> outputVarsList,
-      Map<String, String> postHookLogKeys, boolean templatingSkipped) {
-    Map<String, String> mergedOutputVars = new HashMap<>();
+  private Map<String, String> mergeOutputVars(List<Map<String, String>> outputVarsList) {
+    Map<String, String> merged = new HashMap<>();
     if (isNotEmpty(outputVarsList)) {
-      outputVarsList.forEach(mergedOutputVars::putAll);
+      outputVarsList.forEach(merged::putAll);
     }
-
-    TemplatingStepPassThroughData ptd = TemplatingStepPassThroughData.builder()
-                                            .completedLink(ChainLink.TEMPLATING)
-                                            .templatingSkipped(templatingSkipped)
-                                            .outputVars(mergedOutputVars)
-                                            .build();
-
-    OptionalSweepingOutput postHooksOpt =
-        serviceStepSweepingOutputHelper.fetchPostTemplateHooksSweepingOutput(ambiance);
-    if (!postHooksOpt.isFound()) {
-      // No post-hooks: skip straight to the terminal link with no callbacks.
-      return AsyncChainExecutableResponse.newBuilder()
-          .setChainEnd(false)
-          .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
-          .build();
-    }
-
-    ServiceHooksSweepingOutput postHooks = (ServiceHooksSweepingOutput) postHooksOpt.getOutput();
-    if (isEmpty(postHooks.getHookMetadataMap())) {
-      return AsyncChainExecutableResponse.newBuilder()
-          .setChainEnd(false)
-          .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
-          .build();
-    }
-
-    List<String> callbackIds = new ArrayList<>();
-
-    for (ServiceHookMetadata hookMetadata : postHooks.getHookMetadataMap().values()) {
-      // Use the logKey pre-computed in startChainLinkAfterRbac so K8 task submission and the
-      // already-registered UI log tab both point at the same key.
-      String logKey = postHookLogKeys != null ? postHookLogKeys.get(hookMetadata.getStepId()) : null;
-      String callbackId =
-          serviceHookTaskHelper.submitHookTask(ambiance, hookMetadata, postHooks.getEnvVars(), new HashMap<>(), logKey);
-      if (isNotEmpty(callbackId)) {
-        callbackIds.add(callbackId);
-      }
-    }
-
-    // chainEnd=false so executeNextLink receives the full response map for all hooks,
-    // allowing every hook failure to be inspected (not just iterator().next()).
-    return AsyncChainExecutableResponse.newBuilder()
-        .setChainEnd(false)
-        .addAllCallbackIds(callbackIds)
-        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
-        .build();
+    return merged;
   }
 
   private void handleHookResponses(Ambiance ambiance, Map<String, ResponseData> responseDataMap, String phase) {
@@ -522,5 +428,227 @@ public class TemplatingStep implements AsyncChainExecutableWithRbac<TemplatingSt
       }
     }
     return outputVars;
+  }
+
+  /**
+   * Called when all pre-hooks are done (or there were none). Submits templating if it will run,
+   * otherwise submits the first post-hook (or signals chain end if no post-hooks either).
+   * When called from startChainLinkAfterRbac, logKeys/units were already added to the builder.
+   */
+  private AsyncChainExecutableResponse submitTemplatingOrPostHooks(Ambiance ambiance,
+      TemplatingStepParameters stepParameters, List<ServiceHookMetadata> postHookList,
+      ServiceHooksSweepingOutput postHooks, Map<String, String> postHookLogKeys,
+      AsyncChainExecutableResponse.Builder builder) {
+    if (willRunTemplating(ambiance)) {
+      String manifestType =
+          cdStepsExpressionResolver.renderValue(ambiance, SERVICE_OUTPUT_MANIFESTS_PRIMARY_TYPE_EXP, true);
+      String templateYaml = deployTemplateFetchHelper.getTemplatingTemplateYamlContent(manifestType, ambiance);
+      String logKey = RunnerRequestBuilder.generateLogKey(ambiance, COMMAND_UNIT_TEMPLATING);
+
+      StageInfraDetails stageInfraDetails = commonAbstractStepUtils.getStageInfra(ambiance);
+      StageInfraDetails.Type stageInfraType = stageInfraDetails.getType();
+
+      String callbackId;
+      if (stageInfraType == StageInfraDetails.Type.K8 || stageInfraType.name().equals("K8")) {
+        String completeStepId =
+            CIStepGroupUtils.getUniqueStepIdentifier(ambiance.getLevelsList(), stepParameters.getId());
+        callbackId = runnerSubmitTaskUtils.submitK8sTask(ambiance, completeStepId, stepParameters.getEnvVars(),
+            templateYaml, (K8StageInfraDetails) stageInfraDetails, logKey, new HashMap<>(), new ArrayList<>());
+      } else {
+        callbackId = runnerSubmitTaskUtils.submitTaskByTemplate(ambiance, COMMAND_UNIT_TEMPLATING,
+            stepParameters.getEnvVars(), templateYaml, new ArrayList<>(), new HashMap<>());
+      }
+
+      TemplatingStepPassThroughData ptd = TemplatingStepPassThroughData.builder()
+                                              .completedLink(ChainLink.PRE_HOOKS)
+                                              .templatingSkipped(false)
+                                              .pendingPostHooks(new ArrayList<>(postHookList))
+                                              .postHookLogKeys(isNotEmpty(postHookLogKeys) ? postHookLogKeys : null)
+                                              .build();
+      builder.setChainEnd(false).setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)));
+      if (isNotEmpty(callbackId)) {
+        builder.addCallbackIds(callbackId);
+      }
+      return builder.build();
+    }
+
+    // Templating skipped — go directly to post-hooks if any.
+    if (isNotEmpty(postHookList)) {
+      ServiceHookMetadata first = postHookList.get(0);
+      List<ServiceHookMetadata> remaining = postHookList.subList(1, postHookList.size());
+      String logKey = postHookLogKeys != null ? postHookLogKeys.get(first.getStepId()) : null;
+
+      ServiceHooksSweepingOutput resolvedPostHooks = postHooks != null
+          ? postHooks
+          : (ServiceHooksSweepingOutput) serviceStepSweepingOutputHelper.fetchPostTemplateHooksSweepingOutput(ambiance)
+                .getOutput();
+      String callbackId = serviceHookTaskHelper.submitHookTask(
+          ambiance, first, resolvedPostHooks.getEnvVars(), new HashMap<>(), logKey);
+
+      TemplatingStepPassThroughData ptd = TemplatingStepPassThroughData.builder()
+                                              .completedLink(ChainLink.TEMPLATING)
+                                              .templatingSkipped(true)
+                                              .pendingPostHooks(new ArrayList<>(remaining))
+                                              .postHookLogKeys(isNotEmpty(postHookLogKeys) ? postHookLogKeys : null)
+                                              .build();
+      builder.setChainEnd(false).setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)));
+      if (isNotEmpty(callbackId)) {
+        builder.addCallbackIds(callbackId);
+      }
+      return builder.build();
+    }
+
+    // Templating skipped, no post-hooks — chain end.
+    TemplatingStepPassThroughData ptd =
+        TemplatingStepPassThroughData.builder().completedLink(ChainLink.POST_HOOKS).templatingSkipped(true).build();
+    return builder.setChainEnd(true)
+        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptd)))
+        .build();
+  }
+
+  /**
+   * A pre-hook (either the initial one, or one submitted from a previous call to this method) just
+   * finished. Submits the next pending pre-hook if any; otherwise moves on to templating, or
+   * straight to post-hooks if templating is skipped.
+   */
+  private AsyncChainExecutableResponse onPreHookLinkCompleted(Ambiance ambiance,
+      TemplatingStepParameters stepParameters, TemplatingStepPassThroughData ptd,
+      Map<String, ResponseData> responseDataMap) {
+    handleHookResponses(ambiance, responseDataMap, "pre-template");
+    List<ServiceHookMetadata> pendingPreHooks = ptd != null ? ptd.getPendingPreHooks() : null;
+    List<ServiceHookMetadata> pendingPostHooks = ptd != null ? ptd.getPendingPostHooks() : null;
+    Map<String, String> savedPostHookLogKeys = ptd != null ? ptd.getPostHookLogKeys() : null;
+
+    if (isNotEmpty(pendingPreHooks)) {
+      // More pre-hooks to run — submit the next one.
+      ServiceHooksSweepingOutput preHooks =
+          resolveHooksOutput(serviceStepSweepingOutputHelper.fetchPreTemplateHooksSweepingOutput(ambiance));
+
+      TemplatingStepPassThroughDataBuilder ptdBuilder = TemplatingStepPassThroughData.builder()
+                                                            .pendingPostHooks(pendingPostHooks)
+                                                            .postHookLogKeys(savedPostHookLogKeys);
+
+      return submitNextHook(ambiance, pendingPreHooks, preHooks.getEnvVars(),
+          stepId
+          -> RunnerRequestBuilder.generateLogKey(ambiance, stepId),
+          ptdBuilder, true, AsyncChainExecutableResponse.newBuilder());
+    }
+
+    // All pre-hooks done — move to templating (or post-hooks if templating is skipped).
+    ServiceHooksSweepingOutput postHooks =
+        resolveHooksOutput(serviceStepSweepingOutputHelper.fetchPostTemplateHooksSweepingOutput(ambiance));
+    List<ServiceHookMetadata> resolvedPostHooks = pendingPostHooks != null ? pendingPostHooks : toHookList(postHooks);
+    return submitTemplatingOrPostHooks(ambiance, stepParameters, resolvedPostHooks, postHooks, savedPostHookLogKeys,
+        AsyncChainExecutableResponse.newBuilder());
+  }
+
+  /**
+   * Templating just finished. Parses its output vars (unless templating was skipped), then submits
+   * the first post-hook if any; otherwise signals chain end.
+   */
+  private AsyncChainExecutableResponse onTemplatingLinkCompleted(
+      Ambiance ambiance, TemplatingStepPassThroughData ptd, Map<String, ResponseData> responseDataMap) {
+    List<Map<String, String>> outputVars = new ArrayList<>();
+    if (!ptd.isTemplatingSkipped()) {
+      outputVars = handleTemplatingResponse(ambiance, responseDataMap);
+    }
+    Map<String, String> mergedOutputVars = mergeOutputVars(outputVars);
+    List<ServiceHookMetadata> pendingPostHooks = ptd.getPendingPostHooks();
+
+    if (isNotEmpty(pendingPostHooks)) {
+      ServiceHooksSweepingOutput postHooks =
+          resolveHooksOutput(serviceStepSweepingOutputHelper.fetchPostTemplateHooksSweepingOutput(ambiance));
+
+      TemplatingStepPassThroughDataBuilder ptdBuilder = TemplatingStepPassThroughData.builder()
+                                                            .completedLink(ChainLink.TEMPLATING)
+                                                            .templatingSkipped(ptd.isTemplatingSkipped())
+                                                            .outputVars(mergedOutputVars)
+                                                            .postHookLogKeys(ptd.getPostHookLogKeys());
+
+      return submitNextHook(ambiance, pendingPostHooks, postHooks.getEnvVars(),
+          stepId
+          -> ptd.getPostHookLogKeys() != null ? ptd.getPostHookLogKeys().get(stepId) : null,
+          ptdBuilder, false, AsyncChainExecutableResponse.newBuilder());
+    }
+
+    // No post-hooks — signal chain end.
+    TemplatingStepPassThroughData nextPtd = TemplatingStepPassThroughData.builder()
+                                                .completedLink(ChainLink.POST_HOOKS)
+                                                .templatingSkipped(ptd.isTemplatingSkipped())
+                                                .outputVars(mergedOutputVars)
+                                                .build();
+    return AsyncChainExecutableResponse.newBuilder()
+        .setChainEnd(true)
+        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(nextPtd)))
+        .build();
+  }
+
+  /**
+   * A post-hook just finished. Submits the next pending post-hook if any; otherwise signals chain end.
+   */
+  private AsyncChainExecutableResponse onPostHookLinkCompleted(
+      Ambiance ambiance, TemplatingStepPassThroughData ptd, Map<String, ResponseData> responseDataMap) {
+    handleHookResponses(ambiance, responseDataMap, "post-template");
+    List<ServiceHookMetadata> pendingPostHooks = ptd.getPendingPostHooks();
+
+    if (isNotEmpty(pendingPostHooks)) {
+      ServiceHooksSweepingOutput postHooks =
+          (ServiceHooksSweepingOutput) serviceStepSweepingOutputHelper.fetchPostTemplateHooksSweepingOutput(ambiance)
+              .getOutput();
+      TemplatingStepPassThroughDataBuilder ptdBuilder = TemplatingStepPassThroughData.builder()
+                                                            .completedLink(ChainLink.TEMPLATING)
+                                                            .templatingSkipped(ptd.isTemplatingSkipped())
+                                                            .outputVars(ptd.getOutputVars())
+                                                            .postHookLogKeys(ptd.getPostHookLogKeys());
+
+      return submitNextHook(ambiance, pendingPostHooks, postHooks.getEnvVars(),
+          stepId
+          -> ptd.getPostHookLogKeys() != null ? ptd.getPostHookLogKeys().get(stepId) : null,
+          ptdBuilder, false, AsyncChainExecutableResponse.newBuilder());
+    }
+
+    // All post-hooks done — signal chain end.
+    TemplatingStepPassThroughData nextPtd = TemplatingStepPassThroughData.builder()
+                                                .completedLink(ChainLink.POST_HOOKS)
+                                                .templatingSkipped(ptd.isTemplatingSkipped())
+                                                .outputVars(ptd.getOutputVars())
+                                                .build();
+
+    return AsyncChainExecutableResponse.newBuilder()
+        .setChainEnd(true)
+        .setPassThroughData(ByteString.copyFrom(RecastOrchestrationUtils.toBytes(nextPtd)))
+        .build();
+  }
+
+  /**
+   * Submits the head of a hook queue, pops it off, stamps the remaining queue onto the supplied
+   * (partially built) TemplatingStepPassThroughData builder, and wraps everything into an
+   * AsyncChainExecutableResponse with the callback ID attached if present.
+   *
+   * @param isPreHook true to stash the remaining queue as pendingPreHooks, false for pendingPostHooks
+   * @param responseBuilder an existing builder to reuse (e.g. one that already has logKeys/units set),
+   *                        or a fresh AsyncChainExecutableResponse.newBuilder()
+   */
+  private AsyncChainExecutableResponse submitNextHook(Ambiance ambiance, List<ServiceHookMetadata> pending,
+      ParameterField<Map<String, ParameterField<JsonNode>>> envVars, Function<String, String> logKeyResolver,
+      TemplatingStepPassThroughDataBuilder ptdBuilder, boolean isPreHook,
+      AsyncChainExecutableResponse.Builder responseBuilder) {
+    ServiceHookMetadata next = pending.get(0);
+    List<ServiceHookMetadata> remaining = pending.subList(1, pending.size());
+    String logKey = logKeyResolver.apply(next.getStepId());
+    String callbackId = serviceHookTaskHelper.submitHookTask(ambiance, next, envVars, new HashMap<>(), logKey);
+
+    if (isPreHook) {
+      ptdBuilder.pendingPreHooks(new ArrayList<>(remaining));
+    } else {
+      ptdBuilder.pendingPostHooks(new ArrayList<>(remaining));
+    }
+
+    responseBuilder.setChainEnd(false).setPassThroughData(
+        ByteString.copyFrom(RecastOrchestrationUtils.toBytes(ptdBuilder.build())));
+    if (isNotEmpty(callbackId)) {
+      responseBuilder.addCallbackIds(callbackId);
+    }
+    return responseBuilder.build();
   }
 }
