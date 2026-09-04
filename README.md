@@ -10,3 +10,12 @@ Static snapshot of four Harness Core service trees for [idp-catalog-info-org](ht
 | `idp-service/` | `idp-service/` |
 
 Not a buildable checkout. Last-week commits and PRs from `harness-core` are replayed here as GitHub history only.
+
+## Catalog owners
+
+| Entity | Owner |
+|--------|--------|
+| pipeline-service | group:pipeline |
+| ng-manager | group:platform |
+| ci-manager | group:ci |
+| idp-service | group:idp |
