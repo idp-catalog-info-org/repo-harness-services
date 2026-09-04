@@ -11,6 +11,7 @@ import static io.harness.idp.configmanager.events.appconfigs.AppConfigCreateEven
 import static io.harness.idp.configmanager.events.appconfigs.AppConfigUpdateEvent.APP_CONFIG_UPDATED;
 import static io.harness.idp.configmanager.events.plugin.PluginDisableEvent.PLUGIN_DISABLED;
 import static io.harness.idp.k8s.constants.K8sConstants.BACKSTAGE_SECRET;
+import static io.harness.rule.OwnerRule.ARYA;
 import static io.harness.rule.OwnerRule.DEVESH;
 import static io.harness.rule.OwnerRule.VIGNESWARA;
 import static io.harness.rule.OwnerRule.VIKYATH_HAREKAL;
@@ -414,6 +415,47 @@ public class ConfigManagerServiceImplTest extends CategoryTest {
     AppConfig appConfig = new AppConfig();
     appConfig.setConfigId(CUSTOM_PLUGIN_ID1);
     appConfig.setConfigs(CUSTOM_PLUGIN_CONFIG_VALUE);
+    configManagerServiceImpl.validateProxyEndpointsForPlugin(
+        appConfig, TEST_ACCOUNT_IDENTIFIER, TEST_PLUGIN_CONFIG_TYPE);
+  }
+
+  @Test
+  @Owner(developers = ARYA)
+  @Category(UnitTests.class)
+  public void testValidateProxyEndpointsRejectsCloudMetadataTarget() {
+    // IDP-10919: the Synack payload must not reach Mongo. Guards the wiring, ProxyTargetValidatorTest covers policy.
+    AppConfig appConfig = new AppConfig();
+    appConfig.setConfigId(Constants.HARNESS_PROXY);
+    appConfig.setConfigs("proxy:\n"
+        + "  endpoints:\n"
+        + "    /ssrf-canary:\n"
+        + "      target: http://metadata.google.internal\n"
+        + "      headers:\n"
+        + "        Metadata-Flavor: Google\n");
+
+    try {
+      configManagerServiceImpl.validateProxyEndpointsForPlugin(
+          appConfig, TEST_ACCOUNT_IDENTIFIER, TEST_PLUGIN_CONFIG_TYPE);
+      fail("Expected the cloud metadata proxy target to be rejected");
+    } catch (InvalidRequestException e) {
+      assertTrue(e.getMessage().contains("/ssrf-canary"));
+    }
+  }
+
+  @Test
+  @Owner(developers = ARYA)
+  @Category(UnitTests.class)
+  public void testValidateProxyEndpointsAllowsPublicTarget() {
+    when(appConfigRepository.findAllByAccountIdentifierAndConfigTypeAndEnabled(
+             TEST_ACCOUNT_IDENTIFIER, ConfigType.PLUGIN, true))
+        .thenReturn(Collections.emptyList());
+    AppConfig appConfig = new AppConfig();
+    appConfig.setConfigId(Constants.HARNESS_PROXY);
+    appConfig.setConfigs("proxy:\n"
+        + "  endpoints:\n"
+        + "    /jira/api:\n"
+        + "      target: https://jira.corp.customer.com\n");
+
     configManagerServiceImpl.validateProxyEndpointsForPlugin(
         appConfig, TEST_ACCOUNT_IDENTIFIER, TEST_PLUGIN_CONFIG_TYPE);
   }

@@ -15,5 +15,6 @@ java_library(
         "//idp-service/src/main/java/io/harness/idp/common:module",
         "@maven//:com_google_cloud_google_cloud_storage",
         "@maven//:com_networknt_json_schema_validator",
+        "@maven//:com_squareup_okhttp3_okhttp",
     ],
 )
