@@ -7,6 +7,7 @@
 
 package io.harness.ng.servicediscovery;
 
+import io.harness.ng.core.infrastructure.services.DiscoveryOrchestrator;
 import io.harness.ng.k8sinlinemanifest.K8sInlineManifestService;
 import io.harness.ng.k8sinlinemanifest.K8sInlineManifestServiceImpl;
 
@@ -26,5 +27,6 @@ public class ServiceDiscoveryModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(K8sInlineManifestService.class).to(K8sInlineManifestServiceImpl.class);
+    bind(DiscoveryOrchestrator.class).to(DiscoveryOrchestratorImpl.class);
   }
 }
