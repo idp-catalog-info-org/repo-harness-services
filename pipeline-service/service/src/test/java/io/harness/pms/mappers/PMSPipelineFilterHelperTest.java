@@ -21,6 +21,7 @@ import io.harness.ng.core.common.beans.NGTag;
 import io.harness.pms.pipeline.PipelineEntity;
 import io.harness.pms.pipeline.PipelineEntity.PipelineEntityKeys;
 import io.harness.pms.pipeline.filters.PMSPipelineFilterHelper;
+import io.harness.pms.yaml.HarnessYamlVersion;
 import io.harness.rule.Owner;
 
 import java.util.ArrayList;
@@ -56,6 +57,117 @@ public class PMSPipelineFilterHelperTest extends CategoryTest {
     for (String field : fieldsToBeUpdated) {
       assertThat(true).isEqualTo(PMSPipelineFilterHelper.getUpdateOperations(pipelineEntity, 0L).modifies(field));
     }
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchDescriptionOmitted() {
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(PipelineEntity.builder().build(), 0L);
+
+    assertThat(update.modifies(PipelineEntityKeys.description)).isFalse();
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchDescriptionCleared() {
+    PipelineEntity oldEntity = PipelineEntity.builder().description("old description").build();
+    PipelineEntity fieldsToUpdate =
+        PipelineEntity.builder().description("").harnessVersion(HarnessYamlVersion.V1).build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 10L);
+    Document unsetObject = (Document) update.getUpdateObject().get("$unset");
+    PipelineEntity updatedEntity =
+        PMSPipelineFilterHelper.updateFieldsInDBEntryForPatch(oldEntity, fieldsToUpdate, 10L);
+
+    assertThat(unsetObject).containsKey(PipelineEntityKeys.description);
+    assertThat(updatedEntity.getDescription()).isNull();
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchDescriptionClearIgnoredForV0() {
+    PipelineEntity oldEntity = PipelineEntity.builder().description("old description").build();
+    // No harnessVersion set -> defaults to V0, where clearing via empty-string is not a supported concept.
+    PipelineEntity fieldsToUpdate = PipelineEntity.builder().description("").build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 10L);
+    PipelineEntity updatedEntity =
+        PMSPipelineFilterHelper.updateFieldsInDBEntryForPatch(oldEntity, fieldsToUpdate, 10L);
+
+    assertThat(update.modifies(PipelineEntityKeys.description)).isFalse();
+    assertThat(updatedEntity.getDescription()).isEqualTo("old description");
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchDescriptionUpdated() {
+    PipelineEntity fieldsToUpdate = PipelineEntity.builder().description("new description").build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 0L);
+    Document setObject = (Document) update.getUpdateObject().get("$set");
+
+    assertThat(setObject).containsEntry(PipelineEntityKeys.description, "new description");
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchTagsOmitted() {
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(PipelineEntity.builder().build(), 0L);
+
+    assertThat(update.modifies(PipelineEntityKeys.tags)).isFalse();
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchTagsCleared() {
+    PipelineEntity oldEntity =
+        PipelineEntity.builder().tags(Collections.singletonList(NGTag.builder().key("k").value("v").build())).build();
+    PipelineEntity fieldsToUpdate =
+        PipelineEntity.builder().tags(Collections.emptyList()).harnessVersion(HarnessYamlVersion.V1).build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 10L);
+    Document unsetObject = (Document) update.getUpdateObject().get("$unset");
+    PipelineEntity updatedEntity =
+        PMSPipelineFilterHelper.updateFieldsInDBEntryForPatch(oldEntity, fieldsToUpdate, 10L);
+
+    assertThat(unsetObject).containsKey(PipelineEntityKeys.tags);
+    assertThat(updatedEntity.getTags()).isNull();
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchTagsClearIgnoredForV0() {
+    List<NGTag> existingTags = Collections.singletonList(NGTag.builder().key("k").value("v").build());
+    PipelineEntity oldEntity = PipelineEntity.builder().tags(existingTags).build();
+    // No harnessVersion set -> defaults to V0, where clearing via an empty list is not a supported concept.
+    PipelineEntity fieldsToUpdate = PipelineEntity.builder().tags(Collections.emptyList()).build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 10L);
+    PipelineEntity updatedEntity =
+        PMSPipelineFilterHelper.updateFieldsInDBEntryForPatch(oldEntity, fieldsToUpdate, 10L);
+
+    assertThat(update.modifies(PipelineEntityKeys.tags)).isFalse();
+    assertThat(updatedEntity.getTags()).isEqualTo(existingTags);
+  }
+
+  @Test
+  @Owner(developers = NAMAN)
+  @Category(UnitTests.class)
+  public void testPatchTagsUpdated() {
+    List<NGTag> newTags = Collections.singletonList(NGTag.builder().key("k").value("v").build());
+    PipelineEntity fieldsToUpdate = PipelineEntity.builder().tags(newTags).build();
+
+    Update update = PMSPipelineFilterHelper.getUpdateOperationsForPatch(fieldsToUpdate, 0L);
+    Document setObject = (Document) update.getUpdateObject().get("$set");
+
+    assertThat(setObject).containsEntry(PipelineEntityKeys.tags, newTags);
   }
 
   @Test

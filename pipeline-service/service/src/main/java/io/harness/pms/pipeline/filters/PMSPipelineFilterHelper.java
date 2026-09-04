@@ -17,6 +17,7 @@ import io.harness.gitsync.beans.StoreType;
 import io.harness.pms.pipeline.PipelineEntity;
 import io.harness.pms.pipeline.PipelineEntity.PipelineEntityKeys;
 import io.harness.pms.pipeline.gitsync.PMSUpdateGitDetailsParams;
+import io.harness.pms.yaml.HarnessYamlVersion;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.data.mongodb.core.query.Update;
 public class PMSPipelineFilterHelper {
   public Update getUpdateOperationsForPatch(PipelineEntity pipelineEntity, long timestamp) {
     Update update = new Update();
-    // TODO(Shalini): Change conditions to not null check when CDS-81968 is done
+    boolean isV1 = HarnessYamlVersion.isV1(pipelineEntity.getHarnessVersion());
     if (isNotEmpty(pipelineEntity.getYaml())) {
       update.set(PipelineEntityKeys.yaml, pipelineEntity.getYaml());
     }
@@ -39,10 +40,16 @@ public class PMSPipelineFilterHelper {
     if (isNotEmpty(pipelineEntity.getName())) {
       update.set(PipelineEntityKeys.name, pipelineEntity.getName());
     }
-    if (isNotEmpty(pipelineEntity.getDescription())) {
+    // Clearing desc/tags via an explicit null/empty merge-patch value is V1-only
+    if (isV1 && pipelineEntity.getDescription() != null && pipelineEntity.getDescription().isEmpty()) {
+      update.unset(PipelineEntityKeys.description);
+    } else if (isNotEmpty(pipelineEntity.getDescription())) {
       update.set(PipelineEntityKeys.description, pipelineEntity.getDescription());
     }
-    if (isNotEmpty(pipelineEntity.getTags())) {
+
+    if (isV1 && pipelineEntity.getTags() != null && pipelineEntity.getTags().isEmpty()) {
+      update.unset(PipelineEntityKeys.tags);
+    } else if (isNotEmpty(pipelineEntity.getTags())) {
       update.set(PipelineEntityKeys.tags, pipelineEntity.getTags());
     }
     if (isNotEmpty(pipelineEntity.getFilters())) {
@@ -98,13 +105,21 @@ public class PMSPipelineFilterHelper {
 
   public PipelineEntity updateFieldsInDBEntryForPatch(
       PipelineEntity oldentityFromDB, PipelineEntity fieldsToUpdate, long timeOfUpdate) {
+    boolean isV1 = HarnessYamlVersion.isV1(fieldsToUpdate.getHarnessVersion());
     return oldentityFromDB.toBuilder()
         .yaml(isNotEmpty(fieldsToUpdate.getYaml()) ? fieldsToUpdate.getYaml() : oldentityFromDB.getYaml())
         .lastUpdatedAt(timeOfUpdate)
         .name(isNotEmpty(fieldsToUpdate.getName()) ? fieldsToUpdate.getName() : oldentityFromDB.getName())
-        .description(isNotEmpty(fieldsToUpdate.getDescription()) ? fieldsToUpdate.getDescription()
-                                                                 : oldentityFromDB.getDescription())
-        .tags(isNotEmpty(fieldsToUpdate.getTags()) ? fieldsToUpdate.getTags() : oldentityFromDB.getTags())
+        .description(isV1
+                ? (fieldsToUpdate.getDescription() != null
+                          ? (fieldsToUpdate.getDescription().isEmpty() ? null : fieldsToUpdate.getDescription())
+                          : oldentityFromDB.getDescription())
+                : (isNotEmpty(fieldsToUpdate.getDescription()) ? fieldsToUpdate.getDescription()
+                                                               : oldentityFromDB.getDescription()))
+        .tags(isV1 ? (fieldsToUpdate.getTags() != null
+                             ? (fieldsToUpdate.getTags().isEmpty() ? null : fieldsToUpdate.getTags())
+                             : oldentityFromDB.getTags())
+                   : (isNotEmpty(fieldsToUpdate.getTags()) ? fieldsToUpdate.getTags() : oldentityFromDB.getTags()))
         .filters(isNotEmpty(fieldsToUpdate.getFilters()) ? fieldsToUpdate.getFilters() : oldentityFromDB.getFilters())
         .stageCount(
             fieldsToUpdate.getStageCount() != null ? fieldsToUpdate.getStageCount() : oldentityFromDB.getStageCount())

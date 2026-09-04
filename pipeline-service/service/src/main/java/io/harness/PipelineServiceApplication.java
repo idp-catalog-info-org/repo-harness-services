@@ -194,6 +194,7 @@ import io.harness.pms.notification.orchestration.handlers.StageStartNotification
 import io.harness.pms.notification.orchestration.handlers.StageStatusUpdateNotificationEventHandler;
 import io.harness.pms.outbox.PipelineOutboxEventHandler;
 import io.harness.pms.pipeline.PipelineEntity;
+import io.harness.pms.pipeline.api.PipelinePatchRequestBodyMixin;
 import io.harness.pms.pipeline.gitsync.helper.PipelineEntityGitSyncHelper;
 import io.harness.pms.pipeline.labels.OrchestrationEndLabelsResolveHandler;
 import io.harness.pms.pipeline.observer.entity.BranchSequenceObserver;
@@ -411,6 +412,7 @@ public class PipelineServiceApplication extends Application<PipelineServiceConfi
     HObjectMapper.configureObjectMapperForNG(mapper);
     mapper.registerModule(new PmsBeansJacksonModule());
     mapper.registerModule(new PipelineServiceJacksonModule());
+    PipelinePatchRequestBodyMixin.configure(mapper);
   }
 
   @Override
