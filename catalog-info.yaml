@@ -45,3 +45,5 @@ spec:
   type: service
   lifecycle: production
   owner: group:idp
+  dependsOn:
+    - component:pipeline-service
