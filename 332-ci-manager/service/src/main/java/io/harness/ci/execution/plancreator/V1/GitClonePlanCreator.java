@@ -92,6 +92,7 @@ public class GitClonePlanCreator extends AbstractStepPlanCreatorV1 {
             .repo(codeBase.getRepoName())
             .connector(codeBase.getConnectorRef())
             .depth(codeBase.getDepth())
+            .insecure(toInsecure(codeBase.getSslVerify()))
             .id(GIT_CLONE_STEP_ID)
             .name(GIT_CLONE_STEP_NAME)
             .clonedir(codeBase.getCloneDirectory() != null && !ParameterField.isNull(codeBase.getCloneDirectory())
@@ -131,6 +132,14 @@ public class GitClonePlanCreator extends AbstractStepPlanCreatorV1 {
   @Override
   protected StepType getStepType() {
     return STEP_TYPE;
+  }
+
+  // CodeBase stores v0 sslVerify; GitCloneStepInfoV1 uses insecure (inverted).
+  protected ParameterField<Boolean> toInsecure(ParameterField<Boolean> sslVerify) {
+    if (sslVerify == null || sslVerify.getValue() == null) {
+      return ParameterField.createValueField(false);
+    }
+    return ParameterField.createValueField(!sslVerify.getValue());
   }
 
   protected Strategy toCloneStrategy(ParameterField<PRCloneStrategy> prCloneStrategy) {

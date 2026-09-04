@@ -40,6 +40,10 @@ public class GitClonePlanCreatorTest extends CategoryTest {
     public Strategy exposedToCloneStrategy(ParameterField<PRCloneStrategy> prCloneStrategy) {
       return toCloneStrategy(prCloneStrategy);
     }
+
+    public ParameterField<Boolean> exposedToInsecure(ParameterField<Boolean> sslVerify) {
+      return toInsecure(sslVerify);
+    }
   }
 
   @Before
@@ -102,5 +106,15 @@ public class GitClonePlanCreatorTest extends CategoryTest {
   public void testToCloneStrategy_returnsNullWhenUnset() {
     assertThat(gitClonePlanCreator.exposedToCloneStrategy(ParameterField.ofNull())).isNull();
     assertThat(gitClonePlanCreator.exposedToCloneStrategy(ParameterField.createValueField(null))).isNull();
+  }
+
+  @Test
+  @Owner(developers = OwnerRule.GARGI)
+  @Category(UnitTests.class)
+  public void testToInsecure_invertsSslVerify() {
+    assertThat(gitClonePlanCreator.exposedToInsecure(ParameterField.createValueField(true)).getValue()).isFalse();
+    assertThat(gitClonePlanCreator.exposedToInsecure(ParameterField.createValueField(false)).getValue()).isTrue();
+    assertThat(gitClonePlanCreator.exposedToInsecure(null).getValue()).isFalse();
+    assertThat(gitClonePlanCreator.exposedToInsecure(ParameterField.ofNull()).getValue()).isFalse();
   }
 }
