@@ -3,6 +3,9 @@ kind: Component
 metadata:
   name: pipeline-service
   description: Pipeline orchestration engine (static snapshot)
+  tags:
+    - pipeline
+    - orchestration
   annotations:
     github.com/project-slug: idp-catalog-info-org/repo-harness-services
 spec:
