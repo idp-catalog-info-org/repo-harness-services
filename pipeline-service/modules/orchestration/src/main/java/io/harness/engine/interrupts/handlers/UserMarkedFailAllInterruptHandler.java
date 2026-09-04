@@ -167,6 +167,14 @@ public class UserMarkedFailAllInterruptHandler extends InterruptPropagatorHandle
       if (StatusUtils.isFinalStatus(planExecution.getStatus())) {
         return interruptService.markProcessed(updatedInterrupt.getUuid(), PROCESSED_UNSUCCESSFULLY);
       }
+      if (isIssuedByAdviser(updatedInterrupt)) {
+        // Adviser-issued failAll interrupts fire mid-strategy, so finding no leaves is expected, not stuck
+        // don't force-fail the plan here, or the next queued node gets blocked forever.
+        log.info("No interruptible leaf nodes found for adviser-issued {} interrupt. Leaving plan status to the "
+                + "in-flight failure strategy",
+            updatedInterrupt.getType());
+        return interruptService.markProcessed(updatedInterrupt.getUuid(), PROCESSED_SUCCESSFULLY);
+      }
       // If count is 0 that means no running leaf node and hence needs to update planExecution forcefully
       planExecutionService.updateStatus(updatedInterrupt.getPlanExecutionId(), this.getStatusToBeTransitioned());
       return interruptService.markProcessed(updatedInterrupt.getUuid(), PROCESSED_SUCCESSFULLY);
@@ -224,6 +232,15 @@ public class UserMarkedFailAllInterruptHandler extends InterruptPropagatorHandle
     waitNotifyEngine.waitForAllOnInList(
         publisherName, AllInterruptCallback.builder().interrupt(updatedInterrupt).build(), notifyIds);
     return updatedInterrupt;
+  }
+
+  /**
+   * True when this interrupt was raised by an adviser (i.e. a failure strategy with failAll) rather than by a user
+   * manually marking the execution as failed.
+   */
+  private static boolean isIssuedByAdviser(Interrupt interrupt) {
+    return interrupt.getInterruptConfig() != null && interrupt.getInterruptConfig().hasIssuedBy()
+        && interrupt.getInterruptConfig().getIssuedBy().hasAdviserIssuer();
   }
 
   @Override
